@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<title>基础笔记</title>
+	<link rel="stylesheet" type="text/css" href="./css/main.css">
+</head>
+<body>
+	<h1 align="center">这是一个HTML标题</h1>
+	<h2 align="center">元素嵌套</h2>
+	<hr>
+	<div>
+		<p >这是一段文本，也可以容纳一个段落。（p标签（块级标签）</p>
+		<div class="test">div标签（块级标签）</div>
+	</div>
+	<div>
+		<span class="test2">span标签（行内标签）</span>
+	</div>
+	<span>
+		<a href="#">a标签（行内标签）</a>
+		<span>span标签（行内标签）</span>
+	</span>
+	<p>
+		<a href="http://c.biancheng.net/view/7528.html">这个一个html教程超链接</a>
+	</p>
+	
+	<h2 align="center">列表</h2>
+	<hr>
+	<h4>有序列表</h4>
+	<ol>
+		<!-- square变成原点、正方形 -->
+    	<li type="A" start="A">第一步</li>
+    	<li type="square">第二步</li>
+    	<li>第三步</li>
+    </ol>
+    <h4>无序标题</h4>
+	<ul>
+		<li>条目1：块元素可以嵌套块元素</li>
+		<li>条目2：块元素可以嵌套行内元素</li>
+		<li>条目3：行内元素可以嵌套行内元素</li>
+		<li>img 里面放图片</li>
+	</ul>
+	<h4>定义标题</h4>
+	<dl>
+    	<dt>定义标题</dt>
+    	<dd>定义描述</dd>
+    	<dd>定义描述</dd>
+    	<dd>定义描述</dd>
+	</dl>
+	<h3>菜单</h3>
+	<h2>表格</h2>
+<!-- table是表格 -->
+<!-- 一个表格只能有一个标题，也就是说 <table> 标签中只能有一个 <caption> 标签 -->
+<!-- tr表示一行，有多少tr就有多少行 -->
+<!-- rowspan和colspan合并单元格 -->
+	<table border="1" style="border-collapse: collapse;">
+		<caption>这是表格的标题</caption>
+		<tr>
+			<th>th表示表格的表头，就是表格的第一行</th>
+			<th>第二列，会加粗</th>
+			<th>性质</th>
+		</tr>
+		<tr>
+			<td>td就是表格的单元格</td>
+			<td style="width: 271px; ">数据可以是文本、图片、列表、段落、表单、水平线、表格等多种形式</td>
+			<td>这才是真正的放数据的标签</td>
+		</tr>
+		<tr>
+      		<td rowspan="2">rowspan向下合并</td>
+      		<td>不变</td>
+      		<td>问题不大</td>
+    	</tr>
+    	<tr>
+      		<td colspan="2">colspan向右合并</td>
+    	</tr>
+	</table>
+	
+	<h2 align="center">锚点链接</h2>
+	<a href="#content">content链接</a>
+	
+	<a href="#top">回到顶部</a>
+	<p>
+		<a href="./box.html">跳转到box页面</a>
+	</p>
+	
+<!-- border黑边框
+	hspace左边距 
+	vspace上下空间-->
+	<img src="../images/gd.jpg"
+		alt="说明" 
+		align="center" 
+	    width="500"
+	    height="350"
+	    border="10" 
+	    hspace="10"
+	    vspace="20" 
+	 />
+<!--注册表-->
+	<form method="post">
+		账号:<input type="text" name="user" size="10" maxlength="10"><br>
+		密码:<input type="password" name="password" size="10" maxlength="10"><br>
+		性别:男<input type="radio" name="sex">
+			女<input type="radio" name="sex"><br>
+
+		多选项:第一<input type="checkbox" name="1">
+			第二<input type="checkbox" name="2"><br>
+
+		文件域<input type="file" name="文件域的名称"><br>
+
+		文本域标签<textarea name="文本域名称" value="in" rows="5" cols="30">
+		</textarea><br>
+
+		列表菜单<select name="菜单名">
+			<option selected="selected">选项名字</option>
+			<!--selected给一个已经选中的属性-->
+			<option>又一个</option>
+		</select><br>
+
+		按钮<input type="button" name="" value="0"><br>
+		提交按钮<input type="submit" name="提交的"><br>
+		重置按钮<input type="reset" name="重来"><br>	
+	</form>
+
+<!--滚动字幕-->
+	<marquee direction="right" behavior="alternate" width="100" bgcolor="yellow" hspace="10">我是字幕</marquee>
+
+	<audio controls="controls" autoplay="autoplay" loop="" src="media/6love.mp3">您的浏览器不支持audio</audio>
+
+
+</body>
+</html>
