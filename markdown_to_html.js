@@ -4,8 +4,14 @@ const highlight = require('highlight.js');
 
 // console.log(marked.parse('I am using __markdown__.'));
 
+var my_renderer = new marked.Renderer();
+my_renderer.table = function (header, body) {
+  return `<table class="table table-hover table-bordered">${header}${body}</table>`;
+};
+
+
 marked.setOptions({
-  renderer: new marked.Renderer(),
+  renderer: my_renderer,
   gfm: true,
   tables: true,
   breaks: true,
@@ -15,9 +21,7 @@ marked.setOptions({
   highlight: function(code) {
     return highlight.highlightAuto(code).value;
   },
-  table: function (header, body) {
-    return '<table class="table table-hover table-bordered">'+header+body+'</table>';
-  },
+  
 });
 
 
