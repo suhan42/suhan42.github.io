@@ -13,8 +13,11 @@ marked.setOptions({
   smartLists: true,
   smartypants: false,
   highlight: function(code) {
-    return highlight.highlightAuto(code).value
-}
+    return highlight.highlightAuto(code).value;
+  },
+  table: function (header, body) {
+    return '<table class="table table-hover table-bordered">'+header+body+'</table>';
+  },
 });
 
 
@@ -22,7 +25,7 @@ marked.setOptions({
 
 
 //读取md
-fs.readFile('m1.md', 'utf-8', function (err, data) {
+fs.readFile('README.md', 'utf-8', function (err, data) {
   if (err) throw err;
   var lexed = marked.lexer(data);
   var html = marked.parser(lexed);

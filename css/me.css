@@ -8,6 +8,8 @@
 4. 其他属性（CSS3）：content / cursor / border-radius / box-shadow / text-shadow / background:linear-gradient …
 */
 
+
+/* wa2中使用的 */
 .ps {
 	font-size:10px;
 	line-height:10px;
@@ -24,6 +26,48 @@
 .line {
 	text-decoration: line-through;
 }
+
+
+/* 字体高亮，配合highlight使用 */
+pre {
+	background-color: #F6F8FF;
+	border-radius: 16px;
+	font-size: 16px;
+	padding: 29px 22px 22px 22px;
+	margin-top: 22px;
+	margin-bottom: 22px;
+	line-height: 1.2;
+	overflow-x: auto;
+}
+/* pre {
+	font-size: 15px;
+	padding: 10px;
+} */
+code {
+	position: relative;
+	background-color: unset !important;
+}
+
+
+/* 为了给marked转码的表格加上表格框 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* 
 body {
