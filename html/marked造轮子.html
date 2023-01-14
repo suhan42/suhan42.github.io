@@ -1,0 +1,343 @@
+<!DOCTYPE html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>marked造轮子</title><base target="_blank"><link href="../images/suhan.png" rel="icon"><link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"><link href="../vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet"><link rel="stylesheet" href="../vendor/hc-mobile-nav/hc-mobile-nav.css"><link href="../css/variables.css" rel="stylesheet"><link href="../css/main.css" rel="stylesheet"><link href="../css/me.css" rel="stylesheet"><link href="../node_modules/highlight.js/styles/github.css" rel="stylesheet" type="text/css"></head><body><header id="header" class="header d-flex align-items-center fixed-top"><div class="container-fluid container-xl d-flex align-items-center justify-content-between"><a href="../index.html" target="_self" class="logo d-flex align-items-center"><img src="../images/suhan.png" alt=""><h2>Suhan</h2></a><nav id="navbar" class="main-nav navbar"><ul><li><a href="../index.html" target="_self">Home</a></li><li><a href="#" target="_self">IT</a></li><li class="dropdown"><a href="#" target="_self"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a><ul><li><a href="#" target="_self">A - Animation</a></li><li><a href="#" target="_self">C - Comic</a></li><li><a href="#" target="_self">G - Game</a></li><li><a href="#" target="_self">N - Novel</a></li></ul></li><li><a href="../view/about.html" target="_self">About</a></li></ul></nav><div class="position-relative"><a href="#" class="mx-2"><span class="bi-twitter"></span></a><a href="#" class="mx-2"><span class="bi-instagram"></span></a><a href="#" class="mx-2 js-search-open" target="_self"><span class="bi-search"></span></a><a class="toggle"><span class="bi-list" target="_self"></span></a><div class="search-form-wrap js-search-form-wrap"><form action="" class="search-form"><span class="icon bi-search"></span><input type="text" placeholder="Search" class="form-control"><button class="btn js-search-close"><span class="bi-x"></span></button></form></div><!-- End Search Form --></div></div></header><main id="main"><section><div class="container"><div class="row"><div class="col-md-12"><h3 class="category-title">marked造轮子</h3><hr><div class="d-md-flex post-entry-1"><div><div class="post-meta"><span class="date">acg</span> <span class="mx-1">&bullet;</span><span>Sat Jan 14 2023 16:53:33 </span></div><h1 id="造轮子">造轮子</h1>
+<p>hexo固然好用，但是在使用的过程总还是有一些问题，比如</p>
+<ol>
+<li>git经常unable to access，push需要借助git desktop才能稳定。</li>
+<li>hexo虽然有很多主题，也可以设置不被渲染的html，但是你打算使用你自己写的前端。</li>
+</ol>
+<p>那么你可以看看下面的内容，尝试自己使用marked造一个小轮子（小hexo）</p>
+<h2 id="marked">marked</h2>
+<p><a href="https://github.com/markedjs/marked">marked</a>是一个JavaScript编写的全功能Markdown解析和编译器。目的是快速的编译超大块的Markdown文本而不必担心结果会出乎意料或者花费很长时间。</p>
+<p>marked最初是为Node.JS编写，现在已完全兼容客户端浏览器。</p>
+<p>新版本号称速度比 C 语言写的 Markdown 转换工具 <a href="http://www.oschina.net/p/discount">Discount</a> 还要快。</p>
+<h3 id="使用">使用</h3>
+<p>安装marked在目标文件夹下</p>
+<pre><code class="language-bash">npm install marked <span class="hljs-comment">--save</span>
+</code></pre>
+<h3 id="marked参数说明">marked参数说明</h3>
+<pre><code><span class="hljs-attribute">-o, –output [output]</span><span class="hljs-punctuation">:</span> <span class="hljs-string">指定输出文件，默认为当前控制台</span>
+<span class="hljs-attribute">-i, –input [input]</span><span class="hljs-punctuation">:</span> <span class="hljs-string">指定输入文件或最后一个参数，默认为当前控制台输入</span>
+<span class="hljs-attribute">-t, –tokens</span><span class="hljs-punctuation">:</span> <span class="hljs-string">输出token流代替HTML</span>
+<span class="hljs-attribute">–pedantic</span><span class="hljs-punctuation">:</span> <span class="hljs-string">只解析符合markdown.pl定义的，不修正markdown的错误</span>
+<span class="hljs-attribute">–gfm</span><span class="hljs-punctuation">:</span> <span class="hljs-string">启动Github样式的Markdown，参考 https://help.github.com/articles/github-flavored-markdown/</span>
+<span class="hljs-attribute">–breaks</span><span class="hljs-punctuation">:</span> <span class="hljs-string">支持Github换行符，必须打开gfm选项</span>
+<span class="hljs-attribute">–tables</span><span class="hljs-punctuation">:</span> <span class="hljs-string">支持Github表格，必须打开gfm选项</span>
+<span class="hljs-attribute">–sanitize</span><span class="hljs-punctuation">:</span> <span class="hljs-string">原始输出，忽略HTML标签</span>
+<span class="hljs-attribute">–smart-lists</span><span class="hljs-punctuation">:</span> <span class="hljs-string">优化列表输出</span>
+<span class="hljs-attribute">–lang-prefix [prefix]</span><span class="hljs-punctuation">:</span> <span class="hljs-string">设置前置样式</span>
+<span class="hljs-attribute">–no-etc</span><span class="hljs-punctuation">:</span> <span class="hljs-string">选择的反正标识</span>
+<span class="hljs-attribute">–silent</span><span class="hljs-punctuation">:</span> <span class="hljs-string">不输出错误信息</span>
+<span class="hljs-attribute">-h, –help</span><span class="hljs-punctuation">:</span> <span class="hljs-string">帮助信息</span>
+</code></pre>
+<h3 id="api使用">API使用</h3>
+<p>接下来，我通过API来调用marked解析markdown文本。</p>
+<p>新建一个脚本文件mark1.js</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">var</span> marked = require(<span class="hljs-string">&#x27;marked&#x27;</span>);
+<span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(marked.parse(<span class="hljs-string">&#x27;I am using __markdown__.&#x27;</span>));
+</code></pre>
+<p>运行脚本mark1.js。</p>
+<pre><code>&lt;<span class="hljs-selector-tag">p</span>&gt;<span class="hljs-selector-tag">I</span> am using &lt;<span class="hljs-selector-tag">strong</span>&gt;markdown&lt;/<span class="hljs-selector-tag">strong</span>&gt;.&lt;/<span class="hljs-selector-tag">p</span>&gt;
+</code></pre>
+<p>下面再用API读取md1.md的文本，进行解析，然后输出为HTML，新建mark2.js文件。</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">var</span> marked = <span class="hljs-keyword">require</span>(<span class="hljs-string">&#x27;marked&#x27;</span>);
+<span class="hljs-keyword">var</span> fs = <span class="hljs-keyword">require</span>(<span class="hljs-string">&quot;fs&quot;</span>);  <span class="hljs-comment">//读取md文件内容</span>
+
+<span class="hljs-comment">// console.log(marked.parse(&#x27;I am using __markdown__.&#x27;));</span>
+
+marked.<span class="hljs-title function_ invoke__">setOptions</span>({
+  <span class="hljs-attr">renderer</span>: <span class="hljs-keyword">new</span> marked.<span class="hljs-title function_ invoke__">Renderer</span>(),
+  <span class="hljs-attr">gfm</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">tables</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">breaks</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">pedantic</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">smartLists</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">smartypants</span>: <span class="hljs-literal">false</span>
+});
+
+<span class="hljs-comment">//读取md</span>
+fs.<span class="hljs-title function_ invoke__">readFile</span>(<span class="hljs-string">&#x27;m1.md&#x27;</span>, <span class="hljs-string">&#x27;utf-8&#x27;</span>, function (err, data) {
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+  <span class="hljs-keyword">var</span> lexed = marked.<span class="hljs-title function_ invoke__">lexer</span>(data);
+  <span class="hljs-keyword">var</span> html = marked.<span class="hljs-title function_ invoke__">parser</span>(lexed);
+
+  <span class="hljs-comment">//创建文件，并写入html</span>
+  fs.<span class="hljs-title function_ invoke__">writeFile</span>(<span class="hljs-string">&#x27;md1.html&#x27;</span>, html, function(err) {
+    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+    console.<span class="hljs-title function_ invoke__">log</span>(<span class="hljs-string">&quot;数据写入成功！&quot;</span>);
+  });
+});
+</code></pre>
+<p>运行之后，就会在该目录下生成一个md1.html文件，其中的内容就是m1.md的内容转码为html后的样子。</p>
+<h3 id="自定义渲染">自定义渲染</h3>
+<p>自定义渲染选项允许你以自定义的方式渲染内容，并把之前的规则设置覆盖掉。</p>
+<p>块级标签支持以下渲染：</p>
+<ul>
+<li>code(string code, string language)</li>
+<li>blockquote(string quote)</li>
+<li>html(string html)</li>
+<li>heading(string text, number level)</li>
+<li>hr()</li>
+<li>list(string body, boolean ordered)</li>
+<li>listitem(string text)</li>
+<li>paragraph(string text)</li>
+<li>table(string header, string body)</li>
+<li>tablerow(string content)</li>
+<li>tablecell(string content, object flags)</li>
+</ul>
+<p>行级标签支持以下渲染：</p>
+<ul>
+<li>strong(string text)</li>
+<li>em(string text)</li>
+<li>codespan(string code)</li>
+<li>br()</li>
+<li>del(string text)</li>
+<li>link(string href, string title, string text)</li>
+<li>image(string href, string title, string text)</li>
+</ul>
+<p>例如</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// 添加自定义渲染</span>
+<span class="hljs-keyword">var</span> my_renderer = <span class="hljs-keyword">new</span> marked.<span class="hljs-title function_ invoke__">Renderer</span>()
+my_renderer.link = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">href, title, text</span>) </span>{
+    <span class="hljs-keyword">return</span> `&lt;a href=<span class="hljs-string">&quot;${href}&quot;</span> title=<span class="hljs-string">&quot;${title || text}&quot;</span> target=<span class="hljs-string">&quot;_blank&quot;</span>&gt;${text}&lt;/a&gt;`
+}
+
+    <span class="hljs-comment">//表格下面两个返回方式的结果不一样，个人更喜欢后者</span>
+my_renderer.table = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">header, body</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&lt;table class=&quot;table table-striped&quot;&gt;&#x27;</span>+header+body+<span class="hljs-string">&#x27;&lt;/table&gt;&#x27;</span>
+    <span class="hljs-comment">//return `&lt;table class=&quot;table table-hover table-bordered&quot;&gt;${header}${body}&lt;/table&gt;`;</span>
+}
+
+marked.<span class="hljs-title function_ invoke__">setOptions</span>({ 
+  <span class="hljs-attr">renderer</span>: my_renderer,	//自定义
+  <span class="hljs-attr">gfm</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">tables</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">breaks</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">pedantic</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">smartLists</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">smartypants</span>: <span class="hljs-literal">false</span>,
+})
+</code></pre>
+<h3 id="出现问题">出现问题</h3>
+<blockquote>
+<h5 id="uncaught-typeerror-typeerror-marked-is-not-a-function">Uncaught TypeError TypeError: marked is not a function</h5>
+<p>解决方案：修改使用方法</p>
+<pre><code class="language-javascript"><span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(marked(<span class="hljs-string">&#x27;I am using __markdown__.&#x27;</span>));
+
+<span class="hljs-comment">//改为</span>
+<span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(marked.parse(<span class="hljs-string">&#x27;I am using __markdown__.&#x27;</span>));
+</code></pre>
+</blockquote>
+<blockquote>
+<h5 id="sanitize-and-sanitizer-parameters-are-deprecated-since-version-070-should-not-be-used-and-will-be-removed-in-the-future-read-more-here-httpsmarkedjsorgusing_advancedmdoptions">sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: <a href="https://marked.js.org/#/USING_ADVANCED.md#options">https://marked.js.org/#/USING_ADVANCED.md#options</a></h5>
+<p>解决方案：sanitize被弃用了，在setOptions中删去sanitize设置</p>
+</blockquote>
+<p>中文资料很少，可以看看下面这些。但是下面这些也是之前的文章了，现在marked已经发生了很多变化，所以还是建议看最新的官方文档。当然我这篇也可以满足基本使用了（笑）。</p>
+<p><a href="https://blog.csdn.net/fens/article/details/84634655">Marked高效的Markdown解析器_Fens的博客</a></p>
+<p><a href="https://cloud.tencent.com/developer/article/1961057">使用marked解析markdown为html</a></p>
+<h2 id="highlightjs">highlight.js</h2>
+<p>代码高亮的库选用的是highlight.js</p>
+<pre><code class="language-bash">npm <span class="hljs-keyword">install </span>highlight.<span class="hljs-keyword">js </span>--save
+</code></pre>
+<p>把highlight加入到js里面</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> highlight = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;highlight.js&#x27;</span>)
+
+marked.<span class="hljs-title function_">setOptions</span>({
+    <span class="hljs-attr">highlight</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">code</span>) {
+        <span class="hljs-keyword">return</span> highlight.<span class="hljs-title function_">highlightAuto</span>(code).<span class="hljs-property">value</span>
+    }
+})
+</code></pre>
+<p>同时，在生成的html中引用highlight中对应的css就可以了。</p>
+<pre><code class="language-html">&lt;link <span class="hljs-attribute">href</span>=<span class="hljs-string">&quot;node_modules/highlight.js/styles/github.css&quot;</span> <span class="hljs-attribute">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attribute">type</span>=<span class="hljs-string">&quot;text/css&quot;</span>&gt;
+</code></pre>
+<p>再写一个code的css外框</p>
+<pre><code class="language-css">pre {
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#F6F8FF</span>;
+    <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">16px</span>;
+    <span class="hljs-attribute">font-size</span>: <span class="hljs-number">16px</span>;
+    <span class="hljs-attribute">padding</span>: <span class="hljs-number">29px</span> <span class="hljs-number">22px</span> <span class="hljs-number">22px</span> <span class="hljs-number">22px</span>;
+    <span class="hljs-attribute">margin-top</span>: <span class="hljs-number">22px</span>;
+    <span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">22px</span>;
+    <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.2</span>;
+    <span class="hljs-attribute">overflow-x</span>: auto;
+}
+<span class="hljs-selector-tag">code</span> {
+    <span class="hljs-attribute">position</span>: relative;
+    <span class="hljs-attribute">background-color</span>: unset <span class="hljs-meta">!important</span>;
+}
+</code></pre>
+<p>大功告成</p>
+<h2 id="完善网页和渲染">完善网页和渲染</h2>
+<p>需要添加的功能：</p>
+<ul>
+<li>加上header与footer进行渲染</li>
+<li>获取一个文件夹的md文件进行批量转码，获取文件名当作title</li>
+<li>添加文件修改时间</li>
+<li>对比html内容，不一致再进行html的生成，一直则不需要生成</li>
+<li>home（index）页面根据html文件数量，修改home页面的预览。在<code>home.js</code><br>使用js读取本地文件并将内容展示到页面<ul>
+<li>这里的文本预览只能获取html的第一个<code>&lt;P&gt;</code>标签。（等待完善）</li>
+</ul>
+</li>
+<li>home页面分页</li>
+<li>tag功能</li>
+</ul>
+<p>这个时候已经可以把markdown转码为html并新建文件进行存储了，而且也有了代码高亮。但是网页只有markdown的内容，并没有header和footer，这不是一个完整的网页。</p>
+<p>所以我们这时候就可以设计一个自己想要的完整的网页，并预留出post div来存放markdown的内容，实现<code>hexo generate</code>把markdown渲染成html的功能。</p>
+<h3 id="加上header与footer进行渲染">加上header与footer进行渲染</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">var</span> marked = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;marked&#x27;</span>);
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;fs&quot;</span>); <span class="hljs-comment">//读取md文件内容</span>
+<span class="hljs-keyword">const</span> highlight = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;highlight.js&#x27;</span>);
+
+<span class="hljs-keyword">var</span> my_renderer = <span class="hljs-keyword">new</span> marked.<span class="hljs-title class_">Renderer</span>();
+my_renderer.<span class="hljs-property">table</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">header, body</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;table class=&quot;table table-hover table-bordered&quot;&gt;<span class="hljs-subst">${header}</span><span class="hljs-subst">${body}</span>&lt;/table&gt;`</span>;
+};
+
+marked.<span class="hljs-title function_">setOptions</span>({
+  <span class="hljs-attr">renderer</span>: my_renderer,
+  <span class="hljs-attr">gfm</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">tables</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">breaks</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">pedantic</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">smartLists</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">smartypants</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">highlight</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">code</span>) {
+    <span class="hljs-keyword">return</span> highlight.<span class="hljs-title function_">highlightAuto</span>(code).<span class="hljs-property">value</span>;
+  },
+  
+});
+
+
+<span class="hljs-comment">//读取md</span>
+fs.<span class="hljs-title function_">readFile</span>(<span class="hljs-string">&#x27;README.md&#x27;</span>, <span class="hljs-string">&#x27;utf-8&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">err, data</span>) {
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+  <span class="hljs-keyword">var</span> lexed = marked.<span class="hljs-title function_">lexer</span>(data);
+  <span class="hljs-keyword">var</span> html = marked.<span class="hljs-title function_">parser</span>(lexed);
+
+  <span class="hljs-keyword">var</span> title = <span class="hljs-string">&#x27;test1&#x27;</span>;
+
+  <span class="hljs-comment">//前部header网页，这里是示例，大家请自行设计自己喜欢的网页</span>
+  <span class="hljs-keyword">var</span> header = <span class="hljs-string">&#x27;&lt;!DOCTYPE html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&#x27;</span>+
+    <span class="hljs-string">&#x27;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;&gt;&lt;title&gt;&#x27;</span>+
+    title+
+    <span class="hljs-string">&#x27;&lt;/title&gt;&lt;base target=&quot;_blank&quot;&gt;&lt;/head&gt;&#x27;</span>+
+    <span class="hljs-string">&#x27;&lt;body&gt;&lt;header id=&quot;header&quot; class=&quot;header d-flex align-items-center fixed-top&quot;&gt;...&lt;/header&gt;&lt;main id=&quot;main&quot;&gt;&#x27;</span>;
+  
+    
+    <span class="hljs-comment">//后面的footer</span>
+  <span class="hljs-keyword">var</span> footer = <span class="hljs-string">&#x27;&lt;/main&gt;&#x27;</span>+
+  <span class="hljs-string">&#x27;&lt;footer id=&quot;footer&quot; class=&quot;footer&quot;&gt;...&lt;/footer&gt;&#x27;</span>+
+  <span class="hljs-string">&#x27;&lt;/body&gt;&lt;/html&gt;&#x27;</span>;
+
+
+  <span class="hljs-comment">//创建文件，并写入html</span>
+  fs.<span class="hljs-title function_">writeFile</span>(<span class="hljs-string">&#x27;./html/test1.html&#x27;</span>, header+html+footer, <span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) {
+    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;数据写入成功！&quot;</span>);
+  });
+});
+</code></pre>
+<p>这样就构建了一个基本的html网页，但是，我们需要批量操作，把一个文件夹里面的所有markdown都转换成html，并且获取文件的名字作为title。</p>
+<h3 id="fs遍历文件">fs遍历文件</h3>
+<p>遍历文件夹</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">var</span> path = <span class="hljs-string">&#x27;./markdown&#x27;</span>;
+fs.<span class="hljs-title function_">readdir</span>(path, <span class="hljs-string">&#x27;utf-8&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">err, files</span>){
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+  files.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">file_name</span>){
+    fs.<span class="hljs-title function_">stat</span>(path+<span class="hljs-string">&#x27;/&#x27;</span>+file_name, <span class="hljs-function">(<span class="hljs-params">err, stat</span>)=&gt;</span>{
+      <span class="hljs-keyword">if</span>(stat.<span class="hljs-title function_">isFile</span>()){
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;文件名:&#x27;</span>, file_name);
+      }<span class="hljs-keyword">else</span>{
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;文件夹名:&#x27;</span>, file_name);
+      }
+    })
+  })
+})
+</code></pre>
+<p>通过遍历文件夹获取所有文件，然后遍历文件的内容，进行markdown转换</p>
+<pre><code class="language-javascript">var marked = require(<span class="hljs-string">&#x27;marked&#x27;</span>);
+var fs = require(&quot;fs&quot;); //读取md文件内容
+const highlight = require(<span class="hljs-string">&#x27;highlight.js&#x27;</span>);
+
+var my_renderer = <span class="hljs-built_in">new</span> marked.Renderer();
+my_renderer.table = <span class="hljs-keyword">function</span> (<span class="hljs-keyword">header</span>, body) {
+  <span class="hljs-keyword">return</span> `&lt;<span class="hljs-keyword">table</span> <span class="hljs-keyword">class</span>=&quot;table table-hover table-bordered&quot;&gt;${<span class="hljs-keyword">header</span>}${body}&lt;/<span class="hljs-keyword">table</span>&gt;`;
+};
+
+marked.setOptions({
+  renderer: my_renderer,
+  gfm: <span class="hljs-keyword">true</span>,
+  <span class="hljs-keyword">tables</span>: <span class="hljs-keyword">true</span>,
+  breaks: <span class="hljs-keyword">true</span>,
+  pedantic: <span class="hljs-keyword">false</span>,
+  smartLists: <span class="hljs-keyword">true</span>,
+  smartypants: <span class="hljs-keyword">false</span>,
+  highlight: <span class="hljs-keyword">function</span>(code) {
+    <span class="hljs-keyword">return</span> highlight.highlightAuto(code).<span class="hljs-keyword">value</span>;
+  },
+  
+});
+
+
+//读取md
+//markdown存放位置
+var <span class="hljs-type">path</span> = <span class="hljs-string">&#x27;./markdown&#x27;</span>;
+
+fs.readdir(<span class="hljs-type">path</span>, <span class="hljs-string">&#x27;utf-8&#x27;</span>, <span class="hljs-keyword">function</span>(err, files){
+  <span class="hljs-keyword">if</span> (err) throw err;
+  //获取每一个文件名字
+  files.<span class="hljs-keyword">forEach</span>(<span class="hljs-keyword">function</span>(file_name){
+    fs.stat(<span class="hljs-type">path</span>+<span class="hljs-string">&#x27;/&#x27;</span>+file_name, (err, stat)=&gt;{
+      <span class="hljs-keyword">if</span> (err) throw err;
+
+      <span class="hljs-keyword">if</span>(stat.isFile()){
+
+        fs.readFile(<span class="hljs-type">path</span>+<span class="hljs-string">&#x27;/&#x27;</span>+file_name, <span class="hljs-string">&#x27;utf-8&#x27;</span>, <span class="hljs-keyword">function</span> (err, data) {
+          <span class="hljs-keyword">if</span>(err) throw err;
+          var lexed = marked.lexer(data);
+          var html = marked.<span class="hljs-keyword">parser</span>(lexed);
+        
+          //去掉后缀获取文章标题
+          var title = file_name.substring(<span class="hljs-number">0</span>, file_name.lastIndexOf(&quot;.&quot;));
+          var tag = <span class="hljs-string">&#x27;acg&#x27;</span>;
+          var <span class="hljs-type">time</span> = stat.mtime.toString(); //修改时间
+          <span class="hljs-type">time</span> = <span class="hljs-type">time</span>.substring(<span class="hljs-number">0</span>, <span class="hljs-type">time</span>.lastIndexOf(&quot;GMT&quot;));
+        
+          var <span class="hljs-keyword">header</span> = <span class="hljs-string">&#x27;header内容&#x27;</span>+title+<span class="hljs-string">&#x27;在这里面添加信息，例如时间time和标签tag&#x27;</span>+<span class="hljs-type">time</span>+tag;
+          var footer = <span class="hljs-string">&#x27;footer内容’;
+        
+          //创建文件，并写入html
+          fs.writeFile(&#x27;</span>./html/<span class="hljs-string">&#x27;+title+&#x27;</span>.html<span class="hljs-string">&#x27;, header+html+footer, function(err) {
+            if(err) throw err;
+            console.log(&quot;数据写入成功！&quot;);
+          });
+        });
+      }
+    })
+  })
+})</span>
+</code></pre>
+<h3 id="如果文本没有变化则不需要重新渲染">如果文本没有变化则不需要重新渲染</h3>
+<pre><code class="language-javascript"><span class="hljs-comment">//判断文件是否存在</span>
+fs.access(&#x27;./html/&#x27;+title+&#x27;.html&#x27;, fs.constants.F_OK,<span class="hljs-function"> (<span class="hljs-params">err</span>) =&gt;</span> { 
+    <span class="hljs-keyword">if</span>(err) {
+        <span class="hljs-comment">//不存在，则创建文件，并写入html</span>
+        write<span class="hljs-constructor">NewFile(<span class="hljs-params">title</span>, <span class="hljs-params">header</span>, <span class="hljs-params">html</span>, <span class="hljs-params">footer</span>)</span>;
+    }<span class="hljs-keyword">else</span> {
+        console.log(<span class="hljs-character">&#x27;-&#x27;</span>+title+&#x27;.html存在于当前目录中&#x27;);
+        <span class="hljs-comment">//文件存在，则比对文件内容，判断是否需要重写</span>
+        fs.read<span class="hljs-constructor">File(&#x27;.<span class="hljs-operator">/</span><span class="hljs-params">html</span><span class="hljs-operator">/</span>&#x27;+<span class="hljs-params">title</span>+&#x27;.<span class="hljs-params">html</span>&#x27;, &#x27;<span class="hljs-params">utf</span>-8&#x27;, <span class="hljs-params">function</span> (<span class="hljs-params">err</span>, <span class="hljs-params">data</span>)</span>{
+            <span class="hljs-keyword">if</span>(err) throw err;
+            <span class="hljs-keyword">if</span>(data != header+html+footer){
+                console.log(&#x27; - 但是文件已修改&#x27;);
+                write<span class="hljs-constructor">NewFile(<span class="hljs-params">title</span>, <span class="hljs-params">header</span>, <span class="hljs-params">html</span>, <span class="hljs-params">footer</span>)</span>;
+            }
+        })
+    }
+});
+</code></pre>
+<h2 id="code-prettify">code-prettify</h2>
+<p><a href="https://github.com/googlearchive/code-prettify">code-prettify</a></p>
+<p>已经使用了highlight了，等有时间再看看code-prettify。(doge.jpg)</p>
+<h2 id="mathjax">mathjax</h2>
+<p>marked + mathjax 实现支持数学公式的 markdown 转 html</p>
+</div></div></div></div></div></section></main><footer id="footer" class="footer"><div class="footer-content"><div class="container"><div class="row g-2"><div class="col-lg-5"><h3 class="footer-heading">About suhan</h3><p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p><p><a href="../view/about.html" class="footer-link-more" target="_self">Learn More</a></p></div><div class="col-6 col-lg-2"><h3 class="footer-heading">Navigation</h3><ul class="footer-links list-unstyled"><li><a href="../index.html" target="_self"><i class="bi bi-chevron-right"></i> Home</a></li><li><a href="#" target="_self"><i class="bi bi-chevron-right"></i> It</a></li><li><a href="#" target="_self"><i class="bi bi-chevron-right"></i> Acgn</a></li><li><a href="../view/about.html" target="_self"><i class="bi bi-chevron-right"></i> About</a></li></ul></div><div class="col-6 col-lg-2"><h3 class="footer-heading">Categories</h3><ul class="footer-links list-unstyled"><li><a href="#" target="_self"><i class="bi bi-chevron-right" target="_self"></i> it</a></li><li><a href="#" target="_self"><i class="bi bi-chevron-right" target="_self"></i> acgn</a></li></ul></div><div class="col-lg-3">虚以待位</div></div></div></div><!-- end class="footer-content" --><div class="footer-legal"><div class="container"><div class="row justify-content-between"><div class="col-md-6 text-center text-md-start mb-3 mb-md-0"><div class="copyright">© Copyright <strong><span>suhan</span></strong>. All Rights Reserved</div><div class="credits">Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a></div></div><div class="col-md-6"><div class="social-links mb-3 mb-lg-0 text-center text-md-end"><a href="#" class="twitter"><i class="bi bi-twitter"></i></a></div></div></div></div></div></footer><a href="#" class="scroll-top d-flex align-items-center justify-content-center" target="_self"><i class="bi bi-arrow-up-short"></i></a><script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script><script src="../vendor/jquery-1.11.0.min.js" type="text/javascript"></script><script src="../vendor/hc-mobile-nav/hc-mobile-nav.js" type="text/javascript" ></script><script src="../js/main.js"></script><script src="../js/me.js" type="text/javascript" ></script></body></html>

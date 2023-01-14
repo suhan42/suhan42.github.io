@@ -257,7 +257,7 @@ section {
 # 标题
 --------------------------------------------------------------*/
 .aside-title, .category-title {
-    text-transform: uppercase;
+    /* text-transform: uppercase;  完全大写*/
     letter-spacing: 0.1rem;
     font-size: 14px;
     font-weight: 700;
@@ -292,7 +292,7 @@ section {
 .post-entry-1 a:hover {
     color: #0000EE; 
 }
-.post-entry-1 h2 {
+/* .post-entry-1 h2 {
     margin-bottom: 20px;
     font-size: 20px;
     font-weight: 500;
@@ -302,13 +302,13 @@ section {
 .post-entry-1.lg h2 {
     font-size: 40px;
     line-height: 1;
-}
+} */
 
 
 .post-meta {
     font-size: 11px;
     letter-spacing: 0.07rem;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     font-weight: 600;
     font-family: var(--font-secondary);
     color: rgba(var(--color-black-rgb), 0.4);
@@ -379,7 +379,7 @@ section {
 .post-entry-2 .post-meta {
     font-size: 11px;
     letter-spacing: 0.07rem;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     font-weight: 600;
     font-family: var(--font-secondary);
     color: rgba(var(--color-black-rgb), 0.4);

@@ -1,1 +1,1 @@
-about
+var time = stat.mtime; //修改时间

@@ -1,4 +1,4 @@
-//配合hc-mobile-nav的demo改的
+//配合hc-mobile-nav的demo改的菜单隐藏在左边（手机适应）
 (function($) {
   var $nav = $('.main-nav');
   var $toggle = $('.toggle');
