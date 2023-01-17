@@ -27,7 +27,9 @@ marked.setOptions({
 
 
 
-
+/*================================
+markdown文件转换为html
+================================= */
 //读取md
 var path = './markdown';
 
@@ -95,7 +97,7 @@ fs.readdir(path, 'utf-8', function(err, files){
         });
 
 
-        /* 创建文件，并写入html */
+        // 创建文件，并写入html
         function writeNewFile(title, header, html, footer){
           fs.writeFile('./html/'+title+'.html', header+html+footer, function(err) {
             if(err) throw err;

@@ -1,1 +1,1 @@
-var time = stat.mtime; //修改时间
+console.log(home_data);

@@ -82,48 +82,57 @@
 
           <!-- directory -->
           <div class="col-md-10">
-            <h3 class="category-title">目录</h3><hr>
+            <h3 class="category-title">content -目录-</h3><hr>
+            
+            <!-- 目录容器，与js进行交互 -->
+            <div class="main-content">
 
-            <div class="d-md-flex post-entry-2 small-img">
-              <a href="./view/wa2.html" class="me-4">
-                <img src="./images/冬馬かずさ.jpg" alt="wa2" class="img-fluid">
-              </a>
-              <div>
-                <div class="post-meta">
-                  <span class="date">acgn</span><span class="mx-1">&bullet;</span>
-                  <span>12-24-2022</span>
-                </div>
-                <a href="./view/wa2.html">
-                  <!-- this is summary -->
-                  <h4>《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理]</h4>
-                  <p>我这篇通关推荐顺序的宗旨是让玩家的体验更好。而对于《白色相簿2》，不看剧透玩起来的感觉要比看剧透好非常多！所以，玩过的不要给别人剧透，没玩过的不要点开任何一个讨论和评论，包括角色介绍！</p>
+              <div class="d-md-flex post-entry-2 small-img">
+                <a href="./view/wa2.html" class="me-4">
+                  <img src="./images/冬馬かずさ.jpg" alt="wa2" class="img-fluid">
                 </a>
+                <div>
+                  <div class="post-meta">
+                    <span class="date">acgn</span><span class="mx-1">&bullet;</span>
+                    <span>12-24-2022</span>
+                  </div>
+                  <a href="./view/wa2.html">
+                    <!-- this is summary -->
+                    <h4>《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理]</h4>
+                    <p>我这篇通关推荐顺序的宗旨是让玩家的体验更好。而对于《白色相簿2》，不看剧透玩起来的感觉要比看剧透好非常多！所以，玩过的不要给别人剧透，没玩过的不要点开任何一个讨论和评论，包括角色介绍！</p>
+                  </a>
+                </div>
               </div>
-            </div>
 
-            <div class="d-md-flex post-entry-2 small-img">
-              <div>
-                <div class="post-meta">
-                  <span class="date">it</span><span class="mx-1">&bullet;</span>
-                  <span>4-12-2022</span>
+
+
+              <div class="d-md-flex post-entry-2 small-img">
+                <div>
+                  <div class="post-meta">
+                    <span class="date">it</span><span class="mx-1">&bullet;</span>
+                    <span>4-12-2022</span>
+                  </div>
+                  <a href="./view/box.html">
+                    <h4>关于css中box的使用</h4>
+                    <p>css box</p>
+                  </a>
                 </div>
-                <a href="./view/box.html">
-                  <h4>关于css中box的使用</h4>
-                  <p>css box</p>
-                </a>
               </div>
+
             </div>
 
 
             <!-- Paging -->
-            <div class="text-start py-4">
-              <div class="custom-pagination">
-                <a href="#" class="prev">Prevous</a>
+            <div class=" text-start py-4">
+              <!-- 分页容器 pagination-container -->
+              <div class="custom-pagination pagination-container">
+                <span href="#" class="page-change prev">Prevous</span>
+                <div class="pagination"></div>
                 <a href="#" class="active">1</a>
                 <a href="#">2</a>
                 <a href="#">3</a>
                 <a href="#">4</a>
-                <a href="#" class="next">Next</a>
+                <span href="#" class="page-change next">Next</span>
               </div>
             </div><!-- End Paging -->
         
@@ -259,5 +268,6 @@
 
   <!-- my js files -->
   <script src="./js/me.js" type="text/javascript" ></script>
+  <script src="./js/pagination-container.js" type="text/javascript" ></script>
   
 </body>
