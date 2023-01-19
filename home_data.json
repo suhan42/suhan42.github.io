@@ -1,0 +1,44 @@
+[
+  {
+    "title": "c自查表",
+    "tag": "null",
+    "time": "Thu Jan 19 2023 21:42:48",
+    "summary": "看c++　std::string 的源码，发现有#pragma GCC system_header这个，不知道什么意思，去google了一下，发现意思如下，以后自己代码中还是不要用这个．",
+    "url": "./html/c自查表.html"
+  },
+  {
+    "title": "Linux命令行",
+    "tag": "null",
+    "time": "Thu Jan 19 2023 21:42:48",
+    "summary": "shell是运行在终端中的文本互动程序，bash（GNU Bourne-Again Shell）是最常用的一种shell。是当前大多数Linux发行版的默认Shell。",
+    "url": "./html/Linux命令行.html"
+  },
+  {
+    "title": "marked造轮子",
+    "tag": "null",
+    "time": "Thu Jan 19 2023 21:42:48",
+    "summary": "hexo固然好用，但是在使用的过程总还是有一些问题，比如",
+    "url": "./html/marked造轮子.html"
+  },
+  {
+    "title": "MySQL自查表",
+    "tag": "null",
+    "time": "Thu Jan 19 2023 21:42:48",
+    "summary": "目录",
+    "url": "./html/MySQL自查表.html"
+  },
+  {
+    "title": "vi、vim",
+    "tag": "null",
+    "time": "Thu Jan 19 2023 21:42:48",
+    "summary": "vi和vim都是Linux中的编辑器，不同的是vim比较高级，可以视为vi的升级版本。vi使用于文本编辑，但是vim更适用于coding",
+    "url": "./html/vi、vim.html"
+  },
+  {
+    "title": "静态博客框架之Hexo & Jekyll",
+    "tag": "null",
+    "time": "Thu Jan 19 2023 21:42:48",
+    "summary": "之所以接触到Hexo以及Jekyll框架是因为之前一直有在写些博客，比如通过<strong>Github Pages</strong>直接写的HTML静态博客，但这种博客维护起来相当麻烦，有如下一些问题：",
+    "url": "./html/静态博客框架之Hexo & Jekyll.html"
+  }
+]

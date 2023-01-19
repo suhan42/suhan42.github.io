@@ -1,5 +1,5 @@
 /*================================
-转换好了之后，统计html文件数量，生成目录数据
+2. markdown转html，转换好了之后，统计html文件数量，生成目录数据
 ================================= */
 function get_home_data(){
   var fs = require("fs");
@@ -38,11 +38,10 @@ function get_home_data(){
 }
 
 
-
-
 let home_data = get_home_data();
+var string_data = JSON.stringify(home_data, null, 2)
 
-
+// 生成home页面目录数据
 var fs2 = require("fs");
-fs2.writeFileSync('./home_data.txt', home_data) 
-console.log(home_data);
+fs2.writeFileSync('./home_data.json', string_data);
+console.log("写入成功！")

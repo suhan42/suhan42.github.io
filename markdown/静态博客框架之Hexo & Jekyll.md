@@ -15,7 +15,7 @@
 于是开始接触比较流行的一些静态博客框架，比较流行的有Jekyll，Hexo，Simple，Octopress，Pelican以及Lo·gecho等等。这些静态程序可以说都有各自的好处，但最后我选择了Hexo来搭建自己的博客，和Jekyll相比，选择Hexo主要原因是：
 
 1. Jeky基于Ruby实现，安装Jeky需要搭建Ruby环境，在Windows搭建Ruby环境并太好弄，而且Jekyll的中文资料比较少。而 Hexo基于NodeJs实现，在Windows上安装NodeJs开发环境简单。
-2. 比较直接的另一个原因是在网上查找了很多博客的主题，发现Jekyll官网提供的主题都不怎么好看(可能是个人原因)，而Hexo的主题看的比较顺眼，在hexo界，使用最多的主题就是[Next](http://theme-next.iissnan.com/)。
+2. 比较直接的另一个原因是在网上查找了很多博客的主题，发现Jekyll官网提供的主题都不怎么好看(可能是个人原因)，而Hexo的主题看的比较顺眼，在hexo界，使用最多的主题就是[next](http://theme-next.iissnan.com/)。
 3. 两者都支持Markdown语法，这点我非常喜欢。
 
 ## Hexo博客开发

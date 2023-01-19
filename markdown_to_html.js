@@ -1,3 +1,6 @@
+/*================================
+1. markdown转html，并且渲染html界面
+================================= */
 var marked = require('marked');
 var fs = require("fs"); //读取md文件内容
 const highlight = require('highlight.js');

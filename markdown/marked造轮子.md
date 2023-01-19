@@ -2,8 +2,9 @@
 
 hexo固然好用，但是在使用的过程总还是有一些问题，比如
 
-1. git经常unable to access，push需要借助git desktop才能稳定。
+1. git经常unable to access，push需要借助git desktop才能稳定。(主要原因)
 2. hexo虽然有很多主题，也可以设置不被渲染的html，但是你打算使用你自己写的前端。
+2. 想搞一搞（bushi
 
 那么你可以看看下面的内容，尝试自己使用marked造一个小轮子（小hexo）
 
@@ -152,7 +153,7 @@ marked.setOptions({
 
 
 
-### 出现问题
+### 常见问题
 
 > ##### Uncaught TypeError TypeError: marked is not a function
 >
@@ -229,25 +230,30 @@ code {
 
 
 
-## 完善网页和渲染
+## ★完善网页和渲染
 
 需要添加的功能：
 
-- 加上header与footer进行渲染
-- 获取一个文件夹的md文件进行批量转码，获取文件名当作title
-- 添加文件修改时间
-- 对比html内容，不一致再进行html的生成，一直则不需要生成
-- home（index）页面根据html文件数量，修改home页面的预览。在`home.js`
+- [x] 加上header与footer进行渲染
+- [x] 获取一个文件夹的md文件进行批量转码生成post文章，获取文件名当作title标题完善文章
+- [x] 添加文件修改时间
+- [x] 对比post内容，不一致再进行html的生成，一致则不需要生成
+- [ ] home（index.html）页面根据html文件（即文章）数量和内容，修改home页面的预览。在`home.js`
   使用js读取本地文件并将内容展示到页面
   - 这里的文本预览只能获取html的第一个`<P>`标签。（等待完善）
-- home页面分页
-- tag功能
+- [ ] home页面分页
+
+到此为止，就能满足纯文本用户基本使用了，当然我们肯定不能到此为止
+
+- [ ] 图片正确转码
+- [ ] post页面文章目录
+- [ ] tags标签
 
 
 
 这个时候已经可以把markdown转码为html并新建文件进行存储了，而且也有了代码高亮。但是网页只有markdown的内容，并没有header和footer，这不是一个完整的网页。
 
-所以我们这时候就可以设计一个自己想要的完整的网页，并预留出post div来存放markdown的内容，实现`hexo generate`把markdown渲染成html的功能。
+所以我们这时候就可以设计一个自己想要的完整的网页，并预留出一个post div来存放markdown的内容，实现`hexo generate`把markdown渲染成html的功能。
 
 ### 加上header与footer进行渲染
 
@@ -308,7 +314,7 @@ fs.readFile('README.md', 'utf-8', function (err, data) {
 
 这样就构建了一个基本的html网页，但是，我们需要批量操作，把一个文件夹里面的所有markdown都转换成html，并且获取文件的名字作为title。
 
-### fs遍历文件
+### fs遍历markdown文件
 
 遍历文件夹
 
@@ -415,6 +421,67 @@ fs.access('./html/'+title+'.html', fs.constants.F_OK, (err) => {
     }
 });
 ```
+
+### 遍历html文件夹，生成home页面的目录页
+
+1. fs遍历html文件，生成JSON文件
+
+```javascript
+/*================================
+markdown转html转换好了之后，统计html文件数量，生成目录数据
+================================= */
+function get_home_data(){
+  var fs = require("fs");
+
+  //所有文件要展示在home页面的内容
+  let home_data = []
+
+  //读取html
+  var path = './html';
+  let files = fs.readdirSync(path, 'utf-8');
+
+  //遍历文件
+  files.forEach(file_name =>{
+    var file = fs.statSync(path+'/'+file_name);
+    if(file.isFile()){
+      
+      var time = file.mtime.toString(); 
+      time = time.substring(0, time.lastIndexOf(" GMT"));
+
+      // 由于readFile是异步读取文件，所以就相当于读取三个文件并打印的操作在同时进行，受延迟等影响，每次执行打印的顺序不固定。而readFileSync()是同步读取，所以按照顺序读取并打印a.txt、b.txt、c.txt，上一个文件未读取时不会读取下一个文件，所有这里使用readFileSync()
+      var summary = fs.readFileSync(path+'/'+file_name, 'utf-8').toString();
+      summary = summary.substring(summary.indexOf("<p>")+3, summary.indexOf("</p>"))
+      
+      const data = {};
+      //去掉后缀获取文章标题
+      data.title = file_name.substring(0, file_name.lastIndexOf("."));
+      data.tag = 'null';
+      data.time = time;
+      data.summary = summary;
+      data.url = path+'/'+file_name;
+
+      home_data.push(data);
+    }
+  })
+  return home_data;
+}
+
+
+let home_data = get_home_data();
+var string_data = JSON.stringify(home_data, null, 2)
+
+// 生成home页面目录数据
+var fs2 = require("fs");
+fs2.writeFileSync('./home_data.json', string_data);
+```
+
+2. 获取生成的json文件，生成目录并分页到home页
+
+这里的内容我感觉没有写好。使用js的XMLHttpRequest或者jQ都一直出错，无法正常拿到json的内容。现在是使用静态文件手动添加的方式，生成数据表。
+
+
+
+
 
 
 

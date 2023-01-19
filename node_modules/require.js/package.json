@@ -1,0 +1,26 @@
+{
+  "name": "require.js",
+  "version": "1.0.0",
+  "description": "Small AMD loader for bundled AMD modules. No dynamic loading or loader plugin support.",
+  "main": "require.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marella/require.js.git"
+  },
+  "keywords": [
+    "amd",
+    "require.js"
+  ],
+  "author": "Ravindra Marella <mv.ravindra@yahoo.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marella/require.js/issues"
+  },
+  "homepage": "https://github.com/marella/require.js#readme"
+}

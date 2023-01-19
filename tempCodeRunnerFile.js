@@ -1,1 +1,1 @@
-console.log(home_data);
+home_data.push(data);

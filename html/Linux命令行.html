@@ -1,0 +1,695 @@
+<!DOCTYPE html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Linux命令行</title><base target="_blank"><link href="../images/suhan.png" rel="icon"><link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"><link href="../vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet"><link rel="stylesheet" href="../vendor/hc-mobile-nav/hc-mobile-nav.css"><link href="../css/variables.css" rel="stylesheet"><link href="../css/main.css" rel="stylesheet"><link href="../css/me.css" rel="stylesheet"><link href="../node_modules/highlight.js/styles/github.css" rel="stylesheet" type="text/css"></head><body><header id="header" class="header d-flex align-items-center fixed-top"><div class="container-fluid container-xl d-flex align-items-center justify-content-between"><a href="../index.html" target="_self" class="logo d-flex align-items-center"><img src="../images/suhan.png" alt=""><h2>Suhan</h2></a><nav id="navbar" class="main-nav navbar"><ul><li><a href="../index.html" target="_self">Home</a></li><li><a href="#" target="_self">IT</a></li><li class="dropdown"><a href="#" target="_self"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a><ul><li><a href="#" target="_self">A - Animation</a></li><li><a href="#" target="_self">C - Comic</a></li><li><a href="#" target="_self">G - Game</a></li><li><a href="#" target="_self">N - Novel</a></li></ul></li><li><a href="../view/about.html" target="_self">About</a></li></ul></nav><div class="position-relative"><a href="#" class="mx-2"><span class="bi-twitter"></span></a><a href="#" class="mx-2"><span class="bi-instagram"></span></a><a href="#" class="mx-2 js-search-open" target="_self"><span class="bi-search"></span></a><a class="toggle"><span class="bi-list" target="_self"></span></a><div class="search-form-wrap js-search-form-wrap"><form action="" class="search-form"><span class="icon bi-search"></span><input type="text" placeholder="Search" class="form-control"><button class="btn js-search-close"><span class="bi-x"></span></button></form></div><!-- End Search Form --></div></div></header><main id="main"><section><div class="container"><div class="row"><div class="col-md-12"><h3 class="category-title">Linux命令行</h3><hr><div class="d-md-flex post-entry-1"><div><div class="post-meta"><span class="date">acg</span> <span class="mx-1">&bullet;</span><span>Mon Sep 19 2022 09:17:22 </span></div><h1 id="shell">shell</h1>
+<p>shell是运行在终端中的文本互动程序，bash（GNU Bourne-Again Shell）是最常用的一种shell。是当前大多数Linux发行版的默认Shell。</p>
+<p>其他的shell还有：sh、bash、ksh、rsh、csh等。Ubuntu系统常用的是bash</p>
+<p>而bash的全名是Bourne Again Shell。最开始在Unix系统中流行的是sh，而bash作为sh的改进版本，提供了更加丰富的功能。一般来说，都推荐使用bash作为默认的Shell。</p>
+<h3 id="基本操作">基本操作</h3>
+<p>查询ip(win) 找VM虚拟网卡</p>
+<pre><code class="language-shell"><span class="hljs-built_in">ipconfig</span>
+</code></pre>
+<p>查询ip(Linux)</p>
+<pre><code class="language-shell"><span class="hljs-attribute">ifconfig</span>
+</code></pre>
+<p>ens33的inet后面是IP地址</p>
+<p>桥接模式：虚拟机和win内网公用一个网络、局域网<br>NAT:虚拟机和win主机公用一个网络、使用虚拟网卡<br>仅主机：和桥接类似，虚拟机无法上网</p>
+<pre><code class="language-shell"><span class="hljs-built_in">ping</span> www.x.com
+</code></pre>
+<p>查看x的源码</p>
+<pre><code class="language-shell">curl http:<span class="hljs-regexp">//</span>www.x.com
+</code></pre>
+<table class="table table-hover table-bordered"><tr>
+<th align="left">命令</th>
+<th>解释</th>
+</tr>
+<tr>
+<td align="left">reboot / init 6</td>
+<td>重启</td>
+</tr>
+<tr>
+<td align="left">poweroff</td>
+<td>关机</td>
+</tr>
+<tr>
+<td align="left">clear</td>
+<td>清空</td>
+</tr>
+<tr>
+<td align="left">who</td>
+<td>查看谁在线</td>
+</tr>
+<tr>
+<td align="left">passwd root</td>
+<td>改密码</td>
+</tr>
+<tr>
+<td align="left">pwd</td>
+<td>返回当前路径（Print Working Directory）</td>
+</tr>
+</table><h3 id="sudo权限管理机制">sudo权限管理机制</h3>
+<p>sudo是一种权限管理机制，依赖于/etc/sudoers，其定义了授权给哪个用户可以以管理员的身份能够执行什么样的管理命令；</p>
+<p>格式：<code>sudo -u USERNAME COMMAND</code></p>
+<p>默认情况下，系统只有root用户可以执行sudo命令。需要root用户通过使用visudo命令编辑sudo的配置文件/etc/sudoers，才可以授权其他普通用户执行sudo命令。</p>
+<pre><code class="language-bash"><span class="hljs-attribute">sudo</span> su (root)  <span class="hljs-comment">#切换root</span>
+</code></pre>
+<p><strong>sudo的运行有这样一个流程：</strong></p>
+<p>1).当用户运行sudo时，系统于/etc/sudoers文件里查找该用户是否有运行sudo的权限；</p>
+<p>2).若用户具有可运行sudo的权限。那么让用户输入用户自己的password，注意这里输入的是用户自己的password。</p>
+<p>3).假设password正确。变開始进行sudo后面的命令，root运行sudo是不须要输入password的，切换到的身份与运行者身份同样的时候。也不须要输入password。</p>
+<h3 id="su切换账户">su切换账户</h3>
+<p>switch user</p>
+<p>su是最简单的身份切换名，用su我们能够进行不论什么用户的切换，一般都是su – username，然后输入password就ok了，可是root用su切换到其它身份的时候是不须要输入password的。</p>
+<p>格式为两种：</p>
+<blockquote>
+<p> su -l USERNAME（-l为login，即登陆的简写）</p>
+<p>su USERNAME </p>
+</blockquote>
+<pre><code class="language-shell"><span class="hljs-attribute">su</span> suhan  <span class="hljs-comment">#换成suhan</span>
+</code></pre>
+<p>如果不指定USERNAME（用户名），默认即为root，所以切换到root的身份的命令即为：su -root或su -，su root 或su。</p>
+<p>su USERNAME，与su – USERNAME的不同之处如下：</p>
+<ul>
+<li>su – USERNAME切换用户后，同时切换到新用户的工作环境中。</li>
+<li>su USERNAME切换用户后，不改变原用户的工作目录，及其他环境变量目录。</li>
+</ul>
+<p><strong>设置初始su密码</strong></p>
+<pre><code class="language-bash"><span class="hljs-attribute">sudo</span> passwd 用户名
+</code></pre>
+<h3 id="man用户手册">man(用户手册)</h3>
+<p>(Manual)</p>
+<p>man pwd						就是获得pwd这个命令的命令手册<br>man -h 							help</p>
+<h3 id="echo回声">echo(回声)</h3>
+<pre><code class="language-shell"><span class="hljs-built_in">echo</span> hello world
+</code></pre>
+<h3 id="cd换地方">cd(换地方)</h3>
+<p>(Change Directory)</p>
+<table class="table table-hover table-bordered"><tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+<tr>
+<td>cd /</td>
+<td>进入系统根目录</td>
+</tr>
+<tr>
+<td>cd ..</td>
+<td>向上一层</td>
+</tr>
+<tr>
+<td>cd ~/Desktop</td>
+<td>桌面</td>
+</tr>
+</table><h3 id="ls看">ls(看)</h3>
+<p>(List Directory Contens)</p>
+<table class="table table-hover table-bordered"><tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+<tr>
+<td>ls</td>
+<td>查看当前文件夹目录全部文件</td>
+</tr>
+<tr>
+<td>ls -l</td>
+<td>列表显示（list mode）</td>
+</tr>
+<tr>
+<td>ls -l -a = ls -la</td>
+<td>文件的各种信息和全部权限（list + all files）（包括隐藏的）</td>
+</tr>
+<tr>
+<td>ls -lh</td>
+<td>(list + human readable size)</td>
+</tr>
+</table><p>CentOS还可以使用命令</p>
+<table class="table table-hover table-bordered"><tr>
+<th>ll</th>
+<th>查看全部文件</th>
+</tr>
+<tr>
+<td>lshw -short</td>
+<td></td>
+</tr>
+</table><h3 id="cat打印文件内容">cat(打印文件内容)</h3>
+<p>(Concatenate and print files)</p>
+<pre><code class="language-bash">cat <span class="hljs-selector-attr">[-AbeEnstTuv]</span> <span class="hljs-selector-attr">[--help]</span> <span class="hljs-selector-attr">[--version]</span> fileName
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li><strong>-n 或 --number</strong>：由 1 开始对所有输出的行数编号。</li>
+<li><strong>-b 或 --number-nonblank</strong>：和 -n 相似，只不过对于空白行不编号。</li>
+<li><strong>-s 或 --squeeze-blank</strong>：当遇到有连续两行以上的空白行，就代换为一行的空白行。</li>
+<li><strong>-v 或 --show-nonprinting</strong>：使用 ^ 和 M- 符号，除了 LFD 和 TAB 之外。</li>
+<li><strong>-E 或 --show-ends</strong> : 在每行结束处显示 $。</li>
+<li><strong>-T 或 --show-tabs</strong>: 将 TAB 字符显示为 ^I。</li>
+<li><strong>-A, --show-all</strong>：等价于 -vET。</li>
+<li><strong>-e：</strong>等价于&quot;-vE&quot;选项；</li>
+<li><strong>-t：</strong>等价于&quot;-vT&quot;选项；</li>
+</ul>
+<table class="table table-hover table-bordered"><tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+<tr>
+<td>cat a.txt</td>
+<td>打印a.txt文件全部内容</td>
+</tr>
+<tr>
+<td>cat -n a.txt</td>
+<td>-n显示行号</td>
+</tr>
+</table><h4 id="head头和tail尾">head头和tail尾</h4>
+<table class="table table-hover table-bordered"><tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+<tr>
+<td>head a.txt</td>
+<td>显示a.txt文件前10行</td>
+</tr>
+<tr>
+<td>tail a.txt</td>
+<td>倒着输出所有内容（还是全部）</td>
+</tr>
+<tr>
+<td>tail -n 5 a.txt</td>
+<td>-n行数（这里是打印最后5行）</td>
+</tr>
+<tr>
+<td>tail -f a.txt</td>
+<td>-f会一直（动态）观察文件，一旦有变化会打印出来</td>
+</tr>
+</table><p>交互浏览</p>
+<pre><code class="language-shell">vim <span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.txt</span>
+</code></pre>
+<pre><code class="language-shell"><span class="hljs-keyword">less</span> a.txt
+</code></pre>
+<h4 id="more查看大文件">more查看大文件</h4>
+<p>space翻页，q退出</p>
+<pre><code class="language-shell">more <span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.txt</span>
+</code></pre>
+<h4 id="nl最后一行">nl最后一行</h4>
+<table class="table table-hover table-bordered"><tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+<tr>
+<td>nl a.txt</td>
+<td>从最后一行开始展示(显示行号)</td>
+</tr>
+<tr>
+<td>nl -ba a.txt</td>
+<td>全部都显示行号(包括空行)</td>
+</tr>
+<tr>
+<td>nl -bt a.txt</td>
+<td>空行不显示出行号(默认都有这个，默认值)</td>
+</tr>
+</table><h4 id="grep内容查找">grep(内容查找)</h4>
+<pre><code class="language-shell"><span class="hljs-keyword">cat</span> <span class="hljs-keyword">a</span>.txt | <span class="hljs-keyword">grep</span> 内容
+</code></pre>
+<h4 id="wc单词统计">wc(单词统计)</h4>
+<p>(Word, line and byte count)</p>
+<pre><code class="language-shell"><span class="hljs-built_in">cat</span> a.txt | <span class="hljs-built_in">wc</span> 			行数 单词 字节
+<span class="hljs-built_in">cat</span> a.txt | <span class="hljs-built_in">wc</span> -l 		行数
+</code></pre>
+<h3 id="echo重定向">echo重定向</h3>
+<p><strong>改变输入输出设备</strong></p>
+<p>将hello添加到hello.txt文件里面</p>
+<pre><code class="language-shell"><span class="hljs-built_in">echo</span> hello &gt; hello.txt
+</code></pre>
+<p>添加到下面一行</p>
+<pre><code class="language-shell"><span class="hljs-built_in">echo</span> hello &gt;&gt; hello.txt
+</code></pre>
+<p>打印出来</p>
+<pre><code class="language-shell"><span class="hljs-built_in">cat</span> &lt; hello.txt
+</code></pre>
+<h3 id="grep管道">grep管道</h3>
+<p><strong>将前一个命令的标准输出作为下一个程序的标准输出</strong></p>
+<pre><code class="language-shell">man less | <span class="hljs-keyword">grep</span> <span class="hljs-keyword">sim</span>
+</code></pre>
+<h3 id="chmod更改文件权限">chmod(更改文件权限)</h3>
+<p>(Change Mode)</p>
+<table class="table table-hover table-bordered"><tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+<tr>
+<td>chmod +x (文件名)</td>
+<td>增加可执行权限（还可以换成+w +r</td>
+</tr>
+<tr>
+<td>chmod -x (文件名)</td>
+<td>移除可执行权限（还可以换成-w -r</td>
+</tr>
+<tr>
+<td>chmod 740 (文件名)</td>
+<td>把权限设置成740</td>
+</tr>
+</table><p>owner：<strong>7=1+2+4= 可执行x + 可写w + 可读r</strong><br>group：4=4= 可读<br>others：0 = 没有权限</p>
+<p>常见：<br>644: -rw-r--r--<br>740: -rwxr-----<br>755: -rwxr-xr-x<br>777: -rwxrwxrwx</p>
+<h3 id="touchmkdir创建">touch/mkdir创建</h3>
+<pre><code>touch <span class="hljs-selector-attr">[-acfm]</span><span class="hljs-selector-attr">[-d&lt;日期时间&gt;]</span><span class="hljs-selector-attr">[-r&lt;参考文件或目录&gt;]</span> <span class="hljs-selector-attr">[-t&lt;日期时间&gt;]</span><span class="hljs-selector-attr">[--help]</span><span class="hljs-selector-attr">[--version]</span><span class="hljs-selector-attr">[文件或目录…]</span>
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>a 改变档案的读取时间记录。</li>
+<li>m 改变档案的修改时间记录。</li>
+<li>c 假如目的档案不存在，不会建立新的档案。与 --no-create 的效果一样。</li>
+<li>f 不使用，是为了与其他 unix 系统的相容性而保留。</li>
+<li>r 使用参考档的时间记录，与 --file 的效果一样。</li>
+<li>d 设定时间与日期，可以使用各种不同的格式。</li>
+<li>t 设定档案的时间记录，格式与 date 指令相同。</li>
+<li>--no-create 不会建立新档案。</li>
+<li>--help 列出指令格式。</li>
+<li>--version 列出版本讯息。</li>
+</ul>
+<p><strong>touch(创建文件)</strong></p>
+<pre><code class="language-shell">touch <span class="hljs-keyword">first</span>.cpp
+</code></pre>
+<p><strong>mkdir(创建文件夹)</strong></p>
+<p>mkdir [-p] dirName</p>
+<ul>
+<li>-p 确保目录名称存在，不存在的就建一个。</li>
+</ul>
+<pre><code class="language-shell">mkdir -p 文件夹/子文件夹
+</code></pre>
+<h3 id="mv移动">mv移动</h3>
+<p>(Move)</p>
+<pre><code class="language-bash"><span class="hljs-built_in">mv</span> [options] <span class="hljs-built_in">source</span> dest
+<span class="hljs-comment">#or</span>
+<span class="hljs-built_in">mv</span> [options] <span class="hljs-built_in">source</span>... directory
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>-a：此选项通常在复制目录时使用，它保留链接、文件属性，并复制目录下的所有内容。其作用等于dpR参数组合。</li>
+<li>-d：复制时保留链接。这里所说的链接相当于 Windows 系统中的快捷方式。</li>
+<li>-f：覆盖已经存在的目标文件而不给出提示。</li>
+<li>-i：与 <strong>-f</strong> 选项相反，在覆盖目标文件之前给出提示，要求用户确认是否覆盖，回答 <strong>y</strong> 时目标文件将被覆盖。</li>
+<li>-p：除复制文件的内容外，还把修改时间和访问权限也复制到新文件中。</li>
+<li>-r：若给出的源文件是一个目录文件，此时将复制该目录下所有的子目录和文件。</li>
+<li>-l：不复制文件，只是生成链接文件。</li>
+</ul>
+<p>重命名</p>
+<pre><code class="language-shell"><span class="hljs-built_in">mv</span> h.txt hello.txt
+</code></pre>
+<p>移动文件、文件夹（这里是文件夹）</p>
+<pre><code class="language-shell">mv 四六级 大学<span class="hljs-regexp">/英语/</span>
+</code></pre>
+<h3 id="cp复制文件">cp复制文件</h3>
+<p>(Copy)</p>
+<pre><code class="language-bash"><span class="hljs-keyword">cp</span> [<span class="hljs-keyword">options</span>] <span class="hljs-keyword">source</span> dest
+#or
+<span class="hljs-keyword">cp</span> [<span class="hljs-keyword">options</span>] <span class="hljs-keyword">source</span>... directory
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>-a：此选项通常在复制目录时使用，它保留链接、文件属性，并复制目录下的所有内容。其作用等于dpR参数组合。</li>
+<li>-d：复制时保留链接。这里所说的链接相当于 Windows 系统中的快捷方式。</li>
+<li>-f：覆盖已经存在的目标文件而不给出提示。</li>
+<li>-i：与 <strong>-f</strong> 选项相反，在覆盖目标文件之前给出提示，要求用户确认是否覆盖，回答 <strong>y</strong> 时目标文件将被覆盖。</li>
+<li>-p：除复制文件的内容外，还把修改时间和访问权限也复制到新文件中。</li>
+<li>-r：若给出的源文件是一个目录文件，此时将复制该目录下所有的子目录和文件。</li>
+<li>-l：不复制文件，只是生成链接文件。</li>
+</ul>
+<p>复制单个文件</p>
+<pre><code class="language-shell">cp <span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.txt</span> a_copy.txt
+</code></pre>
+<p>复制文件夹</p>
+<pre><code class="language-shell"><span class="hljs-keyword">cp</span> -r dir1 dir2
+</code></pre>
+<h3 id="rm删除文件">rm删除文件</h3>
+<p>(Remove)</p>
+<p>没有回收站！！！</p>
+<pre><code class="language-bash">rm [options] name...
+</code></pre>
+<ul>
+<li>-i 删除前逐一询问确认。</li>
+<li>-f 即使原档案属性设为唯读，亦直接删除，无需逐一确认。</li>
+<li>-r 将目录及以下之档案亦逐一删除。<ul>
+<li>-rf 强制删除文件夹</li>
+</ul>
+</li>
+</ul>
+<table class="table table-hover table-bordered"><tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+<tr>
+<td>rm a.txt</td>
+<td>删除单个文件</td>
+</tr>
+<tr>
+<td>rm a.txt b.txt c.txt</td>
+<td>删除多个文件</td>
+</tr>
+<tr>
+<td>rm ./*.txt</td>
+<td>当前目录下的所有txt文件</td>
+</tr>
+<tr>
+<td>rm -r dir1</td>
+<td>递归删除dir1和所有子文件/目录</td>
+</tr>
+</table><h3 id="tarzip压缩解压">tar/zip压缩解压</h3>
+<p>tar [选项] 打包文件名 待打包文件</p>
+<table class="table table-hover table-bordered"><tr>
+<th>选项</th>
+<th>解释</th>
+</tr>
+<tr>
+<td>-c</td>
+<td>创建一个打包文件</td>
+</tr>
+<tr>
+<td>-x</td>
+<td>解开一个打包文件</td>
+</tr>
+<tr>
+<td>-z</td>
+<td>使用gzip压缩文件</td>
+</tr>
+<tr>
+<td>-j</td>
+<td>使用bzip2压缩文件</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>压缩过程显示文件</td>
+</tr>
+<tr>
+<td>-f</td>
+<td>使用文档名</td>
+</tr>
+</table><p>压缩</p>
+<pre><code class="language-shell">tar -zcf demo<span class="hljs-selector-class">.tar</span><span class="hljs-selector-class">.gz</span> <span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.txt</span> <span class="hljs-selector-tag">b</span><span class="hljs-selector-class">.txt</span> c.txt
+</code></pre>
+<p>解压</p>
+<pre><code class="language-shell">tar -zxf <span class="hljs-built_in">demo</span>.tar.gz
+</code></pre>
+<pre><code class="language-shell">zip demo<span class="hljs-selector-class">.zip</span> <span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.txt</span> <span class="hljs-selector-tag">b</span><span class="hljs-selector-class">.txt</span> 					#压缩
+unzip demo<span class="hljs-selector-class">.zip</span> 								#解压缩
+</code></pre>
+<h3 id="tree树状图">tree树状图</h3>
+<p>Linux tree命令用于以树状图列出目录的内容。</p>
+<p>执行tree指令，它会列出指定目录下的所有文件，包括子目录里的文件。</p>
+<pre><code class="language-bash">tree <span class="hljs-selector-attr">[-aACdDfFgilnNpqstux]</span><span class="hljs-selector-attr">[-I &lt;范本样式&gt;]</span><span class="hljs-selector-attr">[-P &lt;范本样式&gt;]</span><span class="hljs-selector-attr">[目录...]</span>
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>-a 显示所有文件和目录。</li>
+<li>-A 使用ASNI绘图字符显示树状图而非以ASCII字符组合。</li>
+<li>-C 在文件和目录清单加上色彩，便于区分各种类型。</li>
+<li>-d 显示目录名称而非内容。</li>
+<li>-D 列出文件或目录的更改时间。</li>
+<li>-f 在每个文件或目录之前，显示完整的相对路径名称。</li>
+<li>-F 在执行文件，目录，Socket，符号连接，管道名称名称，各自加上&quot;*&quot;,&quot;/&quot;,&quot;=&quot;,&quot;@&quot;,&quot;|&quot;号。</li>
+<li>-g 列出文件或目录的所属群组名称，没有对应的名称时，则显示群组识别码。</li>
+<li>-i 不以阶梯状列出文件或目录名称。</li>
+<li>-L level 限制目录显示层级。</li>
+<li>-l 如遇到性质为符号连接的目录，直接列出该连接所指向的原始目录。</li>
+<li>-n 不在文件和目录清单加上色彩。</li>
+<li>-N 直接列出文件和目录名称，包括控制字符。</li>
+<li>-p 列出权限标示。</li>
+<li>-P&lt;范本样式&gt; 只显示符合范本样式的文件或目录名称。</li>
+<li>-q 用&quot;?&quot;号取代控制字符，列出文件和目录名称。</li>
+<li>-s 列出文件或目录大小。</li>
+<li>-t 用文件和目录的更改时间排序。</li>
+<li>-u 列出文件或目录的拥有者名称，没有对应的名称时，则显示用户识别码。</li>
+<li>-x 将范围局限在现行的文件系统中，若指定目录下的某些子目录，其存放于另一个文件系统上，则将该子目录予以排除在寻找范围外。</li>
+</ul>
+<h3 id="date显示或设定系统的日期与时间">date显示或设定系统的日期与时间</h3>
+<pre><code class="language-bash">date <span class="hljs-comment">[OPTION]</span>... <span class="hljs-comment">[+FORMAT]</span>
+date <span class="hljs-comment">[-u]</span> <span class="hljs-comment">[-d datestr]</span> <span class="hljs-comment">[-s datestr]</span> <span class="hljs-comment">[--utc]</span> <span class="hljs-comment">[--universal]</span> <span class="hljs-comment">[--date=datestr]</span> <span class="hljs-comment">[--set=datestr]</span> <span class="hljs-comment">[--help]</span> <span class="hljs-comment">[--version]</span> <span class="hljs-comment">[+FORMAT]</span> <span class="hljs-comment">[MMDDhhmm<span class="hljs-comment">[<span class="hljs-comment">[CC]</span>YY]</span><span class="hljs-comment">[.ss]</span>]</span>
+</code></pre>
+<p>参数：</p>
+<ul>
+<li><strong>-d, --date=STRING</strong>：通过字符串显示时间格式，字符串不能是&#39;now&#39;。</li>
+<li><strong>-f, --file=DATEFILE</strong>：类似于--date; 一次从DATEFILE处理一行。</li>
+<li>**-I[FMT], --iso-8601[=FMT]**：按照 ISO 8601 格式输出时间，FMT 可以为&#39;date&#39;(默认)，&#39;hours&#39;，&#39;minutes&#39;，&#39;seconds&#39;，&#39;ns&#39;。 可用于设置日期和时间的精度，例如：2006-08-14T02:34:56-0600。</li>
+<li><strong>-R, --rfc-2822</strong> ： 按照 RFC 5322 格式输出时间和日期，例如: Mon, 14 Aug 2006 02:34:56 -0600。</li>
+<li><strong>--rfc-3339=FMT</strong>：按照 RFC 3339 格式输出，FMT 可以为&#39;date&#39;, &#39;seconds&#39;,&#39;ns&#39;中的一个，可用于设置日期和时间的精度， 例如：2006-08-14 02:34:56-06:00。</li>
+<li><strong>-r, --reference=FILE</strong>：显示文件的上次修改时间。</li>
+<li><strong>-s, --set=STRING</strong>：根据字符串设置系统时间。</li>
+<li><strong>-u, --utc, --universal</strong>：显示或设置协调世界时(UTC)。</li>
+<li><strong>--help</strong>：显示帮助信息。</li>
+<li><strong>--version</strong>：输出版本信息。</li>
+</ul>
+<p>FORMAT 参数：</p>
+<p>在显示方面，使用者可以设定欲显示的格式 ，格式设定为一个加号后接数个标记，其中可用的标记列表如下：</p>
+<p>%%   输出字符 %<br>%a   星期几的缩写 (Sun..Sat)<br>%A   星期的完整名称(Sunday..Saturday)。<br>%b   缩写的月份名称（例如，Jan）<br>%B   完整的月份名称（例如，January）<br>%c   本地日期和时间（例如，Thu Mar  3 23:05:25 2005）<br>%C   世纪，和%Y类似，但是省略后两位（例如，20）<br>%d   日 (01..31)<br>%D   日期，等价于%m/%d/%y<br>%e   一月中的一天，格式使用空格填充，等价于%_d<br>%F   完整的日期；等价于 %Y-%m-%d<br>%g   ISO 标准计数周的年份的最后两位数字<br>%G   ISO 标准计数周的年份，通常只对%V有用<br>%h   等价于 %b<br>%H   小时 (00..23)<br>%I   小时 (01..12)<br>%j   一年中的第几天 (001..366)<br>%k   小时，使用空格填充 ( 0..23); 等价于 %_H<br>%l   小时, 使用空格填充 ( 1..12); 等价于 %_I<br>%m   月份 (01..12)<br>%M   分钟 (00..59)<br>%n   新的一行，换行符<br>%N   纳秒 (000000000..999999999)<br>%p   用于表示当地的AM或PM，如果未知则为空白<br>%P   类似 %p, 但是是小写的<br>%r   本地的 12 小时制时间(例如 11:11:04 PM)<br>%R   24 小时制 的小时与分钟; 等价于 %H:%M<br>%s   自 1970-01-01 00:00:00 UTC 到现在的秒数<br>%S   秒 (00..60)<br>%t   插入水平制表符 tab<br>%T   时间; 等价于 %H:%M:%S<br>%u   一周中的一天 (1..7); 1 表示星期一<br>%U   一年中的第几周，周日作为一周的起始 (00..53)<br>%V   ISO 标准计数周，该方法将周一作为一周的起始 (01..53)<br>%w   一周中的一天（0..6），0代表星期天<br>%W   一年中的第几周，周一作为一周的起始（00..53）<br>%x   本地的日期格式（例如，12/31/99）<br>%X   本地的日期格式（例如，23:13:48）<br>%y   年份后两位数字 (00..99)<br>%Y   年<br>%z   +hhmm 格式的数值化时区格式（例如，-0400）<br>%:z  +hh:mm 格式的数值化时区格式（例如，-04:00）<br>%::z  +hh:mm:ss格式的数值化时区格式（例如，-04:00:00）<br>%:::z  数值化时区格式，相比上一个格式增加&#39;:&#39;以显示必要的精度（例如，-04，+05:30）<br>%Z  时区缩写 （如 EDT）</p>
+<p>显示当前时间</p>
+<pre><code class="language-bash"><span class="hljs-comment"># date</span>
+<span class="hljs-attribute">Tue</span> May <span class="hljs-number">24</span> <span class="hljs-number">09</span>:<span class="hljs-number">29</span>:<span class="hljs-number">43</span> CST <span class="hljs-number">2022</span>
+<span class="hljs-comment"># date &#x27;+%c&#x27; </span>
+<span class="hljs-attribute">Tue</span> <span class="hljs-number">24</span> May <span class="hljs-number">2022</span> <span class="hljs-number">09</span>:<span class="hljs-number">30</span>:<span class="hljs-number">03</span> AM CST
+<span class="hljs-comment"># date &#x27;+%D&#x27; //显示完整的时间</span>
+<span class="hljs-attribute">05</span>/<span class="hljs-number">24</span>/<span class="hljs-number">22</span>
+<span class="hljs-comment"># date &#x27;+%x&#x27; //显示数字日期</span>
+<span class="hljs-attribute">05</span>/<span class="hljs-number">24</span>/<span class="hljs-number">2022</span>
+<span class="hljs-comment"># date &#x27;+%T&#x27; //显示日期，年份用四位数表示</span>
+<span class="hljs-attribute">14</span>:<span class="hljs-number">09</span>:<span class="hljs-number">31</span>
+<span class="hljs-comment"># date &#x27;+%X&#x27; //显示24小时的格式</span>
+<span class="hljs-attribute">09</span>:<span class="hljs-number">31</span>:<span class="hljs-number">31</span> AM
+</code></pre>
+<p>格式化输出：</p>
+<pre><code class="language-bash"><span class="hljs-comment"># date +&quot;%Y-%m-%d&quot;</span>
+<span class="hljs-attribute">2009</span>-<span class="hljs-number">12</span>-<span class="hljs-number">07</span>
+</code></pre>
+<p>输出昨天日期：</p>
+<pre><code class="language-bash"><span class="hljs-attr"># date -d &quot;1</span> day ago<span class="hljs-string">&quot; +&quot;</span><span class="hljs-meta">%</span>Y-<span class="hljs-meta">%</span>m-<span class="hljs-meta">%</span>d<span class="hljs-string">&quot;
+2012-11-19</span>
+</code></pre>
+<p>输出 2 秒后的时间：</p>
+<pre><code class="language-bash"><span class="hljs-comment"># date -d &quot;2 second&quot; +&quot;%Y-%m-%d %H:%M.%S&quot;</span>
+<span class="hljs-attribute">2012</span>-<span class="hljs-number">11</span>-<span class="hljs-number">20</span> <span class="hljs-number">14</span>:<span class="hljs-number">21</span>.<span class="hljs-number">31</span>
+</code></pre>
+<h3 id="查看进程">查看进程</h3>
+<p>例如：</p>
+<pre><code class="language-shell"><span class="hljs-keyword">ps</span> -ef|<span class="hljs-keyword">grep</span> ssh
+<span class="hljs-keyword">ps</span> -ef|<span class="hljs-keyword">grep</span> tomcat
+</code></pre>
+<p>pid查看<br>netstat -naop|grep pid</p>
+<p>例如：</p>
+<pre><code class="language-shell">netstat -naop<span class="hljs-string">|grep 8080</span>
+</code></pre>
+<p>查看特定用户</p>
+<pre><code class="language-bash"><span class="hljs-attribute">ps</span> -u root  <span class="hljs-comment">#显示root进程用户信息</span>
+</code></pre>
+<p>停止进程(-9表示强制停止)</p>
+<pre><code class="language-shell"><span class="hljs-attribute">kill</span> -<span class="hljs-number">9</span> pid
+</code></pre>
+<h3 id="watch观察">watch观察</h3>
+<p>linux系统里有一些日志文件。观察这些日志文件是系统管理员的一个重要任务。你可以很方便地<a href="http://tuxtweaks.com/2011/02/command-line-basics-head-and-tail/">使用tail命令</a>观察它们。但是如果你想要长时间监视这些文件，每几分钟使用tail检查那些日志文件是一件很乏味的事情。你可以写一个短小的<a href="http://tuxtweaks.com/2012/01/creating-a-terminal-window-clock/">无限循环的脚本</a>来周期性地检查文件，但其实已经有一个程序可以为你处理这种重复的任务。</p>
+<p>Linux中的watch 命令提供了一种方式处理重复的任务。默认watch会每<strong>2</strong>秒重复执行命令。你一定也想到了,watch是一个很好的观察log文件的工具。下面是一个例子。</p>
+<pre><code class="language-bash">watch tail /<span class="hljs-keyword">var</span>/<span class="hljs-built_in">log</span>/syslog
+</code></pre>
+<p>想要停止命令的执行,只要使用标准的kill流程, [Ctrl]+C。</p>
+<pre><code>watch [<span class="hljs-keyword">options</span>] <span class="hljs-keyword">command</span>
+</code></pre>
+<p>参数：</p>
+<ul>
+<li><p>-b, --beep             如果命令以非零返回值退出的话则发出哔声</p>
+</li>
+<li><p>-c, --color              interpret ANSI color and style sequences</p>
+</li>
+<li><p>-d, --differences   highlight changes between updates</p>
+</li>
+</ul>
+<p>  选项watch 会高亮显示变化的区域。<br>  而-d=cumulative选项会把变动过的地方(不管最近的那次有没有变动)都高亮显示出来</p>
+<ul>
+<li><p>-e, --errexit           exit if command has a non-zero exit</p>
+</li>
+<li><p>-g, --chgexit           exit when output from command changes</p>
+</li>
+<li><p>-n, --interval 秒       seconds to wait between updates</p>
+</li>
+<li><p>-p, --precise          尝试以精确的间隔运行命令</p>
+</li>
+<li><p>-t, --no-title         会关闭watch命令在顶部的时间间隔,命令，当前时间的输出</p>
+</li>
+<li><p>-w, --no-wrap          turn off line wrapping</p>
+</li>
+<li><p>-x, --exec             将命令传给 exec 而非“sh -c”</p>
+</li>
+<li><p>-h, --help     显示此帮助然后离开</p>
+</li>
+<li><p>-v, --version  output version information and exit</p>
+</li>
+</ul>
+<p>watch并不仅限于浏览日志文件。它可以用来重复你给它的任何命令。如果你要<a href="http://tuxtweaks.com/2008/08/how-to-control-fan-speeds-in-ubuntu/">监测CPU的温度</a>,你可以使用watch后跟上<strong>sensord</strong>命令来查看。</p>
+<pre><code><span class="hljs-attribute">watch</span> -n <span class="hljs-number">1</span> sensors
+</code></pre>
+<p>e.g.：</p>
+<pre><code class="language-bash">watch -n {运行时间间隔} -d <span class="hljs-string">&quot;{运行的指令}&quot;</span>
+
+
+watch -n 1 netstat -ant       <span class="hljs-comment"># 命令：每隔一秒高亮显示网络链接数的变化情况</span>
+watch -n 1 -d <span class="hljs-string">&#x27;pstree|grep http&#x27;</span> <span class="hljs-comment"># 每隔一秒高亮显示http链接数的变化情况。 </span>
+                后面接的命令若带有管道符，需要加<span class="hljs-string">&#x27;&#x27;</span>将命令区域归整。
+                
+watch <span class="hljs-string">&#x27;netstat -an | grep:21 | \ grep&lt;模拟攻击客户机的IP&gt;| wc -l&#x27;</span> <span class="hljs-comment"># 实时查看模拟攻击客户机建立起来的连接数</span>
+watch -d <span class="hljs-string">&#x27;ls -l|grep scf&#x27;</span>       <span class="hljs-comment"># 监测当前目录中 scf&#x27; 的文件的变化</span>
+watch -n 10 <span class="hljs-string">&#x27;cat /proc/loadavg&#x27;</span> <span class="hljs-comment"># 10秒一次输出系统的平均负载</span>
+watch -d <span class="hljs-string">&#x27;ls -l | fgrep goface&#x27;</span>     <span class="hljs-comment"># 监测goface的文件</span>
+watch -t -differences=cumulative <span class="hljs-built_in">uptime</span>
+</code></pre>
+<h3 id="防火墙">防火墙</h3>
+<p>systemctl status firewalld 				查看防火墙<br>systemctl start firewalld					开始防火墙<br>systemctl stop firewalld					关闭防火墙<br>systemctl restart firewalld				重启防火墙</p>
+<p>白名单</p>
+<pre><code class="language-shell">vim <span class="hljs-regexp">/usr/</span>lib<span class="hljs-regexp">/firewalld/</span>services/ssh.xml
+</code></pre>
+<pre><code class="language-xml">  &lt;port <span class="hljs-attribute">protocol</span>=<span class="hljs-string">&quot;tcp&quot;</span> <span class="hljs-attribute">port</span>=<span class="hljs-string">&quot;8080&quot;</span>/&gt;
+</code></pre>
+<p>systemctl restart firewalld 		重启防火墙</p>
+<h3 id="这里是搜索-mysql">这里是搜索 MySQL</h3>
+<p>find命令查询，速度会慢点<br>find / -name mysql</p>
+<p>whereis命令搜索，速度较快<br>whereis mysql</p>
+<h3 id="用户">用户</h3>
+<p>Linux用户分类<br>超级用户   root  uid = 0<br>普通用户         uid = 500<del>60000<br>伪用户           udi = 1</del>499</p>
+<p>伪用户不能登录系统，也不会在home下创建相应的文件夹，主要是执行一些系统命令</p>
+<p>用户组(便于分配权限)<br>用户组 可以包含多个 用户<br>一用户 至少属于一个 用户组</p>
+<h4 id="group组">group组</h4>
+<pre><code class="language-bash">groupadd 组名						<span class="hljs-comment">#创建用户组</span>
+groupmod -n 新组名 旧组名			 <span class="hljs-comment">#修改用户组名</span>
+groupdel 组名						<span class="hljs-comment">#删除用户组</span>
+<span class="hljs-built_in">groups</span>							<span class="hljs-comment">#查询用户所在的组</span>
+</code></pre>
+<p>修改用户所属组</p>
+<h4 id="user用户">user用户</h4>
+<pre><code class="language-bash">useradd 用户名					<span class="hljs-comment">#添加一般用户</span>
+useradd -g 用户组 用户名		<span class="hljs-comment">#添加用户到组</span>
+useradd -m aaa				<span class="hljs-comment">#创建用户名为aaa的用户,添加到home</span>
+useradd caojh -u <span class="hljs-number">544</span>		<span class="hljs-comment">#建立用户且制定ID</span>
+
+usermod -<span class="hljs-keyword">a</span> -G 用户组 用户名
+
+userdel
+</code></pre>
+<p><strong>参数说明</strong>：</p>
+<ul>
+<li><p>-c&lt;备注&gt; 　加上备注文字。备注文字会保存在passwd的备注栏位中。</p>
+</li>
+<li><p>-d&lt;登入目录&gt; 　指定用户登入时的起始目录。</p>
+</li>
+<li><p>-D 　变更预设值．</p>
+</li>
+<li><p>-e&lt;有效期限&gt; 　指定帐号的有效期限。</p>
+</li>
+<li><p>-f&lt;缓冲天数&gt; 　指定在密码过期后多少天即关闭该帐号。</p>
+</li>
+<li><p>-g&lt;群组&gt; 　指定用户所属的群组。</p>
+</li>
+<li><p>-G&lt;群组&gt; 　指定用户所属的附加群组。</p>
+</li>
+<li><p>-m 　在home目录下自动建立用户的登入目录。</p>
+</li>
+<li><p>-M 　不要自动建立用户的登入目录。</p>
+</li>
+<li><p>-n 　取消建立以用户名称为名的群组．</p>
+</li>
+<li><p>-r 　建立系统帐号。</p>
+</li>
+<li><p>-s<shell>　 　指定用户登入后所使用的shell。</p>
+</li>
+<li><p>-u<uid> 　指定用户ID。</p>
+</li>
+<li><p>-a|--append，把用户追加到某些组中，仅与-G选项一起使用</p>
+</li>
+<li><p>-G|--groups，把用户追加到某些组中，仅与-a选项一起使用</p>
+</li>
+</ul>
+<p><strong>创建一个用户步骤</strong></p>
+<ol>
+<li><p>useradd -m aaa</p>
+</li>
+<li><p>sudo passwd aaa</p>
+</li>
+<li><p>sudo vi /etc/sudoers设置给予的权限</p>
+<p>找到user privilege这一行<br>通过按i写入如上命令 给aaa分配所有权限</p>
+</li>
+<li><p>设置命令解释器<br>sudo vi /etc/passwd<br>将文件拉倒最后修改解释器类型</p>
+</li>
+</ol>
+<p>权限设置<br>先给root添加sudoers文件的读写权限</p>
+<pre><code>chmod <span class="hljs-number">777</span> <span class="hljs-regexp">/etc/</span>sudoers
+</code></pre>
+<p>编辑sudoers文件</p>
+<pre><code>vi <span class="hljs-regexp">/etc/</span>sudoers
+</code></pre>
+<p>找到如下一行代码</p>
+<pre><code>root <span class="hljs-keyword">ALL</span>=(<span class="hljs-keyword">ALL</span>) <span class="hljs-keyword">ALL</span>
+</code></pre>
+<p>在下面添加</p>
+<pre><code>tony <span class="hljs-keyword">ALL</span>=(<span class="hljs-keyword">ALL</span>) <span class="hljs-keyword">ALL</span>
+</code></pre>
+<p>共有四种格式的权限</p>
+<pre><code class="language-bash">tony <span class="hljs-keyword">ALL</span>=(<span class="hljs-keyword">ALL</span>) <span class="hljs-keyword">ALL</span>
+%tony <span class="hljs-keyword">ALL</span>=(<span class="hljs-keyword">ALL</span>) <span class="hljs-keyword">ALL</span>
+tony <span class="hljs-keyword">ALL</span>=(<span class="hljs-keyword">ALL</span>) NOPASSWD: <span class="hljs-keyword">ALL</span>
+%tony <span class="hljs-keyword">ALL</span>=(<span class="hljs-keyword">ALL</span>) NOPASSWD: <span class="hljs-keyword">ALL</span>
+第一行:允许用户tony执行sudo命令(需要输入密码)
+第二行:允许用户组tony里面的用户执行sudo命令(需要输入密码)
+第三行:允许用户tony执行sudo命令,并且在执行的时候不输入密码
+第四行:允许用户组tony里面的用户执行sudo命令,并且在执行的时候不输入密码
+</code></pre>
+<p>编辑完成 按 ESC+:wq！保存退出</p>
+<p>最后将root的sudoers文件权限改回来</p>
+<pre><code class="language-bash">chmod <span class="hljs-number">0440</span> <span class="hljs-regexp">/etc/</span>sudoers 
+</code></pre>
+<p>如果该用户账号只显示$</p>
+<p>则在root下修改 /etc/passwd</p>
+<p>sudo vim /etc/passwd</p>
+<pre><code><span class="hljs-symbol">username:</span><span class="hljs-symbol">X:</span><span class="hljs-number">1000</span><span class="hljs-symbol">:</span><span class="hljs-number">1000</span><span class="hljs-symbol">:</span><span class="hljs-symbol">:/home/wr</span><span class="hljs-symbol">:/bin/sh</span>(这是之前的)
+
+改为了<span class="hljs-symbol">username:</span><span class="hljs-symbol">X:</span><span class="hljs-number">1000</span><span class="hljs-symbol">:</span><span class="hljs-number">1000</span><span class="hljs-symbol">:</span><span class="hljs-symbol">:/home/wr</span><span class="hljs-symbol">:/bin/bash</span>
+</code></pre>
+<p>在该账户名下路径最后的/sh改为/bash</p>
+<p>用户相关配置信息</p>
+<p>/etc/passwd 			用户信息文件<br>/etc/shadow 			保存密码信息<br>/etc/group 				用户组信息<br>/etc/gshadow 			用户组密码信息</p>
+<h3 id="查看用户">查看用户</h3>
+<p>查看当前用户名称</p>
+<pre><code class="language-bash"><span class="hljs-built_in">whoami</span>
+</code></pre>
+<p>Linux 中，使用 w 或 who 命令都可以查看服务器上目前已登录的用户信息，两者的区别在于，w 命令除了能知道目前已登陆的用户信息，还可以知道每个用户执行任务的情况。</p>
+<pre><code class="language-bash">w
+<span class="hljs-built_in">who</span>
+</code></pre>
+<h2 id="linux系统版本信息">Linux系统版本信息</h2>
+<p>几种查看Linux版本信息的方法：</p>
+<ol>
+<li>uname -a</li>
+<li>cat /proc/version</li>
+<li>cat /etc/issue</li>
+<li>lsb_release -a</li>
+</ol>
+<p>详解 lsb_release -a</p>
+<p>登录到服务器执行 lsb_release -a ，即可列出所有版本信息，例如：</p>
+<pre><code class="language-bash">[root<span class="hljs-subst">@3</span><span class="hljs-number">.5</span><span class="hljs-number">.5</span>Biz<span class="hljs-number">-46</span> ~]<span class="hljs-meta"># lsb_release -a</span>
+
+LSB Version: <span class="hljs-number">1.3</span>
+
+Distributor ID: RedHatEnterpriseAS
+
+<span class="hljs-symbol">Description:</span> Red Hat Enterprise Linux AS release <span class="hljs-number">4</span> (Nahant Update <span class="hljs-number">1</span>)
+
+<span class="hljs-symbol">Release:</span> <span class="hljs-number">4</span>
+
+<span class="hljs-symbol">Codename:</span> NahantUpdate1
+
+[root<span class="hljs-subst">@3</span><span class="hljs-number">.5</span><span class="hljs-number">.5</span>Biz<span class="hljs-number">-46</span> ~]<span class="hljs-meta">#</span>
+这个命令适用于所有的linux，包括Redhat、SuSE、Debian等发行版。
+</code></pre>
+<h4 id="查看redhat的release版本">查看redhat的release版本</h4>
+<p>dhat的release版本#more /etc/redhat-release<br>Red Hat Enterprise Linux AS release 4 (Nahant Update 4)</p>
+<p>#more /etc/issue<br># more /proc/version</p>
+<p>查看CPU信息<br>#grep &quot;model name&quot; /proc/cpuinfo<br>#more /proc/cpuinfo</p>
+<p>查看CPU位数(32 or 64)<br>#getconf LONG_BIT</p>
+<p>查看内存信息<br>#more /proc/meminfo<br>#grep MemTotal /proc/meminfo</p>
+<p>查看libc、gcc版本<br>#ldd /sbin/mii-tool<br>#rpm -qa | grep glibc<br>#gcc –v</p>
+<h4 id="查看ubuntu版本">查看Ubuntu版本</h4>
+<p>方法一</p>
+<p>在终端中执行下列指令：<br>cat /etc/issue<br>可以查看当前正在运行的 Ubuntu 的版本号。其输出结果类似下面的内容：<br>Ubuntu 7.04 \n \l</p>
+<p>方法二</p>
+<p>使用 lsb_release 命令也可以查看 Ubuntu 的版本号，与方法一相比，内容更为详细。执行指令如下：<br>sudo lsb_release -a</p>
+<p>将输出结果：<br>Distributor ID: Ubuntu<br>Description: Ubuntu 7.04<br>Release: 7.04<br>Codename: feisty</p>
+<p>查看freebsd版本<br>uname -a</p>
+</div></div></div></div></div></section></main><footer id="footer" class="footer"><div class="footer-content"><div class="container"><div class="row g-2"><div class="col-lg-5"><h3 class="footer-heading">About suhan</h3><p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p><p><a href="../view/about.html" class="footer-link-more" target="_self">Learn More</a></p></div><div class="col-6 col-lg-2"><h3 class="footer-heading">Navigation</h3><ul class="footer-links list-unstyled"><li><a href="../index.html" target="_self"><i class="bi bi-chevron-right"></i> Home</a></li><li><a href="#" target="_self"><i class="bi bi-chevron-right"></i> It</a></li><li><a href="#" target="_self"><i class="bi bi-chevron-right"></i> Acgn</a></li><li><a href="../view/about.html" target="_self"><i class="bi bi-chevron-right"></i> About</a></li></ul></div><div class="col-6 col-lg-2"><h3 class="footer-heading">Categories</h3><ul class="footer-links list-unstyled"><li><a href="#" target="_self"><i class="bi bi-chevron-right" target="_self"></i> it</a></li><li><a href="#" target="_self"><i class="bi bi-chevron-right" target="_self"></i> acgn</a></li></ul></div><div class="col-lg-3">虚以待位</div></div></div></div><!-- end class="footer-content" --><div class="footer-legal"><div class="container"><div class="row justify-content-between"><div class="col-md-6 text-center text-md-start mb-3 mb-md-0"><div class="copyright">© Copyright <strong><span>suhan</span></strong>. All Rights Reserved</div><div class="credits">Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a></div></div><div class="col-md-6"><div class="social-links mb-3 mb-lg-0 text-center text-md-end"><a href="#" class="twitter"><i class="bi bi-twitter"></i></a></div></div></div></div></div></footer><a href="#" class="scroll-top d-flex align-items-center justify-content-center" target="_self"><i class="bi bi-arrow-up-short"></i></a><script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script><script src="../vendor/jquery-1.11.0.min.js" type="text/javascript"></script><script src="../vendor/hc-mobile-nav/hc-mobile-nav.js" type="text/javascript" ></script><script src="../js/main.js"></script><script src="../js/me.js" type="text/javascript" ></script></body></html>
