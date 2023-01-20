@@ -16,7 +16,8 @@
 
 
 
-let newsData =[
+let newsData = 
+[
   {
     "title": "c自查表",
     "tag": "null",
@@ -34,8 +35,8 @@ let newsData =[
   {
     "title": "marked造轮子",
     "tag": "null",
-    "time": "Thu Jan 19 2023 21:42:48",
-    "summary": "hexo固然好用，但是在使用的过程总还是有一些问题，比如",
+    "time": "Fri Jan 20 2023 18:53:54",
+    "summary": "学会了使用hexo做静态博客，可以大大提高舒适度。hexo固然好用，但是在使用的过程总还是有一些问题，比如",
     "url": "./html/marked造轮子.html"
   },
   {
@@ -55,13 +56,11 @@ let newsData =[
   {
     "title": "静态博客框架之Hexo & Jekyll",
     "tag": "null",
-    "time": "Thu Jan 19 2023 21:42:48",
+    "time": "Fri Jan 20 2023 18:53:54",
     "summary": "之所以接触到Hexo以及Jekyll框架是因为之前一直有在写些博客，比如通过<strong>Github Pages</strong>直接写的HTML静态博客，但这种博客维护起来相当麻烦，有如下一些问题：",
     "url": "./html/静态博客框架之Hexo & Jekyll.html"
   }
 ]
-
-
 
 
 
@@ -86,10 +85,21 @@ let old_data = [
 ]
 
 
+
+// 根据时间进行排序
+function sortTime(a,b){
+  return Date.parse(b.time)-Date.parse(a.time)
+}
+newsData.sort(sortTime);
+
+
+
+//在末尾加上old_data
 newsData = newsData.concat(old_data);
 
 
-          
+
+
 let newMain = document.querySelector('.main-content');//新闻容器
 let pagination =  document.querySelector('.pagination');//分页容器
 let pageCount = Math.ceil(newsData.length/5); //根据数据的长度计算总共几页

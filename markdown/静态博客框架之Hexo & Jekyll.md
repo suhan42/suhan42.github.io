@@ -143,7 +143,7 @@ ssh -T git@github.com
 
 ---
 
-推荐使用
+最后推荐使用
 
 Github pages + Hexo + NexT
 
