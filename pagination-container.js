@@ -115,22 +115,23 @@ let render = ()=>{
 
     // 判断是否有img图片资源
     if(item.hasOwnProperty("img")){
+      // 构建html
       newMain.innerHTML +=
       `<div class="d-md-flex post-entry-2 small-img">
-              <a href="${item.url}" class="me-4">
-                <img src="${item.img}" alt="${item.title}" class="img-fluid">
-              </a>
-              <div>
-                <div class="post-meta">
-                  <span class="date">${item.tag}</span><span class="mx-1">&bullet;</span>
-                  <span>${item.time}</span>
-                </div>
-                <a href="${item.url}">
-                  <h4>${item.title}</h4>
-                  <p>${item.summary}</p>
-                </a>
-              </div>
-            </div>`;
+        <a href="${item.url}" class="me-4">
+          <img src="${item.img}" alt="${item.title}" class="img-fluid">
+        </a>
+        <div>
+          <div class="post-meta">
+            <span class="date">${item.tag}</span><span class="mx-1">&bullet;</span>
+            <span>${item.time}</span>
+          </div>
+          <a href="${item.url}">
+            <h4>${item.title}</h4>
+            <p>${item.summary}</p>
+          </a>
+        </div>
+      </div>`;
     } 
     else {
       // 构建html
