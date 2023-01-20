@@ -46,10 +46,14 @@ pre {
 code {
 	position: relative;
 	background-color: unset !important;
+	
+	/*元素内的空白保留，并允许换行*/
+	white-space: pre-wrap !important;
+	/*是否允许在单词内断句*/
+	word-wrap: break-word !important;
+	/*强调怎么样断句*/
+	/*word-break: break-all !important;*/
 }
-
-
-/* 为了给marked转码的表格加上表格框 */
 
 
 

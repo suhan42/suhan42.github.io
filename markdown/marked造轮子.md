@@ -1,6 +1,6 @@
 # 造轮子
 
-学会了使用hexo做静态博客，可以大大提高舒适度。hexo固然好用，但是在使用的过程总还是有一些问题，比如
+hexo固然好用，但是在使用的过程总还是有一些问题，比如
 
 1. git经常unable to access，push需要借助git desktop才能稳定。(主要原因)
 2. hexo虽然有很多主题，也可以设置不被渲染的html，但是你打算使用你自己写的前端。
@@ -228,6 +228,28 @@ code {
 
 大功告成
 
+### 出现的问题
+
+code代码不换行
+
+解决方法，修改css中code
+
+```css
+code {
+	position: relative;
+	background-color: unset !important;
+	
+	/*元素内的空白保留，并允许换行*/
+	white-space: pre-wrap !important;
+	/*是否允许在单词内断句*/
+	word-wrap: break-word !important;
+	/*强调怎么样断句*/
+	/*word-break: break-all !important;*/
+}
+```
+
+[markDown转换html后code不换行问题_遇见的昨天的博客-CSDN博客_markdownsharp转换后不能换行](https://blog.csdn.net/qq_44787816/article/details/114340701)
+
 
 
 ## ★完善网页和渲染
@@ -241,13 +263,15 @@ code {
 - [x] home（index.html）页面根据html文件（即文章）数量和内容，修改home页面的预览。在`home.js`
   使用js读取本地文件并将内容展示到页面
   - [ ] 这里的文本预览只能获取html的第一个`<P>`标签。（等待完善）
-  - [ ] 获取html中的img作为home页的预览图
-  - [ ] 以有无img作为区分，区分渲染
 - [x] home页面分页
 
 到此为止，就能满足纯文本用户基本使用了，当然我们肯定不能到此为止
 
-- [ ] 图片正确转码
+- 关于图片处理
+  - [ ] markdown图片正确转码html
+  - [ ] 获取html中的img作为home页的预览图
+  - [x] 以有无img作为区分，区分渲染
+
 - [ ] post页面文章目录
 - [ ] tags标签
 
