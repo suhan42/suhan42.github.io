@@ -230,7 +230,7 @@ code {
 
 ### 出现的问题
 
-code代码不换行
+#### code代码不换行
 
 解决方法，修改css中code
 
@@ -250,6 +250,8 @@ code {
 
 [markDown转换html后code不换行问题_遇见的昨天的博客-CSDN博客_markdownsharp转换后不能换行](https://blog.csdn.net/qq_44787816/article/details/114340701)
 
+#### 在本地预览有高亮，但是在github pages没有高亮
+
 
 
 ## ★完善网页和渲染
@@ -264,8 +266,6 @@ code {
   使用js读取本地文件并将内容展示到页面
   - [ ] 这里的文本预览只能获取html的第一个`<P>`标签。（等待完善）
 - [x] home页面分页
-
-到此为止，就能满足纯文本用户基本使用了，当然我们肯定不能到此为止
 
 - 关于图片处理
   - [ ] markdown图片正确转码html
