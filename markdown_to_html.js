@@ -136,8 +136,8 @@ function markdown_to_html() {
             </nav><!-- end navbar -->
       
             <div class="position-relative">
-              <a href="#" class="mx-2"><span class="bi-twitter"></span></a>
-              <a href="#" class="mx-2"><span class="bi-instagram"></span></a>
+            <a href="https://github.com/suhan42" class="mx-2"><span class="bi-github"></span></a>
+            <a href="#" class="mx-2"><span class="bi-twitter"></span></a>
               <a href="#" class="mx-2 js-search-open" target="_self"><span class="bi-search"></span></a>
               
               <a class="toggle"><span class="bi-list" target="_self"></span></a>
