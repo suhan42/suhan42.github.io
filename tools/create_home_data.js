@@ -1,5 +1,6 @@
 /*================================
 2. markdown转html，转换好了之后，统计html文件数量，生成目录数据
+last version
 ================================= */
 function get_home_data(){
   var fs = require("fs");
