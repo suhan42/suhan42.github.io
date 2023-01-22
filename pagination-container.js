@@ -18,61 +18,58 @@
 
 let newsData = 
 
-
 [
   {
     "title": "c自查表",
     "tag": "null",
-    "time": "Sun Jan 22 2023 20:59:41",
+    "time": "Sun Jan 22 2023 21:59:02",
     "summary": "看c++　std::string 的源码，发现有#pragma GCC system_header这个，不知道什么意思，去google了一下，发现意思如下，以后自己代码中还是不要用这个．",
-    "url": "./_htmls/c自查表.html"
+    "url": "./htmls/c自查表.html"
   },
   {
     "title": "Linux命令行",
     "tag": "null",
-    "time": "Sun Jan 22 2023 20:59:42",
+    "time": "Sun Jan 22 2023 21:59:02",
     "summary": "shell是运行在终端中的文本互动程序，bash（GNU Bourne-Again Shell）是最常用的一种shell。是当前大多数Linux发行版的默认Shell。",
-    "url": "./_htmls/Linux命令行.html"
+    "url": "./htmls/Linux命令行.html"
   },
   {
     "title": "marked造轮子",
     "tag": "null",
-    "time": "Sun Jan 22 2023 21:21:18",
+    "time": "Sun Jan 22 2023 21:59:03",
     "summary": "hexo固然好用，但是在使用的过程总还是有一些问题，比如",
-    "url": "./_htmls/marked造轮子.html"
+    "url": "./htmls/marked造轮子.html"
   },
   {
     "title": "MySQL自查表",
     "tag": "null",
-    "time": "Sun Jan 22 2023 20:59:43",
+    "time": "Sun Jan 22 2023 21:59:03",
     "summary": "目录",
-    "url": "./_htmls/MySQL自查表.html"
+    "url": "./htmls/MySQL自查表.html"
   },
   {
     "title": "vi、vim",
     "tag": "null",
-    "time": "Sun Jan 22 2023 20:59:43",
+    "time": "Sun Jan 22 2023 21:59:03",
     "summary": "vi和vim都是Linux中的编辑器，不同的是vim比较高级，可以视为vi的升级版本。vi使用于文本编辑，但是vim更适用于coding",
-    "url": "./_htmls/vi、vim.html"
+    "url": "./htmls/vi、vim.html"
   },
   {
     "title": "《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理]",
     "tag": "null",
-    "time": "Sun Jan 22 2023 20:59:43",
+    "time": "Sun Jan 22 2023 21:59:03",
     "summary": "我这篇通关推荐顺序的宗旨是让玩家的体验更好。对于《白色相簿2》，不看剧透玩起来的感觉要比看剧透好非常多！所以在不透剧的前提下，通过这篇文章科普一些信息，并且提高游戏体验",
-    "url": "./_htmls/《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理].html",
+    "url": "./htmls/《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理].html",
     "imgsrc": "./images/冬馬かずさ.jpg"
   },
   {
     "title": "静态博客框架之Hexo & Jekyll",
     "tag": "null",
-    "time": "Sun Jan 22 2023 21:21:19",
+    "time": "Sun Jan 22 2023 21:59:03",
     "summary": "之所以接触到Hexo以及Jekyll框架是因为之前一直有在写些博客，比如通过<strong>Github Pages</strong>直接写的HTML静态博客，但这种博客维护起来相当麻烦，有如下一些问题：",
-    "url": "./_htmls/静态博客框架之Hexo & Jekyll.html"
+    "url": "./htmls/静态博客框架之Hexo & Jekyll.html"
   }
 ]
-
-
 
 
 
@@ -91,7 +88,7 @@ let old_data = [
     title: "关于css中box的使用",
     tag: "it",
     time: "4-12-2022",
-    url: "./_views/box.html",
+    url: "./views/box.html",
     summary: "这篇不是markdown笔记，是直接写的html网页，所以建议同时观看html源码，可以更好的学习理解。",
     
   },
@@ -108,7 +105,7 @@ let top_data =
   title: "新年快乐！！！",
   tag: "happy",
   time: "1-22-2023",
-  url: "./_views/fireworks.html",
+  url: "./views/fireworks.html",
   summary: "新年快乐，兔年大吉。恭喜发财，万事如意！",
   
 };

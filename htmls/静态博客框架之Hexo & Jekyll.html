@@ -2,7 +2,7 @@
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>vi、vim</title>
+        <title>静态博客框架之Hexo & Jekyll</title>
       
         <base target="_blank">
       
@@ -46,7 +46,7 @@
                     <li><a href="#" target="_self">N - Novel</a></li>
                   </ul>
                 </li>
-                <li><a href="../_plugins/about.html" target="_self">About</a></li>
+                <li><a href="../plugins/about.html" target="_self">About</a></li>
               </ul>
             </nav><!-- end navbar -->
       
@@ -79,162 +79,106 @@
               <div class="row">
                 <div class="col-md-12">
       
-                  <h3 class="category-title">vi、vim</h3><hr>
+                  <h3 class="category-title">静态博客框架之Hexo & Jekyll</h3><hr>
       
                   <div class="d-md-flex post-entry-1">
                     <div>
                       <div class="post-meta">
                         <span class="date">null</span> <span class="mx-1">&bullet;</span>
-                        <span>Fri Sep 16 2022 09:28:11</span>
+                        <span>Fri Jan 20 2023 18:51:20</span>
                       </div>
-                      <h1 id="vivim-的使用">vi/vim 的使用</h1>
-<p>vi和vim都是Linux中的编辑器，不同的是vim比较高级，可以视为vi的升级版本。vi使用于文本编辑，但是vim更适用于coding</p>
-<p>基本上 vi/vim 共分为三种模式，分别是命令模式（Command mode），输入模式（Insert mode）和底线命令模式（Last line mode）。 这三种模式的作用分别是：</p>
-<h2 id="命令模式：">※命令模式：</h2>
-<p>用户刚刚启动 vi/vim，便进入了命令模式。</p>
-<p>此状态下敲击键盘动作会被Vim识别为命令，而非输入字符。比如我们此时按下i，并不会输入一个字符，i被当作了一个命令。</p>
-<p>以下是常用的几个命令：</p>
-<table class="table table-hover table-bordered"><tr>
-<th>命令</th>
-<th>说明</th>
-</tr>
-<tr>
-<td>i(a,o)</td>
-<td>切换到输入模式，以输入字符。</td>
-</tr>
-<tr>
-<td>x</td>
-<td>删除当前光标所在处的字符。</td>
-</tr>
-<tr>
-<td>:</td>
-<td>切换到底线命令模式，以在最底一行输入命令。</td>
-</tr>
-<tr>
-<td>yy</td>
-<td>复制当前一行的内容</td>
-</tr>
-<tr>
-<td>p</td>
-<td>拷贝 yy 的内容</td>
-</tr>
-<tr>
-<td>dd</td>
-<td>删除一行</td>
-</tr>
-<tr>
-<td>gg</td>
-<td>移动光标到第一行</td>
-</tr>
-<tr>
-<td>G</td>
-<td>移动到最后一行</td>
-</tr>
-<tr>
-<td>u</td>
-<td>撤销(相当于Ctrl+z)</td>
-</tr>
-<tr>
-<td>ctrl+r</td>
-<td>反撤销</td>
-</tr>
-</table><p>若想要编辑文本：启动Vim，进入了命令模式，按下i，切换到输入模式。</p>
-<p>命令模式只有一些最基本的命令，因此仍要依靠底线命令模式输入更多命令。</p>
-<h2 id="输入模式">※输入模式</h2>
-<p>在命令模式下按下i就进入了输入模式。</p>
-<p>在输入模式中，可以使用以下按键：</p>
-<table class="table table-hover table-bordered"><tr>
-<th>命令</th>
-<th>说明</th>
-</tr>
-<tr>
-<td>字符按键以及Shift组合</td>
-<td>输入字符</td>
-</tr>
-<tr>
-<td>ENTER</td>
-<td>回车键，换行</td>
-</tr>
-<tr>
-<td>BACK SPACE</td>
-<td>退格键，删除光标前一个字符</td>
-</tr>
-<tr>
-<td>DEL</td>
-<td>删除键，删除光标后一个字符</td>
-</tr>
-<tr>
-<td>上下左右</td>
-<td>方向键，在文本中移动光标</td>
-</tr>
-<tr>
-<td>HOME/END</td>
-<td>移动光标到行首/行尾</td>
-</tr>
-<tr>
-<td>Page Up/Page Down</td>
-<td>上/下翻页</td>
-</tr>
-<tr>
-<td>Insert</td>
-<td>切换光标为输入/替换模式，光标将变成竖线/下划线</td>
-</tr>
-<tr>
-<td>ESC</td>
-<td>退出输入模式，切换到命令模式</td>
-</tr>
-</table><h2 id="底线命令模式">※底线命令模式</h2>
-<p>在命令模式下按下:（英文冒号）就进入了底线命令模式。</p>
-<p>底线命令模式可以输入单个或多个字符的命令，可用的命令非常多。</p>
-<p>在底线命令模式中，基本的命令有（已经省略了冒号）：</p>
-<table class="table table-hover table-bordered"><tr>
-<th>命令</th>
-<th>说明</th>
-</tr>
-<tr>
-<td>q</td>
-<td>退出程序</td>
-</tr>
-<tr>
-<td>w</td>
-<td>保存文件</td>
-</tr>
-<tr>
-<td>wq</td>
-<td>保存退出</td>
-</tr>
-<tr>
-<td>q!</td>
-<td>不保存退出</td>
-</tr>
-<tr>
-<td>set number</td>
-<td>显示行号</td>
-</tr>
-<tr>
-<td>set nonumber</td>
-<td>不显示行号</td>
-</tr>
-<tr>
-<td>n</td>
-<td>定位到第 n 行</td>
-</tr>
-<tr>
-<td>/xxx</td>
-<td>搜索xxx</td>
-</tr>
-<tr>
-<td>n</td>
-<td>来回切换搜到的xxx内容</td>
-</tr>
-<tr>
-<td>noh</td>
-<td>取消搜索后的高亮</td>
-</tr>
-</table><p>替换</p>
-<p>n,$s/旧内容/新内容/g</p>
-<p>​	n 		从第n行开始<br>​	$s 		末尾<br>​	g 		表示全局替换</p>
-<p>按ESC键可随时退出底线命令模式。</p>
+                      <h2 id="github-pages">GitHub pages</h2>
+<p>之所以接触到Hexo以及Jekyll框架是因为之前一直有在写些博客，比如通过<strong>Github Pages</strong>直接写的HTML静态博客，但这种博客维护起来相当麻烦，有如下一些问题：</p>
+<ol>
+<li>维护繁杂，加一篇日志链接往往需要改动很多HTML页面中的链接。</li>
+<li>设计困难，非前端设计人员的通病，往往在界面设计以及效果实现上浪费很多时间。</li>
+<li>不支持MD语法，写一篇博客相当于写一个HTML页面，相当累人。</li>
+</ol>
+<h1 id="静态博客框架">静态博客框架</h1>
+<p>目前有两大静态博客主流框架：<a href="http://jekyllcn.com/">jekyll</a>和<a href="https://hexo.io/">hexo</a>。</p>
+<h2 id="选择hexo还是jekyll">选择Hexo还是Jekyll</h2>
+<p>于是开始接触比较流行的一些静态博客框架，比较流行的有Jekyll，Hexo，Simple，Octopress，Pelican以及Lo·gecho等等。这些静态程序可以说都有各自的好处，但最后我选择了Hexo来搭建自己的博客，和Jekyll相比，选择Hexo主要原因是：</p>
+<ol>
+<li>Jeky基于Ruby实现，安装Jeky需要搭建Ruby环境，在Windows搭建Ruby环境并太好弄，而且Jekyll的中文资料比较少。而 Hexo基于NodeJs实现，在Windows上安装NodeJs开发环境简单。</li>
+<li>比较直接的另一个原因是在网上查找了很多博客的主题，发现Jekyll官网提供的主题都不怎么好看(可能是个人原因)，而Hexo的主题看的比较顺眼，在hexo界，使用最多的主题就是<a href="http://theme-next.iissnan.com/">next</a>。</li>
+<li>两者都支持Markdown语法，这点我非常喜欢。</li>
+</ol>
+<h2 id="hexo博客开发">Hexo博客开发</h2>
+<p>关于hexo的部署无需多言了，直接看官方文档就可以了，写得很清楚了。</p>
+<p><a href="https://hexo.io/zh-cn/docs/">文档 | Hexo</a></p>
+<h4 id="检查版本">检查版本</h4>
+<pre><code class="language-bash"><span class="hljs-keyword">node</span> <span class="hljs-title">-v</span>
+npm -v
+git --<span class="hljs-keyword">version</span>
+hexo -v
+</code></pre>
+<h3 id="正常流程">正常流程</h3>
+<h4 id="初始化">初始化</h4>
+<p>在本地git库（这个文件夹需要是空文件夹）里面git bash</p>
+<blockquote>
+<p>对应官方文档建站</p>
+<pre><code class="language-bash"><span class="hljs-variable">$</span> hexo init &lt;folder&gt;
+<span class="hljs-variable">$</span> <span class="hljs-built_in">cd</span> &lt;folder&gt;
+<span class="hljs-variable">$</span> npm install
+</code></pre>
+</blockquote>
+<pre><code class="language-bash">hexo init <span class="hljs-meta">#初始化hexo</span>
+npm install <span class="hljs-meta">#安装所有依赖</span>
+
+hexo <span class="hljs-keyword">server</span> <span class="hljs-meta">#静态生成本地界面，可以在本地localhost查看</span>
+    hexo s <span class="hljs-meta">#简写</span>
+</code></pre>
+<h4 id="修改配置文件">修改配置文件</h4>
+<p>init之后修改里面的<code>_config.yml</code>文件（在文件最后）</p>
+<pre><code class="language-yaml"><span class="hljs-symbol">deploy:</span>
+<span class="hljs-symbol">  type:</span> git
+<span class="hljs-symbol">  repository:</span> git@github.com:suhan42/suhan42.github.io.git
+  <span class="hljs-meta">#repo: https:<span class="hljs-comment">//github.com/suhan42/suhan42.github.io.git</span></span>
+<span class="hljs-symbol">  branch:</span> main
+</code></pre>
+<p>config.yml里的deploy的type要为git，repo中的地址http而不是https。</p>
+<h4 id="安装一键部署插件">安装一键部署插件</h4>
+<p>在git bash中使用</p>
+<pre><code class="language-bash">npm install hexo-deployer-git <span class="hljs-comment">--save</span>
+</code></pre>
+<p>如果上面报错就使用</p>
+<pre><code class="language-bash">cnpm install hexo-deployer-git <span class="hljs-comment">--save</span>
+</code></pre>
+<h4 id="部署到git">部署到git</h4>
+<pre><code class="language-bash">hexo clean <span class="hljs-comment">#删除之前生成的文件，若未生成过静态文件，可忽略此命令。</span>
+
+hexo generate <span class="hljs-comment">#生成静态文件</span>
+    hexo g
+
+hexo <span class="hljs-keyword">deploy</span> <span class="hljs-comment">#部署网站，上传到github</span>
+    hexo d <span class="hljs-comment">#简写</span>
+</code></pre>
+<p>以上内容可以简单复制</p>
+<pre><code class="language-bash">hexo clean &amp;&amp; hexo <span class="hljs-keyword">generate</span> &amp;&amp; hexo deploy
+</code></pre>
+<p>如果出现<code>Deploy done</code>，则说明部署成功了。</p>
+<p>这个时候再去git中打开对应的name.github.io就可以看到界面了。</p>
+<h2 id="一些报错">一些报错</h2>
+<h5 id="openssl-ssl_read-connection-was-reset-errno-10054">OpenSSL SSL_read: Connection was reset, errno 10054</h5>
+<p>解决办法：</p>
+<ol>
+<li>修改设置，解除SSL验证。打开 命令行工具， 输入：</li>
+</ol>
+<pre><code class="language-bash">git config <span class="hljs-attr">--global</span> http<span class="hljs-selector-class">.sslVerify</span> <span class="hljs-string">&quot;false&quot;</span>
+</code></pre>
+<ol start="2">
+<li>在项目目录下打开命令行工具，输入<code>git init</code>，问题得到有效解决。</li>
+</ol>
+<h5 id="网络问题">网络问题</h5>
+<p>github的网络经常会出问题，连接有效性检验：</p>
+<pre><code class="language-bash"><span class="hljs-meta"># 任选其一即可</span>
+<span class="hljs-built_in">ping</span> github.com
+ssh -T git<span class="hljs-symbol">@github</span>.com
+</code></pre>
+<p>实在不行就翻墙试试</p>
+<hr>
+<p>最后推荐使用</p>
+<p>Github pages + Hexo + NexT</p>
 
 
 
@@ -272,7 +216,7 @@
           <div class="col-lg-5">
             <h3 class="footer-heading">About suhan</h3>
             <p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p>
-            <p><a href="../_plugins/about.html" class="footer-link-more" target="_self">Learn More</a></p>
+            <p><a href="../plugins/about.html" class="footer-link-more" target="_self">Learn More</a></p>
           </div>
 
           <div class="col-6 col-lg-2">
@@ -281,7 +225,7 @@
               <li><a href="../index.html" target="_self"><i class="bi bi-chevron-right"></i> Home</a></li>
               <li><a href="#" target="_self"><i class="bi bi-chevron-right"></i> It</a></li>
               <li><a href="#" target="_self"><i class="bi bi-chevron-right"></i> Acgn</a></li>
-              <li><a href="../_plugins/about.html" target="_self"><i class="bi bi-chevron-right"></i> About</a></li>
+              <li><a href="../plugins/about.html" target="_self"><i class="bi bi-chevron-right"></i> About</a></li>
             </ul>
           </div>
 

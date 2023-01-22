@@ -56,7 +56,7 @@ function post_to_html() {
   /*================================
   渲染html
   ================================= */
-  var _posts = './_posts';
+  var _posts = './posts';
 
   let files = fs.readdirSync(_posts, 'utf-8');
   //获取每一个文件名字
@@ -141,7 +141,7 @@ function post_to_html() {
                     <li><a href="#" target="_self">N - Novel</a></li>
                   </ul>
                 </li>
-                <li><a href="../_plugins/about.html" target="_self">About</a></li>
+                <li><a href="../plugins/about.html" target="_self">About</a></li>
               </ul>
             </nav><!-- end navbar -->
       
@@ -185,16 +185,16 @@ function post_to_html() {
                       `;
 
       var fsFooter = require("fs");
-      var footer = fsFooter.readFileSync('./_plugins/footer.html', 'utf-8').toString();
+      var footer = fsFooter.readFileSync('./plugins/footer.html', 'utf-8').toString();
 
       //判断文件是否存在
       try {
-        fs.accessSync('./_htmls/'+title+'.html', fs.constants.F_OK)
+        fs.accessSync('./htmls/'+title+'.html', fs.constants.F_OK)
 
         // 文件存在
         console.log('-'+title+'.html 存在于当前目录中');
         // 文件存在，则比对文件内容，判断是否需要重写
-        var old_file = fs.readFileSync('./_htmls/'+title+'.html', 'utf-8')
+        var old_file = fs.readFileSync('./htmls/'+title+'.html', 'utf-8')
         if(old_file != header+html+footer){
           console.log(' - '+title+' 文件已修改');
           writeNewFile(title, header, html, footer);
@@ -209,7 +209,7 @@ function post_to_html() {
 
   // 创建文件，并写入html
   function writeNewFile(title, header, html, footer){
-    fs.writeFileSync('./_htmls/'+title+'.html', header+html+footer)
+    fs.writeFileSync('./htmls/'+title+'.html', header+html+footer)
     console.log('==='+title+'  数据写入成功！===');
   }
   
@@ -243,7 +243,7 @@ function create_home_data() {
     let home_data = []
 
     //读取html
-    var _htmls = './_htmls';
+    var _htmls = './htmls';
     let files = fs.readdirSync(_htmls, 'utf-8');
 
     //遍历文件
