@@ -269,7 +269,7 @@ code {
 
 - 关于图片处理
   - [ ] markdown图片正确转码html
-  - [ ] 获取html中的img作为home页的预览图
+  - [x] 获取html中的img作为home页的预览图
   - [x] 以有无img作为区分，区分渲染
 
 - [ ] post页面文章目录

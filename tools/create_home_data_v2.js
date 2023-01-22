@@ -1,7 +1,7 @@
 /*================================
 2. markdown转html，转换好了之后，统计html文件数量，生成目录数据
 使用 fs 异步
-last version
+未使用 _文件夹
 ================================= */
 function get_home_data(){
   var fs = require("fs");
