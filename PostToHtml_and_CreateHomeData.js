@@ -19,7 +19,7 @@ while(turn != true){
 /** 
  * @file post_to_html
  * @brief 1. post（markdown）转html，并且渲染html界面
- * @date 1.22.2023
+ * @date 1.23.2023
  * @param file_name name of post file
  * @author suhan
  */
@@ -34,7 +34,9 @@ function post_to_html() {
   my_renderer.table = function (header, body) {
     return `<table class="table table-hover table-bordered">${header}${body}</table>`;
   };
-
+  my_renderer.image = function(href, title, text) {
+    return `<img src="${href}" alt="${text}">`
+  };
 
   marked.setOptions({
     renderer: my_renderer,

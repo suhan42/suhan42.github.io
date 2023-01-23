@@ -16,7 +16,7 @@
   {
     "title": "marked造轮子",
     "tag": "null",
-    "time": "Sun Jan 22 2023 21:59:03",
+    "time": "Mon Jan 23 2023 16:17:35",
     "summary": "hexo固然好用，但是在使用的过程总还是有一些问题，比如",
     "url": "./htmls/marked造轮子.html"
   },
@@ -26,6 +26,14 @@
     "time": "Sun Jan 22 2023 21:59:03",
     "summary": "目录",
     "url": "./htmls/MySQL自查表.html"
+  },
+  {
+    "title": "test",
+    "tag": "null",
+    "time": "Mon Jan 23 2023 15:18:25",
+    "summary": "photo test",
+    "url": "./htmls/test.html",
+    "imgsrc": "./images/gd.jpg"
   },
   {
     "title": "vi、vim",
@@ -41,6 +49,14 @@
     "summary": "我这篇通关推荐顺序的宗旨是让玩家的体验更好。对于《白色相簿2》，不看剧透玩起来的感觉要比看剧透好非常多！所以在不透剧的前提下，通过这篇文章科普一些信息，并且提高游戏体验",
     "url": "./htmls/《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理].html",
     "imgsrc": "./images/冬馬かずさ.jpg"
+  },
+  {
+    "title": "关于Git使用",
+    "tag": "null",
+    "time": "Mon Jan 23 2023 16:17:36",
+    "summary": "Git是分布式版本控制系统，那么它就没有中央服务器的，每个人的电脑就是一个完整的版本库，这样，工作的时候就不需要联网了，因为版本都是在自己的电脑上。既然每个人的电脑都有一个完整的版本库，那多个人如何协作呢？比如说自己在电脑上改了文件A，其他人也在电脑上改了文件A，这时，你们两之间只需把各自的修改推送给对方，就可以互相看到对方的修改了。",
+    "url": "./htmls/关于Git使用.html",
+    "imgsrc": ".\\images\\git\\work.png"
   },
   {
     "title": "静态博客框架之Hexo & Jekyll",

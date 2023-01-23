@@ -18,6 +18,8 @@
 
 let newsData = 
 
+
+
 [
   {
     "title": "c自查表",
@@ -36,7 +38,7 @@ let newsData =
   {
     "title": "marked造轮子",
     "tag": "null",
-    "time": "Sun Jan 22 2023 21:59:03",
+    "time": "Mon Jan 23 2023 16:17:35",
     "summary": "hexo固然好用，但是在使用的过程总还是有一些问题，比如",
     "url": "./htmls/marked造轮子.html"
   },
@@ -46,6 +48,14 @@ let newsData =
     "time": "Sun Jan 22 2023 21:59:03",
     "summary": "目录",
     "url": "./htmls/MySQL自查表.html"
+  },
+  {
+    "title": "test",
+    "tag": "null",
+    "time": "Mon Jan 23 2023 15:18:25",
+    "summary": "photo test",
+    "url": "./htmls/test.html",
+    "imgsrc": "./images/gd.jpg"
   },
   {
     "title": "vi、vim",
@@ -63,6 +73,14 @@ let newsData =
     "imgsrc": "./images/冬馬かずさ.jpg"
   },
   {
+    "title": "关于Git使用",
+    "tag": "null",
+    "time": "Mon Jan 23 2023 16:17:36",
+    "summary": "Git是分布式版本控制系统，那么它就没有中央服务器的，每个人的电脑就是一个完整的版本库，这样，工作的时候就不需要联网了，因为版本都是在自己的电脑上。既然每个人的电脑都有一个完整的版本库，那多个人如何协作呢？比如说自己在电脑上改了文件A，其他人也在电脑上改了文件A，这时，你们两之间只需把各自的修改推送给对方，就可以互相看到对方的修改了。",
+    "url": "./htmls/关于Git使用.html",
+    "imgsrc": ".\\images\\git\\work.png"
+  },
+  {
     "title": "静态博客框架之Hexo & Jekyll",
     "tag": "null",
     "time": "Sun Jan 22 2023 21:59:03",
@@ -70,15 +88,6 @@ let newsData =
     "url": "./htmls/静态博客框架之Hexo & Jekyll.html"
   }
 ]
-
-
-
-
-
-
-
-
-
 
 
 
@@ -145,7 +154,7 @@ let render = ()=>{
       newMain.innerHTML +=
       `<div class="d-md-flex post-entry-2 small-img">
         <a href="${item.url}" class="me-4">
-          <img src="${item.imgsrc}" alt="${item.title}" class="img-fluid">
+          <img src="${item.imgsrc}" alt="${item.title}" class="img-fluid post-img">
         </a>
         <div>
           <div class="post-meta">

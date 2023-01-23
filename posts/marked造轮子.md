@@ -268,7 +268,7 @@ code {
 - [x] home页面分页
 
 - 关于图片处理
-  - [ ] markdown图片正确转码html
+  - [x] markdown图片正确转码html
   - [x] 获取html中的img作为home页的预览图
   - [x] 以有无img作为区分，区分渲染
 
@@ -525,3 +525,8 @@ fs2.writeFileSync('./home_data.json', string_data);
 
 marked + mathjax 实现支持数学公式的 markdown 转 html
 
+
+
+# 待解决
+
+highlight在本地预览有高亮，但是在github pages没有高亮
