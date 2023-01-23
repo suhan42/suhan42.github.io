@@ -8,11 +8,11 @@
 
 ### 目录文件夹
 
-`_htmls`：渲染之后的网页
+`htmls`：渲染之后的网页
 
-`_plugins`：固定的静态界面模板，比如footer.html
+`plugins`：固定的静态界面模板，比如footer.html
 
-`_posts`：手写的笔记或网页，比如markdown文件
+`posts`：手写的笔记或网页，比如markdown文件
 
-`_views`：静态不渲染的网页
+`views`：静态不渲染的网页
 

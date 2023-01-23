@@ -281,6 +281,12 @@ section {
 .post-entry-1 img {
     max-width: 100%;
     width: auto;
+    /* 居中 */
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center; 
+    margin: 0 auto;
+
     /* height: 100px;
     object-fit: cover;
     object-position: 50% 20%; */
