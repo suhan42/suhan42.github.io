@@ -19,7 +19,6 @@
 let newsData = 
 
 
-
 [
   {
     "title": "c自查表",
@@ -65,6 +64,13 @@ let newsData =
     "url": "./htmls/vi、vim.html"
   },
   {
+    "title": "what did you learn from your heartbreak",
+    "tag": "null",
+    "time": "Sun Apr 02 2023 22:06:21",
+    "summary": "  Thank you for leaving. This just shows that you weren&#39;t for me. Those who stay are supposed to stay, those who to go are supposed to go. Rejection is a chisel for perfection. <em>NO</em> means next opportunity or new options.",
+    "url": "./htmls/what did you learn from your heartbreak.html"
+  },
+  {
     "title": "《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理]",
     "tag": "null",
     "time": "Sun Jan 22 2023 21:59:03",
@@ -101,23 +107,20 @@ let old_data = [
     summary: "这篇不是markdown笔记，是直接写的html网页，所以建议同时观看html源码，可以更好的学习理解。",
     
   },
+  {
+    title: "新年快乐！！！",
+    tag: "happy",
+    time: "1-22-2023",
+    url: "./views/fireworks.html",
+    summary: "新年快乐，兔年大吉。恭喜发财，万事如意！",
+    
+  },
 ];
 //在末尾加上old_data
 newsData = newsData.concat(old_data);
 
 // num = {};
 // fruits.push(num);
-
-
-let top_data = 
-{
-  title: "新年快乐！！！",
-  tag: "happy",
-  time: "1-22-2023",
-  url: "./views/fireworks.html",
-  summary: "新年快乐，兔年大吉。恭喜发财，万事如意！",
-  
-};
 
 
 
@@ -130,8 +133,16 @@ function sortTime(a,b){
 newsData.sort(sortTime);
 
 
+
+
+
 // 设置顶置文件
-newsData.unshift(top_data)
+
+// let top_data = 
+// {};
+
+//   newsData.unshift(top_data)
+
 
 
 
