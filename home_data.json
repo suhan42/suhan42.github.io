@@ -27,14 +27,7 @@
     "summary": "目录",
     "url": "./htmls/MySQL自查表.html"
   },
-  {
-    "title": "test",
-    "tag": "null",
-    "time": "Mon Jan 23 2023 15:18:25",
-    "summary": "photo test",
-    "url": "./htmls/test.html",
-    "imgsrc": "./images/gd.jpg"
-  },
+ 
   {
     "title": "vi、vim",
     "tag": "null",
