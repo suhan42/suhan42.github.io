@@ -1,3 +1,11 @@
+/**
+ * 1. post（markdown）转html，并且渲染html界面
+ * 2. post转html转换好了之后，统计html文件数量，生成home目录数据，保存到home_data.json
+ * 
+ */
+
+
+
 // 使用单标志法进行进程的互斥
 var turn = true;
 while(turn != false){

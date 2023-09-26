@@ -27,7 +27,14 @@
     "summary": "目录",
     "url": "./htmls/MySQL自查表.html"
   },
- 
+  {
+    "title": "test",
+    "tag": "null",
+    "time": "Mon Jan 23 2023 15:18:25",
+    "summary": "photo test",
+    "url": "./htmls/test.html",
+    "imgsrc": "./images/gd.jpg"
+  },
   {
     "title": "vi、vim",
     "tag": "null",
@@ -38,8 +45,8 @@
   {
     "title": "what did you learn from your heartbreak",
     "tag": "null",
-    "time": "Sun Apr 02 2023 22:06:21",
-    "summary": "  Thank you for leaving. This just shows that you weren&#39;t for me. Those who stay are supposed to stay, those who to go are supposed to go. Rejection is a chisel for perfection. <em>NO</em> means next opportunity or new options.",
+    "time": "Tue Sep 26 2023 10:32:13",
+    "summary": "  -Rindo:",
     "url": "./htmls/what did you learn from your heartbreak.html"
   },
   {
