@@ -93,6 +93,14 @@ let newsData =
 
 let old_data = [
   {
+    title: "倒计时",
+    tag: "it",
+    time: "4-26-2024",
+    url: "./views/divergence/divergence.html",
+    summary: "一个辉光管倒计时",
+    
+  },
+  {
     title: "关于css中box的使用",
     tag: "it",
     time: "4-12-2022",
