@@ -1,0 +1,176 @@
+@charset "utf-8";
+
+/*
+盒子模型、浮动、定位
+*/
+
+
+/*盒子边框（border） */
+#main div {
+	/*border-width: 1px;
+	border-style: solid;
+	border-color: black;
+	可以简写为下面*/
+	border: 1px solid black;
+	overflow: hidden;/*  */
+}
+
+table tr{
+	border-spacing:none; border-collapse:collapse;
+	border: 1px solid black;
+	border-collapse: collapse;/*相邻边框合并在一起*/
+}
+table th {
+	border: 1px solid black;
+	border-collapse: collapse;/*相邻边框合并在一起*/
+}
+table td {
+	border: 1px solid black;
+	border-collapse: collapse;/*相邻边框合并在一起*/
+}
+#main h2,h3,h4,h5 {
+	text-align: center;
+	font-weight:bold;
+}
+
+@media (min-width: 1000px) {
+	.containerer{
+		margin-left: 200px;
+		border: 1px dashed black;
+	}
+	.link {
+		width: 200px;
+		position: fixed;/*相对浏览器定位*/
+		top: 100px;
+		/*bottom: 100px;*/
+		z-index: 1;
+	}
+	.link a {
+		text-decoration: none;/*取消下划线*/
+	}
+	.link a:hover {
+		text-decoration: underline;
+	}
+}
+
+header, footer {
+	z-index: 2;
+}
+
+.padd {
+	width: 100px;
+	height: 50px;
+
+	padding: 50px;
+	padding-left: 30px;
+}
+
+.txt {
+	white-space: pre;/*保留回车、空格*/
+}
+
+/* 两种放入图片 */
+.img {
+	width: 300px;/* 插入图片更改大小 width 和 height */
+	height: 210px;
+	margin-top: 30px;  /* 插入图片更改位置 可以用margin 或padding  盒模型 */
+	margin-left: 50px; /* 插入当图片也是一个盒子 */
+}
+.im {
+	height: 100px;
+	background-image: url(../images/gd.jpg); /*当color和image同时存在时，背景图案优先显示*/
+	background-repeat: no-repeat;/*重复显示方式：repeat-x在x方向重复, repeat-y, no-repeat*/
+	background-attachment: scroll;/*背景图案是否跟随内容一起滚动：scroll默认, fixed不跟随滚动*/
+	background-position: 10px;/*起始显示：top, left, center。或者background-position: 30px 50px;*/
+	background-size: 50%;
+}
+
+
+
+/* 圆角边框、阴影、透明 */
+.bg {
+	background: skyblue;
+	height: 400px;
+}
+.bg .o {
+	background: white;
+
+	background: rgba(0, 0, 0, .4);/*背景透明*/
+	opacity: 0.7;/*透明，0是完全透明，字也会透明*/
+
+	/*box-shadow:水平阴影 垂直阴影 模糊距离（虚实）  阴影尺寸（影子大小）  阴影颜色  内/外阴影；*/
+	box-shadow: 10px 10px 10px 1px black;/*阴影部分*/
+
+	border-radius: 20px;/*原角*/
+
+	filter: blur(1px);/*模糊*/
+}
+
+
+
+
+/* 浮动 */
+.float {
+	float: left;
+}
+.fl {
+	float: left;
+	width: 100px;
+	height: 100px;
+}
+.floatClear {
+	/*clear属性用于清除浮动
+	left: 不允许左侧有浮动元素（清除左侧浮动的影响）
+	right: 不允许右侧有浮动元素（清除右侧浮动的影响）
+	*/
+	clear: both;
+}
+.f1 {
+	border: 2px solid red;
+}
+.f2 {
+	float: left;
+	background: #ffffcc;
+	height: 300px;
+	width: 300px;
+	margin: 10px;
+}
+.f3 {
+	float: left;
+	background: #ff0000;
+	height: 200px;
+	margin: 10px;
+}
+.f4 {
+	clear: both;
+	background: blue;
+	height: 100px;
+	margin: 10px;
+}
+.f5 {
+	background: green;
+	height: 100px;
+	margin: 10px;
+}
+.f6 {
+	background: #ff00ff;
+	margin: 10px;
+}
+
+
+
+
+/* 定位 */
+img {
+	width: 100%;
+}
+.imgCenter {
+	text-align: center;
+	width: AUTO;
+	max-width: 800px;/*最大的数值*/
+	border: none;
+}
+.g {
+	position:relative;
+	bottom:166px;
+}

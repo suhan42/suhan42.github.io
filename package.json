@@ -1,7 +1,17 @@
 {
+  "private": true,
   "dependencies": {
     "highlight.js": "^11.7.0",
     "marked": "^4.2.5",
     "require.js": "^1.0.0"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.8"
+  },
+  "scripts": {
+    "validate:content": "node scripts/validate-content.mjs",
+    "clean": "node -e \"const fs=require('fs'); fs.rmSync('site',{recursive:true,force:true}); console.log('site/ cleaned');\"",
+    "build": "npm run clean && npx @11ty/eleventy",
+    "serve": "npx @11ty/eleventy --serve"
   }
 }
