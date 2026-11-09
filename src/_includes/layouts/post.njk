@@ -1,21 +1,37 @@
 ---
 layout: layouts/base.njk
 ---
+{# 文章页 layout：自动目录、标题、meta 和正文阅读线；post 正文由 Markdown 或受控 HTML 生成。 #}
+{% set article = content | withToc %}
+<div class="post-layout{% if not article.hasToc %} no-toc{% endif %}">
+  {% if article.hasToc %}
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      {{ article.toc | safe }}
+    </nav>
+  </details>
+  {% endif %}
 
-<div class="row">
-  <div class="col-md-10">
-    <h3 class="category-title">{{ title }}</h3><hr>
-    <div class="d-md-flex post-entry-1">
-      <div>
-        <div class="post-meta">
-          <span class="date">{{ category }}</span> <span class="mx-1">&bullet;</span>
-          <span>{{ date | dateDisplay }}</span>
-        </div>
-        <div class="post-content">
-          {{ content | safe }}
-        </div>
-      </div>
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/{{ category }}/" class="post-category">{{ category }}</a>
+      <time datetime="{{ date | dateToIso }}">{{ date | dateDisplay }}</time>
+      {% if tags and tags.length %}
+      <span aria-hidden="true">/</span>
+      {% for tag in tags %}
+      <a href="/tags/{{ tag }}/">#{{ tag }}</a>
+      {% endfor %}
+      {% endif %}
     </div>
-  </div>
-  {% include "partials/sidebar.njk" %}
+
+    <h1 class="post-title">{{ title }}</h1>
+
+    <div class="post-body">
+{{ article.content | trim | safe }}
+    </div>
+  </article>
 </div>

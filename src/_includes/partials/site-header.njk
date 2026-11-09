@@ -1,40 +1,42 @@
-{# 站点公共头部，由 base.njk 引入，所有页面共享同一结构 #}
-<header id="header" class="header d-flex align-items-center fixed-top">
-  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-    <a href="/" class="logo d-flex align-items-center">
-      <img src="/assets/images/suhan.png" alt="">
-      <h2>{{ site.title }}</h2>
+{# 站点公共头部：低噪音导航、主题切换和原生折叠的移动菜单，由 base.njk 引入。 #}
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="{{ site.title }} 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">{{ site.title }}</span>
     </a>
 
-    <nav id="navbar" class="main-nav navbar">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/categories/it/">IT</a></li>
-        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
-          <ul>
-            <li><a href="/categories/acgn/">A - Animation</a></li>
-            <li><a href="/categories/acgn/">C - Comic</a></li>
-            <li><a href="/categories/acgn/">G - Game</a></li>
-            <li><a href="/categories/acgn/">N - Novel</a></li>
-          </ul>
-        </li>
-        <li><a href="/about/">About</a></li>
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        {% for item in site.nav %}
+        {% set active = item.url | isNavActive(page.url, category) %}
+        <li><a href="{{ item.url }}" class="nav-link{% if active %} is-active{% endif %}"{% if active %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+        {% endfor %}
       </ul>
     </nav>
 
-    <div class="position-relative">
-      <a href="{{ site.social.github }}" class="mx-2" target="_blank"><span class="bi-github"></span></a>
-      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+    <div class="header-actions">
+      <a href="{{ site.social.github }}" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
 
-      <a class="toggle"><span class="bi-list"></span></a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
 
-      <div class="search-form-wrap js-search-form-wrap">
-        <form action="" class="search-form">
-          <span class="icon bi-search"></span>
-          <input type="text" placeholder="Search" class="form-control">
-          <button class="btn js-search-close"><span class="bi-x"></span></button>
-        </form>
-      </div>
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          {% for item in site.nav %}
+          {% set active = item.url | isNavActive(page.url, category) %}
+          <a href="{{ item.url }}"{% if active %} class="is-active" aria-current="page"{% endif %}>{{ item.label }}</a>
+          {% endfor %}
+          <a href="/archive/"{% if page.url == "/archive/" %} class="is-active" aria-current="page"{% endif %}>Archive</a>
+        </nav>
+      </details>
     </div>
   </div>
 </header>

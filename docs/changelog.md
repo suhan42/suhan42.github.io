@@ -2,6 +2,26 @@
 
 最新内容放前面；同一天合并写，聚焦具体内容，不记录过多 git 操作。
 
+## 2026-11-09
+
+### 站点视觉重做
+
+- 重写 `assets/css/main.css`，建立 `night` 夜航深色和 `paper` 纸墨浅色两套主题变量，统一卡片、侧栏、分页、文章阅读线、表格和代码块的表面、边框与文字层级。
+- `base.njk` 增加首帧主题恢复和 `theme-color`，没有保存值时跟随系统配色；新增 `assets/js/theme.js`，负责手动切换、持久化、系统偏好变化和无障碍标签。
+- 首页重构为 hero 和 Latest 两个主分区；Works 移入右侧栏做三行毛玻璃索引，works 元数据集中到 `src/_data/custom-pages.json`，首页和侧栏共用同一份数据。
+- Works 右栏索引保持约 192px 高，使用半透明表面、毛玻璃、材质色印章、hover 边框和箭头滑入；主内容不再被 Works 大卡片截断。
+- 站点品牌标记从文字 `S` 换回旧头像 `assets/images/suhan.png`，保留 28px、8px 圆角和 `-4deg` 旋转；主站 header 与 CSS Box 独立页头保持一致。
+- header 改为低噪音桌面导航、主题按钮和原生 `details` 移动菜单，移除基础页面对 Bootstrap、jQuery 和 hc-mobile-nav 的运行时依赖。
+- 文章页、分类页、标签页、归档页、关于页和 404 页统一到新的阅读线与卡片体系，导航支持首页分页、分类页和文章所属分类高亮。
+- 文章页新增自动目录：`withToc` 过滤器读取渲染后的正文标题，给 `h1` 到 `h6` 补齐唯一 id，并在左侧生成粘性目录；移动端默认折叠在正文上方，重复标题自动追加数字后缀。
+- 调整目录版式：桌面端目录贴到内容区左侧，文章阅读线保持居中；参考 beUI 和 ExpoKit 的侧栏处理，隐藏默认滚动条并改为悬浮时出现的 4px 细条，同时增加目录展开动效、目录项悬浮位移和当前章节高亮。
+- 目录收起改为侧栏整列收起：正文从 880px 扩展到 1000px 并重新居中，左侧只保留贴边目录入口；收起图标改为双箭头，桌面端左右旋转、移动端上下旋转。
+- 修复 Works 三个独立页面：Divergence Meter 改用绝对资源路径、预加载辉光管图片并支持手机端两行缩放；Happy New Year 移除失效的外部图片和音频，改成本地程序化烟花粒子；CSS Box 移除与新站冲突的旧全局皮肤和导航，换成轻量页头与纸墨阅读底。
+- 摘要改为可选：`excerpt` 过滤器从正文第一段生成展示摘要，文章卡、RSS 和搜索索引统一使用同一兜底逻辑。
+- 修复文章页 layout 缺少 `base.njk` 导致的正文片段输出、`simple-page` 标题样式误伤文章卡、归档年份间距过紧、文章卡分类链接被整卡遮罩截获等问题。
+- 启用 Nunjucks `trimBlocks` 和 `lstripBlocks`，消除构建产物中的行尾空格；`package.json` 声明 `type: module`，消除 Eleventy 配置的模块类型告警。
+- 验证通过：`npm run validate:content`、`npm run build`、`npm run validate:output`、`git diff --check`；Playwright 覆盖 1440px 双主题、文章页、归档页、分类页、768px 和 390px 移动端，无控制台错误和失败请求。
+
 ## 2026-11-06
 
 ### 迁移分支 `migration/eleventy-v1`

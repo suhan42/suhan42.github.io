@@ -59,7 +59,7 @@ title: 非空
 date: YYYY-MM-DD
 slug: 只允许小写英文、数字和连字符，全站唯一
 category: 受控分类
-summary: 非空完整句
+summary: 可选；需要精确控制列表、RSS 和搜索摘要时填写，缺省时取正文第一段
 status: published 或 draft
 ```
 

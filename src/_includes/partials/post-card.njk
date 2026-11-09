@@ -1,31 +1,22 @@
-{# 文章卡片组件：显示封面图、日期、分类、标题和摘要；无封面时渲染纯文字卡 #}
-{% if post.cover %}
-<div class="d-md-flex post-entry-2 small-img">
-  <a href="{{ post.url }}" class="me-4">
-    <img src="{{ post.cover }}" alt="{{ post.title }}" class="img-fluid post-img">
-  </a>
-  <div>
+{# 文章卡片：摘要优先取 front matter，没有时用 excerpt 过滤器取正文第一段，因此不需要逐篇维护简介。 #}
+<article class="post-card{% if not post.cover %} no-cover{% endif %}">
+  {% if post.cover %}
+  <img src="{{ post.cover }}" alt="" class="post-cover" loading="lazy">
+  {% endif %}
+
+  <div class="post-body-area">
     <div class="post-meta">
-      <span class="date">{{ post.data.category }}</span><span class="mx-1">&bullet;</span>
-      <span>{{ post.data.date | dateDisplay }}</span>
+      <a href="/categories/{{ post.data.category }}/" class="post-category">{{ post.data.category }}</a>
+      <time datetime="{{ post.data.date | dateToIso }}">{{ post.data.date | dateDisplay }}</time>
     </div>
-    <a href="{{ post.url }}">
-      <h4>{{ post.data.title }}</h4>
-      <p>{{ post.data.summary }}</p>
+
+    <a href="{{ post.url }}" class="card-link">
+      <h3 class="post-title">{{ post.data.title }}</h3>
     </a>
+
+    {% set cardSummary = post.data.summary or post.templateContent | excerpt %}
+    {% if cardSummary %}
+    <p class="post-summary">{{ cardSummary }}</p>
+    {% endif %}
   </div>
-</div>
-{% else %}
-<div class="d-md-flex post-entry-2 small-img">
-  <div>
-    <div class="post-meta">
-      <span class="date">{{ post.data.category }}</span><span class="mx-1">&bullet;</span>
-      <span>{{ post.data.date | dateDisplay }}</span>
-    </div>
-    <a href="{{ post.url }}">
-      <h4>{{ post.data.title }}</h4>
-      <p>{{ post.data.summary }}</p>
-    </a>
-  </div>
-</div>
-{% endif %}
+</article>

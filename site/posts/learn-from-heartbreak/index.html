@@ -1,78 +1,96 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="night">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
   <title>what did you learn from your heartbreak - Suhan</title>
 
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
+
   <link href="/assets/images/suhan.png" rel="icon">
-  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css" rel="stylesheet">
-  <link href="/assets/css/variables.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
-  <link href="/assets/css/me.css" rel="stylesheet">
   <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
-  
 </head>
 <body>
-  
-<header id="header" class="header d-flex align-items-center fixed-top">
-  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-    <a href="/" class="logo d-flex align-items-center">
-      <img src="/assets/images/suhan.png" alt="">
-      <h2>Suhan</h2>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
     </a>
 
-    <nav id="navbar" class="main-nav navbar">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/categories/it/">IT</a></li>
-        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
-          <ul>
-            <li><a href="/categories/acgn/">A - Animation</a></li>
-            <li><a href="/categories/acgn/">C - Comic</a></li>
-            <li><a href="/categories/acgn/">G - Game</a></li>
-            <li><a href="/categories/acgn/">N - Novel</a></li>
-          </ul>
-        </li>
-        <li><a href="/about/">About</a></li>
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
       </ul>
     </nav>
 
-    <div class="position-relative">
-      <a href="https://github.com/suhan42" class="mx-2" target="_blank"><span class="bi-github"></span></a>
-      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
 
-      <a class="toggle"><span class="bi-list"></span></a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
 
-      <div class="search-form-wrap js-search-form-wrap">
-        <form action="" class="search-form">
-          <span class="icon bi-search"></span>
-          <input type="text" placeholder="Search" class="form-control">
-          <button class="btn js-search-close"><span class="bi-x"></span></button>
-        </form>
-      </div>
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
     </div>
   </div>
 </header>
 
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout no-toc">
 
-  <main id="main">
-    <section>
-      <div class="container">
-        
-<div class="row">
-  <div class="col-md-10">
-    <h3 class="category-title">what did you learn from your heartbreak</h3><hr>
-    <div class="d-md-flex post-entry-1">
-      <div>
-        <div class="post-meta">
-          <span class="date">essay</span> <span class="mx-1">&bullet;</span>
-          <span>2023-09-26</span>
-        </div>
-        <div class="post-content">
-          <p>-Rindo:</p>
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/essay/" class="post-category">essay</a>
+      <time datetime="2023-09-26">2023-09-26</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/essay/">#essay</a>
+      <a href="/tags/english/">#english</a>
+    </div>
+
+    <h1 class="post-title">what did you learn from your heartbreak</h1>
+
+    <div class="post-body">
+<p>-Rindo:</p>
 <p>Thank you for leaving. This just shows that you weren't for me. Those who stay are supposed to stay, those who to go are supposed to go. Rejection is a chisel for perfection. <em>NO</em> means next opportunity or new options.</p>
 <p>SO, It's not heartbreak, it's heart shape. Nothing can break your heart. Heart is not breakable.</p>
 <p>These experiences that you're going through are shaping your heart for the relationship that will be long lasting. It's fine tuning it, actually, You need to ask yourself the questions that led you to the situation you were in. But always think of it as heart reshaping, heart developing.</p>
@@ -80,155 +98,30 @@
 <p>i see.</p>
 <p>-Rindo:</p>
 <p>I think after you become matureenough, then you can use your sharp eyes to recogniz e people, find who you really suit to,then, take it seriously.</p>
-
-        </div>
-      </div>
     </div>
-  </div>
-  
-<div class="col-md-2">
-  <div class="aside-block">
-    <h3 class="aside-title">Video</h3>
-    <div class="video-post">
-      <a href="https://www.bilibili.com" class="glightbox link-video">
-        <span class="bi-play-fill"></span>
-        <img src="/assets/images/gd.jpg" alt="" class="img-fluid">
-      </a>
-    </div>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Categories</h3>
-    <ul class="aside-links list-unstyled">
-      
-      <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i>acgn</a></li>
-      
-      <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i>essay</a></li>
-      
-      <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i>it</a></li>
-      
-    </ul>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Tags</h3>
-    <ul class="aside-tags list-unstyled">
-      
-      <li><a href="/tags/c/">#c</a></li>
-    
-      <li><a href="/tags/cpp/">#cpp</a></li>
-    
-      <li><a href="/tags/database/">#database</a></li>
-    
-      <li><a href="/tags/english/">#english</a></li>
-    
-      <li><a href="/tags/essay/">#essay</a></li>
-    
-      <li><a href="/tags/game/">#game</a></li>
-    
-      <li><a href="/tags/git/">#git</a></li>
-    
-      <li><a href="/tags/guide/">#guide</a></li>
-    
-      <li><a href="/tags/hexo/">#hexo</a></li>
-    
-      <li><a href="/tags/jekyll/">#jekyll</a></li>
-    
-      <li><a href="/tags/linux/">#linux</a></li>
-    
-      <li><a href="/tags/markdown/">#markdown</a></li>
-    
-      <li><a href="/tags/marked/">#marked</a></li>
-    
-      <li><a href="/tags/mysql/">#mysql</a></li>
-    
-      <li><a href="/tags/note/">#note</a></li>
-    
-      <li><a href="/tags/shell/">#shell</a></li>
-    
-      <li><a href="/tags/static-site/">#static-site</a></li>
-    
-      <li><a href="/tags/vim/">#vim</a></li>
-    
-      <li><a href="/tags/white-album-2/">#white-album-2</a></li>
-    
-      <li><a href="/tags/workflow/">#workflow</a></li>
-    
-    </ul>
-  </div>
+  </article>
 </div>
-
-</div>
-
-      </div>
-    </section>
   </main>
 
-  
-<footer id="footer" class="footer">
-  <div class="footer-content">
-    <div class="container">
-      <div class="row g-2">
-        <div class="col-lg-5">
-          <h3 class="footer-heading">About suhan</h3>
-          <p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p>
-          <p><a href="/about/" class="footer-link-more">Learn More</a></p>
-        </div>
 
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Navigation</h3>
-          <ul class="footer-links list-unstyled">
-            <li><a href="/"><i class="bi bi-chevron-right"></i> Home</a></li>
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> It</a></li>
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> Acgn</a></li>
-            <li><a href="/about/"><i class="bi bi-chevron-right"></i> About</a></li>
-          </ul>
-        </div>
-
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Categories</h3>
-          <ul class="footer-links list-unstyled">
-            
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> acgn</a></li>
-            
-            <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i> essay</a></li>
-            
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> it</a></li>
-            
-          </ul>
-        </div>
-
-        <div class="col-lg-3">
-          虚以待位
-          ？？？
-        </div>
-      </div>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
     </div>
-  </div>
 
-  <div class="footer-legal">
-    <div class="container">
-      <div class="row justify-content-between">
-        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-          <div class="copyright">&copy; Copyright <strong><span>suhan42</span></strong>. All Rights Reserved</div>
-        </div>
-        <div class="col-md-6">
-          <div class="social-links mb-3 mb-lg-0 text-center text-md-end">
-            <a href="https://github.com/suhan42" class="github" target="_blank"><i class="bi bi-github"></i></a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
   </div>
 </footer>
 
-<a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-
-  <script src="/assets/vendor/jquery-1.11.0.min.js"></script>
-  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js"></script>
+  <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/site.js"></script>
-  <script src="/assets/js/me.js"></script>
 </body>
 </html>

@@ -1,21 +1,21 @@
 # Eleventy 迁移开发计划
 
-更新时间：2026-11-06
+更新时间：2026-11-09
 
 本计划定义从当前自研静态博客生成器迁移到 Eleventy 的阶段、任务、验收标准、回滚边界和主要风险。原则是不推翻现有视觉，不引入 CI/CD，分阶段交付，每阶段都能本地验证；破坏性删除、依赖变更和 URL 退役必须先获得确认。
 
 ## 当前进度（给后续 AI 的交接记录）
 
-截至 2026-11-06，迁移分支 `migration/eleventy-v1` 的完成状态：
+截至 2026-11-09，迁移分支 `migration/eleventy-v1` 的完成状态：
 
 | 阶段 | 状态 | 说明 |
 |---|---|---|
 | P0 基线 | √ | 备份标签 `pre-eleventy-migration`、迁移分支和清点文档已完成 |
 | P1 内容正式化 | √ | 9 篇 Markdown + 1 篇文章型 HTML 全部有完整 front matter；`test.md` 为 draft |
 | P2 Eleventy 骨架 | √ | Eleventy 3.1.8 安装、目录结构、最小模板、内容校验和首次构建通过 |
-| P3 页面模板与视觉 | 未开始 | 下一步：完整首页、header/footer/sidebar、分页、自定义页面迁移 |
-| P4 站点能力 | 未开始 | 归档、分类页、标签页、RSS、sitemap、搜索索引、输出校验 |
-| P5 清理与发布 | 未开始 | 旧脚本/旧产物清理、`site/` 提交策略、发布验收 |
+| P3 页面模板与视觉 | √ | 首页、header/footer/sidebar、分页、文章页和双主题视觉重做完成 |
+| P4 站点能力 | √ | 归档、分类页、标签页、RSS、sitemap、搜索索引和输出校验完成 |
+| P5 清理与发布 | 进行中 | 旧 URL 跳转和 `site/` 提交策略已落地，发布前仍需完整人工验收 |
 
 关键决策记录：
 
@@ -23,7 +23,7 @@
 2. 三个自定义页面（divergence、box、fireworks）全部保留首页展示资格。
 3. WA2 文章保留 HTML 正文格式，迁入 `src/content/posts/`。
 4. `node_modules` 移出 git 追踪比原计划提前到 P2，因为安装后不处理会导致后续提交包含全部依赖。
-5. `site/` 构建产物本地验证用，暂不提交；P5 发布时再决定提交策略。
+5. `site/` 作为唯一发布目录提交到仓库；构建、验收和推送仍由人工执行。
 
 环境差异记录：
 
@@ -192,12 +192,12 @@ P2 在迁移分支开发，不部署。构建失败时保留 `main` 不动；如
 
 ### 目标
 
-保留当前视觉语言，把重复 HTML 收敛为 Eleventy layout 和 partial。
+把重复 HTML 收敛为 Eleventy layout 和 partial，并在 2026-11-09 完成夜航/纸墨双主题视觉重做；不再保留旧 Bootstrap 皮肤作为基础站点依赖。
 
 ### 任务
 
 1. 创建 `base.njk`，统一 HTML head、编码、viewport、站点元数据、header、footer 和基础脚本。
-2. 将首页迁移为 `home.njk`，使用 Eleventy pagination。
+2. 将首页迁移为 `index.njk`，使用 Eleventy pagination。
 3. 将旧首页文章卡迁移为 `post-card.njk`。
 4. 将分页迁移为 `pagination.njk`，支持首页、上一页、下一页和页码状态。
 5. 创建 `post.njk`，渲染标题、日期、分类、标签、正文、封面和文章导航。
@@ -209,8 +209,8 @@ P2 在迁移分支开发，不部署。构建失败时保留 `main` 不动；如
    - `views/box.html` 和 fireworks 页面按同样策略归类；
    - 明确哪些页面仍需要 jQuery，哪些可以先用原生 JS。
 10. 更新所有样式和脚本引用为 `/assets/...`。
-11. 输出 `post-navigation.njk`，按日期排序生成上一篇和下一篇。
-12. 逐页校验 header、footer、移动导航、分页、文章样式和代码高亮。
+11. 文章页输出标题、日期、分类、标签、自动目录和正文阅读线，目录在桌面端吸附在左侧、移动端折叠。
+12. 逐页校验 header、footer、移动导航、分页、文章样式和双主题切换。
 
 ### 模板边界
 

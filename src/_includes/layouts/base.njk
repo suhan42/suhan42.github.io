@@ -1,39 +1,58 @@
 <!DOCTYPE html>
-<html lang="{{ site.language or 'zh-CN' }}">
+<html lang="{{ site.language or 'zh-CN' }}" data-theme="night">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% if title %}{{ title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="{{ description or 'suhan 的个人博客，收录技术笔记、随笔和交互作品。' }}">
+  <title>{% if title and title != site.title %}{{ title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
 
   <link href="/assets/images/suhan.png" rel="icon">
-  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css" rel="stylesheet">
-  <link href="/assets/css/variables.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
-  <link href="/assets/css/me.css" rel="stylesheet">
   <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
   {% if pageStyles %}
   <style>{{ pageStyles | safe }}</style>
   {% endif %}
 </head>
 <body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
   {% include "partials/site-header.njk" %}
 
-  <main id="main">
-    <section>
-      <div class="container">
-        {{ content | safe }}
+  <main id="main" class="layout{% if postLayout %} post-layout-shell{% endif %}" tabindex="-1">
+{% if showRail %}
+    <div class="content-rail">
+      <div class="content-main">
+{{ content | trim | safe }}
       </div>
-    </section>
+      {% include "partials/sidebar.njk" %}
+    </div>
+{% else %}
+{{ content | trim | safe }}
+{% endif %}
   </main>
 
   {% include "partials/site-footer.njk" %}
 
-  <script src="/assets/vendor/jquery-1.11.0.min.js"></script>
-  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js"></script>
+  <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/site.js"></script>
-  <script src="/assets/js/me.js"></script>
 </body>
 </html>

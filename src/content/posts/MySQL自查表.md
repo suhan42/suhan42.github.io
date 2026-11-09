@@ -11,10 +11,6 @@ summary: 这是一份 MySQL 使用自查笔记，覆盖 SQL 组成、常用语�
 status: published
 ---
 
-目录
-
-[TOC]
-
 结构化查询语言SQL（Structured Query Language）
 
 核心SQL的四个组成部分：

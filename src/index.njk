@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.njk
 title: Suhan
+showRail: true
 pagination:
   data: collections.publishedPosts
   size: 5
@@ -9,17 +10,23 @@ eleventyComputed:
   permalink: "{% if pagination.pageNumber == 0 %}/{% else %}/page/{{ pagination.pageNumber + 1 }}/{% endif %}"
 ---
 
-{% set slugSuffix = '' %}
-<div class="row">
-  <div class="col-md-10">
-    <h3 class="category-title">content | become a Sigma</h3><hr>
+<section class="hero">
+  <p class="hero-eyebrow">Technical notes · essays · interactive works</p>
+  <h1 class="hero-title">夜里读书，纸上写笔记，偶尔做一点小作品。</h1>
+  <p class="hero-copy">这里是 suhan 的个人博客：技术自查表、读书随笔和 {{ customPages.length }} 个手作交互页，全部由 Markdown 或 HTML 在构建期生成。</p>
+</section>
 
+<section class="posts-section">
+  <div class="section-heading">
+    <h2 class="section-title">Latest</h2>
+    <p class="section-note">newest first</p>
+  </div>
+
+  <div class="post-list">
     {% for post in pagePosts %}
       {% include "partials/post-card.njk" %}
     {% endfor %}
-
-    {% include "partials/pagination.njk" %}
   </div>
 
-  {% include "partials/sidebar.njk" %}
-</div>
+  {% include "partials/pagination.njk" %}
+</section>

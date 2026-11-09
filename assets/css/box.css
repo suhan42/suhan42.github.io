@@ -174,3 +174,154 @@ img {
 	position:relative;
 	bottom:166px;
 }
+
+/* 独立教学页的页面骨架：使用纸墨浅色底，不再加载博客全局皮肤和旧导航。 */
+html {
+	scroll-padding-top: 88px;
+}
+
+body {
+	margin: 0;
+	padding-top: 72px;
+	background: #f7f4ee;
+	color: #1f1b16;
+	font-family: "Inter", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+	line-height: 1.75;
+}
+
+a {
+	color: #8a5a2c;
+}
+
+.work-header {
+	position: fixed;
+	inset: 0 0 auto;
+	z-index: 50;
+	height: 64px;
+	border-bottom: 1px solid rgb(31 27 22 / 12%);
+	background: rgb(247 244 238 / 92%);
+	backdrop-filter: blur(12px);
+}
+
+.work-header-inner {
+	display: flex;
+	width: 100%;
+	max-width: 1200px;
+	height: 100%;
+	margin: 0 auto;
+	padding: 0 24px;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.work-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	color: #1f1b16;
+	font-family: "Georgia", "Noto Serif SC", "Songti SC", serif;
+	font-size: 20px;
+	text-decoration: none;
+}
+
+.work-brand-mark {
+	display: block;
+	width: 28px;
+	height: 28px;
+	flex: 0 0 auto;
+	border-radius: 8px;
+	background: #efe9df;
+	object-fit: cover;
+	box-shadow: 0 0 0 1px rgb(31 27 22 / 12%);
+	transform: rotate(-4deg);
+}
+
+.work-nav {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.work-nav a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 36px;
+	padding: 4px 10px;
+	border-radius: 10px;
+	color: #5e554a;
+	text-decoration: none;
+	transition: color 140ms ease, background-color 140ms ease;
+}
+
+.work-nav a:hover,
+.work-nav a:focus-visible {
+	background: #efe9df;
+	color: #1f1b16;
+}
+
+.work-footer {
+	display: flex;
+	max-width: 1200px;
+	margin: 48px auto 0;
+	padding: 24px;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	border-top: 1px solid rgb(31 27 22 / 12%);
+	color: #7b7266;
+	font-size: 13px;
+}
+
+.work-footer p {
+	margin: 0;
+}
+
+.work-footer a {
+	color: #5e554a;
+	text-decoration: none;
+}
+
+.work-footer a:hover {
+	color: #1f1b16;
+	text-decoration: underline;
+}
+
+@media (min-width: 1000px) {
+	.containerer {
+		margin-left: 220px;
+		margin-right: 24px;
+		padding: 24px 20px;
+	}
+
+	.link {
+		top: 88px;
+		left: 24px;
+		width: 196px;
+		max-height: calc(100vh - 120px);
+		padding-right: 8px;
+		overflow-y: auto;
+	}
+}
+
+@media (max-width: 640px) {
+	.work-nav {
+		display: none;
+	}
+
+	.work-header-inner {
+		padding: 0 16px;
+	}
+
+	.link {
+		padding: 0 16px;
+	}
+
+	.containerer {
+		padding: 0 16px;
+	}
+
+	.work-footer {
+		padding: 24px 16px;
+	}
+}

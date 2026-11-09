@@ -11,12 +11,13 @@ eleventyExcludeFromCollections: true
     <description>{{ site.title }} 的个人博客</description>
     <language>{{ site.language }}</language>
     {% for post in collections.publishedPosts %}
+    {% set postSummary = post.data.summary or post.templateContent | excerpt %}
     <item>
       <title>{{ post.data.title }}</title>
       <link>{{ site.url }}{{ post.url }}</link>
       <guid>{{ site.url }}{{ post.url }}</guid>
       <pubDate>{{ post.data.date | dateToRfc822 }}</pubDate>
-      <description>{{ post.data.summary }}</description>
+      <description>{{ postSummary }}</description>
       <category>{{ post.data.category }}</category>
     </item>
     {% endfor %}

@@ -5,13 +5,14 @@ eleventyExcludeFromCollections: true
 
 [
   {% for post in collections.publishedPosts %}
+  {% set postSummary = post.data.summary or post.templateContent | excerpt %}
   {
     "title": {{ post.data.title | toJson | safe }},
     "url": "{{ post.url }}",
     "date": "{{ post.data.date | dateDisplay }}",
     "category": "{{ post.data.category }}",
     "tags": {{ post.data.tags | default([]) | toJson | safe }},
-    "summary": {{ post.data.summary | toJson | safe }}
+    "summary": {{ postSummary | toJson | safe }}
   }{% if not loop.last %},{% endif %}
   {% endfor %}
 ]

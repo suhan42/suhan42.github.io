@@ -1,50 +1,153 @@
+@charset "utf-8";
+
+/*
+Divergence Meter 独立页样式。
+保留辉光管、黑底和暖色刻度的原始视觉，同时让计数器和时间面板在窄屏下缩放显示。
+*/
+
+:root {
+  --meter-scale: 1;
+  --gold: #e89f29;
+  --ember: #831b05;
+}
+
 * {
-	margin: 0px;
-	padding: 0px;
-	overflow: hidden;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  background: #000;
 }
 
 body {
-	height: 100%;
-	width: 100%;
-	background-color: #000;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  color: var(--gold);
+  font-family: "Noto Serif SC", "Songti SC", SimSun, serif;
 }
 
-.text {
-	color: #972B0F;
-	font-size: 40px;
-	list-style: 4cm;
+.back {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 4px 12px;
+  border: 1px solid rgb(232 159 41 / 28%);
+  border-radius: 999px;
+  background: rgb(0 0 0 / 42%);
+  color: rgb(232 159 41 / 72%);
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 12px;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  transition: color 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
 
-	text-align: center;
-	margin-top: 40px;
+.back:hover,
+.back:focus-visible {
+  border-color: rgb(232 159 41 / 58%);
+  background: rgb(0 0 0 / 68%);
+  color: var(--gold);
+}
+
+.stage {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vh, 24px);
+  padding: 64px 16px 24px;
+}
+
+.divergence-title,
+.divergence-suffix {
+  background-image: linear-gradient(135deg, var(--gold), var(--ember));
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(20px, 2.4vw, 32px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  -webkit-background-clip: text;
+}
+
+.divergence-title {
+  text-align: center;
+}
+
+.divergence-count {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .divergence-day {
-	position: absolute;
-	/* top: 50%; */
-	left: 50%;
-	margin: -120px 0 0 -175px;
-	background-color: #000;
+  display: flex;
 }
+
 .divergence-day div {
-	float: left;
-	height: 305px;
-	width: 100px;
+  flex: 0 0 auto;
+  width: 100px;
+  height: 305px;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.divergence-meter-frame {
+  width: calc(1040px * var(--meter-scale));
+  height: calc(307px * var(--meter-scale));
 }
 
 .divergence-meter {
-	position: absolute;
-	/* top: 50%; */
-	top: 550px;
-	left: 50%;
-	margin: -153px 0 0 -416px;
-	background-color: #000;
+  display: flex;
+  width: 1040px;
+  height: 307px;
+  background-image: url(/assets/custom/divergence-meter/image/empty.jpg);
+  background-repeat: repeat-x;
+  background-size: 104px 307px;
+  transform: scale(var(--meter-scale));
+  transform-origin: top left;
 }
+
 .divergence-meter div {
-	float: left;
-	height: 307px;
-	width: 104px;
+  flex: 0 0 auto;
+  width: 104px;
+  height: 307px;
+  background-position: center;
+  background-size: 100% 100%;
 }
-.divergence-meter,.divergence-day .frame {
-	background-image: url(image/empty.jpg);
+
+@media (max-width: 520px) {
+  .divergence-count {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .divergence-day div {
+    width: 92px;
+    height: 281px;
+  }
+
+  .divergence-meter-frame {
+    width: calc(520px * var(--meter-scale));
+    height: calc(614px * var(--meter-scale));
+  }
+
+  .divergence-meter {
+    width: 520px;
+    height: 614px;
+    flex-wrap: wrap;
+    background-repeat: repeat;
+  }
 }

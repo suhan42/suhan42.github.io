@@ -7,54 +7,42 @@ permalink: /custom/divergence-meter/
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8">
-    <title>divergence meter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Divergence Meter - Suhan</title>
 
     <script type="text/javascript" src="/assets/custom/divergence-meter/javascript/jquery-1.7.2.js"></script>
     <script type="text/javascript" src="/assets/custom/divergence-meter/javascript/divergence-meter.js"></script>
     <link rel="stylesheet" href="/assets/custom/divergence-meter/style.css"/>
   </head>
   <body>
-    <div class="text">
-      <svg width="800" height="200">
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="90%">
-            <stop offset="0%" style="stop-color:#E89F29; stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#831B05; stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <text x="0" y="36" fill="url(#grad)">距离2025-6-30还有</text>
-      </svg>
-    </div>
+    <a class="back" href="/">← Suhan</a>
 
-    <div id="days" class="divergence-day">
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
+    <main class="stage">
+      <h1 class="divergence-title" id="divergence-title">距离2025-6-30还有</h1>
 
-    <div class="text">
-      <svg width="800" height="200">
-        <defs>
-          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="90%">
-            <stop offset="0%" style="stop-color:#E89F29; stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#831B05; stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <text x="550" y="50" fill="url(#grad1)">天，零：</text>
-      </svg>
-    </div>
+      <div class="divergence-count">
+        <div id="days" class="divergence-day">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <span class="divergence-suffix" aria-hidden="true">天，零：</span>
+      </div>
 
-    <div id="myDiv" class="divergence-meter">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
+      <div class="divergence-meter-frame">
+        <div id="myDiv" class="divergence-meter" role="img" aria-label="世界线变动率与今日剩余时间">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    </main>
   </body>
 </html>

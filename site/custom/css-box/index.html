@@ -1,72 +1,33 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<title>box</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="CSS 盒模型、浮动与定位的可视化笔记。">
+	<title>CSS Box 手册 - Suhan</title>
 
 	<link rel="stylesheet" type="text/css" href="/assets/css/box.css">
 
 	<!-- Favicons -->
   <link href="/assets/images/suhan.png" rel="icon">
 
-  <!-- bootstrap css files -->
-  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <!-- hc-mobile-nav css files -->
-  <link rel="stylesheet" href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css">
-
-  <!-- Template Main CSS Files -->
-  <link href="/assets/css/variables.css" rel="stylesheet">
-  <link href="/assets/css/main.css" rel="stylesheet">
-  
-  <link href="/assets/css/me.css" rel="stylesheet">
-
 </head>
 <body>
 
 	<!-- ======= Header ======= -->
-	<header id="header" class="header d-flex align-items-center fixed-top">
-		<div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-			<a href="/" target="_self" class="logo d-flex align-items-center">
-				<img src="/assets/images/suhan.png" alt="">
-				<h2>Suhan</h2>
+	<header class="work-header">
+		<div class="work-header-inner">
+			<a href="/" class="work-brand">
+				<img src="/assets/images/suhan.png" alt="" class="work-brand-mark" width="28" height="28" aria-hidden="true">
+				<span>Suhan</span>
 			</a>
-
-			<nav id="navbar" class="main-nav navbar">
-				<ul>
-					<li><a href="/" target="_self">Home</a></li>
-					<li><a href="#" target="_self">IT</a></li>
-					<li class="dropdown"><a href="#" target="_self"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
-						<ul>
-							<li><a href="#" target="_self">A - Animation</a></li>
-							<li><a href="#" target="_self">C - Comic</a></li>
-							<li><a href="#" target="_self">G - Game</a></li>
-							<li><a href="#" target="_self">N - Novel</a></li>
-						</ul>
-					</li>
-					<li><a href=".//about/" target="_self">About</a></li>
-				</ul>
-			</nav><!-- end navbar -->
-
-			<div class="position-relative">
-				<a href="https://github.com/suhan42" class="mx-2" target="_blank"><span class="bi-github"></span></a>
-        <a href="#" class="mx-2"><span class="bi-twitter"></span></a>
-				<a href="#" class="mx-2 js-search-open" target="_self"><span class="bi-search"></span></a>
-				
-				<a class="toggle"><span class="bi-list" target="_self"></span></a>
-
-				<!-- ======= Search Form ======= -->
-				<div class="search-form-wrap js-search-form-wrap">
-					<form action="" class="search-form">
-						<span class="icon bi-search"></span>
-						<input type="text" placeholder="Search" class="form-control">
-						<button class="btn js-search-close"><span class="bi-x"></span></button>
-					</form>
-				</div><!-- End Search Form -->
-			</div>
-
+			<nav class="work-nav" aria-label="主导航">
+				<a href="/">Home</a>
+				<a href="/categories/it/">IT</a>
+				<a href="/categories/acgn/">ACGN</a>
+				<a href="/about/">About</a>
+			</nav>
 		</div>
 	</header>
 
@@ -521,49 +482,10 @@
 	</main>
 
 	<!-- ======= Footer ======= -->
-  <footer id="footer" class="footer">
-
-    <div class="footer-legal">
-      <div class="container">
-        <div class="row justify-content-between">
-
-
-          <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-            <div class="copyright">
-              © Copyright <strong><span>suhan</span></strong>. All Rights Reserved
-            </div>
-
-            <div class="credits">
-              Designed by <a href="https://bootstrapmade.com/" target="_blank">BootstrapMade</a>
-            </div>
-
-          </div>
-
-          <div class="col-md-6">
-            <div class="social-links mb-3 mb-lg-0 text-center text-md-end">
-							<a href="https://github.com/suhan42" class="github" target="_blank"><i class="bi bi-github"></i></a>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-  </footer>
-
-	<a href="#" class="scroll-top d-flex align-items-center justify-content-center" target="_self"><i class="bi bi-arrow-up-short"></i></a>
-
-	<!-- Vendor JS Files -->
-  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <!-- hc-mobile-nav.js files -->
-  <script src="/assets/vendor/jquery-1.11.0.min.js" type="text/javascript"></script>
-	<script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js" type="text/javascript" ></script>
-
-  <!-- Template Main JS File -->
-  <script src="/assets/js/site.js"></script>
-
-  <!-- my js files -->
-  <script src="/assets/js/me.js" type="text/javascript" ></script>
+	<footer class="work-footer">
+		<p>© 2026 suhan42 · CSS Box 手册</p>
+		<a href="/">返回首页</a>
+	</footer>
 
 
 </body>

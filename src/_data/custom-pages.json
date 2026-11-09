@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "divergence-meter",
+    "title": "Divergence Meter",
+    "category": "acgn",
+    "kind": "交互页",
+    "note": "辉光管风格的世界线倒计时。",
+    "accent": "night",
+    "mark": "DM",
+    "url": "/custom/divergence-meter/"
+  },
+  {
+    "slug": "happy-new-year",
+    "title": "Happy New Year",
+    "category": "acgn",
+    "kind": "节令页",
+    "note": "新年烟花动画，全屏交互。",
+    "accent": "gold",
+    "mark": "NY",
+    "url": "/custom/happy-new-year/"
+  },
+  {
+    "slug": "css-box",
+    "title": "CSS Box 手册",
+    "category": "it",
+    "kind": "教学页",
+    "note": "盒模型、浮动与定位的可视化笔记。",
+    "accent": "blue",
+    "mark": "BX",
+    "url": "/custom/css-box/"
+  }
+]

@@ -28,9 +28,9 @@ npm run serve          # 本地预览，默认 http://localhost:8080
 | `src/content/pages/` | About 等固定页面 |
 | `src/_includes/layouts/` | 布局模板：`base.njk`、`post.njk` |
 | `src/_includes/partials/` | 可复用组件：header、footer、sidebar、文章卡、分页 |
-| `src/_data/` | 站点配置 `site.json` |
-| `assets/` | 站点静态资源：CSS、JS、图片、vendor 库 |
-| `site/` | Eleventy 构建产物，唯一发布目录（本地验证用，不提交） |
+| `src/_data/` | 站点配置 `site.json` 和特殊页元数据 `custom-pages.json` |
+| `assets/` | 站点静态资源：主题 CSS、主题脚本、图片和 vendor 库 |
+| `site/` | Eleventy 构建产物，唯一发布目录，提交到仓库 |
 | `docs/` | 项目文档：现状分析、目标架构、迁移计划、发布清单 |
 | `scripts/` | 内容校验等构建辅助脚本 |
 
@@ -48,7 +48,7 @@ slug: stable-url-slug
 category: it
 tags:
   - example
-summary: 一句话摘要，用于首页卡片、RSS 和搜索。
+summary: 一句话摘要，用于首页卡片、RSS 和搜索。 # 可选
 cover: /assets/images/example.jpg   # 可选
 status: published                     # 或 draft，draft 不进首页和公开索引
 ---
@@ -58,7 +58,7 @@ status: published                     # 或 draft，draft 不进首页和公开�
 
 1. `slug` 只允许小写英文、数字和连字符，全站唯一，决定文章 URL `/posts/{slug}/`。
 2. `date` 是唯一排序依据，禁止依赖文件修改时间。
-3. `summary` 必填，用于首页卡片展示。
+3. `summary` 可选；缺省时列表、RSS 和搜索索引统一取正文第一段生成展示摘要，需要精确控制时再显式填写。
 4. 站内图片引用统一写作 `/assets/images/...`，禁止 `./`、`../` 和反斜杠路径。
 5. 文章型 HTML（如《白色相簿2》攻略）与 Markdown 同等对待，都放 `posts/` 且要求完整 front matter；独立交互页放 `custom/`，不进文章集合。
 
@@ -70,6 +70,14 @@ npm run build
 ```
 
 校验和构建通过后再进入发布流程。
+
+## 界面主题
+
+站点使用两套可切换主题：`night` 是夜航深色，`paper` 是纸墨浅色。`base.njk` 在首帧前恢复用户选择，没有保存值时跟随系统配色；`assets/js/theme.js` 负责按钮切换、持久化和无障碍标签更新。
+
+页面样式集中在 `assets/css/main.css`，基础站点不再加载 Bootstrap、jQuery 和 hc-mobile-nav。移动导航使用原生 `details`，主题按钮和移动菜单都支持键盘操作。
+
+文章页目录由正文标题自动生成，不要求手写目录数据。桌面端显示在正文左侧并随页面滚动吸附，收起后正文从 880px 扩展到 1000px；移动端折叠在正文上方。Markdown 标题和文章型 HTML 里的标题都会参与生成。
 
 ## 路由规则
 
@@ -91,7 +99,7 @@ npm run build
 npm ci
 npm run validate:content
 npm run build
-npm run validate:output   # P4 实现后可用
+npm run validate:output
 git status --short        # 人工确认变更
 git commit                # 仅在用户明确要求时执行
 ```

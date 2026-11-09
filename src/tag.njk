@@ -9,14 +9,14 @@ eleventyComputed:
   title: "Tag: {{ tag }}"
 ---
 
-<div class="row">
-  <div class="col-md-10">
-    <h3 class="category-title">#{{ tag }}</h3><hr>
+<section class="simple-page">
+  <h1 class="post-title">#{{ tag }}</h1>
+  <p class="post-summary">Tag archive</p>
+  <div class="post-list">
     {% for post in collections.publishedPosts %}
     {% if post.data.tags and tag in post.data.tags %}
       {% include "partials/post-card.njk" %}
     {% endif %}
     {% endfor %}
   </div>
-  {% include "partials/sidebar.njk" %}
-</div>
+</section>

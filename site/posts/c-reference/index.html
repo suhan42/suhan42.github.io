@@ -1,91 +1,184 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="night">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
   <title>C 自查表 - Suhan</title>
 
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
+
   <link href="/assets/images/suhan.png" rel="icon">
-  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css" rel="stylesheet">
-  <link href="/assets/css/variables.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
-  <link href="/assets/css/me.css" rel="stylesheet">
   <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
-  
 </head>
 <body>
-  
-<header id="header" class="header d-flex align-items-center fixed-top">
-  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-    <a href="/" class="logo d-flex align-items-center">
-      <img src="/assets/images/suhan.png" alt="">
-      <h2>Suhan</h2>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
     </a>
 
-    <nav id="navbar" class="main-nav navbar">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/categories/it/">IT</a></li>
-        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
-          <ul>
-            <li><a href="/categories/acgn/">A - Animation</a></li>
-            <li><a href="/categories/acgn/">C - Comic</a></li>
-            <li><a href="/categories/acgn/">G - Game</a></li>
-            <li><a href="/categories/acgn/">N - Novel</a></li>
-          </ul>
-        </li>
-        <li><a href="/about/">About</a></li>
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
       </ul>
     </nav>
 
-    <div class="position-relative">
-      <a href="https://github.com/suhan42" class="mx-2" target="_blank"><span class="bi-github"></span></a>
-      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
 
-      <a class="toggle"><span class="bi-list"></span></a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
 
-      <div class="search-form-wrap js-search-form-wrap">
-        <form action="" class="search-form">
-          <span class="icon bi-search"></span>
-          <input type="text" placeholder="Search" class="form-control">
-          <button class="btn js-search-close"><span class="bi-x"></span></button>
-        </form>
-      </div>
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
     </div>
   </div>
 </header>
 
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-2"><a href="#%E5%A4%B4%E6%96%87%E4%BB%B6">头文件</a></li>
+<li class="toc-item toc-level-3"><a href="#pragma-gcc-system-header">#pragma GCC system_header</a></li>
+<li class="toc-item toc-level-3"><a href="#define%E5%AE%8F">#define宏</a></li>
+<li class="toc-item toc-level-4"><a href="#1%E5%AE%8Fdefine4">1.宏#define4</a></li>
+<li class="toc-item toc-level-4"><a href="#2%E5%AE%8F%E7%9A%84%E5%AE%9A%E4%B9%89%E6%A0%BC%E5%BC%8F">2.宏的定义格式</a></li>
+<li class="toc-item toc-level-4"><a href="#3%E5%88%A0%E9%99%A4%E5%AE%8Fundef">3.删除宏#undef</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%B3%9B%E5%9E%8B">泛型</a></li>
+<li class="toc-item toc-level-3"><a href="#generic%E5%85%B3%E9%94%AE%E5%AD%97">_Generic关键字</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%A2%84%E5%A4%84%E7%90%86%E5%91%BD%E4%BB%A4">预处理命令</a></li>
+<li class="toc-item toc-level-3"><a href="#include">#include</a></li>
+<li class="toc-item toc-level-3"><a href="#define">#define</a></li>
+<li class="toc-item toc-level-3"><a href="#undef">#undef</a></li>
+<li class="toc-item toc-level-3"><a href="#if%E6%9D%A1%E4%BB%B6%E7%BC%96%E8%AF%91">#if（条件编译）</a></li>
+<li class="toc-item toc-level-3"><a href="#ifdef">#ifdef</a></li>
+<li class="toc-item toc-level-3"><a href="#ifndef">#ifndef</a></li>
+<li class="toc-item toc-level-3"><a href="#elif">#elif</a></li>
+<li class="toc-item toc-level-3"><a href="#defined%E5%87%BD%E6%95%B0">defined函数</a></li>
+<li class="toc-item toc-level-2"><a href="#struct%E7%BB%93%E6%9E%84%E4%BD%93">struct结构体</a></li>
+<li class="toc-item toc-level-2"><a href="#union%E5%85%B1%E5%90%8C%E4%BD%93">union共同体</a></li>
+<li class="toc-item toc-level-2"><a href="#enum%E6%9E%9A%E4%B8%BE">enum枚举</a></li>
+<li class="toc-item toc-level-2"><a href="#system">system</a></li>
+<li class="toc-item toc-level-2"><a href="#switch">switch</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%BF%9B%E5%88%B6%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B">进制、数据类型</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%9B%E5%88%B6%E8%BD%AC%E6%8D%A2itoa">进制转换itoa()</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%A7%91%E5%AD%A6%E8%AE%A1%E6%95%B0%E6%B3%95">科学计数法</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%BD%AC%E4%B9%89%E5%AD%97%E7%AC%A6">转义字符</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%BF%90%E7%AE%97%E7%AC%A6">运算符</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97">逻辑运算</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BD%8D%E8%BF%90%E7%AE%97">位运算</a></li>
+<li class="toc-item toc-level-4"><a href="#%E7%A7%BB%E4%BD%8D%E8%BF%90%E7%AE%97">移位运算</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%A8%A1%E9%99%A4%E8%BF%90%E7%AE%97">模%、除/运算</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%90%E7%AE%97%E7%AC%A6%E4%BC%98%E5%85%88%E7%BA%A7">运算符优先级</a></li>
+<li class="toc-item toc-level-2"><a href="#sizeof">sizeof()</a></li>
+<li class="toc-item toc-level-2"><a href="#typeid">typeid()！！！！！！</a></li>
+<li class="toc-item toc-level-2"><a href="#mathh">math.h</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BA%93%E5%AE%8F">库宏</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BA%93%E5%87%BD%E6%95%B0">库函数</a></li>
+<li class="toc-item toc-level-2"><a href="#cstringstringh">cstring、string.h</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BA%93%E5%8F%98%E9%87%8F">库变量</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BA%93%E5%AE%8F-2">库宏</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BA%93%E5%87%BD%E6%95%B0-2">库函数</a></li>
+<li class="toc-item toc-level-4"><a href="#strtok">strtok</a></li>
+<li class="toc-item toc-level-4"><a href="#strrchr">strrchr</a></li>
+<li class="toc-item toc-level-3"><a href="#char">char</a></li>
+<li class="toc-item toc-level-3"><a href="#string%E5%9C%A8c%E4%B8%AD">string在c中</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%AE%9A%E4%B9%89">定义</a></li>
+<li class="toc-item toc-level-4"><a href="#%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA">输入输出</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%B8%B2%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0">串处理函数</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%A4%A7%E5%B0%8F%E5%86%99">大小写</a></li>
+<li class="toc-item toc-level-4"><a href="#charstring%E8%BD%AC%E6%8D%A2">char、string转换</a></li>
+<li class="toc-item toc-level-2"><a href="#stdlibh">stdlib.h</a></li>
+<li class="toc-item toc-level-3"><a href="#t-malloc">(T *)malloc()</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%95%B0%E7%BB%84">数组</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BA%8C%E7%BB%B4%E6%8C%87%E9%92%88">二维指针</a></li>
+<li class="toc-item toc-level-3"><a href="#t-calloc">(T *)calloc()</a></li>
+<li class="toc-item toc-level-3"><a href="#realloc">realloc()</a></li>
+<li class="toc-item toc-level-3"><a href="#freep">free(p)</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%BE%AA%E7%8E%AF">循环</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%A2%9C%E8%89%B2%E4%BB%A3%E7%A0%81">颜色代码</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%85%A8%E5%B1%80%E6%8D%A2%E8%89%B2">全局换色</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%83%A8%E5%88%86%E6%8D%A2%E8%89%B2">部分换色</a></li>
+<li class="toc-item toc-level-1"><a href="#ascii%E7%A0%81">Ascii码</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%85%B6%E4%BB%96">其他</a></li>
+<li class="toc-item toc-level-3"><a href="#inline-void-main%E4%B8%8Eivoid-main%E6%9C%89%E4%BD%95%E5%8C%BA%E5%88%AB">inline void main()与ivoid main()有何区别？</a></li>
+</ol>
+    </nav>
+  </details>
 
-  <main id="main">
-    <section>
-      <div class="container">
-        
-<div class="row">
-  <div class="col-md-10">
-    <h3 class="category-title">C 自查表</h3><hr>
-    <div class="d-md-flex post-entry-1">
-      <div>
-        <div class="post-meta">
-          <span class="date">it</span> <span class="mx-1">&bullet;</span>
-          <span>2023-01-22</span>
-        </div>
-        <div class="post-content">
-          <h2>头文件</h2>
-<h3>#pragma GCC system_header</h3>
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">it</a>
+      <time datetime="2023-01-22">2023-01-22</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/c/">#c</a>
+      <a href="/tags/cpp/">#cpp</a>
+      <a href="/tags/note/">#note</a>
+    </div>
+
+    <h1 class="post-title">C 自查表</h1>
+
+    <div class="post-body">
+<h2 id="头文件">头文件</h2>
+<h3 id="pragma-gcc-system-header">#pragma GCC system_header</h3>
 <p>看c++　std::string 的源码，发现有#pragma GCC system_header这个，不知道什么意思，去google了一下，发现意思如下，以后自己代码中还是不要用这个．</p>
 <p>从#pragma <a href="https://so.csdn.net/so/search?q=GCC&amp;spm=1001.2101.3001.7020">GCC</a> system_header直到文件结束之间的代码会被<a href="https://so.csdn.net/so/search?q=%E7%BC%96%E8%AF%91%E5%99%A8&amp;spm=1001.2101.3001.7020">编译器</a>视为系统头文件之中的代码. 系统头文件中的代码往往不能完全遵循C标准, 所以头文件之中的警告信息往往不显示. (除非用 #warning显式指明).</p>
-<h3>#define宏</h3>
+<h3 id="define宏">#define宏</h3>
 <p>当我们对程序文件进行编译时，可能会对.h文件重复编译</p>
 <p>例如：</p>
 <p>当a.cpp中include了b.h和c.h，而b.h和c.h都include了d.h，这时会导致d.h头文件在编译的过程中要被编译两次。</p>
 <p>为了减少编译次数，提高代码编译效率，我们需要使用#ifndef宏定义命令把头文件内容包起来，这样就能解决这个问题。</p>
-<h4>1.宏#define4</h4>
+<h4 id="1宏define4">1.宏#define4</h4>
 <p>宏（Macro），是一种批量处理的称谓。</p>
 <p>宏定义将一个标识符定义为一个字符串，源程序中的该标识符均以指定的字符串来代替。预处理命令后通常不加分号。这并不是说所有的预处理命令后都不能有分号出现。由于宏定义只是用宏名对一个字符串进行简单的替换，因此如果在宏定义命令后加了分号，将会连同分号一起进行置换。</p>
 <p>宏定义的功能是在编译预处理时，对程序中所有出现的“宏名”都用宏定义中的字符串去代换，这称为“宏代换”或“宏展开”。</p>
-<h4>2.宏的定义格式</h4>
+<h4 id="2宏的定义格式">2.宏的定义格式</h4>
 <pre><code class="language-c">#define &lt;宏名&gt;（&lt;参数表&gt;） &lt;宏体&gt;
 </code></pre>
 <p>&lt;宏名&gt;是一个标识符，&lt;参数表&gt;中的参数可以是一个，也可以是多个，视具体情况而定，当有多个参数的时候，每个参数之间用逗号分隔。&lt;宏体&gt;是被替换用的字符串，宏体中的字符串是由参数表中的各个参数组成的表达式。</p>
@@ -115,7 +208,7 @@ int main()
 <p>（3）定义带参数的宏时，宏体中与参数名相同的字符串适当地加上圆括号是十分重要的，这样能够避免可能产生的错误</p>
 <p>（4）定义带参数的宏后，使用时最好避免使用表达式传参。</p>
 <p>宏函数和自定义函数相比，效率更高但是安全性低且会使编译生成的目标文件变大；宏函数没有分配和释放栈帧、传参、传返回值等一系列工作，适合那些简短并且频繁调用的函数，但是对于递归则不推荐使用宏</p>
-<h4>3.删除宏#undef</h4>
+<h4 id="3删除宏undef">3.删除宏#undef</h4>
 <p>（1）删除宏的作用
 #undef：取消已定义的宏</p>
 <p>#define定义预处理器标识符，将保持已定义状态且在作用域内，直到程序结束或者使用#undef 指令取消定义。</p>
@@ -131,9 +224,9 @@ int main(void)
     return 0;
 }
 </code></pre>
-<h2>泛型</h2>
+<h2 id="泛型">泛型</h2>
 <p>很遗憾，C语言本身不支持真正意义上的泛型编程，但是却在一定程度上可以“实现泛型编程”。</p>
-<h3>_Generic关键字</h3>
+<h3 id="generic关键字">_Generic关键字</h3>
 <p>_Generic是C11的关键字，通过该关键字可以有一个泛型表达式：</p>
 <pre><code class="language-c">_Generic((value). int:&quot;int&quot;, float:&quot;float&quot;,char*:&quot;char*&quot;,default:&quot;other type&quot;)
 </code></pre>
@@ -165,7 +258,7 @@ int main(void)
 xxx type: char*
 </code></pre>
 <p>可以看到通过TYPE就可以获得表达式的结果类型</p>
-<h2>预处理命令</h2>
+<h2 id="预处理命令">预处理命令</h2>
 <pre><code class="language-c">#include&lt;stdio.h&gt; //预处理命令&lt;头文件&gt; 头文件包含命令
 #define max 100 //定义标识符 定义宏
 typedef int MyInt;  //定义数据类型
@@ -181,7 +274,7 @@ typedef int MyInt;  //定义数据类型
 
 template &lt;class T&gt;
 </code></pre>
-<h3>#include</h3>
+<h3 id="include">#include</h3>
 <p>#include的用法有两种，尖括号&lt;&gt;和双引号&quot;&quot;</p>
 <p>第一种----<strong>尖括号</strong></p>
 <pre><code>#include &lt;stdio.h&gt;
@@ -204,7 +297,7 @@ template &lt;class T&gt;
 <p>头文件包含允许嵌套</p>
 </li>
 </ol>
-<h3>#define</h3>
+<h3 id="define">#define</h3>
 <p>格式：#define 标识符 字符串</p>
 <p>#define作用域都是从定义开始直到整个文件结尾（这一点和typedef就区别很大）</p>
 <ul>
@@ -218,10 +311,10 @@ template &lt;class T&gt;
 <p>如果放在所有函数之外，它的作用域就是从<strong>它定义开始直到文件尾</strong></p>
 <p>如果放在某个函数内，它的作用域就是从<strong>它定义开始直到该函数结尾</strong></p>
 <p>总结：#define和声明、定义都不同，宏定义不占内存空间，因为宏在预处理阶段就会被替换掉，到了编译的阶段是没有宏存在的，它在预编译阶段就被处理了。</p>
-<h3>#undef</h3>
+<h3 id="undef">#undef</h3>
 <p>上文提到#define的作用域是从它声明开始到文件结尾，#undef就是取消之前的宏定义（也就是#define的标识符）。</p>
 <p>格式：#undef 标识符（注意：如果标识符当前没有被定义成一个宏名称，那么就会<strong>忽略</strong>该指令）。</p>
-<h3>#if（条件编译）</h3>
+<h3 id="if条件编译">#if（条件编译）</h3>
 <p>#if的使用和if else的使用非常相似，一般使用格式如下</p>
 <blockquote>
 <p>#if 整型常量表达式1
@@ -251,7 +344,7 @@ int main()
     return 0;
 }
 </code></pre>
-<h3>#ifdef</h3>
+<h3 id="ifdef">#ifdef</h3>
 <p>#ifdef的作用是判断某个宏是否定义，如果该宏已经定义则执行后面的代码，一般使用格式如下</p>
 <blockquote>
 <p>#ifdef  宏名
@@ -277,7 +370,7 @@ int main()
     return 0;
 }
 </code></pre>
-<h3>#ifndef</h3>
+<h3 id="ifndef">#ifndef</h3>
 <p>#ifndef恰好和#ifdef相反</p>
 <blockquote>
 <p>#ifndef 宏名
@@ -287,9 +380,9 @@ int main()
 #endif</p>
 </blockquote>
 <p>如果该宏未被定义，则对“程序段1”进行编译，否则对“程序段2”进行编译</p>
-<h3>#elif</h3>
+<h3 id="elif">#elif</h3>
 <p>#elif相当于if else语句中的else if()语句，需要注意的是该语句是#elif，而不是#elseif</p>
-<h3>defined函数</h3>
+<h3 id="defined函数">defined函数</h3>
 <p>defined函数的作用是判断某个宏是否被定义,若该宏被定义则返回<strong>1</strong>，否则返回<strong>0</strong>，该函数经常与#if #elif #else配合使用，一般使用格式为：</p>
 <p><strong>defined 宏名</strong></p>
 <p><strong>或</strong></p>
@@ -311,7 +404,7 @@ int main()
     return 0;
 }
 </code></pre>
-<h2>struct结构体</h2>
+<h2 id="struct结构体">struct结构体</h2>
 <pre><code class="language-c">struct
 {     
 	long int id;     
@@ -349,7 +442,7 @@ printf(&quot;%d\n&quot;,(*stu1).id);
 
 
 </code></pre>
-<h2>union共同体</h2>
+<h2 id="union共同体">union共同体</h2>
 <p>设有字符型变量c、整型变量j，若这二个变量在使用过程中互斥，即当用到c时，一定不用j，当用j时，一定不用c，则无需为二个变量分配不同的存储空间，而可使二个变量共同使用一个存储空间，如图8.1所示。具有这种存储特性的变量称为共同体类型的变量。要定义共同体类型变量，必须先定义共同体类型。共同体类型的定义方法与结构体类型的定义方法类似，只要用关键字union 代替struct即可。</p>
 <pre><code class="language-c">#include&lt;stdio.h&gt;
 
@@ -373,7 +466,7 @@ int main(){
 <li>共同体类型中的成员类型可为任意已定义的数据类型。</li>
 </ol>
 <p>由于共同体变量在程序设计中已很少用</p>
-<h2>enum枚举</h2>
+<h2 id="enum枚举">enum枚举</h2>
 <p>枚举是 C 语言中的一种基本数据类型，它可以让数据更简洁，更易读。</p>
 <p>比如：一星期有 7 天，如果不用枚举，我们需要使用 #define 来为每个整数定义一个别名：</p>
 <pre><code class="language-c">#define MON  1 
@@ -487,7 +580,7 @@ int main()
     return 0;
 }
 </code></pre>
-<h2>system</h2>
+<h2 id="system">system</h2>
 <pre><code class="language-c++">#include &lt;stdlib.h&gt;
 
 system(&quot;pause&quot;);用来暂停黑窗口
@@ -495,7 +588,7 @@ Sleep(500);延迟操作
 system(&quot;cls&quot;);清屏
 用 system(&quot;color 0A&quot;); 
 </code></pre>
-<h2>switch</h2>
+<h2 id="switch">switch</h2>
 <p>可以嵌套</p>
 <pre><code class="language-c">#include&lt;stdio.h&gt;
 int main()
@@ -531,7 +624,7 @@ int main()
 three
 m=7,n=2</p>
 </blockquote>
-<h2>进制、数据类型</h2>
+<h2 id="进制数据类型">进制、数据类型</h2>
 <table>
 <thead>
 <tr>
@@ -620,7 +713,7 @@ m=7,n=2</p>
 //无符号
 unsigned int a; //无符号整型%u
 </code></pre>
-<h3>进制转换itoa()</h3>
+<h3 id="进制转换itoa">进制转换itoa()</h3>
 <pre><code class="language-c">#include &lt;stdlib.h&gt;
 </code></pre>
 <p><strong>函数原型</strong>： char *itoa(int i,char *s,int radix);</p>
@@ -642,7 +735,7 @@ int main(){
 
 二进制：1100
 </code></pre>
-<h3>科学计数法</h3>
+<h3 id="科学计数法">科学计数法</h3>
 <p><strong>科学记数法</strong>是以简洁的方式书写冗长数字的有用速记法。虽然科学记数法一开始可能看起来很陌生，但了解科学记数法将帮助您了解浮点数的工作原理。</p>
 <p>注意：</p>
 <ul>
@@ -670,7 +763,7 @@ int main(){
     1.2e-2
 </code></pre>
 <p>有效数字（'e'之前的部分）中的数字称为<strong>有效数字</strong>。有效位数定义了数字的<strong>精度</strong>。有效数字中的数字越多，数字就越精确。</p>
-<h2>转义字符</h2>
+<h2 id="转义字符">转义字符</h2>
 <table>
 <thead>
 <tr>
@@ -737,7 +830,7 @@ int main(){
 </tr>
 </tbody>
 </table>
-<h2>运算符</h2>
+<h2 id="运算符">运算符</h2>
 <p><strong>单目运算符</strong>：是指运算所需变量为一个的运算符，即在运算当中只有一个操作数，又叫一元运算符。</p>
 <p><strong>双目运算符</strong>：运算所需变量为两个的运算符，或者要求运算对象的个数是2的运算符。</p>
 <p><strong>三目运算符：？</strong></p>
@@ -750,7 +843,7 @@ int main(){
 <p>result=a&gt;b?&quot;x&quot;:(a&gt;c?&quot;y&quot;:&quot;z&quot;);</p>
 <p>解读： 判断a是否大于b，如果a大于b 则把x的值赋给result，如果a小于b 那么在a大于b 的前提下进行判断a是否大于c</p>
 <p>如果a大于c 那么把y的值赋给result，如果a小于c那么把z的值赋给result</p>
-<h3>逻辑运算</h3>
+<h3 id="逻辑运算">逻辑运算</h3>
 <ul>
 <li>单目
 <ul>
@@ -764,7 +857,7 @@ int main(){
 </ul>
 </li>
 </ul>
-<h3>位运算</h3>
+<h3 id="位运算">位运算</h3>
 <table>
 <thead>
 <tr>
@@ -806,7 +899,7 @@ int main(){
 </tr>
 </tbody>
 </table>
-<h4>移位运算</h4>
+<h4 id="移位运算">移位运算</h4>
 <p>按二进制形式把所有的数字向左移动对应的位数，高位移出(舍弃)，低位的空位补零。</p>
 <p>需要移位的数字 &lt;&lt; 移位的次数</p>
 <p>例如：3 &lt;&lt; 2，则是将数字3左移2位</p>
@@ -822,13 +915,13 @@ b = 32&gt;&gt;1; //b=16,因为2*16=32
 b = 32&gt;&gt;2; //b=8,4*8=32
 b = 32&gt;&gt;3; //b=4,8*4=32
 </code></pre>
-<h3>模%、除/运算</h3>
+<h3 id="模除运算">模%、除/运算</h3>
 <p>有一个数abcd</p>
 <p>abcd%10 = d</p>
 <p>abcd/10 = 123</p>
 <p>abcd%100 = cd</p>
 <p>abcd/100 = 12</p>
-<h3>运算符优先级</h3>
+<h3 id="运算符优先级">运算符优先级</h3>
 <p><strong>算数 &gt; 关系 &gt; 逻辑 &gt; 赋值</strong></p>
 <p>单目运算（++ -- + -） 优先于 双目运算（* / % 大于 + -）</p>
 <ul>
@@ -926,7 +1019,7 @@ b = 32&gt;&gt;3; //b=4,8*4=32
 </tr>
 </tbody>
 </table>
-<h2>sizeof()</h2>
+<h2 id="sizeof">sizeof()</h2>
 <p>sizeof是运算符而不是函数，它是一个编译时运算符，用于判断变量或数据类型的<strong>字节</strong>大小。返回值类型是size_t（long long unsigned int），这是一个typedef定义的一个无符号整型的别名。运算对象是类型说明符时，必须加上括号。</p>
 <p>sizeof 运算符可用于获取类、结构、共用体和其他用户自定义数据类型的大小。</p>
 <pre><code class="language-c">int main()
@@ -940,7 +1033,7 @@ b = 32&gt;&gt;3; //b=4,8*4=32
 }
 </code></pre>
 <p>指针都显示<strong>8</strong>位</p>
-<h2>typeid()！！！！！！</h2>
+<h2 id="typeid">typeid()！！！！！！</h2>
 <p>c++里面的，c没有</p>
 <pre><code class="language-c">#include &lt;typeinfo&gt;
 
@@ -953,9 +1046,9 @@ char _dataType[10];
 strcpy(_dataType, typeid(_arr).name());
 </code></pre>
 <p>返回数据类型</p>
-<h2>math.h</h2>
+<h2 id="mathh">math.h</h2>
 <p><strong>math.h</strong> 头文件定义了各种数学函数和一个宏。在这个库中所有可用的功能都带有一个 <strong>double</strong> 类型的参数，且都返回 <strong>double</strong> 类型的结果。</p>
-<h3>库宏</h3>
+<h3 id="库宏">库宏</h3>
 <p>下面是这个库中定义的唯一的一个宏：</p>
 <table>
 <thead>
@@ -971,7 +1064,7 @@ strcpy(_dataType, typeid(_arr).name());
 </tr>
 </tbody>
 </table>
-<h3>库函数</h3>
+<h3 id="库函数">库函数</h3>
 <p>下面列出了头文件 math.h 中定义的函数：</p>
 <table>
 <thead>
@@ -1067,9 +1160,9 @@ strcpy(_dataType, typeid(_arr).name());
 </tr>
 </tbody>
 </table>
-<h2>cstring、string.h</h2>
+<h2 id="cstringstringh">cstring、string.h</h2>
 <p><strong>string .h</strong> 头文件定义了一个变量类型、一个宏和各种操作字符数组的函数。</p>
-<h3>库变量</h3>
+<h3 id="库变量">库变量</h3>
 <p>下面是头文件 string.h 中定义的变量类型：</p>
 <table>
 <thead>
@@ -1085,7 +1178,7 @@ strcpy(_dataType, typeid(_arr).name());
 </tr>
 </tbody>
 </table>
-<h3>库宏</h3>
+<h3 id="库宏-2">库宏</h3>
 <p>下面是头文件 string.h 中定义的宏：</p>
 <table>
 <thead>
@@ -1101,7 +1194,7 @@ strcpy(_dataType, typeid(_arr).name());
 </tr>
 </tbody>
 </table>
-<h3>库函数</h3>
+<h3 id="库函数-2">库函数</h3>
 <p>下面是头文件 string.h 中定义的函数：</p>
 <table>
 <thead>
@@ -1201,7 +1294,7 @@ strcpy(_dataType, typeid(_arr).name());
 </tr>
 </tbody>
 </table>
-<h4>strtok</h4>
+<h4 id="strtok">strtok</h4>
 <pre><code class="language-c">#include&lt;stdio.h&gt;
 #include&lt;string.h&gt;
 
@@ -1223,7 +1316,7 @@ int main(){
     return(0);
 }
 </code></pre>
-<h4>strrchr</h4>
+<h4 id="strrchr">strrchr</h4>
 <p>char *strrchr(const char *str, char c);</p>
 <p>函数功能：查找一个字符c在另一个<a href="https://so.csdn.net/so/search?q=%E5%AD%97%E7%AC%A6%E4%B8%B2&amp;spm=1001.2101.3001.7020">字符串</a>str中末次出现的位置（也就是从str的右侧开始查找字符c首次出现的位置），并返回这个位置的地址。如果未能找到指定字符，那么函数将返回NULL。使用这个地址返回从最后一个字符c到str末尾的字符串。</p>
 <pre><code class="language-c++">#include &lt;string.h&gt;
@@ -1241,7 +1334,7 @@ int main(void)
     return 0;
 }
 </code></pre>
-<h3>char</h3>
+<h3 id="char">char</h3>
 <pre><code class="language-c">char ch;
 ch = getchar();  //用getchar()输入
 putchar(ch);  //输出
@@ -1249,9 +1342,9 @@ putchar(ch);  //输出
 
 const char* cha;
 </code></pre>
-<h3>string在c中</h3>
+<h3 id="string在c中">string在c中</h3>
 <p>c语言中没有string，只能用char[]或者char*来代替</p>
-<h4>定义</h4>
+<h4 id="定义">定义</h4>
 <pre><code class="language-c">char *str;
 scanf(&quot;%s&quot;,str);
 </code></pre>
@@ -1270,7 +1363,7 @@ char * ans = (char *)malloc(sizeof(char) * (n + 1));
 memset(ans, 'a', sizeof(char) * n);  
 ans[n] = '\0';
 </code></pre>
-<h4>输入输出</h4>
+<h4 id="输入输出">输入输出</h4>
 <p>string除了使用scanf()和printf()外，还使用gets()和puts()。</p>
 <p>输入还有：</p>
 <ul>
@@ -1303,7 +1396,7 @@ gets(str);
 puts(str);
 printf(&quot;%s\n&quot;,str);
 </code></pre>
-<h4>串处理函数</h4>
+<h4 id="串处理函数">串处理函数</h4>
 <table>
 <thead>
 <tr>
@@ -1338,7 +1431,7 @@ printf(&quot;%s\n&quot;,str);
 </tr>
 </tbody>
 </table>
-<h4>大小写</h4>
+<h4 id="大小写">大小写</h4>
 <p>strupr(字符串)：大写转换 将字符串中的所有小写字母转换成大写字母</p>
 <p>strlwr(字符串)： 小写转换 将字符串中的大写字母转换成小写字母</p>
 <pre><code class="language-c">#include&lt;stdio.h&gt;
@@ -1357,7 +1450,7 @@ int main(){
 <p>A2
 a2</p>
 </blockquote>
-<h4>char、string转换</h4>
+<h4 id="charstring转换">char、string转换</h4>
 <p>只能找其他间接的方法了，这里提供几种：</p>
 <pre><code class="language-c++">//1、构造函数里有个string（size_t,char）
 char x = 'a';
@@ -1374,8 +1467,8 @@ string s(xx)
 char string[20];
 strcpy(string, &quot;There are two rings&quot;);
 </code></pre>
-<h2>stdlib.h</h2>
-<h3>(T *)malloc()</h3>
+<h2 id="stdlibh">stdlib.h</h2>
+<h3 id="t-malloc">(T *)malloc()</h3>
 <p>void *malloc( size_t size )</p>
 <p>语句给指针变量分配一个整型存储空间。
 C语言中定义指针变量后，必须给指针变量进行相应的地址分配，，之后才可以使用指针变量，否则就会出现程序异常。</p>
@@ -1395,12 +1488,12 @@ int *p = (int*)malloc(4);
 <pre><code class="language-c">void * malloc(int size);	//	void*表示函数返回值为任意类型，size是分配的内存单元字节数
 </code></pre>
 <p>当如果不给p分配内存地址，它就会变成“野指针”，进而导致程序崩溃。</p>
-<h4>数组</h4>
+<h4 id="数组">数组</h4>
 <p>p[5]</p>
 <pre><code class="language-c">int *p = (int*)malloc(sizeof(int)*5);	//让系统为p选择一个内存空间。
 int *p = (int*)malloc(4*5);
 </code></pre>
-<h4>二维指针</h4>
+<h4 id="二维指针">二维指针</h4>
 <pre><code class="language-c">int a=3;
 int *b=&amp;a;
 int **c=&amp;b;
@@ -1414,7 +1507,7 @@ int (*p2)[5];  //二维数组指针，不能去掉括号
 <p>指针数组和二维数组指针有着本质上的区别：</p>
 <p><strong>指针数组</strong>是一个数组，只是每个元素保存的都是指针，以上面的 p1 为例，在32位环境下它占用 4×5 = 20 个字节的内存。</p>
 <p><strong>二维数组指针</strong>是一个指针，它指向一个二维数组，以上面的 p2 为例，它占用 4 个字节的内存。</p>
-<h3>(T *)calloc()</h3>
+<h3 id="t-calloc">(T *)calloc()</h3>
 <p>void *calloc(size_t nitems, size_t size)</p>
 <p>分配所需的内存空间，并返回一个指向它的指针。malloc和calloc之间的不同点是，malloc不会设置内存为零，而calloc会设置分配的内存为零（因为calloc在返回在堆区申请的那块动态内存的起始地址之前，会将每个字节都初始化为0）。</p>
 <pre><code class="language-c">int *p = (int*)calloc(1,sizeof(int)); //让系统为p选择一个内存空间
@@ -1423,7 +1516,7 @@ int *p = (int*)malloc(sizeof(int)*5);
 //等于
 int *p = (int*)calloc(5,sizeof(int));
 </code></pre>
-<h3>realloc()</h3>
+<h3 id="realloc">realloc()</h3>
 <p>void *realloc(void *ptr, size_t size)</p>
 <p>尝试重新调整之前调用malloc或calloc所分配的ptr所指向的内存块的大小。</p>
 <p>realloc失败的时候，返回<strong>NULL</strong></p>
@@ -1435,18 +1528,18 @@ int *p = (int*)calloc(5,sizeof(int));
 //new
 int *pnn=(int *)realloc(p, sizeof(int)*15);
 </code></pre>
-<h3>free(p)</h3>
+<h3 id="freep">free(p)</h3>
 <p>void free( void *ptr )</p>
 <p>函数释放指针<em>ptr</em>指向的空间，以供以后使用。指针<em>ptr</em> 必须由先前对malloc(),  calloc() realloc()的调用返回</p>
-<h2>循环</h2>
+<h2 id="循环">循环</h2>
 <pre><code>break
 continue
 </code></pre>
 <p>空结束</p>
 <pre><code class="language-c">while (*str != '\0'){ }
 </code></pre>
-<h2>颜色代码</h2>
-<h3>全局换色</h3>
+<h2 id="颜色代码">颜色代码</h2>
+<h3 id="全局换色">全局换色</h3>
 <pre><code class="language-c++">#include&lt;stdlib.h&gt;
 system(&quot;color 0A&quot;);
 </code></pre>
@@ -1468,7 +1561,7 @@ D=淡紫色
 E=淡黄色
 F=亮白色</p>
 <hr>
-<h3>部分换色</h3>
+<h3 id="部分换色">部分换色</h3>
 <pre><code class="language-cpp">#include&lt;Windows.h&gt;
 </code></pre>
 <p>wAttributes——字符属性，包括颜色和 DBCS （点击查询DBCS双字节字符）</p>
@@ -1508,7 +1601,7 @@ SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);  //绿色
 <pre><code class="language-c++">SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);//设置白色
 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); //设置蓝底白字
 </code></pre>
-<h1>Ascii码</h1>
+<h1 id="ascii码">Ascii码</h1>
 <table>
 <thead>
 <tr>
@@ -2165,158 +2258,33 @@ SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BACKGROUND_BLUE | FOREG
 <p>0～31及127(共33个)是控制字符或通信专用字符（其余为可显示字符），如控制符：LF（换行）、CR（回车）、FF（换页）、DEL（删除）、BS（退格)、BEL（响铃）等；通信专用字符：SOH（文头）、EOT（文尾）、ACK（确认）等；ASCII值为8、9、10 和13 分别转换为退格、制表、换行和回车字符。它们并没有特定的图形显示，但会依不同的应用程序，而对文本显示有不同的影响。</p>
 <p>32～126(共95个)是字符(32是空格），其中48～57为0到9十个阿拉伯数字。</p>
 <p>65～90为26个大写英文字母，97～122号为26个小写英文字母，其余为一些标点符号、运算符号等。</p>
-<h1>其他</h1>
-<h3>inline void main()与ivoid main()有何区别？</h3>
+<h1 id="其他">其他</h1>
+<h3 id="inline-void-main与ivoid-main有何区别">inline void main()与ivoid main()有何区别？</h3>
 <p>对于main函数，没有任何区别的，因为main函数不能内联。inline只是表示内联的意思，所谓内谓，同宏类似，编译器在编译时会直接将代码内容内联到调用处，目的在于避免一次函数调用，利于提高程序性能。(因为函数调用也是有开销）</p>
-
-        </div>
-      </div>
     </div>
-  </div>
-  
-<div class="col-md-2">
-  <div class="aside-block">
-    <h3 class="aside-title">Video</h3>
-    <div class="video-post">
-      <a href="https://www.bilibili.com" class="glightbox link-video">
-        <span class="bi-play-fill"></span>
-        <img src="/assets/images/gd.jpg" alt="" class="img-fluid">
-      </a>
-    </div>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Categories</h3>
-    <ul class="aside-links list-unstyled">
-      
-      <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i>acgn</a></li>
-      
-      <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i>essay</a></li>
-      
-      <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i>it</a></li>
-      
-    </ul>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Tags</h3>
-    <ul class="aside-tags list-unstyled">
-      
-      <li><a href="/tags/c/">#c</a></li>
-    
-      <li><a href="/tags/cpp/">#cpp</a></li>
-    
-      <li><a href="/tags/database/">#database</a></li>
-    
-      <li><a href="/tags/english/">#english</a></li>
-    
-      <li><a href="/tags/essay/">#essay</a></li>
-    
-      <li><a href="/tags/game/">#game</a></li>
-    
-      <li><a href="/tags/git/">#git</a></li>
-    
-      <li><a href="/tags/guide/">#guide</a></li>
-    
-      <li><a href="/tags/hexo/">#hexo</a></li>
-    
-      <li><a href="/tags/jekyll/">#jekyll</a></li>
-    
-      <li><a href="/tags/linux/">#linux</a></li>
-    
-      <li><a href="/tags/markdown/">#markdown</a></li>
-    
-      <li><a href="/tags/marked/">#marked</a></li>
-    
-      <li><a href="/tags/mysql/">#mysql</a></li>
-    
-      <li><a href="/tags/note/">#note</a></li>
-    
-      <li><a href="/tags/shell/">#shell</a></li>
-    
-      <li><a href="/tags/static-site/">#static-site</a></li>
-    
-      <li><a href="/tags/vim/">#vim</a></li>
-    
-      <li><a href="/tags/white-album-2/">#white-album-2</a></li>
-    
-      <li><a href="/tags/workflow/">#workflow</a></li>
-    
-    </ul>
-  </div>
+  </article>
 </div>
-
-</div>
-
-      </div>
-    </section>
   </main>
 
-  
-<footer id="footer" class="footer">
-  <div class="footer-content">
-    <div class="container">
-      <div class="row g-2">
-        <div class="col-lg-5">
-          <h3 class="footer-heading">About suhan</h3>
-          <p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p>
-          <p><a href="/about/" class="footer-link-more">Learn More</a></p>
-        </div>
 
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Navigation</h3>
-          <ul class="footer-links list-unstyled">
-            <li><a href="/"><i class="bi bi-chevron-right"></i> Home</a></li>
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> It</a></li>
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> Acgn</a></li>
-            <li><a href="/about/"><i class="bi bi-chevron-right"></i> About</a></li>
-          </ul>
-        </div>
-
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Categories</h3>
-          <ul class="footer-links list-unstyled">
-            
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> acgn</a></li>
-            
-            <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i> essay</a></li>
-            
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> it</a></li>
-            
-          </ul>
-        </div>
-
-        <div class="col-lg-3">
-          虚以待位
-          ？？？
-        </div>
-      </div>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
     </div>
-  </div>
 
-  <div class="footer-legal">
-    <div class="container">
-      <div class="row justify-content-between">
-        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-          <div class="copyright">&copy; Copyright <strong><span>suhan42</span></strong>. All Rights Reserved</div>
-        </div>
-        <div class="col-md-6">
-          <div class="social-links mb-3 mb-lg-0 text-center text-md-end">
-            <a href="https://github.com/suhan42" class="github" target="_blank"><i class="bi bi-github"></i></a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
   </div>
 </footer>
 
-<a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-
-  <script src="/assets/vendor/jquery-1.11.0.min.js"></script>
-  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js"></script>
+  <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/site.js"></script>
-  <script src="/assets/js/me.js"></script>
 </body>
 </html>

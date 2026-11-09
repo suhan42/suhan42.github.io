@@ -1,11 +1,11 @@
 // 内容校验脚本：检查所有文章源文件的 front matter 完整性、slug 唯一性和路径规范。
-// 必填字段缺失、slug 重复、路径包含反斜杠或相对路径时 fail-fast 退出。
+// summary 不再必填，列表摘要由模板从正文第一段自动生成；其余必填字段缺失、slug 重复或路径非法时 fail-fast 退出。
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const POSTS_DIR = 'src/content/posts';
-const REQUIRED_FIELDS = ['title', 'date', 'slug', 'category', 'summary', 'status'];
+const REQUIRED_FIELDS = ['title', 'date', 'slug', 'category', 'status'];
 const STATUS_VALUES = ['published', 'draft'];
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}(?:T[\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?$/;
@@ -105,4 +105,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`校验通过：${files.length} 个文件，slug 全部唯一，必填字段完整。`);
+console.log(`校验通过：${files.length} 个文件，slug 全部唯一，核心字段完整；摘要改由正文首段自动生成。`);

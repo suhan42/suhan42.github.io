@@ -1,82 +1,146 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="night">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
   <title>Linux 命令行 - Suhan</title>
 
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
+
   <link href="/assets/images/suhan.png" rel="icon">
-  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css" rel="stylesheet">
-  <link href="/assets/css/variables.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
-  <link href="/assets/css/me.css" rel="stylesheet">
   <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
-  
 </head>
 <body>
-  
-<header id="header" class="header d-flex align-items-center fixed-top">
-  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-    <a href="/" class="logo d-flex align-items-center">
-      <img src="/assets/images/suhan.png" alt="">
-      <h2>Suhan</h2>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
     </a>
 
-    <nav id="navbar" class="main-nav navbar">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/categories/it/">IT</a></li>
-        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
-          <ul>
-            <li><a href="/categories/acgn/">A - Animation</a></li>
-            <li><a href="/categories/acgn/">C - Comic</a></li>
-            <li><a href="/categories/acgn/">G - Game</a></li>
-            <li><a href="/categories/acgn/">N - Novel</a></li>
-          </ul>
-        </li>
-        <li><a href="/about/">About</a></li>
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
       </ul>
     </nav>
 
-    <div class="position-relative">
-      <a href="https://github.com/suhan42" class="mx-2" target="_blank"><span class="bi-github"></span></a>
-      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
 
-      <a class="toggle"><span class="bi-list"></span></a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
 
-      <div class="search-form-wrap js-search-form-wrap">
-        <form action="" class="search-form">
-          <span class="icon bi-search"></span>
-          <input type="text" placeholder="Search" class="form-control">
-          <button class="btn js-search-close"><span class="bi-x"></span></button>
-        </form>
-      </div>
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
     </div>
   </div>
 </header>
 
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#shell">shell</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C">基本操作</a></li>
+<li class="toc-item toc-level-3"><a href="#sudo%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6">sudo权限管理机制</a></li>
+<li class="toc-item toc-level-3"><a href="#su%E5%88%87%E6%8D%A2%E8%B4%A6%E6%88%B7">su切换账户</a></li>
+<li class="toc-item toc-level-3"><a href="#man%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C">man(用户手册)</a></li>
+<li class="toc-item toc-level-3"><a href="#echo%E5%9B%9E%E5%A3%B0">echo(回声)</a></li>
+<li class="toc-item toc-level-3"><a href="#cd%E6%8D%A2%E5%9C%B0%E6%96%B9">cd(换地方)</a></li>
+<li class="toc-item toc-level-3"><a href="#ls%E7%9C%8B">ls(看)</a></li>
+<li class="toc-item toc-level-3"><a href="#cat%E6%89%93%E5%8D%B0%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9">cat(打印文件内容)</a></li>
+<li class="toc-item toc-level-4"><a href="#head%E5%A4%B4%E5%92%8Ctail%E5%B0%BE">head头和tail尾</a></li>
+<li class="toc-item toc-level-4"><a href="#more%E6%9F%A5%E7%9C%8B%E5%A4%A7%E6%96%87%E4%BB%B6">more查看大文件</a></li>
+<li class="toc-item toc-level-4"><a href="#nl%E6%9C%80%E5%90%8E%E4%B8%80%E8%A1%8C">nl最后一行</a></li>
+<li class="toc-item toc-level-4"><a href="#grep%E5%86%85%E5%AE%B9%E6%9F%A5%E6%89%BE">grep(内容查找)</a></li>
+<li class="toc-item toc-level-4"><a href="#wc%E5%8D%95%E8%AF%8D%E7%BB%9F%E8%AE%A1">wc(单词统计)</a></li>
+<li class="toc-item toc-level-3"><a href="#echo%E9%87%8D%E5%AE%9A%E5%90%91">echo重定向</a></li>
+<li class="toc-item toc-level-3"><a href="#grep%E7%AE%A1%E9%81%93">grep管道</a></li>
+<li class="toc-item toc-level-3"><a href="#chmod%E6%9B%B4%E6%94%B9%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90">chmod(更改文件权限)</a></li>
+<li class="toc-item toc-level-3"><a href="#touchmkdir%E5%88%9B%E5%BB%BA">touch/mkdir创建</a></li>
+<li class="toc-item toc-level-3"><a href="#mv%E7%A7%BB%E5%8A%A8">mv移动</a></li>
+<li class="toc-item toc-level-3"><a href="#cp%E5%A4%8D%E5%88%B6%E6%96%87%E4%BB%B6">cp复制文件</a></li>
+<li class="toc-item toc-level-3"><a href="#rm%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6">rm删除文件</a></li>
+<li class="toc-item toc-level-3"><a href="#tarzip%E5%8E%8B%E7%BC%A9%E8%A7%A3%E5%8E%8B">tar/zip压缩解压</a></li>
+<li class="toc-item toc-level-3"><a href="#tree%E6%A0%91%E7%8A%B6%E5%9B%BE">tree树状图</a></li>
+<li class="toc-item toc-level-3"><a href="#date%E6%98%BE%E7%A4%BA%E6%88%96%E8%AE%BE%E5%AE%9A%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%97%A5%E6%9C%9F%E4%B8%8E%E6%97%B6%E9%97%B4">date显示或设定系统的日期与时间</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B">查看进程</a></li>
+<li class="toc-item toc-level-3"><a href="#watch%E8%A7%82%E5%AF%9F">watch观察</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%98%B2%E7%81%AB%E5%A2%99">防火墙</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%99%E9%87%8C%E6%98%AF%E6%90%9C%E7%B4%A2-mysql">这里是搜索 MySQL</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%94%A8%E6%88%B7">用户</a></li>
+<li class="toc-item toc-level-4"><a href="#group%E7%BB%84">group组</a></li>
+<li class="toc-item toc-level-4"><a href="#user%E7%94%A8%E6%88%B7">user用户</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9F%A5%E7%9C%8B%E7%94%A8%E6%88%B7">查看用户</a></li>
+<li class="toc-item toc-level-2"><a href="#linux%E7%B3%BB%E7%BB%9F%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF">Linux系统版本信息</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%9F%A5%E7%9C%8Bredhat%E7%9A%84release%E7%89%88%E6%9C%AC">查看redhat的release版本</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%9F%A5%E7%9C%8Bubuntu%E7%89%88%E6%9C%AC">查看Ubuntu版本</a></li>
+</ol>
+    </nav>
+  </details>
 
-  <main id="main">
-    <section>
-      <div class="container">
-        
-<div class="row">
-  <div class="col-md-10">
-    <h3 class="category-title">Linux 命令行</h3><hr>
-    <div class="d-md-flex post-entry-1">
-      <div>
-        <div class="post-meta">
-          <span class="date">it</span> <span class="mx-1">&bullet;</span>
-          <span>2023-01-22</span>
-        </div>
-        <div class="post-content">
-          <h1>shell</h1>
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">it</a>
+      <time datetime="2023-01-22">2023-01-22</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/linux/">#linux</a>
+      <a href="/tags/shell/">#shell</a>
+      <a href="/tags/note/">#note</a>
+    </div>
+
+    <h1 class="post-title">Linux 命令行</h1>
+
+    <div class="post-body">
+<h1 id="shell">shell</h1>
 <p>shell是运行在终端中的文本互动程序，bash（GNU Bourne-Again Shell）是最常用的一种shell。是当前大多数Linux发行版的默认Shell。</p>
 <p>其他的shell还有：sh、bash、ksh、rsh、csh等。Ubuntu系统常用的是bash</p>
 <p>而bash的全名是Bourne Again Shell。最开始在Unix系统中流行的是sh，而bash作为sh的改进版本，提供了更加丰富的功能。一般来说，都推荐使用bash作为默认的Shell。</p>
-<h3>基本操作</h3>
+<h3 id="基本操作">基本操作</h3>
 <p>查询ip(win) 找VM虚拟网卡</p>
 <pre><code class="language-shell">ipconfig
 </code></pre>
@@ -126,7 +190,7 @@ NAT:虚拟机和win主机公用一个网络、使用虚拟网卡
 </tr>
 </tbody>
 </table>
-<h3>sudo权限管理机制</h3>
+<h3 id="sudo权限管理机制">sudo权限管理机制</h3>
 <p>sudo是一种权限管理机制，依赖于/etc/sudoers，其定义了授权给哪个用户可以以管理员的身份能够执行什么样的管理命令；</p>
 <p>格式：<code>sudo -u USERNAME COMMAND</code></p>
 <p>默认情况下，系统只有root用户可以执行sudo命令。需要root用户通过使用visudo命令编辑sudo的配置文件/etc/sudoers，才可以授权其他普通用户执行sudo命令。</p>
@@ -136,7 +200,7 @@ NAT:虚拟机和win主机公用一个网络、使用虚拟网卡
 <p>1).当用户运行sudo时，系统于/etc/sudoers文件里查找该用户是否有运行sudo的权限；</p>
 <p>2).若用户具有可运行sudo的权限。那么让用户输入用户自己的password，注意这里输入的是用户自己的password。</p>
 <p>3).假设password正确。变開始进行sudo后面的命令，root运行sudo是不须要输入password的，切换到的身份与运行者身份同样的时候。也不须要输入password。</p>
-<h3>su切换账户</h3>
+<h3 id="su切换账户">su切换账户</h3>
 <p>switch user</p>
 <p>su是最简单的身份切换名，用su我们能够进行不论什么用户的切换，一般都是su – username，然后输入password就ok了，可是root用su切换到其它身份的时候是不须要输入password的。</p>
 <p>格式为两种：</p>
@@ -155,14 +219,14 @@ NAT:虚拟机和win主机公用一个网络、使用虚拟网卡
 <p><strong>设置初始su密码</strong></p>
 <pre><code class="language-bash">sudo passwd 用户名
 </code></pre>
-<h3>man(用户手册)</h3>
+<h3 id="man用户手册">man(用户手册)</h3>
 <p>(Manual)</p>
 <p>man pwd						就是获得pwd这个命令的命令手册
 man -h 							help</p>
-<h3>echo(回声)</h3>
+<h3 id="echo回声">echo(回声)</h3>
 <pre><code class="language-shell">echo hello world
 </code></pre>
-<h3>cd(换地方)</h3>
+<h3 id="cd换地方">cd(换地方)</h3>
 <p>(Change Directory)</p>
 <table>
 <thead>
@@ -186,7 +250,7 @@ man -h 							help</p>
 </tr>
 </tbody>
 </table>
-<h3>ls(看)</h3>
+<h3 id="ls看">ls(看)</h3>
 <p>(List Directory Contens)</p>
 <table>
 <thead>
@@ -229,7 +293,7 @@ man -h 							help</p>
 </tr>
 </tbody>
 </table>
-<h3>cat(打印文件内容)</h3>
+<h3 id="cat打印文件内容">cat(打印文件内容)</h3>
 <p>(Concatenate and print files)</p>
 <pre><code class="language-bash">cat [-AbeEnstTuv] [--help] [--version] fileName
 </code></pre>
@@ -263,7 +327,7 @@ man -h 							help</p>
 </tr>
 </tbody>
 </table>
-<h4>head头和tail尾</h4>
+<h4 id="head头和tail尾">head头和tail尾</h4>
 <table>
 <thead>
 <tr>
@@ -295,11 +359,11 @@ man -h 							help</p>
 </code></pre>
 <pre><code class="language-shell">less a.txt
 </code></pre>
-<h4>more查看大文件</h4>
+<h4 id="more查看大文件">more查看大文件</h4>
 <p>space翻页，q退出</p>
 <pre><code class="language-shell">more a.txt
 </code></pre>
-<h4>nl最后一行</h4>
+<h4 id="nl最后一行">nl最后一行</h4>
 <table>
 <thead>
 <tr>
@@ -322,15 +386,15 @@ man -h 							help</p>
 </tr>
 </tbody>
 </table>
-<h4>grep(内容查找)</h4>
+<h4 id="grep内容查找">grep(内容查找)</h4>
 <pre><code class="language-shell">cat a.txt | grep 内容
 </code></pre>
-<h4>wc(单词统计)</h4>
+<h4 id="wc单词统计">wc(单词统计)</h4>
 <p>(Word, line and byte count)</p>
 <pre><code class="language-shell">cat a.txt | wc 			行数 单词 字节
 cat a.txt | wc -l 		行数
 </code></pre>
-<h3>echo重定向</h3>
+<h3 id="echo重定向">echo重定向</h3>
 <p><strong>改变输入输出设备</strong></p>
 <p>将hello添加到hello.txt文件里面</p>
 <pre><code class="language-shell">echo hello &gt; hello.txt
@@ -341,11 +405,11 @@ cat a.txt | wc -l 		行数
 <p>打印出来</p>
 <pre><code class="language-shell">cat &lt; hello.txt
 </code></pre>
-<h3>grep管道</h3>
+<h3 id="grep管道">grep管道</h3>
 <p><strong>将前一个命令的标准输出作为下一个程序的标准输出</strong></p>
 <pre><code class="language-shell">man less | grep sim
 </code></pre>
-<h3>chmod(更改文件权限)</h3>
+<h3 id="chmod更改文件权限">chmod(更改文件权限)</h3>
 <p>(Change Mode)</p>
 <table>
 <thead>
@@ -377,7 +441,7 @@ others：0 = 没有权限</p>
 740: -rwxr-----
 755: -rwxr-xr-x
 777: -rwxrwxrwx</p>
-<h3>touch/mkdir创建</h3>
+<h3 id="touchmkdir创建">touch/mkdir创建</h3>
 <pre><code>touch [-acfm][-d&lt;日期时间&gt;][-r&lt;参考文件或目录&gt;] [-t&lt;日期时间&gt;][--help][--version][文件或目录…]
 </code></pre>
 <p>参数说明：</p>
@@ -403,7 +467,7 @@ others：0 = 没有权限</p>
 </ul>
 <pre><code class="language-shell">mkdir -p 文件夹/子文件夹
 </code></pre>
-<h3>mv移动</h3>
+<h3 id="mv移动">mv移动</h3>
 <p>(Move)</p>
 <pre><code class="language-bash">mv [options] source dest
 #or
@@ -425,7 +489,7 @@ mv [options] source... directory
 <p>移动文件、文件夹（这里是文件夹）</p>
 <pre><code class="language-shell">mv 四六级 大学/英语/
 </code></pre>
-<h3>cp复制文件</h3>
+<h3 id="cp复制文件">cp复制文件</h3>
 <p>(Copy)</p>
 <pre><code class="language-bash">cp [options] source dest
 #or
@@ -447,7 +511,7 @@ cp [options] source... directory
 <p>复制文件夹</p>
 <pre><code class="language-shell">cp -r dir1 dir2
 </code></pre>
-<h3>rm删除文件</h3>
+<h3 id="rm删除文件">rm删除文件</h3>
 <p>(Remove)</p>
 <p>没有回收站！！！</p>
 <pre><code class="language-bash">rm [options] name...
@@ -487,7 +551,7 @@ cp [options] source... directory
 </tr>
 </tbody>
 </table>
-<h3>tar/zip压缩解压</h3>
+<h3 id="tarzip压缩解压">tar/zip压缩解压</h3>
 <p>tar [选项] 打包文件名 待打包文件</p>
 <table>
 <thead>
@@ -532,7 +596,7 @@ cp [options] source... directory
 <pre><code class="language-shell">zip demo.zip a.txt b.txt 					#压缩
 unzip demo.zip 								#解压缩
 </code></pre>
-<h3>tree树状图</h3>
+<h3 id="tree树状图">tree树状图</h3>
 <p>Linux tree命令用于以树状图列出目录的内容。</p>
 <p>执行tree指令，它会列出指定目录下的所有文件，包括子目录里的文件。</p>
 <pre><code class="language-bash">tree [-aACdDfFgilnNpqstux][-I &lt;范本样式&gt;][-P &lt;范本样式&gt;][目录...]
@@ -560,7 +624,7 @@ unzip demo.zip 								#解压缩
 <li>-u 列出文件或目录的拥有者名称，没有对应的名称时，则显示用户识别码。</li>
 <li>-x 将范围局限在现行的文件系统中，若指定目录下的某些子目录，其存放于另一个文件系统上，则将该子目录予以排除在寻找范围外。</li>
 </ul>
-<h3>date显示或设定系统的日期与时间</h3>
+<h3 id="date显示或设定系统的日期与时间">date显示或设定系统的日期与时间</h3>
 <pre><code class="language-bash">date [OPTION]... [+FORMAT]
 date [-u] [-d datestr] [-s datestr] [--utc] [--universal] [--date=datestr] [--set=datestr] [--help] [--version] [+FORMAT] [MMDDhhmm[[CC]YY][.ss]]
 </code></pre>
@@ -650,7 +714,7 @@ Tue 24 May 2022 09:30:03 AM CST
 <pre><code class="language-bash"># date -d &quot;2 second&quot; +&quot;%Y-%m-%d %H:%M.%S&quot;
 2012-11-20 14:21.31
 </code></pre>
-<h3>查看进程</h3>
+<h3 id="查看进程">查看进程</h3>
 <p>例如：</p>
 <pre><code class="language-shell">ps -ef|grep ssh
 ps -ef|grep tomcat
@@ -666,7 +730,7 @@ netstat -naop|grep pid</p>
 <p>停止进程(-9表示强制停止)</p>
 <pre><code class="language-shell">kill -9 pid
 </code></pre>
-<h3>watch观察</h3>
+<h3 id="watch观察">watch观察</h3>
 <p>linux系统里有一些日志文件。观察这些日志文件是系统管理员的一个重要任务。你可以很方便地<a href="http://tuxtweaks.com/2011/02/command-line-basics-head-and-tail/">使用tail命令</a>观察它们。但是如果你想要长时间监视这些文件，每几分钟使用tail检查那些日志文件是一件很乏味的事情。你可以写一个短小的<a href="http://tuxtweaks.com/2012/01/creating-a-terminal-window-clock/">无限循环的脚本</a>来周期性地检查文件，但其实已经有一个程序可以为你处理这种重复的任务。</p>
 <p>Linux中的watch 命令提供了一种方式处理重复的任务。默认watch会每<strong>2</strong>秒重复执行命令。你一定也想到了,watch是一个很好的观察log文件的工具。下面是一个例子。</p>
 <pre><code class="language-bash">watch tail /var/log/syslog
@@ -734,7 +798,7 @@ watch -n 10 'cat /proc/loadavg' # 10秒一次输出系统的平均负载
 watch -d 'ls -l | fgrep goface'     # 监测goface的文件
 watch -t -differences=cumulative uptime
 </code></pre>
-<h3>防火墙</h3>
+<h3 id="防火墙">防火墙</h3>
 <p>systemctl status firewalld 				查看防火墙
 systemctl start firewalld					开始防火墙
 systemctl stop firewalld					关闭防火墙
@@ -745,12 +809,12 @@ systemctl restart firewalld				重启防火墙</p>
 <pre><code class="language-xml">  &lt;port protocol=&quot;tcp&quot; port=&quot;8080&quot;/&gt;
 </code></pre>
 <p>systemctl restart firewalld 		重启防火墙</p>
-<h3>这里是搜索 MySQL</h3>
+<h3 id="这里是搜索-mysql">这里是搜索 MySQL</h3>
 <p>find命令查询，速度会慢点
 find / -name mysql</p>
 <p>whereis命令搜索，速度较快
 whereis mysql</p>
-<h3>用户</h3>
+<h3 id="用户">用户</h3>
 <p>Linux用户分类
 超级用户   root  uid = 0
 普通用户         uid = 500~60000
@@ -759,14 +823,14 @@ whereis mysql</p>
 <p>用户组(便于分配权限)
 用户组 可以包含多个 用户
 一用户 至少属于一个 用户组</p>
-<h4>group组</h4>
+<h4 id="group组">group组</h4>
 <pre><code class="language-bash">groupadd 组名						#创建用户组
 groupmod -n 新组名 旧组名			 #修改用户组名
 groupdel 组名						#删除用户组
 groups							#查询用户所在的组
 </code></pre>
 <p>修改用户所属组</p>
-<h4>user用户</h4>
+<h4 id="user用户">user用户</h4>
 <pre><code class="language-bash">useradd 用户名					#添加一般用户
 useradd -g 用户组 用户名		#添加用户到组
 useradd -m aaa				#创建用户名为aaa的用户,添加到home
@@ -883,7 +947,7 @@ tony ALL=(ALL) NOPASSWD: ALL
 /etc/shadow 			保存密码信息
 /etc/group 				用户组信息
 /etc/gshadow 			用户组密码信息</p>
-<h3>查看用户</h3>
+<h3 id="查看用户">查看用户</h3>
 <p>查看当前用户名称</p>
 <pre><code class="language-bash">whoami
 </code></pre>
@@ -891,7 +955,7 @@ tony ALL=(ALL) NOPASSWD: ALL
 <pre><code class="language-bash">w
 who
 </code></pre>
-<h2>Linux系统版本信息</h2>
+<h2 id="linux系统版本信息">Linux系统版本信息</h2>
 <p>几种查看Linux版本信息的方法：</p>
 <ol>
 <li>uname -a</li>
@@ -916,7 +980,7 @@ Codename: NahantUpdate1
 [root@3.5.5Biz-46 ~]#
 这个命令适用于所有的linux，包括Redhat、SuSE、Debian等发行版。
 </code></pre>
-<h4>查看redhat的release版本</h4>
+<h4 id="查看redhat的release版本">查看redhat的release版本</h4>
 <p>dhat的release版本#more /etc/redhat-release
 Red Hat Enterprise Linux AS release 4 (Nahant Update 4)</p>
 <p>#more /etc/issue
@@ -933,7 +997,7 @@ Red Hat Enterprise Linux AS release 4 (Nahant Update 4)</p>
 #ldd /sbin/mii-tool
 #rpm -qa | grep glibc
 #gcc –v</p>
-<h4>查看Ubuntu版本</h4>
+<h4 id="查看ubuntu版本">查看Ubuntu版本</h4>
 <p>方法一</p>
 <p>在终端中执行下列指令：
 cat /etc/issue
@@ -949,155 +1013,30 @@ Release: 7.04
 Codename: feisty</p>
 <p>查看freebsd版本
 uname -a</p>
-
-        </div>
-      </div>
     </div>
-  </div>
-  
-<div class="col-md-2">
-  <div class="aside-block">
-    <h3 class="aside-title">Video</h3>
-    <div class="video-post">
-      <a href="https://www.bilibili.com" class="glightbox link-video">
-        <span class="bi-play-fill"></span>
-        <img src="/assets/images/gd.jpg" alt="" class="img-fluid">
-      </a>
-    </div>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Categories</h3>
-    <ul class="aside-links list-unstyled">
-      
-      <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i>acgn</a></li>
-      
-      <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i>essay</a></li>
-      
-      <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i>it</a></li>
-      
-    </ul>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Tags</h3>
-    <ul class="aside-tags list-unstyled">
-      
-      <li><a href="/tags/c/">#c</a></li>
-    
-      <li><a href="/tags/cpp/">#cpp</a></li>
-    
-      <li><a href="/tags/database/">#database</a></li>
-    
-      <li><a href="/tags/english/">#english</a></li>
-    
-      <li><a href="/tags/essay/">#essay</a></li>
-    
-      <li><a href="/tags/game/">#game</a></li>
-    
-      <li><a href="/tags/git/">#git</a></li>
-    
-      <li><a href="/tags/guide/">#guide</a></li>
-    
-      <li><a href="/tags/hexo/">#hexo</a></li>
-    
-      <li><a href="/tags/jekyll/">#jekyll</a></li>
-    
-      <li><a href="/tags/linux/">#linux</a></li>
-    
-      <li><a href="/tags/markdown/">#markdown</a></li>
-    
-      <li><a href="/tags/marked/">#marked</a></li>
-    
-      <li><a href="/tags/mysql/">#mysql</a></li>
-    
-      <li><a href="/tags/note/">#note</a></li>
-    
-      <li><a href="/tags/shell/">#shell</a></li>
-    
-      <li><a href="/tags/static-site/">#static-site</a></li>
-    
-      <li><a href="/tags/vim/">#vim</a></li>
-    
-      <li><a href="/tags/white-album-2/">#white-album-2</a></li>
-    
-      <li><a href="/tags/workflow/">#workflow</a></li>
-    
-    </ul>
-  </div>
+  </article>
 </div>
-
-</div>
-
-      </div>
-    </section>
   </main>
 
-  
-<footer id="footer" class="footer">
-  <div class="footer-content">
-    <div class="container">
-      <div class="row g-2">
-        <div class="col-lg-5">
-          <h3 class="footer-heading">About suhan</h3>
-          <p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p>
-          <p><a href="/about/" class="footer-link-more">Learn More</a></p>
-        </div>
 
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Navigation</h3>
-          <ul class="footer-links list-unstyled">
-            <li><a href="/"><i class="bi bi-chevron-right"></i> Home</a></li>
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> It</a></li>
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> Acgn</a></li>
-            <li><a href="/about/"><i class="bi bi-chevron-right"></i> About</a></li>
-          </ul>
-        </div>
-
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Categories</h3>
-          <ul class="footer-links list-unstyled">
-            
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> acgn</a></li>
-            
-            <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i> essay</a></li>
-            
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> it</a></li>
-            
-          </ul>
-        </div>
-
-        <div class="col-lg-3">
-          虚以待位
-          ？？？
-        </div>
-      </div>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
     </div>
-  </div>
 
-  <div class="footer-legal">
-    <div class="container">
-      <div class="row justify-content-between">
-        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-          <div class="copyright">&copy; Copyright <strong><span>suhan42</span></strong>. All Rights Reserved</div>
-        </div>
-        <div class="col-md-6">
-          <div class="social-links mb-3 mb-lg-0 text-center text-md-end">
-            <a href="https://github.com/suhan42" class="github" target="_blank"><i class="bi bi-github"></i></a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
   </div>
 </footer>
 
-<a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-
-  <script src="/assets/vendor/jquery-1.11.0.min.js"></script>
-  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js"></script>
+  <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/site.js"></script>
-  <script src="/assets/js/me.js"></script>
 </body>
 </html>

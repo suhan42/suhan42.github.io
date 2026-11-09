@@ -1,6 +1,6 @@
 # Eleventy 目标架构
 
-更新时间：2026-11-06
+更新时间：2026-11-09
 
 本文定义迁移完成后的规范文件树、目录职责、内容数据模型、模板体系、构建输出、路由规则和 GitHub Pages 发布边界。它描述目标状态；阶段任务、删除顺序和回滚边界见 [migration-plan.md](migration-plan.md)。
 
@@ -8,7 +8,7 @@
 
 源内容、模板、静态资产、构建配置和发布产物分层清晰。Eleventy 只负责构建期静态生成，不在客户端运行，也不引入客户端框架。发布产物提交到仓库；构建、验收和发布由人工执行，不使用 CI/CD 自动化。
 
-文章的唯一可信来源是 Markdown 和 front matter。展示标题、URL slug、发布时间、分类、标签、摘要和发布状态不得依赖文件系统时间或生成器猜测。模板只消费数据，不在模板里硬编码文章列表。
+文章的唯一可信来源是 Markdown 和 front matter。展示标题、URL slug、发布时间、分类、标签和发布状态不得依赖文件系统时间或生成器猜测。`summary` 可选；缺省时模板从正文第一段提取展示摘要，只用于列表、RSS 和搜索索引的展示层，不写回内容源。模板只消费数据，不在模板里硬编码文章列表。
 
 `site/` 是唯一发布目录。除 `docs/`、配置文件、源码和静态资产外，仓库根目录不应继续维护旧的生成页面或重复数据文件。
 
@@ -31,8 +31,8 @@ suhan42.github.io/
 │  │  └─ box.css
 │  ├─ js/
 │  │  ├─ site.js
-│  │  ├─ me.js
-│  │  └─ search.js
+│  │  ├─ theme.js
+│  │  └─ me.js
 │  ├─ images/
 │  └─ vendor/
 │     ├─ bootstrap/
@@ -48,23 +48,19 @@ suhan42.github.io/
 │
 ├─ src/
 │  ├─ _data/
-│  │  └─ site.json
+│  │  ├─ site.json
+│  │  └─ custom-pages.json
 │  │
 │  ├─ _includes/
 │  │  ├─ layouts/
 │  │  │  ├─ base.njk
-│  │  │  ├─ home.njk
-│  │  │  ├─ post.njk
-│  │  │  ├─ archive.njk
-│  │  │  ├─ taxonomy.njk
-│  │  │  └─ page.njk
+│  │  │  └─ post.njk
 │  │  └─ partials/
 │  │     ├─ site-header.njk
 │  │     ├─ site-footer.njk
 │  │     ├─ sidebar.njk
 │  │     ├─ post-card.njk
-│  │     ├─ pagination.njk
-│  │     └─ post-navigation.njk
+│  │     └─ pagination.njk
 │  │
 │  ├─ content/
 │  │  ├─ posts/
@@ -75,16 +71,15 @@ suhan42.github.io/
 │  │  │  ├─ 2023-09-26-heartbreak.md
 │  │  │  └─ 2023-01-22-wa2-playthrough-guide.html
 │  │  ├─ pages/
-│  │  │  ├─ about.html
-│  │  │  ├─ archive.njk
-│  │  │  ├─ tags.njk
-│  │  │  ├─ categories.njk
-│  │  │  └─ 404.njk
+│  │  │  └─ about.html
 │  │  └─ custom/
-│  │     └─ divergence/
+│  │     ├─ divergence.html
+│  │     ├─ box.html
+│  │     └─ fireworks.html
 │  │
 │  ├─ index.njk
-│  ├─ posts.njk
+│  ├─ archive.njk
+│  ├─ 404.njk
 │  ├─ tag.njk
 │  ├─ category.njk
 │  ├─ feed.njk
@@ -177,7 +172,7 @@ status: published
 | `slug` | 是 | `/^[a-z0-9]+(?:-[a-z0-9]+)*$/` | URL 标识，全站唯一 |
 | `category` | 是 | 小写英文或受控映射键 | 一个文章只属于一个主分类 |
 | `tags` | 否 | 字符串数组 | 小写标签，用于跨主题聚合 |
-| `summary` | 是 | 非空字符串 | 首页、RSS 和搜索摘要 |
+| `summary` | 否 | 非空字符串 | 首页、RSS 和搜索摘要；缺省时由正文第一段生成展示摘要 |
 | `cover` | 否 | 站点绝对路径 | 首页封面；无封面时模板渲染文字卡 |
 | `status` | 是 | `published` 或 `draft` | 非 published 文章不进入首页、集合、RSS 和搜索索引 |
 
@@ -197,54 +192,55 @@ status: published
 
 ## 模板架构
 
-模板使用 Nunjucks。`base.njk` 是唯一 HTML 骨架来源，负责 `<!DOCTYPE html>`、编码、viewport、站点名、页面标题、description、canonical、样式表、header、footer 和基础脚本。其他 layout 只填充内容区。
+模板使用 Nunjucks。`base.njk` 是唯一 HTML 骨架来源，负责 `<!DOCTYPE html>`、编码、viewport、站点名、页面标题、description、主题初始化、样式表、header、footer 和基础脚本。其他 layout 或页面只填充内容区。
 
 ```text
 base.njk
 ├─ partials/site-header.njk
 ├─ layout content area
-│  ├─ home.njk / post.njk / taxonomy.njk / page.njk
+│  ├─ index.njk / post.njk / category.njk / tag.njk / archive.njk / 404.njk
 │  ├─ partials/post-card.njk
 │  ├─ partials/pagination.njk
-│  └─ partials/post-navigation.njk
+│  └─ partials/sidebar.njk
 └─ partials/site-footer.njk
 ```
 
-`home.njk` 使用 Eleventy pagination，每页显示五篇 published 文章。第 1 页输出 `/`，后续页输出 `/page/2/`、`/page/3/`。`post.njk` 输出标题、日期、分类、标签、正文、目录、上一篇和下一篇。`taxonomy.njk` 供标签页和分类页复用。
+`index.njk` 使用 Eleventy pagination，每页显示五篇 published 文章。第 1 页输出 `/`，后续页输出 `/page/2/`、`/page/3/`。`post.njk` 通过 `posts.11tydata.json` 应用，输出标题、日期、分类、标签、可收起的自动目录和正文阅读线；桌面端收起目录后正文从 880px 扩展到 1000px。`category.njk` 与 `tag.njk` 分别生成分类页和标签页，`archive.njk` 按年份归档，`404.njk` 输出站点骨架下的错误页。
 
-首页卡片结构保持现有视觉方向，不改变整体品牌：
+首页主内容以 hero 和 Latest 两个分区组织，Works 移入右侧栏做紧凑索引。特殊页数据来自 `custom-pages.json`，文章数据来自 `collections.publishedPosts`，home 与侧栏不硬编码内容：
+
+```text
+┌──────────────────────────────────────────────────────┐
+│ Suhan                          Home IT ACGN About  ◐ │
+├───────────────────────────────────────────┬──────────┤
+│ 夜里读书，纸上写笔记，偶尔做一点小作品。       │ Works    │
+│ 这里是 suhan 的个人博客……                     │ DM/NY/BX │
+│                                           │          │
+│ Latest                                    │ Categories│
+│ ┌───────────────────────────────────────┐ │          │
+│ │ 2023-09-26 · essay  文章标题            │ │          │
+│ │ 摘要文本……                              │ │          │
+│ └───────────────────────────────────────┘ │          │
+│ [1] [2]                              Next │ Tags     │
+└───────────────────────────────────────────┴──────────┘
+```
+
+文章页保持约 880px 的单一阅读线，不叠加侧栏：
 
 ```text
 ┌────────────────────────────────────────────┐
-│ Suhan                         Home ACGN About │
+│ Suhan                         Home IT ACGN About ◐ │
 ├────────────────────────────────────────────┤
-│ 最新文章                                      │
-│                                             │
-│ ┌────────────┐  2023-01-23 · it             │
-│ │ cover image │  marked 造轮子               │
-│ └────────────┘  用 marked 写构建器。          │
-│                                             │
-│ ┌────────────┐  2023-01-22 · it             │
-│ │ cover image │  Linux 命令行                │
-│ └────────────┘  shell 是终端解释器。          │
-│                                             │
-│ [ 1 ] [ 2 ] [ 3 ]  Prev / Next              │
+│ 目录           │ marked 造轮子                │
+│ 什么是 Git      │ 2023-01-23 · it · marked   │
+│ 工作原理        │                             │
+│ 常用操作        │ 正文......                   │
+│                │                             │
+│ 粘性目录        │ 单一阅读线                   │
 └────────────────────────────────────────────┘
 ```
 
-文章页补充导航和目录：
-
-```text
-┌────────────────────────────────────────────┐
-│ marked 造轮子                                │
-│ 2023-01-23 · it · marked · markdown         │
-│                                             │
-│ 正文......                                   │
-│                                             │
-│ 上一篇：Linux 命令行                          │
-│ 下一篇：MySQL 自查表                          │
-└────────────────────────────────────────────┘
-```
+主题初始化内联在 `base.njk` 的 head 中，避免首帧闪白或闪黑；`assets/js/theme.js` 只负责用户切换、持久化、系统偏好变化和按钮标签更新。header 在桌面端使用完整导航，移动端使用原生 `details` 折叠菜单，不引第三方菜单库。
 
 模板中输出标题、摘要、标签、图片地址和 URL 时必须使用 Nunjucks 自动转义。只有站点配置和受控生成 HTML 允许使用 safe 过滤器。
 
@@ -295,7 +291,7 @@ npm run validate:output
 
 ### 无障碍与语义
 
-页面使用语义化标题层级；文章标题是 `h1`，列表标题不抢占 `h1`。图片必须有描述性 `alt`。交互控件必须可键盘访问。颜色对比沿用或改进现有 Bootstrap 主题，不在迁移中随机改品牌视觉。
+页面使用语义化标题层级；文章标题是 `h1`，列表标题不抢占 `h1`。图片必须有描述性 `alt`。交互控件必须可键盘访问，主题按钮、移动菜单和跳转主内容都提供可见焦点或明确状态。颜色对比使用 `night` 和 `paper` 两套主题变量统一维护，正文和控件文字保持足够对比度。
 
 ### 性能
 
