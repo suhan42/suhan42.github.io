@@ -1,0 +1,22 @@
+---
+pagination:
+  data: collections.allTags
+  size: 1
+  alias: tag
+permalink: /tags/{{ tag }}/
+layout: layouts/base.njk
+eleventyComputed:
+  title: "Tag: {{ tag }}"
+---
+
+<div class="row">
+  <div class="col-md-10">
+    <h3 class="category-title">#{{ tag }}</h3><hr>
+    {% for post in collections.publishedPosts %}
+    {% if post.data.tags and tag in post.data.tags %}
+      {% include "partials/post-card.njk" %}
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% include "partials/sidebar.njk" %}
+</div>

@@ -1,0 +1,24 @@
+---
+permalink: /feed.xml
+eleventyExcludeFromCollections: true
+---
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>{{ site.title }}</title>
+    <link>{{ site.url }}</link>
+    <description>{{ site.title }} 的个人博客</description>
+    <language>{{ site.language }}</language>
+    {% for post in collections.publishedPosts %}
+    <item>
+      <title>{{ post.data.title }}</title>
+      <link>{{ site.url }}{{ post.url }}</link>
+      <guid>{{ site.url }}{{ post.url }}</guid>
+      <pubDate>{{ post.data.date | dateToRfc822 }}</pubDate>
+      <description>{{ post.data.summary }}</description>
+      <category>{{ post.data.category }}</category>
+    </item>
+    {% endfor %}
+  </channel>
+</rss>

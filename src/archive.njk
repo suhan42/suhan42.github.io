@@ -1,0 +1,22 @@
+---
+layout: layouts/base.njk
+title: Archive
+permalink: /archive/
+---
+
+<div class="row">
+  <div class="col-md-10">
+    <h3 class="category-title">Archive</h3><hr>
+    {% for year, posts in collections.publishedPosts | groupByYear %}
+    <div class="aside-block">
+      <h3 class="aside-title">{{ year }}</h3>
+      <ul class="aside-links list-unstyled">
+        {% for post in posts %}
+        <li><a href="{{ post.url }}"><i class="bi bi-chevron-right"></i>{{ post.data.date | dateDisplay }} · {{ post.data.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+  {% include "partials/sidebar.njk" %}
+</div>

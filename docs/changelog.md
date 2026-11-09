@@ -59,6 +59,20 @@
 
 - 重写 `README.md` 为完整总资料：项目定位、快速开始、项目结构、写作流程、路由规则、构建发布和文档索引。
 - 更新 `AGENTS.md`：把文档更新规则从"主动判断"改为"必须同步更新 changelog 并检查相关文档"，禁止推迟到提交确认时集中补做。
+
+#### P4：站点能力补齐
+
+- 新增 `/archive/` 归档页，`groupByYear` 过滤器按年份分组，published 文章按时间倒序列出。
+- 新增 `/categories/{category}/` 分类页，从 categories collection 遍历生成 acgn、essay、it 三个页面。
+- 新增 `/tags/{tag}/` 标签页，从 allTags collection 生成 20 个标签页面。
+- 新增 `/404.html` 页面，继承站点骨架。
+- 新增 `/feed.xml` RSS，9 篇 published 文章，含标题、链接、RFC 822 日期、摘要和分类。
+- 新增 `/sitemap.xml`，35 个 URL，含首页、about、archive、全部分类、全部标签和文章页。
+- 新增 `/data/search-index.json`，9 篇 published 文章的标题、URL、日期、分类、标签和摘要，draft 已排除。
+- 文章页和聚合页加入基础 SEO：页面 title 组合站点名。
+- 新增 `scripts/validate-output.mjs` 输出校验：死链、反斜杠路径、node_modules 引用、published 数量检查，`npm run validate:output` 通过。
+- 过程中修复：搜索索引 JSON 被 Nunjucks 转义成 `&quot;`，用 `safe` 过滤器修复；css-box 页面引用旧 `main.js` 改为 `site.js`；删除 bootstrap-icons 演示页 `index.html`（207KB，引用不存在的演示资源，非运行所需）。
+- 构建通过：44 个文件（41 个 HTML 页面），`npm run validate:content` 和 `npm run validate:output` 全部通过。
 #### 架构决策
 
 - 文章型 HTML 与独立型 HTML 的边界：按"是否需要进入文章集合"分类，不按文件扩展名分类。

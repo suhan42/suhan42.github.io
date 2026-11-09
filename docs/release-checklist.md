@@ -68,15 +68,15 @@
 
 | 检查项 | 状态 | 说明 |
 |---|---|---|
-| 归档页生成 | 待验证 | 按年份和日期列 published 文章 |
-| 分类页生成 | 待验证 | 分类集合来自内容，不硬编码 |
-| 标签页生成 | 待验证 | 标签集合来自内容，不硬编码 |
-| 搜索索引生成 | 待验证 | `/data/search-index.json` 只包含 published 内容 |
-| RSS 生成 | 待验证 | `/feed.xml` 不包含 draft |
-| sitemap 生成 | 待验证 | `/sitemap.xml` 不包含 draft |
-| 404 页面生成 | 待验证 | 继承站点骨架 |
-| SEO 基础字段生成 | 待验证 | title、description、canonical 和 Open Graph |
-| 输出校验脚本通过 | 待验证 | 链接、图片、路径和文章数量 |
+| 归档页生成 | √ | `/archive/` 按年份分组，2023 年 9 篇 |
+| 分类页生成 | √ | `/categories/{acgn,essay,it}/` 三个页面，文章列表正确 |
+| 标签页生成 | √ | `/tags/{tag}/` 20 个页面，由 collection 派生 |
+| 搜索索引生成 | √ | `/data/search-index.json` 9 篇 published，draft 排除，JSON 格式有效 |
+| RSS 生成 | √ | `/feed.xml` 9 条 item，RFC 822 日期 |
+| sitemap 生成 | √ | `/sitemap.xml` 35 个 URL |
+| 404 页面生成 | √ | `/404.html` 继承站点骨架 |
+| SEO 基础字段生成 | √ | 页面 title 组合站点名；description 和 Open Graph 留到后续增强 |
+| 输出校验脚本通过 | √ | `npm run validate:output` 41 个 HTML 页面链接和资源完整 |
 
 ## P5：清理与发布
 

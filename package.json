@@ -10,6 +10,7 @@
   },
   "scripts": {
     "validate:content": "node scripts/validate-content.mjs",
+    "validate:output": "node scripts/validate-output.mjs",
     "clean": "node -e \"const fs=require('fs'); fs.rmSync('site',{recursive:true,force:true}); console.log('site/ cleaned');\"",
     "build": "npm run clean && npx @11ty/eleventy",
     "serve": "npx @11ty/eleventy --serve"

@@ -48,6 +48,25 @@ export default function (eleventyConfig) {
     return Array.from(set).sort();
   });
 
+  // 按年份分组过滤器，用于归档页；输入已排序的 posts 数组，输出 [年份, 该年文章数组] 键值对数组。
+  eleventyConfig.addFilter("groupByYear", (posts) => {
+    const map = new Map();
+    for (const post of posts) {
+      const year = new Date(post.data.date).getFullYear();
+      if (!map.has(year)) map.set(year, []);
+      map.get(year).push(post);
+    }
+    return Array.from(map.entries());
+  });
+
+  // RSS 需要的 RFC 822 日期格式过滤器。
+  eleventyConfig.addFilter("dateToRfc822", (value) => {
+    return new Date(value).toUTCString();
+  });
+
+  // JSON 输出过滤器，用于搜索索引中的中文和特殊字符转义。
+  eleventyConfig.addFilter("toJson", (value) => JSON.stringify(value));
+
   return {
     dir: {
       input: "src",
