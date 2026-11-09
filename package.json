@@ -1,7 +1,15 @@
 {
-  "dependencies": {
-    "highlight.js": "^11.7.0",
-    "marked": "^4.2.5",
-    "require.js": "^1.0.0"
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.8",
+    "playwright": "^1.65.0"
+  },
+  "scripts": {
+    "validate:content": "node scripts/validate-content.mjs",
+    "validate:output": "node scripts/validate-output.mjs",
+    "clean": "node scripts/clean-site.mjs",
+    "build": "npm run clean && npx @11ty/eleventy && node scripts/generate-redirects.mjs",
+    "serve": "npx @11ty/eleventy --serve"
   }
 }

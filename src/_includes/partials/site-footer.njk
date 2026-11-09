@@ -1,0 +1,17 @@
+{# 站点公共底部：低噪音一行式信息，不展开成多栏大 footer。 #}
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; {{ currentYear }} {{ site.author }}</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="{{ site.social.github }}" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>

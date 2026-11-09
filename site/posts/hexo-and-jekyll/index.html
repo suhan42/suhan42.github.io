@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>静态博客框架之 Hexo 与 Jekyll - Suhan</title>
+
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-2"><a href="#github-pages">GitHub pages</a></li>
+<li class="toc-item toc-level-1"><a href="#%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E6%A1%86%E6%9E%B6">静态博客框架</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%80%89%E6%8B%A9hexo%E8%BF%98%E6%98%AFjekyll">选择Hexo还是Jekyll</a></li>
+<li class="toc-item toc-level-2"><a href="#hexo%E5%8D%9A%E5%AE%A2%E5%BC%80%E5%8F%91">Hexo博客开发</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%A3%80%E6%9F%A5%E7%89%88%E6%9C%AC">检查版本</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%AD%A3%E5%B8%B8%E6%B5%81%E7%A8%8B">正常流程</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%88%9D%E5%A7%8B%E5%8C%96">初始化</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6">修改配置文件</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%AE%89%E8%A3%85%E4%B8%80%E9%94%AE%E9%83%A8%E7%BD%B2%E6%8F%92%E4%BB%B6">安装一键部署插件</a></li>
+<li class="toc-item toc-level-4"><a href="#%E9%83%A8%E7%BD%B2%E5%88%B0git">部署到git</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%80%E4%BA%9B%E6%8A%A5%E9%94%99">一些报错</a></li>
+<li class="toc-item toc-level-5"><a href="#openssl-ssl-read-connection-was-reset-errno-10054">OpenSSL SSL_read: Connection was reset, errno 10054</a></li>
+<li class="toc-item toc-level-5"><a href="#%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98">网络问题</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">it</a>
+      <time datetime="2023-01-22">2023-01-22</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/static-site/">#static-site</a>
+      <a href="/tags/hexo/">#hexo</a>
+      <a href="/tags/jekyll/">#jekyll</a>
+    </div>
+
+    <h1 class="post-title">静态博客框架之 Hexo 与 Jekyll</h1>
+
+    <div class="post-body">
+<h2 id="github-pages">GitHub pages</h2>
+<p>之所以接触到Hexo以及Jekyll框架是因为之前一直有在写些博客，比如通过<strong>Github Pages</strong>直接写的HTML静态博客，但这种博客维护起来相当麻烦，有如下一些问题：</p>
+<ol>
+<li>维护繁杂，加一篇日志链接往往需要改动很多HTML页面中的链接。</li>
+<li>设计困难，非前端设计人员的通病，往往在界面设计以及效果实现上浪费很多时间。</li>
+<li>不支持MD语法，写一篇博客相当于写一个HTML页面，相当累人。</li>
+</ol>
+<h1 id="静态博客框架">静态博客框架</h1>
+<p>目前有两大静态博客主流框架：<a href="http://jekyllcn.com/">jekyll</a>和<a href="https://hexo.io/">hexo</a>。</p>
+<h2 id="选择hexo还是jekyll">选择Hexo还是Jekyll</h2>
+<p>于是开始接触比较流行的一些静态博客框架，比较流行的有Jekyll，Hexo，Simple，Octopress，Pelican以及Lo·gecho等等。这些静态程序可以说都有各自的好处，但最后我选择了Hexo来搭建自己的博客，和Jekyll相比，选择Hexo主要原因是：</p>
+<ol>
+<li>Jeky基于Ruby实现，安装Jeky需要搭建Ruby环境，在Windows搭建Ruby环境并太好弄，而且Jekyll的中文资料比较少。而 Hexo基于NodeJs实现，在Windows上安装NodeJs开发环境简单。</li>
+<li>比较直接的另一个原因是在网上查找了很多博客的主题，发现Jekyll官网提供的主题都不怎么好看(可能是个人原因)，而Hexo的主题看的比较顺眼，在hexo界，使用最多的主题就是<a href="http://theme-next.iissnan.com/">next</a>。</li>
+<li>两者都支持Markdown语法，这点我非常喜欢。</li>
+</ol>
+<h2 id="hexo博客开发">Hexo博客开发</h2>
+<p>关于hexo的部署无需多言了，直接看官方文档就可以了，写得很清楚了。</p>
+<p><a href="https://hexo.io/zh-cn/docs/">文档 | Hexo</a></p>
+<h4 id="检查版本">检查版本</h4>
+<pre><code class="language-bash">node -v
+npm -v
+git --version
+hexo -v
+</code></pre>
+<h3 id="正常流程">正常流程</h3>
+<h4 id="初始化">初始化</h4>
+<p>在本地git库（这个文件夹需要是空文件夹）里面git bash</p>
+<blockquote>
+<p>对应官方文档建站</p>
+<pre><code class="language-bash">$ hexo init &lt;folder&gt;
+$ cd &lt;folder&gt;
+$ npm install
+</code></pre>
+</blockquote>
+<pre><code class="language-bash">hexo init #初始化hexo
+npm install #安装所有依赖
+
+hexo server #静态生成本地界面，可以在本地localhost查看
+	hexo s #简写
+</code></pre>
+<h4 id="修改配置文件">修改配置文件</h4>
+<p>init之后修改里面的<code>_config.yml</code>文件（在文件最后）</p>
+<pre><code class="language-yaml">deploy:
+  type: git
+  repository: git@github.com:suhan42/suhan42.github.io.git
+  #repo: https://github.com/suhan42/suhan42.github.io.git
+  branch: main
+</code></pre>
+<p>config.yml里的deploy的type要为git，repo中的地址http而不是https。</p>
+<h4 id="安装一键部署插件">安装一键部署插件</h4>
+<p>在git bash中使用</p>
+<pre><code class="language-bash">npm install hexo-deployer-git --save
+</code></pre>
+<p>如果上面报错就使用</p>
+<pre><code class="language-bash">cnpm install hexo-deployer-git --save
+</code></pre>
+<h4 id="部署到git">部署到git</h4>
+<pre><code class="language-bash">hexo clean #删除之前生成的文件，若未生成过静态文件，可忽略此命令。
+
+hexo generate #生成静态文件
+	hexo g
+
+hexo deploy #部署网站，上传到github
+	hexo d #简写
+</code></pre>
+<p>以上内容可以简单复制</p>
+<pre><code class="language-bash">hexo clean &amp;&amp; hexo generate &amp;&amp; hexo deploy
+</code></pre>
+<p>如果出现<code>Deploy done</code>，则说明部署成功了。</p>
+<p>这个时候再去git中打开对应的name.github.io就可以看到界面了。</p>
+<h2 id="一些报错">一些报错</h2>
+<h5 id="openssl-ssl-read-connection-was-reset-errno-10054">OpenSSL SSL_read: Connection was reset, errno 10054</h5>
+<p>解决办法：</p>
+<ol>
+<li>修改设置，解除SSL验证。打开 命令行工具， 输入：</li>
+</ol>
+<pre><code class="language-bash">git config --global http.sslVerify &quot;false&quot;
+</code></pre>
+<ol start="2">
+<li>在项目目录下打开命令行工具，输入<code>git init</code>，问题得到有效解决。</li>
+</ol>
+<h5 id="网络问题">网络问题</h5>
+<p>github的网络经常会出问题，连接有效性检验：</p>
+<pre><code class="language-bash"># 任选其一即可
+ping github.com
+ssh -T git@github.com
+</code></pre>
+<p>实在不行就翻墙试试</p>
+<hr>
+<p>最后推荐使用</p>
+<p>Github pages + Hexo + NexT</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

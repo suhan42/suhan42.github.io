@@ -1,0 +1,66 @@
+
+[
+  {
+    "title": "what did you learn from your heartbreak",
+    "url": "/posts/learn-from-heartbreak/",
+    "date": "2023-09-26",
+    "category": "essay",
+    "tags": ["essay","english"],
+    "summary": "这篇随笔用英文整理了从失恋中获得的思考：失去不是终点，这些经历会塑造更成熟的心智和更长久的关系。"
+  },  {
+    "title": "marked 造轮子",
+    "url": "/posts/marked-blog-generator/",
+    "date": "2023-01-23",
+    "category": "it",
+    "tags": ["marked","markdown","static-site"],
+    "summary": "这篇笔记记录如何用 marked 和 highlight.js 手写一个轻量博客生成器，覆盖 marked 的基本用法、自定义渲染器、代码高亮和常见问题排查。"
+  },  {
+    "title": "关于 Git 使用",
+    "url": "/posts/about-git/",
+    "date": "2023-01-23",
+    "category": "it",
+    "tags": ["git","workflow"],
+    "summary": "这篇笔记介绍 Git 的分布式版本控制思想和工作原理，整理常用操作命令，适合作为个人协作与版本管理的参考。"
+  },  {
+    "title": "Linux 命令行",
+    "url": "/posts/linux-command/",
+    "date": "2023-01-22",
+    "category": "it",
+    "tags": ["linux","shell","note"],
+    "summary": "这是一份 Linux 命令行速查笔记，覆盖 shell 基础概念、常用操作、版本查询和日常维护中容易忘记的命令用法。"
+  },  {
+    "title": "MySQL 自查表",
+    "url": "/posts/mysql-reference/",
+    "date": "2023-01-22",
+    "category": "it",
+    "tags": ["mysql","database","note"],
+    "summary": "这是一份 MySQL 使用自查笔记，覆盖 SQL 组成、常用语句、配置管理和版本升级中容易遇到的问题。"
+  },  {
+    "title": "C 自查表",
+    "url": "/posts/c-reference/",
+    "date": "2023-01-22",
+    "category": "it",
+    "tags": ["c","cpp","note"],
+    "summary": "这是一份 C 和 C++ 常见问题的自查笔记，覆盖编译器行为、头文件宏、字符编码、main 函数签名等容易踩坑的知识点。"
+  },  {
+    "title": "vi 与 vim",
+    "url": "/posts/vi-and-vim/",
+    "date": "2023-01-22",
+    "category": "it",
+    "tags": ["linux","vim","note"],
+    "summary": "这篇笔记对比 vi 和 vim 的差异，整理三种编辑模式和常用命令，适合作为 Linux 文本编辑的快速参考。"
+  },  {
+    "title": "静态博客框架之 Hexo 与 Jekyll",
+    "url": "/posts/hexo-and-jekyll/",
+    "date": "2023-01-22",
+    "category": "it",
+    "tags": ["static-site","hexo","jekyll"],
+    "summary": "这篇笔记对比 Hexo 和 Jekyll 两个静态博客框架，分析各自的生态、部署方式和适用场景，并说明选择 Hexo 的原因。"
+  },  {
+    "title": "《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理]",
+    "url": "/posts/wa2-playthrough-guide/",
+    "date": "2023-01-22",
+    "category": "acgn",
+    "tags": ["game","white-album-2","guide"],
+    "summary": "这篇攻略整理了《白色相簿2》各版本的通关推荐顺序、名词解释和注意事项，帮助不透剧的玩家获得更好的游戏体验。"
+  }]

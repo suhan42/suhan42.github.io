@@ -1,0 +1,16 @@
+{
+  "title": "Suhan",
+  "url": "https://suhan42.github.io",
+  "author": "suhan42",
+  "language": "zh-CN",
+  "timezone": "Asia/Shanghai",
+  "nav": [
+    { "label": "Home", "url": "/" },
+    { "label": "IT", "url": "/categories/it/" },
+    { "label": "ACGN", "url": "/categories/acgn/" },
+    { "label": "About", "url": "/about/" }
+  ],
+  "social": {
+    "github": "https://github.com/suhan42"
+  }
+}

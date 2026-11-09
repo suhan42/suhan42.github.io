@@ -1,0 +1,22 @@
+{# 文章卡片：摘要优先取 front matter，没有时用 excerpt 过滤器取正文第一段，因此不需要逐篇维护简介。 #}
+<article class="post-card{% if not post.cover %} no-cover{% endif %}">
+  {% if post.cover %}
+  <img src="{{ post.cover }}" alt="" class="post-cover" loading="lazy">
+  {% endif %}
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/{{ post.data.category }}/" class="post-category">{{ post.data.category }}</a>
+      <time datetime="{{ post.data.date | dateToIso }}">{{ post.data.date | dateDisplay }}</time>
+    </div>
+
+    <a href="{{ post.url }}" class="card-link">
+      <h3 class="post-title">{{ post.data.title }}</h3>
+    </a>
+
+    {% set cardSummary = post.data.summary or post.templateContent | excerpt %}
+    {% if cardSummary %}
+    <p class="post-summary">{{ cardSummary }}</p>
+    {% endif %}
+  </div>
+</article>

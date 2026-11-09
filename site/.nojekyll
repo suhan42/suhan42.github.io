@@ -1,0 +1,1 @@
+该文件用于禁用 GitHub Pages 的 Jekyll 处理，保证下划线开头的目录（如 Eleventy 内部资源）能正常访问。

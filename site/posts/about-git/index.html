@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>关于 Git 使用 - Suhan</title>
+
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#%E4%BB%80%E4%B9%88%E6%98%AFgit">什么是Git</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86">工作原理</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C">常用操作</a></li>
+<li class="toc-item toc-level-1"><a href="#git%E4%BD%BF%E7%94%A8">Git使用</a></li>
+<li class="toc-item toc-level-2"><a href="#%E7%99%BB%E5%BD%95">登录</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93">远程仓库</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%8A%E4%BC%A0%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93">上传本地仓库</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%8A%E4%BC%A0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93">上传远程仓库</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86">分支管理</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%9F%A5%E7%9C%8B%E4%BF%AE%E6%94%B9">查看修改</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%A0%87%E7%AD%BE">标签</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">it</a>
+      <time datetime="2023-01-23">2023-01-23</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/git/">#git</a>
+      <a href="/tags/workflow/">#workflow</a>
+    </div>
+
+    <h1 class="post-title">关于 Git 使用</h1>
+
+    <div class="post-body">
+<h2 id="什么是git">什么是Git</h2>
+<p>Git是分布式版本控制系统，那么它就没有中央服务器的，每个人的电脑就是一个完整的版本库，这样，工作的时候就不需要联网了，因为版本都是在自己的电脑上。既然每个人的电脑都有一个完整的版本库，那多个人如何协作呢？比如说自己在电脑上改了文件A，其他人也在电脑上改了文件A，这时，你们两之间只需把各自的修改推送给对方，就可以互相看到对方的修改了。</p>
+<h2 id="工作原理">工作原理</h2>
+<p><img src="/assets/images/git/work.png" alt="work"></p>
+<p><img src="/assets/images/git/git1.jpg" alt="git1"></p>
+<h2 id="常用操作">常用操作</h2>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>git init</td>
+<td>初始化仓库</td>
+</tr>
+<tr>
+<td>git clone</td>
+<td>拷贝一份远程仓库，也就是下载一个项目。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>git add</td>
+<td>添加文件到暂存区</td>
+</tr>
+<tr>
+<td>git status</td>
+<td>查看仓库当前的状态，显示有变更的文件。</td>
+</tr>
+<tr>
+<td>git diff</td>
+<td>比较文件的不同，即暂存区和工作区的差异。</td>
+</tr>
+<tr>
+<td>git commit</td>
+<td>提交暂存区到本地仓库。</td>
+</tr>
+<tr>
+<td>git reset</td>
+<td>回退版本。</td>
+</tr>
+<tr>
+<td>git rm</td>
+<td>删除工作区文件。</td>
+</tr>
+<tr>
+<td>git mv</td>
+<td>移动或重命名工作区文件。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>git log</td>
+<td>查看历史提交记录</td>
+</tr>
+<tr>
+<td>git blame <file></td>
+<td>以列表形式查看指定文件的历史修改记录</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>git remote</td>
+<td>远程仓库操作</td>
+</tr>
+<tr>
+<td>git fetch</td>
+<td>从远程获取代码库</td>
+</tr>
+<tr>
+<td>git pull</td>
+<td>下载远程代码并合并</td>
+</tr>
+<tr>
+<td>git push</td>
+<td>上传远程代码并合并</td>
+</tr>
+</tbody>
+</table>
+<h2 id="git使用">Git使用</h2>
+<h3 id="登录">登录</h3>
+<p>打开<code>git bash</code>之后，输入：</p>
+<pre><code class="language-shell">git config --global user.email &quot;你的邮箱&quot;
+git config --global user.name &quot;你的名字&quot;
+</code></pre>
+<p>（注意<code>&quot;</code>前面是有空格的，没有提示信息表示成功）
+输入完后再接着执行</p>
+<p><img src="/assets/images/git/user.png" alt="user"></p>
+<p>注意<code>git config --globa</code>l参数，有了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，当然你也可以对某个仓库指定的不同的用户名和邮箱，根据个人情况设置。</p>
+<pre><code class="language-shell">git config --global user.name
+</code></pre>
+<p>设置仓库局部用户名和邮箱</p>
+<pre><code class="language-bash">#one 仓库
+git config user.name &quot;one_name&quot;;
+git config user.email &quot;one_email&quot;
+#two 仓库
+git config user.name &quot;two_name&quot;;
+git config user.email &quot;two_email&quot;
+</code></pre>
+<p>查看信息</p>
+<pre><code class="language-bash">git config -l  #查看所有配置
+git config --system --list #查看系统配置
+git config --global --list #查看用户（全局）配置
+</code></pre>
+<p>即可成功!</p>
+<h3 id="远程仓库">远程仓库</h3>
+<p>先注册github账号，由于你的本地Git仓库和github仓库之间的传输是通过SSH加密的，所以需要一点设置：</p>
+<ol>
+<li>创建SSH Key。在用户主目录下，看看有没有<code>.ssh</code>目录，如果有，再看看这个目录下有没有<code>id_rsa</code>和<code>id_rsa.pub</code>这两个文件。
+<ol>
+<li>如果有的话，直接跳过此如下命令。</li>
+<li>如果没有的话，打开cmd命令行，输入如下命令：</li>
+</ol>
+</li>
+</ol>
+<pre><code class="language-shell">ssh-keygen -t rsa -C &quot;youremail@example.com&quot;
+</code></pre>
+<p><img src="/assets/images/git/ssh.png" alt="sshGet"></p>
+<pre><code class="language-shell">Enter file in which to save the key (C:\Users\cenha/.ssh/id_rsa): #设置密钥的文件名，不设置默认下面的名字
+
+Enter passphrase (empty for no passphrase): #设置密钥的密码，直接回车为不设置
+
+Enter same passphrase again: #再输入一遍密码，未设置密码直接回车
+</code></pre>
+<p>这两步演示的时候是直接按的回车，
+而如果这里是空的话，确实之后就不需要输入密码了。
+passphrase这个并非是gitlab的密码，而是git的安全口令
+我觉得这个口令更多的是为了保证每次使用git的时候更安全，所以自然就需要每次输入
+那么如果你使用的时候不想输入passphrase的话，则不需要设置安全口令。</p>
+<p>（你自己的邮箱地址，推荐和注册github的邮箱保持一致）, 我本地已经有了这些文件，如下所示：</p>
+<p><img src="/assets/images/git/sshId.png" alt=""></p>
+<p><code>id_rsa</code>是私钥，不能泄露出去，<code>id_rsa.pub</code>是公钥，可以放心地告诉任何人。</p>
+<ol start="2">
+<li>
+<p>登录Gitee，右上角：设置→SSH公钥，输入你的标题和公钥，点击确定。</p>
+<p>（登录github，右上角：设置→settings→SSH and GPR keys→New SSH key，然后输入title，输入上面的公钥id_rsa.pub，然后点击保存。点击 Add Key，你就应该可以看到已经添加的key。）</p>
+</li>
+<li>
+<p>在git bash中测试ssh（github需要这一步，gitee不需要）</p>
+</li>
+</ol>
+<pre><code class="language-bash">ssh -T git@github.com
+</code></pre>
+<h3 id="上传本地仓库">上传本地仓库</h3>
+<p>在本地的电脑上新建一个文件夹，在这个文件夹里面右键选择<code>Git Bash Here</code></p>
+<ol>
+<li>要添加文件到版本库，首先需要将这个目录变为git可以管理的仓库，在命令框里面输入：</li>
+</ol>
+<pre><code class="language-shell">git init
+</code></pre>
+<p>这时会有一个隐藏文件夹<code>.git</code>出现</p>
+<ol start="2">
+<li>把要上传的项目复制到新建的文件夹里面，将项目上传的本地仓库，输入:</li>
+</ol>
+<pre><code class="language-shell">git add 01.txt
+git commit -m &quot;备注&quot;
+</code></pre>
+<p>这里以01.txt为例子</p>
+<p><code>git add</code>：将文件提交到暂存区</p>
+<p><code>git commit -m</code>：将暂存区文件提交到仓库（引号内为注释）</p>
+<blockquote>
+<p>在 Linux 系统中，commit 信息使用单引号 <code>'</code>，Windows 系统，commit 信息使用双引号 <code>&quot;</code>。所以在 git bash 中 <strong>git commit -m '提交说明'</strong> 这样是可以的，在 Windows 命令行中就要使用双引号 <strong>git commit -m &quot;提交说明</strong>。</p>
+</blockquote>
+<h3 id="上传远程仓库">上传远程仓库</h3>
+<pre><code class="language-shell">git remote add origin https://...
+
+git push -u origin master
+</code></pre>
+<p><code>git remote add origin https://...</code>是将你本地的仓库和github仓库进行关联，关联一次之后无法再次关联，报错：<code>error: remote origin already exists.</code></p>
+<p><code>-u</code>是表示第一次上传</p>
+<p><img src="/assets/images/git/successful.png" alt="successful"></p>
+<h3 id="分支管理">分支管理</h3>
+<p>使用分支意味着你可以从开发主线上分离开来，然后在不影响主线的同时继续工作。</p>
+<ul>
+<li>创建分支命令：</li>
+</ul>
+<pre><code class="language-shell">git branch (branchname)
+</code></pre>
+<p>单单使用<code>git branch</code>的时候是列出分支。当你执行 <strong>git init</strong> 的时候，默认情况下 Git 就会为你创建 <strong>master</strong> 分支。</p>
+<ul>
+<li>切换分支命令</li>
+</ul>
+<pre><code class="language-shell">git checkout (branchname)
+</code></pre>
+<p>当你切换分支的时候，Git 会用该分支的最后提交的快照替换你的工作目录的内容， 所以多个分支不需要多个目录。</p>
+<p>我们也可以使用<code>git checkout -b (branchname)</code>命令来创建新分支并立即切换到该分支下，从而在该分支中操作。</p>
+<ul>
+<li>合并分支命令</li>
+</ul>
+<pre><code class="language-shell">git merge (branchname)
+</code></pre>
+<p>一旦某分支有了独立内容，你终究会希望将它合并回到你的主分支。 你可以使用上面的命令把这个分支合并到master分支。</p>
+<ul>
+<li>删除分支命令</li>
+</ul>
+<pre><code class="language-shell">git branch -d (branchname)
+</code></pre>
+<p>合并并不仅仅是简单的文件添加、移除的操作，Git也会合并修改。我们可以用 git add 要告诉 Git 文件冲突已经解决。</p>
+<ul>
+<li>查看分支</li>
+</ul>
+<pre><code class="language-bash">git branch -v
+</code></pre>
+<blockquote>
+<p>分支切换问题Please commit your changes or stash them before you switch branches.</p>
+</blockquote>
+<p>因为当前的分支dev 最初也是从master 分支上衍生出来的。而此时你要再从该分支上切换到其主分支。那么你需要先把该dev分支上的改动提交后才能切换，但是该dev分支上还没有完成全部的修改，你不想提交。那么此时你就要选择 stash (存放)它们（你在当前分支上改动的却没有提交commit的内容）。
+所以第一步，在当前分支上执行 <code>git stash</code> 命令。将当前分支存起来</p>
+<pre><code class="language-bash">git stash
+
+#然后再切换分支
+git checkout (branchname)
+</code></pre>
+<p>这时候再执行 <code>git status</code> 命令，显示没有东西需要提交，接着就可以在主分支master上创建并切换到新的分支去修复另一个Bug了。</p>
+<pre><code class="language-bash">git status
+git stash list #命令去查看我们“存储”的列表。
+
+#之后
+git stash drop #来删除
+</code></pre>
+<h3 id="查看修改">查看修改</h3>
+<ul>
+<li>检查该版本库是否有文件未提交：</li>
+</ul>
+<pre><code class="language-shell">git status：检查当前文件状态
+</code></pre>
+<ul>
+<li>检查文件是否被修改</li>
+</ul>
+<pre><code class="language-shell">git diff 01.txt
+</code></pre>
+<p><code>git diff</code>：查看文件修改的内容</p>
+<p><code>git log</code>：获得历史修改记录</p>
+<p><code>git log --pretty=oneline</code>：使记录只显示主要的内容，一行显示</p>
+<ul>
+<li>返回版本</li>
+</ul>
+<pre><code class="language-SHELL">cat：查看文件内容
+
+git reset --hard HEAD^：回退到上一个版本
+
+git reflog：获取历史版本号
+
+git reset --hard 版本号：回退到该版本号对应的版本
+</code></pre>
+<p>**PS：**如果要回退到上上个版本，可以使用git reset --hard HEAD^^命令，但是这样稍显麻烦，如果回退到100个版本之前，只需要执行这个命令即可：git reset --hard HEAD~100；</p>
+<h3 id="标签">标签</h3>
+<p>如果你达到一个重要的阶段，并希望永远记住那个特别的提交快照，你可以使用 git tag 给它打上标签。</p>
+<p>比如说，我们想为我们的项目发布一个&quot;1.0&quot;版本。 我们可以用 git tag -a v1.0 命令给最新一次提交打上（HEAD）&quot;v1.0&quot;的标签。</p>
+<p>-a 选项意为&quot;创建一个带注解的标签&quot;。 不用 -a 选项也可以执行的，但它不会记录这标签是啥时候打的，谁打的，也不会让你添加个标签的注解。 我推荐一直创建带注解的标签。</p>
+<pre><code class="language-shell">git tag -a v1.0
+</code></pre>
+<p>如果我们要查看所有标签可以使用以下命令：</p>
+<pre><code class="language-shell">$ git tag
+v0.9
+v1.0
+</code></pre>
+<p>指定标签信息命令：</p>
+<pre><code class="language-shell">git tag -a &lt;tagname&gt; -m &quot;我是标签&quot;
+</code></pre>
+<p>PGP签名标签命令：</p>
+<pre><code class="language-shell">git tag -s &lt;tagname&gt; -m &quot;我是标签&quot;
+</code></pre>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

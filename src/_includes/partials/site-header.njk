@@ -1,0 +1,42 @@
+{# 站点公共头部：低噪音导航、主题切换和原生折叠的移动菜单，由 base.njk 引入。 #}
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="{{ site.title }} 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">{{ site.title }}</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        {% for item in site.nav %}
+        {% set active = item.url | isNavActive(page.url, category) %}
+        <li><a href="{{ item.url }}" class="nav-link{% if active %} is-active{% endif %}"{% if active %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="{{ site.social.github }}" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          {% for item in site.nav %}
+          {% set active = item.url | isNavActive(page.url, category) %}
+          <a href="{{ item.url }}"{% if active %} class="is-active" aria-current="page"{% endif %}>{{ item.label }}</a>
+          {% endfor %}
+          <a href="/archive/"{% if page.url == "/archive/" %} class="is-active" aria-current="page"{% endif %}>Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>

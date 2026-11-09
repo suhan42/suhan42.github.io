@@ -1,0 +1,23 @@
+---
+pagination:
+  data: collections.categories
+  size: 1
+  alias: category
+permalink: /categories/{{ category }}/
+layout: layouts/base.njk
+title: Category
+eleventyComputed:
+  title: "Category: {{ category }}"
+---
+
+<section class="simple-page">
+  <h1 class="post-title">{{ category }}</h1>
+  <p class="post-summary">Category archive</p>
+  <div class="post-list">
+    {% for post in collections.publishedPosts %}
+    {% if post.data.category == category %}
+      {% include "partials/post-card.njk" %}
+    {% endif %}
+    {% endfor %}
+  </div>
+</section>

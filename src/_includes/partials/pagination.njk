@@ -1,0 +1,21 @@
+{# 分页组件：Eleventy pagination 数据驱动，第一页为 /，后续为 /page/N/。 #}
+<nav class="pagination" aria-label="文章分页">
+  {% if pagination.href.previous %}
+  <a href="{{ pagination.href.previous }}" class="page-prev">Previous</a>
+  {% endif %}
+
+  {% for pageEntry in pagination.pages %}
+  {% set pageNum = loop.index %}
+  {% if pageNum == pagination.pageNumber + 1 %}
+  <a aria-current="page" class="is-active">{{ pageNum }}</a>
+  {% elif pageNum == 1 %}
+  <a href="/">{{ pageNum }}</a>
+  {% else %}
+  <a href="/page/{{ pageNum }}/">{{ pageNum }}</a>
+  {% endif %}
+  {% endfor %}
+
+  {% if pagination.href.next %}
+  <a href="{{ pagination.href.next }}" class="page-next">Next</a>
+  {% endif %}
+</nav>

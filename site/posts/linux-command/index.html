@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Linux 命令行 - Suhan</title>
+
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#shell">shell</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C">基本操作</a></li>
+<li class="toc-item toc-level-3"><a href="#sudo%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6">sudo权限管理机制</a></li>
+<li class="toc-item toc-level-3"><a href="#su%E5%88%87%E6%8D%A2%E8%B4%A6%E6%88%B7">su切换账户</a></li>
+<li class="toc-item toc-level-3"><a href="#man%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C">man(用户手册)</a></li>
+<li class="toc-item toc-level-3"><a href="#echo%E5%9B%9E%E5%A3%B0">echo(回声)</a></li>
+<li class="toc-item toc-level-3"><a href="#cd%E6%8D%A2%E5%9C%B0%E6%96%B9">cd(换地方)</a></li>
+<li class="toc-item toc-level-3"><a href="#ls%E7%9C%8B">ls(看)</a></li>
+<li class="toc-item toc-level-3"><a href="#cat%E6%89%93%E5%8D%B0%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9">cat(打印文件内容)</a></li>
+<li class="toc-item toc-level-4"><a href="#head%E5%A4%B4%E5%92%8Ctail%E5%B0%BE">head头和tail尾</a></li>
+<li class="toc-item toc-level-4"><a href="#more%E6%9F%A5%E7%9C%8B%E5%A4%A7%E6%96%87%E4%BB%B6">more查看大文件</a></li>
+<li class="toc-item toc-level-4"><a href="#nl%E6%9C%80%E5%90%8E%E4%B8%80%E8%A1%8C">nl最后一行</a></li>
+<li class="toc-item toc-level-4"><a href="#grep%E5%86%85%E5%AE%B9%E6%9F%A5%E6%89%BE">grep(内容查找)</a></li>
+<li class="toc-item toc-level-4"><a href="#wc%E5%8D%95%E8%AF%8D%E7%BB%9F%E8%AE%A1">wc(单词统计)</a></li>
+<li class="toc-item toc-level-3"><a href="#echo%E9%87%8D%E5%AE%9A%E5%90%91">echo重定向</a></li>
+<li class="toc-item toc-level-3"><a href="#grep%E7%AE%A1%E9%81%93">grep管道</a></li>
+<li class="toc-item toc-level-3"><a href="#chmod%E6%9B%B4%E6%94%B9%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90">chmod(更改文件权限)</a></li>
+<li class="toc-item toc-level-3"><a href="#touchmkdir%E5%88%9B%E5%BB%BA">touch/mkdir创建</a></li>
+<li class="toc-item toc-level-3"><a href="#mv%E7%A7%BB%E5%8A%A8">mv移动</a></li>
+<li class="toc-item toc-level-3"><a href="#cp%E5%A4%8D%E5%88%B6%E6%96%87%E4%BB%B6">cp复制文件</a></li>
+<li class="toc-item toc-level-3"><a href="#rm%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6">rm删除文件</a></li>
+<li class="toc-item toc-level-3"><a href="#tarzip%E5%8E%8B%E7%BC%A9%E8%A7%A3%E5%8E%8B">tar/zip压缩解压</a></li>
+<li class="toc-item toc-level-3"><a href="#tree%E6%A0%91%E7%8A%B6%E5%9B%BE">tree树状图</a></li>
+<li class="toc-item toc-level-3"><a href="#date%E6%98%BE%E7%A4%BA%E6%88%96%E8%AE%BE%E5%AE%9A%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%97%A5%E6%9C%9F%E4%B8%8E%E6%97%B6%E9%97%B4">date显示或设定系统的日期与时间</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B">查看进程</a></li>
+<li class="toc-item toc-level-3"><a href="#watch%E8%A7%82%E5%AF%9F">watch观察</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%98%B2%E7%81%AB%E5%A2%99">防火墙</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%99%E9%87%8C%E6%98%AF%E6%90%9C%E7%B4%A2-mysql">这里是搜索 MySQL</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%94%A8%E6%88%B7">用户</a></li>
+<li class="toc-item toc-level-4"><a href="#group%E7%BB%84">group组</a></li>
+<li class="toc-item toc-level-4"><a href="#user%E7%94%A8%E6%88%B7">user用户</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9F%A5%E7%9C%8B%E7%94%A8%E6%88%B7">查看用户</a></li>
+<li class="toc-item toc-level-2"><a href="#linux%E7%B3%BB%E7%BB%9F%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF">Linux系统版本信息</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%9F%A5%E7%9C%8Bredhat%E7%9A%84release%E7%89%88%E6%9C%AC">查看redhat的release版本</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%9F%A5%E7%9C%8Bubuntu%E7%89%88%E6%9C%AC">查看Ubuntu版本</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">it</a>
+      <time datetime="2023-01-22">2023-01-22</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/linux/">#linux</a>
+      <a href="/tags/shell/">#shell</a>
+      <a href="/tags/note/">#note</a>
+    </div>
+
+    <h1 class="post-title">Linux 命令行</h1>
+
+    <div class="post-body">
+<h1 id="shell">shell</h1>
+<p>shell是运行在终端中的文本互动程序，bash（GNU Bourne-Again Shell）是最常用的一种shell。是当前大多数Linux发行版的默认Shell。</p>
+<p>其他的shell还有：sh、bash、ksh、rsh、csh等。Ubuntu系统常用的是bash</p>
+<p>而bash的全名是Bourne Again Shell。最开始在Unix系统中流行的是sh，而bash作为sh的改进版本，提供了更加丰富的功能。一般来说，都推荐使用bash作为默认的Shell。</p>
+<h3 id="基本操作">基本操作</h3>
+<p>查询ip(win) 找VM虚拟网卡</p>
+<pre><code class="language-shell">ipconfig
+</code></pre>
+<p>查询ip(Linux)</p>
+<pre><code class="language-shell">ifconfig
+</code></pre>
+<p>ens33的inet后面是IP地址</p>
+<p>桥接模式：虚拟机和win内网公用一个网络、局域网
+NAT:虚拟机和win主机公用一个网络、使用虚拟网卡
+仅主机：和桥接类似，虚拟机无法上网</p>
+<pre><code class="language-shell">ping www.x.com
+</code></pre>
+<p>查看x的源码</p>
+<pre><code class="language-shell">curl http://www.x.com
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">reboot / init 6</td>
+<td>重启</td>
+</tr>
+<tr>
+<td style="text-align:left">poweroff</td>
+<td>关机</td>
+</tr>
+<tr>
+<td style="text-align:left">clear</td>
+<td>清空</td>
+</tr>
+<tr>
+<td style="text-align:left">who</td>
+<td>查看谁在线</td>
+</tr>
+<tr>
+<td style="text-align:left">passwd root</td>
+<td>改密码</td>
+</tr>
+<tr>
+<td style="text-align:left">pwd</td>
+<td>返回当前路径（Print Working Directory）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sudo权限管理机制">sudo权限管理机制</h3>
+<p>sudo是一种权限管理机制，依赖于/etc/sudoers，其定义了授权给哪个用户可以以管理员的身份能够执行什么样的管理命令；</p>
+<p>格式：<code>sudo -u USERNAME COMMAND</code></p>
+<p>默认情况下，系统只有root用户可以执行sudo命令。需要root用户通过使用visudo命令编辑sudo的配置文件/etc/sudoers，才可以授权其他普通用户执行sudo命令。</p>
+<pre><code class="language-bash">sudo su (root)  #切换root
+</code></pre>
+<p><strong>sudo的运行有这样一个流程：</strong></p>
+<p>1).当用户运行sudo时，系统于/etc/sudoers文件里查找该用户是否有运行sudo的权限；</p>
+<p>2).若用户具有可运行sudo的权限。那么让用户输入用户自己的password，注意这里输入的是用户自己的password。</p>
+<p>3).假设password正确。变開始进行sudo后面的命令，root运行sudo是不须要输入password的，切换到的身份与运行者身份同样的时候。也不须要输入password。</p>
+<h3 id="su切换账户">su切换账户</h3>
+<p>switch user</p>
+<p>su是最简单的身份切换名，用su我们能够进行不论什么用户的切换，一般都是su – username，然后输入password就ok了，可是root用su切换到其它身份的时候是不须要输入password的。</p>
+<p>格式为两种：</p>
+<blockquote>
+<p>su -l USERNAME（-l为login，即登陆的简写）</p>
+<p>su USERNAME</p>
+</blockquote>
+<pre><code class="language-shell">su suhan  #换成suhan
+</code></pre>
+<p>如果不指定USERNAME（用户名），默认即为root，所以切换到root的身份的命令即为：su -root或su -，su root 或su。</p>
+<p>su USERNAME，与su – USERNAME的不同之处如下：</p>
+<ul>
+<li>su – USERNAME切换用户后，同时切换到新用户的工作环境中。</li>
+<li>su USERNAME切换用户后，不改变原用户的工作目录，及其他环境变量目录。</li>
+</ul>
+<p><strong>设置初始su密码</strong></p>
+<pre><code class="language-bash">sudo passwd 用户名
+</code></pre>
+<h3 id="man用户手册">man(用户手册)</h3>
+<p>(Manual)</p>
+<p>man pwd						就是获得pwd这个命令的命令手册
+man -h 							help</p>
+<h3 id="echo回声">echo(回声)</h3>
+<pre><code class="language-shell">echo hello world
+</code></pre>
+<h3 id="cd换地方">cd(换地方)</h3>
+<p>(Change Directory)</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cd /</td>
+<td>进入系统根目录</td>
+</tr>
+<tr>
+<td>cd ..</td>
+<td>向上一层</td>
+</tr>
+<tr>
+<td>cd ~/Desktop</td>
+<td>桌面</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ls看">ls(看)</h3>
+<p>(List Directory Contens)</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ls</td>
+<td>查看当前文件夹目录全部文件</td>
+</tr>
+<tr>
+<td>ls -l</td>
+<td>列表显示（list mode）</td>
+</tr>
+<tr>
+<td>ls -l -a = ls -la</td>
+<td>文件的各种信息和全部权限（list + all files）（包括隐藏的）</td>
+</tr>
+<tr>
+<td>ls -lh</td>
+<td>(list + human readable size)</td>
+</tr>
+</tbody>
+</table>
+<p>CentOS还可以使用命令</p>
+<table>
+<thead>
+<tr>
+<th>ll</th>
+<th>查看全部文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lshw -short</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="cat打印文件内容">cat(打印文件内容)</h3>
+<p>(Concatenate and print files)</p>
+<pre><code class="language-bash">cat [-AbeEnstTuv] [--help] [--version] fileName
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li><strong>-n 或 --number</strong>：由 1 开始对所有输出的行数编号。</li>
+<li><strong>-b 或 --number-nonblank</strong>：和 -n 相似，只不过对于空白行不编号。</li>
+<li><strong>-s 或 --squeeze-blank</strong>：当遇到有连续两行以上的空白行，就代换为一行的空白行。</li>
+<li><strong>-v 或 --show-nonprinting</strong>：使用 ^ 和 M- 符号，除了 LFD 和 TAB 之外。</li>
+<li><strong>-E 或 --show-ends</strong> : 在每行结束处显示 $。</li>
+<li><strong>-T 或 --show-tabs</strong>: 将 TAB 字符显示为 ^I。</li>
+<li><strong>-A, --show-all</strong>：等价于 -vET。</li>
+<li>**-e：**等价于&quot;-vE&quot;选项；</li>
+<li>**-t：**等价于&quot;-vT&quot;选项；</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cat a.txt</td>
+<td>打印a.txt文件全部内容</td>
+</tr>
+<tr>
+<td>cat -n a.txt</td>
+<td>-n显示行号</td>
+</tr>
+</tbody>
+</table>
+<h4 id="head头和tail尾">head头和tail尾</h4>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>head a.txt</td>
+<td>显示a.txt文件前10行</td>
+</tr>
+<tr>
+<td>tail a.txt</td>
+<td>倒着输出所有内容（还是全部）</td>
+</tr>
+<tr>
+<td>tail -n 5 a.txt</td>
+<td>-n行数（这里是打印最后5行）</td>
+</tr>
+<tr>
+<td>tail -f a.txt</td>
+<td>-f会一直（动态）观察文件，一旦有变化会打印出来</td>
+</tr>
+</tbody>
+</table>
+<p>交互浏览</p>
+<pre><code class="language-shell">vim a.txt
+</code></pre>
+<pre><code class="language-shell">less a.txt
+</code></pre>
+<h4 id="more查看大文件">more查看大文件</h4>
+<p>space翻页，q退出</p>
+<pre><code class="language-shell">more a.txt
+</code></pre>
+<h4 id="nl最后一行">nl最后一行</h4>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nl a.txt</td>
+<td>从最后一行开始展示(显示行号)</td>
+</tr>
+<tr>
+<td>nl -ba a.txt</td>
+<td>全部都显示行号(包括空行)</td>
+</tr>
+<tr>
+<td>nl -bt a.txt</td>
+<td>空行不显示出行号(默认都有这个，默认值)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="grep内容查找">grep(内容查找)</h4>
+<pre><code class="language-shell">cat a.txt | grep 内容
+</code></pre>
+<h4 id="wc单词统计">wc(单词统计)</h4>
+<p>(Word, line and byte count)</p>
+<pre><code class="language-shell">cat a.txt | wc 			行数 单词 字节
+cat a.txt | wc -l 		行数
+</code></pre>
+<h3 id="echo重定向">echo重定向</h3>
+<p><strong>改变输入输出设备</strong></p>
+<p>将hello添加到hello.txt文件里面</p>
+<pre><code class="language-shell">echo hello &gt; hello.txt
+</code></pre>
+<p>添加到下面一行</p>
+<pre><code class="language-shell">echo hello &gt;&gt; hello.txt
+</code></pre>
+<p>打印出来</p>
+<pre><code class="language-shell">cat &lt; hello.txt
+</code></pre>
+<h3 id="grep管道">grep管道</h3>
+<p><strong>将前一个命令的标准输出作为下一个程序的标准输出</strong></p>
+<pre><code class="language-shell">man less | grep sim
+</code></pre>
+<h3 id="chmod更改文件权限">chmod(更改文件权限)</h3>
+<p>(Change Mode)</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chmod +x (文件名)</td>
+<td>增加可执行权限（还可以换成+w +r</td>
+</tr>
+<tr>
+<td>chmod -x (文件名)</td>
+<td>移除可执行权限（还可以换成-w -r</td>
+</tr>
+<tr>
+<td>chmod 740 (文件名)</td>
+<td>把权限设置成740</td>
+</tr>
+</tbody>
+</table>
+<p>owner：<strong>7=1+2+4= 可执行x + 可写w + 可读r</strong>
+group：4=4= 可读
+others：0 = 没有权限</p>
+<p>常见：
+644: -rw-r--r--
+740: -rwxr-----
+755: -rwxr-xr-x
+777: -rwxrwxrwx</p>
+<h3 id="touchmkdir创建">touch/mkdir创建</h3>
+<pre><code>touch [-acfm][-d&lt;日期时间&gt;][-r&lt;参考文件或目录&gt;] [-t&lt;日期时间&gt;][--help][--version][文件或目录…]
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>a 改变档案的读取时间记录。</li>
+<li>m 改变档案的修改时间记录。</li>
+<li>c 假如目的档案不存在，不会建立新的档案。与 --no-create 的效果一样。</li>
+<li>f 不使用，是为了与其他 unix 系统的相容性而保留。</li>
+<li>r 使用参考档的时间记录，与 --file 的效果一样。</li>
+<li>d 设定时间与日期，可以使用各种不同的格式。</li>
+<li>t 设定档案的时间记录，格式与 date 指令相同。</li>
+<li>--no-create 不会建立新档案。</li>
+<li>--help 列出指令格式。</li>
+<li>--version 列出版本讯息。</li>
+</ul>
+<p><strong>touch(创建文件)</strong></p>
+<pre><code class="language-shell">touch first.cpp
+</code></pre>
+<p><strong>mkdir(创建文件夹)</strong></p>
+<p>mkdir [-p] dirName</p>
+<ul>
+<li>-p 确保目录名称存在，不存在的就建一个。</li>
+</ul>
+<pre><code class="language-shell">mkdir -p 文件夹/子文件夹
+</code></pre>
+<h3 id="mv移动">mv移动</h3>
+<p>(Move)</p>
+<pre><code class="language-bash">mv [options] source dest
+#or
+mv [options] source... directory
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>-a：此选项通常在复制目录时使用，它保留链接、文件属性，并复制目录下的所有内容。其作用等于dpR参数组合。</li>
+<li>-d：复制时保留链接。这里所说的链接相当于 Windows 系统中的快捷方式。</li>
+<li>-f：覆盖已经存在的目标文件而不给出提示。</li>
+<li>-i：与 <strong>-f</strong> 选项相反，在覆盖目标文件之前给出提示，要求用户确认是否覆盖，回答 <strong>y</strong> 时目标文件将被覆盖。</li>
+<li>-p：除复制文件的内容外，还把修改时间和访问权限也复制到新文件中。</li>
+<li>-r：若给出的源文件是一个目录文件，此时将复制该目录下所有的子目录和文件。</li>
+<li>-l：不复制文件，只是生成链接文件。</li>
+</ul>
+<p>重命名</p>
+<pre><code class="language-shell">mv h.txt hello.txt
+</code></pre>
+<p>移动文件、文件夹（这里是文件夹）</p>
+<pre><code class="language-shell">mv 四六级 大学/英语/
+</code></pre>
+<h3 id="cp复制文件">cp复制文件</h3>
+<p>(Copy)</p>
+<pre><code class="language-bash">cp [options] source dest
+#or
+cp [options] source... directory
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>-a：此选项通常在复制目录时使用，它保留链接、文件属性，并复制目录下的所有内容。其作用等于dpR参数组合。</li>
+<li>-d：复制时保留链接。这里所说的链接相当于 Windows 系统中的快捷方式。</li>
+<li>-f：覆盖已经存在的目标文件而不给出提示。</li>
+<li>-i：与 <strong>-f</strong> 选项相反，在覆盖目标文件之前给出提示，要求用户确认是否覆盖，回答 <strong>y</strong> 时目标文件将被覆盖。</li>
+<li>-p：除复制文件的内容外，还把修改时间和访问权限也复制到新文件中。</li>
+<li>-r：若给出的源文件是一个目录文件，此时将复制该目录下所有的子目录和文件。</li>
+<li>-l：不复制文件，只是生成链接文件。</li>
+</ul>
+<p>复制单个文件</p>
+<pre><code class="language-shell">cp a.txt a_copy.txt
+</code></pre>
+<p>复制文件夹</p>
+<pre><code class="language-shell">cp -r dir1 dir2
+</code></pre>
+<h3 id="rm删除文件">rm删除文件</h3>
+<p>(Remove)</p>
+<p>没有回收站！！！</p>
+<pre><code class="language-bash">rm [options] name...
+</code></pre>
+<ul>
+<li>-i 删除前逐一询问确认。</li>
+<li>-f 即使原档案属性设为唯读，亦直接删除，无需逐一确认。</li>
+<li>-r 将目录及以下之档案亦逐一删除。
+<ul>
+<li>-rf 强制删除文件夹</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rm a.txt</td>
+<td>删除单个文件</td>
+</tr>
+<tr>
+<td>rm a.txt b.txt c.txt</td>
+<td>删除多个文件</td>
+</tr>
+<tr>
+<td>rm ./*.txt</td>
+<td>当前目录下的所有txt文件</td>
+</tr>
+<tr>
+<td>rm -r dir1</td>
+<td>递归删除dir1和所有子文件/目录</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tarzip压缩解压">tar/zip压缩解压</h3>
+<p>tar [选项] 打包文件名 待打包文件</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-c</td>
+<td>创建一个打包文件</td>
+</tr>
+<tr>
+<td>-x</td>
+<td>解开一个打包文件</td>
+</tr>
+<tr>
+<td>-z</td>
+<td>使用gzip压缩文件</td>
+</tr>
+<tr>
+<td>-j</td>
+<td>使用bzip2压缩文件</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>压缩过程显示文件</td>
+</tr>
+<tr>
+<td>-f</td>
+<td>使用文档名</td>
+</tr>
+</tbody>
+</table>
+<p>压缩</p>
+<pre><code class="language-shell">tar -zcf demo.tar.gz a.txt b.txt c.txt
+</code></pre>
+<p>解压</p>
+<pre><code class="language-shell">tar -zxf demo.tar.gz
+</code></pre>
+<pre><code class="language-shell">zip demo.zip a.txt b.txt 					#压缩
+unzip demo.zip 								#解压缩
+</code></pre>
+<h3 id="tree树状图">tree树状图</h3>
+<p>Linux tree命令用于以树状图列出目录的内容。</p>
+<p>执行tree指令，它会列出指定目录下的所有文件，包括子目录里的文件。</p>
+<pre><code class="language-bash">tree [-aACdDfFgilnNpqstux][-I &lt;范本样式&gt;][-P &lt;范本样式&gt;][目录...]
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>-a 显示所有文件和目录。</li>
+<li>-A 使用ASNI绘图字符显示树状图而非以ASCII字符组合。</li>
+<li>-C 在文件和目录清单加上色彩，便于区分各种类型。</li>
+<li>-d 显示目录名称而非内容。</li>
+<li>-D 列出文件或目录的更改时间。</li>
+<li>-f 在每个文件或目录之前，显示完整的相对路径名称。</li>
+<li>-F 在执行文件，目录，Socket，符号连接，管道名称名称，各自加上&quot;*&quot;,&quot;/&quot;,&quot;=&quot;,&quot;@&quot;,&quot;|&quot;号。</li>
+<li>-g 列出文件或目录的所属群组名称，没有对应的名称时，则显示群组识别码。</li>
+<li>-i 不以阶梯状列出文件或目录名称。</li>
+<li>-L level 限制目录显示层级。</li>
+<li>-l 如遇到性质为符号连接的目录，直接列出该连接所指向的原始目录。</li>
+<li>-n 不在文件和目录清单加上色彩。</li>
+<li>-N 直接列出文件和目录名称，包括控制字符。</li>
+<li>-p 列出权限标示。</li>
+<li>-P&lt;范本样式&gt; 只显示符合范本样式的文件或目录名称。</li>
+<li>-q 用&quot;?&quot;号取代控制字符，列出文件和目录名称。</li>
+<li>-s 列出文件或目录大小。</li>
+<li>-t 用文件和目录的更改时间排序。</li>
+<li>-u 列出文件或目录的拥有者名称，没有对应的名称时，则显示用户识别码。</li>
+<li>-x 将范围局限在现行的文件系统中，若指定目录下的某些子目录，其存放于另一个文件系统上，则将该子目录予以排除在寻找范围外。</li>
+</ul>
+<h3 id="date显示或设定系统的日期与时间">date显示或设定系统的日期与时间</h3>
+<pre><code class="language-bash">date [OPTION]... [+FORMAT]
+date [-u] [-d datestr] [-s datestr] [--utc] [--universal] [--date=datestr] [--set=datestr] [--help] [--version] [+FORMAT] [MMDDhhmm[[CC]YY][.ss]]
+</code></pre>
+<p>参数：</p>
+<ul>
+<li><strong>-d, --date=STRING</strong>：通过字符串显示时间格式，字符串不能是'now'。</li>
+<li><strong>-f, --file=DATEFILE</strong>：类似于--date; 一次从DATEFILE处理一行。</li>
+<li><strong>-I[FMT], --iso-8601[=FMT]</strong>：按照 ISO 8601 格式输出时间，FMT 可以为'date'(默认)，'hours'，'minutes'，'seconds'，'ns'。 可用于设置日期和时间的精度，例如：2006-08-14T02:34:56-0600。</li>
+<li><strong>-R, --rfc-2822</strong> ： 按照 RFC 5322 格式输出时间和日期，例如: Mon, 14 Aug 2006 02:34:56 -0600。</li>
+<li><strong>--rfc-3339=FMT</strong>：按照 RFC 3339 格式输出，FMT 可以为'date', 'seconds','ns'中的一个，可用于设置日期和时间的精度， 例如：2006-08-14 02:34:56-06:00。</li>
+<li><strong>-r, --reference=FILE</strong>：显示文件的上次修改时间。</li>
+<li><strong>-s, --set=STRING</strong>：根据字符串设置系统时间。</li>
+<li><strong>-u, --utc, --universal</strong>：显示或设置协调世界时(UTC)。</li>
+<li><strong>--help</strong>：显示帮助信息。</li>
+<li><strong>--version</strong>：输出版本信息。</li>
+</ul>
+<p>FORMAT 参数：</p>
+<p>在显示方面，使用者可以设定欲显示的格式 ，格式设定为一个加号后接数个标记，其中可用的标记列表如下：</p>
+<p>%%   输出字符 %
+%a   星期几的缩写 (Sun..Sat)
+%A   星期的完整名称(Sunday..Saturday)。
+%b   缩写的月份名称（例如，Jan）
+%B   完整的月份名称（例如，January）
+%c   本地日期和时间（例如，Thu Mar  3 23:05:25 2005）
+%C   世纪，和%Y类似，但是省略后两位（例如，20）
+%d   日 (01..31)
+%D   日期，等价于%m/%d/%y
+%e   一月中的一天，格式使用空格填充，等价于%_d
+%F   完整的日期；等价于 %Y-%m-%d
+%g   ISO 标准计数周的年份的最后两位数字
+%G   ISO 标准计数周的年份，通常只对%V有用
+%h   等价于 %b
+%H   小时 (00..23)
+%I   小时 (01..12)
+%j   一年中的第几天 (001..366)
+%k   小时，使用空格填充 ( 0..23); 等价于 %_H
+%l   小时, 使用空格填充 ( 1..12); 等价于 %_I
+%m   月份 (01..12)
+%M   分钟 (00..59)
+%n   新的一行，换行符
+%N   纳秒 (000000000..999999999)
+%p   用于表示当地的AM或PM，如果未知则为空白
+%P   类似 %p, 但是是小写的
+%r   本地的 12 小时制时间(例如 11:11:04 PM)
+%R   24 小时制 的小时与分钟; 等价于 %H:%M
+%s   自 1970-01-01 00:00:00 UTC 到现在的秒数
+%S   秒 (00..60)
+%t   插入水平制表符 tab
+%T   时间; 等价于 %H:%M:%S
+%u   一周中的一天 (1..7); 1 表示星期一
+%U   一年中的第几周，周日作为一周的起始 (00..53)
+%V   ISO 标准计数周，该方法将周一作为一周的起始 (01..53)
+%w   一周中的一天（0..6），0代表星期天
+%W   一年中的第几周，周一作为一周的起始（00..53）
+%x   本地的日期格式（例如，12/31/99）
+%X   本地的日期格式（例如，23:13:48）
+%y   年份后两位数字 (00..99)
+%Y   年
+%z   +hhmm 格式的数值化时区格式（例如，-0400）
+%:z  +hh:mm 格式的数值化时区格式（例如，-04:00）
+%::z  +hh:mm:ss格式的数值化时区格式（例如，-04:00:00）
+%:::z  数值化时区格式，相比上一个格式增加':'以显示必要的精度（例如，-04，+05:30）
+%Z  时区缩写 （如 EDT）</p>
+<p>显示当前时间</p>
+<pre><code class="language-bash"># date
+Tue May 24 09:29:43 CST 2022
+# date '+%c' 
+Tue 24 May 2022 09:30:03 AM CST
+# date '+%D' //显示完整的时间
+05/24/22
+# date '+%x' //显示数字日期
+05/24/2022
+# date '+%T' //显示日期，年份用四位数表示
+14:09:31
+# date '+%X' //显示24小时的格式
+09:31:31 AM
+</code></pre>
+<p>格式化输出：</p>
+<pre><code class="language-bash"># date +&quot;%Y-%m-%d&quot;
+2009-12-07
+</code></pre>
+<p>输出昨天日期：</p>
+<pre><code class="language-bash"># date -d &quot;1 day ago&quot; +&quot;%Y-%m-%d&quot;
+2012-11-19
+</code></pre>
+<p>输出 2 秒后的时间：</p>
+<pre><code class="language-bash"># date -d &quot;2 second&quot; +&quot;%Y-%m-%d %H:%M.%S&quot;
+2012-11-20 14:21.31
+</code></pre>
+<h3 id="查看进程">查看进程</h3>
+<p>例如：</p>
+<pre><code class="language-shell">ps -ef|grep ssh
+ps -ef|grep tomcat
+</code></pre>
+<p>pid查看
+netstat -naop|grep pid</p>
+<p>例如：</p>
+<pre><code class="language-shell">netstat -naop|grep 8080
+</code></pre>
+<p>查看特定用户</p>
+<pre><code class="language-bash">ps -u root  #显示root进程用户信息
+</code></pre>
+<p>停止进程(-9表示强制停止)</p>
+<pre><code class="language-shell">kill -9 pid
+</code></pre>
+<h3 id="watch观察">watch观察</h3>
+<p>linux系统里有一些日志文件。观察这些日志文件是系统管理员的一个重要任务。你可以很方便地<a href="http://tuxtweaks.com/2011/02/command-line-basics-head-and-tail/">使用tail命令</a>观察它们。但是如果你想要长时间监视这些文件，每几分钟使用tail检查那些日志文件是一件很乏味的事情。你可以写一个短小的<a href="http://tuxtweaks.com/2012/01/creating-a-terminal-window-clock/">无限循环的脚本</a>来周期性地检查文件，但其实已经有一个程序可以为你处理这种重复的任务。</p>
+<p>Linux中的watch 命令提供了一种方式处理重复的任务。默认watch会每<strong>2</strong>秒重复执行命令。你一定也想到了,watch是一个很好的观察log文件的工具。下面是一个例子。</p>
+<pre><code class="language-bash">watch tail /var/log/syslog
+</code></pre>
+<p>想要停止命令的执行,只要使用标准的kill流程, [Ctrl]+C。</p>
+<pre><code>watch [options] command
+</code></pre>
+<p>参数：</p>
+<ul>
+<li>
+<p>-b, --beep             如果命令以非零返回值退出的话则发出哔声</p>
+</li>
+<li>
+<p>-c, --color              interpret ANSI color and style sequences</p>
+</li>
+<li>
+<p>-d, --differences   highlight changes between updates</p>
+</li>
+</ul>
+<p>选项watch 会高亮显示变化的区域。
+而-d=cumulative选项会把变动过的地方(不管最近的那次有没有变动)都高亮显示出来</p>
+<ul>
+<li>
+<p>-e, --errexit           exit if command has a non-zero exit</p>
+</li>
+<li>
+<p>-g, --chgexit           exit when output from command changes</p>
+</li>
+<li>
+<p>-n, --interval 秒       seconds to wait between updates</p>
+</li>
+<li>
+<p>-p, --precise          尝试以精确的间隔运行命令</p>
+</li>
+<li>
+<p>-t, --no-title         会关闭watch命令在顶部的时间间隔,命令，当前时间的输出</p>
+</li>
+<li>
+<p>-w, --no-wrap          turn off line wrapping</p>
+</li>
+<li>
+<p>-x, --exec             将命令传给 exec 而非“sh -c”</p>
+</li>
+<li>
+<p>-h, --help     显示此帮助然后离开</p>
+</li>
+<li>
+<p>-v, --version  output version information and exit</p>
+</li>
+</ul>
+<p>watch并不仅限于浏览日志文件。它可以用来重复你给它的任何命令。如果你要<a href="http://tuxtweaks.com/2008/08/how-to-control-fan-speeds-in-ubuntu/">监测CPU的温度</a>,你可以使用watch后跟上<strong>sensord</strong>命令来查看。</p>
+<pre><code>watch -n 1 sensors
+</code></pre>
+<p>e.g.：</p>
+<pre><code class="language-bash">watch -n {运行时间间隔} -d &quot;{运行的指令}&quot;
+
+
+watch -n 1 netstat -ant       # 命令：每隔一秒高亮显示网络链接数的变化情况
+watch -n 1 -d 'pstree|grep http' # 每隔一秒高亮显示http链接数的变化情况。 
+				后面接的命令若带有管道符，需要加''将命令区域归整。
+				
+watch 'netstat -an | grep:21 | \ grep&lt;模拟攻击客户机的IP&gt;| wc -l' # 实时查看模拟攻击客户机建立起来的连接数
+watch -d 'ls -l|grep scf'       # 监测当前目录中 scf' 的文件的变化
+watch -n 10 'cat /proc/loadavg' # 10秒一次输出系统的平均负载
+watch -d 'ls -l | fgrep goface'     # 监测goface的文件
+watch -t -differences=cumulative uptime
+</code></pre>
+<h3 id="防火墙">防火墙</h3>
+<p>systemctl status firewalld 				查看防火墙
+systemctl start firewalld					开始防火墙
+systemctl stop firewalld					关闭防火墙
+systemctl restart firewalld				重启防火墙</p>
+<p>白名单</p>
+<pre><code class="language-shell">vim /usr/lib/firewalld/services/ssh.xml
+</code></pre>
+<pre><code class="language-xml">  &lt;port protocol=&quot;tcp&quot; port=&quot;8080&quot;/&gt;
+</code></pre>
+<p>systemctl restart firewalld 		重启防火墙</p>
+<h3 id="这里是搜索-mysql">这里是搜索 MySQL</h3>
+<p>find命令查询，速度会慢点
+find / -name mysql</p>
+<p>whereis命令搜索，速度较快
+whereis mysql</p>
+<h3 id="用户">用户</h3>
+<p>Linux用户分类
+超级用户   root  uid = 0
+普通用户         uid = 500~60000
+伪用户           udi = 1~499</p>
+<p>伪用户不能登录系统，也不会在home下创建相应的文件夹，主要是执行一些系统命令</p>
+<p>用户组(便于分配权限)
+用户组 可以包含多个 用户
+一用户 至少属于一个 用户组</p>
+<h4 id="group组">group组</h4>
+<pre><code class="language-bash">groupadd 组名						#创建用户组
+groupmod -n 新组名 旧组名			 #修改用户组名
+groupdel 组名						#删除用户组
+groups							#查询用户所在的组
+</code></pre>
+<p>修改用户所属组</p>
+<h4 id="user用户">user用户</h4>
+<pre><code class="language-bash">useradd 用户名					#添加一般用户
+useradd -g 用户组 用户名		#添加用户到组
+useradd -m aaa				#创建用户名为aaa的用户,添加到home
+useradd caojh -u 544		#建立用户且制定ID
+
+usermod -a -G 用户组 用户名
+
+userdel
+</code></pre>
+<p><strong>参数说明</strong>：</p>
+<ul>
+<li>
+<p>-c&lt;备注&gt; 　加上备注文字。备注文字会保存在passwd的备注栏位中。</p>
+</li>
+<li>
+<p>-d&lt;登入目录&gt; 　指定用户登入时的起始目录。</p>
+</li>
+<li>
+<p>-D 　变更预设值．</p>
+</li>
+<li>
+<p>-e&lt;有效期限&gt; 　指定帐号的有效期限。</p>
+</li>
+<li>
+<p>-f&lt;缓冲天数&gt; 　指定在密码过期后多少天即关闭该帐号。</p>
+</li>
+<li>
+<p>-g&lt;群组&gt; 　指定用户所属的群组。</p>
+</li>
+<li>
+<p>-G&lt;群组&gt; 　指定用户所属的附加群组。</p>
+</li>
+<li>
+<p>-m 　在home目录下自动建立用户的登入目录。</p>
+</li>
+<li>
+<p>-M 　不要自动建立用户的登入目录。</p>
+</li>
+<li>
+<p>-n 　取消建立以用户名称为名的群组．</p>
+</li>
+<li>
+<p>-r 　建立系统帐号。</p>
+</li>
+<li>
+<p>-s<shell>　 　指定用户登入后所使用的shell。</p>
+</li>
+<li>
+<p>-u<uid> 　指定用户ID。</p>
+</li>
+<li>
+<p>-a|--append，把用户追加到某些组中，仅与-G选项一起使用</p>
+</li>
+<li>
+<p>-G|--groups，把用户追加到某些组中，仅与-a选项一起使用</p>
+</li>
+</ul>
+<p><strong>创建一个用户步骤</strong></p>
+<ol>
+<li>
+<p>useradd -m aaa</p>
+</li>
+<li>
+<p>sudo passwd aaa</p>
+</li>
+<li>
+<p>sudo vi /etc/sudoers设置给予的权限</p>
+<p>找到user privilege这一行
+通过按i写入如上命令 给aaa分配所有权限</p>
+</li>
+<li>
+<p>设置命令解释器
+sudo vi /etc/passwd
+将文件拉倒最后修改解释器类型</p>
+</li>
+</ol>
+<p>权限设置
+先给root添加sudoers文件的读写权限</p>
+<pre><code>chmod 777 /etc/sudoers
+</code></pre>
+<p>编辑sudoers文件</p>
+<pre><code>vi /etc/sudoers
+</code></pre>
+<p>找到如下一行代码</p>
+<pre><code>root ALL=(ALL) ALL
+</code></pre>
+<p>在下面添加</p>
+<pre><code>tony ALL=(ALL) ALL
+</code></pre>
+<p>共有四种格式的权限</p>
+<pre><code class="language-bash">tony ALL=(ALL) ALL
+%tony ALL=(ALL) ALL
+tony ALL=(ALL) NOPASSWD: ALL
+%tony ALL=(ALL) NOPASSWD: ALL
+第一行:允许用户tony执行sudo命令(需要输入密码)
+第二行:允许用户组tony里面的用户执行sudo命令(需要输入密码)
+第三行:允许用户tony执行sudo命令,并且在执行的时候不输入密码
+第四行:允许用户组tony里面的用户执行sudo命令,并且在执行的时候不输入密码
+</code></pre>
+<p>编辑完成 按 ESC+:wq！保存退出</p>
+<p>最后将root的sudoers文件权限改回来</p>
+<pre><code class="language-bash">chmod 0440 /etc/sudoers 
+</code></pre>
+<p>如果该用户账号只显示$</p>
+<p>则在root下修改 /etc/passwd</p>
+<p>sudo vim /etc/passwd</p>
+<pre><code>username:X:1000:1000::/home/wr:/bin/sh(这是之前的)
+
+改为了username:X:1000:1000::/home/wr:/bin/bash
+</code></pre>
+<p>在该账户名下路径最后的/sh改为/bash</p>
+<p>用户相关配置信息</p>
+<p>/etc/passwd 			用户信息文件
+/etc/shadow 			保存密码信息
+/etc/group 				用户组信息
+/etc/gshadow 			用户组密码信息</p>
+<h3 id="查看用户">查看用户</h3>
+<p>查看当前用户名称</p>
+<pre><code class="language-bash">whoami
+</code></pre>
+<p>Linux 中，使用 w 或 who 命令都可以查看服务器上目前已登录的用户信息，两者的区别在于，w 命令除了能知道目前已登陆的用户信息，还可以知道每个用户执行任务的情况。</p>
+<pre><code class="language-bash">w
+who
+</code></pre>
+<h2 id="linux系统版本信息">Linux系统版本信息</h2>
+<p>几种查看Linux版本信息的方法：</p>
+<ol>
+<li>uname -a</li>
+<li>cat /proc/version</li>
+<li>cat /etc/issue</li>
+<li>lsb_release -a</li>
+</ol>
+<p>详解 lsb_release -a</p>
+<p>登录到服务器执行 lsb_release -a ，即可列出所有版本信息，例如：</p>
+<pre><code class="language-bash">[root@3.5.5Biz-46 ~]# lsb_release -a
+
+LSB Version: 1.3
+
+Distributor ID: RedHatEnterpriseAS
+
+Description: Red Hat Enterprise Linux AS release 4 (Nahant Update 1)
+
+Release: 4
+
+Codename: NahantUpdate1
+
+[root@3.5.5Biz-46 ~]#
+这个命令适用于所有的linux，包括Redhat、SuSE、Debian等发行版。
+</code></pre>
+<h4 id="查看redhat的release版本">查看redhat的release版本</h4>
+<p>dhat的release版本#more /etc/redhat-release
+Red Hat Enterprise Linux AS release 4 (Nahant Update 4)</p>
+<p>#more /etc/issue
+# more /proc/version</p>
+<p>查看CPU信息
+#grep &quot;model name&quot; /proc/cpuinfo
+#more /proc/cpuinfo</p>
+<p>查看CPU位数(32 or 64)
+#getconf LONG_BIT</p>
+<p>查看内存信息
+#more /proc/meminfo
+#grep MemTotal /proc/meminfo</p>
+<p>查看libc、gcc版本
+#ldd /sbin/mii-tool
+#rpm -qa | grep glibc
+#gcc –v</p>
+<h4 id="查看ubuntu版本">查看Ubuntu版本</h4>
+<p>方法一</p>
+<p>在终端中执行下列指令：
+cat /etc/issue
+可以查看当前正在运行的 Ubuntu 的版本号。其输出结果类似下面的内容：
+Ubuntu 7.04 \n \l</p>
+<p>方法二</p>
+<p>使用 lsb_release 命令也可以查看 Ubuntu 的版本号，与方法一相比，内容更为详细。执行指令如下：
+sudo lsb_release -a</p>
+<p>将输出结果：
+Distributor ID: Ubuntu
+Description: Ubuntu 7.04
+Release: 7.04
+Codename: feisty</p>
+<p>查看freebsd版本
+uname -a</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

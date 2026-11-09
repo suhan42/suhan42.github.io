@@ -1,0 +1,13 @@
+# 依赖目录，构建期通过 npm ci 安装，不提交到仓库。
+node_modules/
+
+# 操作系统临时文件。
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# 编辑器缓存。
+.vscode/
+.idea/
+*.swp
+*.swo

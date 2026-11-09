@@ -1,0 +1,48 @@
+{# 侧栏：特殊页、分类、标签和归档都由构建期集合派生，不在页面里硬编码。 #}
+<aside class="rail" aria-label="站点索引">
+  <section class="rail-card works-rail" aria-labelledby="works-title">
+    <div class="rail-heading">
+      <h2 class="rail-title" id="works-title">Works</h2>
+      <span class="works-count">{{ customPages.length }}</span>
+    </div>
+    <div class="works-rail-list">
+      {% for page in customPages %}
+      <a href="{{ page.url }}" class="works-rail-item" data-accent="{{ page.accent }}">
+        <span class="works-rail-mark" aria-hidden="true">{{ page.mark }}</span>
+        <span class="works-rail-copy">
+          <span class="works-rail-name">{{ page.title }}</span>
+          <span class="works-rail-meta">{{ page.kind }} · {{ page.category }}</span>
+        </span>
+        <span class="works-rail-arrow bi bi-arrow-up-right" aria-hidden="true"></span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="rail-card">
+    <h2 class="rail-title">Categories</h2>
+    <ul class="rail-links">
+      {% for category in collections.categories %}
+      <li><a href="/categories/{{ category }}/">{{ category }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="rail-card">
+    <h2 class="rail-title">Tags</h2>
+    <div class="rail-tags">
+      {% for tag in collections.allTags %}
+      <a href="/tags/{{ tag }}/" class="rail-tag">#{{ tag }}</a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="rail-card">
+    <h2 class="rail-title">Elsewhere</h2>
+    <ul class="rail-links">
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/feed.xml">RSS</a></li>
+      <li><a href="/sitemap.xml">Sitemap</a></li>
+    </ul>
+  </section>
+</aside>

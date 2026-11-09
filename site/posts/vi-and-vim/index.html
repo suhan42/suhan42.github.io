@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>vi 与 vim - Suhan</title>
+
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#vivim-%E7%9A%84%E4%BD%BF%E7%94%A8">vi/vim 的使用</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F">※命令模式：</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%BE%93%E5%85%A5%E6%A8%A1%E5%BC%8F">※输入模式</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%BA%95%E7%BA%BF%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F">※底线命令模式</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">it</a>
+      <time datetime="2023-01-22">2023-01-22</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/linux/">#linux</a>
+      <a href="/tags/vim/">#vim</a>
+      <a href="/tags/note/">#note</a>
+    </div>
+
+    <h1 class="post-title">vi 与 vim</h1>
+
+    <div class="post-body">
+<h1 id="vivim-的使用">vi/vim 的使用</h1>
+<p>vi和vim都是Linux中的编辑器，不同的是vim比较高级，可以视为vi的升级版本。vi使用于文本编辑，但是vim更适用于coding</p>
+<p>基本上 vi/vim 共分为三种模式，分别是命令模式（Command mode），输入模式（Insert mode）和底线命令模式（Last line mode）。 这三种模式的作用分别是：</p>
+<h2 id="命令模式">※命令模式：</h2>
+<p>用户刚刚启动 vi/vim，便进入了命令模式。</p>
+<p>此状态下敲击键盘动作会被Vim识别为命令，而非输入字符。比如我们此时按下i，并不会输入一个字符，i被当作了一个命令。</p>
+<p>以下是常用的几个命令：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i(a,o)</td>
+<td>切换到输入模式，以输入字符。</td>
+</tr>
+<tr>
+<td>x</td>
+<td>删除当前光标所在处的字符。</td>
+</tr>
+<tr>
+<td>:</td>
+<td>切换到底线命令模式，以在最底一行输入命令。</td>
+</tr>
+<tr>
+<td>yy</td>
+<td>复制当前一行的内容</td>
+</tr>
+<tr>
+<td>p</td>
+<td>拷贝 yy 的内容</td>
+</tr>
+<tr>
+<td>dd</td>
+<td>删除一行</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>移动光标到第一行</td>
+</tr>
+<tr>
+<td>G</td>
+<td>移动到最后一行</td>
+</tr>
+<tr>
+<td>u</td>
+<td>撤销(相当于Ctrl+z)</td>
+</tr>
+<tr>
+<td>ctrl+r</td>
+<td>反撤销</td>
+</tr>
+</tbody>
+</table>
+<p>若想要编辑文本：启动Vim，进入了命令模式，按下i，切换到输入模式。</p>
+<p>命令模式只有一些最基本的命令，因此仍要依靠底线命令模式输入更多命令。</p>
+<h2 id="输入模式">※输入模式</h2>
+<p>在命令模式下按下i就进入了输入模式。</p>
+<p>在输入模式中，可以使用以下按键：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>字符按键以及Shift组合</td>
+<td>输入字符</td>
+</tr>
+<tr>
+<td>ENTER</td>
+<td>回车键，换行</td>
+</tr>
+<tr>
+<td>BACK SPACE</td>
+<td>退格键，删除光标前一个字符</td>
+</tr>
+<tr>
+<td>DEL</td>
+<td>删除键，删除光标后一个字符</td>
+</tr>
+<tr>
+<td>上下左右</td>
+<td>方向键，在文本中移动光标</td>
+</tr>
+<tr>
+<td>HOME/END</td>
+<td>移动光标到行首/行尾</td>
+</tr>
+<tr>
+<td>Page Up/Page Down</td>
+<td>上/下翻页</td>
+</tr>
+<tr>
+<td>Insert</td>
+<td>切换光标为输入/替换模式，光标将变成竖线/下划线</td>
+</tr>
+<tr>
+<td>ESC</td>
+<td>退出输入模式，切换到命令模式</td>
+</tr>
+</tbody>
+</table>
+<h2 id="底线命令模式">※底线命令模式</h2>
+<p>在命令模式下按下:（英文冒号）就进入了底线命令模式。</p>
+<p>底线命令模式可以输入单个或多个字符的命令，可用的命令非常多。</p>
+<p>在底线命令模式中，基本的命令有（已经省略了冒号）：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>q</td>
+<td>退出程序</td>
+</tr>
+<tr>
+<td>w</td>
+<td>保存文件</td>
+</tr>
+<tr>
+<td>wq</td>
+<td>保存退出</td>
+</tr>
+<tr>
+<td>q!</td>
+<td>不保存退出</td>
+</tr>
+<tr>
+<td>set number</td>
+<td>显示行号</td>
+</tr>
+<tr>
+<td>set nonumber</td>
+<td>不显示行号</td>
+</tr>
+<tr>
+<td>n</td>
+<td>定位到第 n 行</td>
+</tr>
+<tr>
+<td>/xxx</td>
+<td>搜索xxx</td>
+</tr>
+<tr>
+<td>n</td>
+<td>来回切换搜到的xxx内容</td>
+</tr>
+<tr>
+<td>noh</td>
+<td>取消搜索后的高亮</td>
+</tr>
+</tbody>
+</table>
+<p>替换</p>
+<p>n,$s/旧内容/新内容/g</p>
+<p>​	n 		从第n行开始
+​	$s 		末尾
+​	g 		表示全局替换</p>
+<p>按ESC键可随时退出底线命令模式。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>
