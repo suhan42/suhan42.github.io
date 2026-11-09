@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vi 与 vim - Suhan</title>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css" rel="stylesheet">
+  <link href="/assets/css/variables.css" rel="stylesheet">
+  <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/css/me.css" rel="stylesheet">
+  <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
+  
+</head>
+<body>
+  
+<header id="header" class="header d-flex align-items-center fixed-top">
+  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+    <a href="/" class="logo d-flex align-items-center">
+      <img src="/assets/images/suhan.png" alt="">
+      <h2>Suhan</h2>
+    </a>
+
+    <nav id="navbar" class="main-nav navbar">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/categories/it/">IT</a></li>
+        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
+          <ul>
+            <li><a href="/categories/acgn/">A - Animation</a></li>
+            <li><a href="/categories/acgn/">C - Comic</a></li>
+            <li><a href="/categories/acgn/">G - Game</a></li>
+            <li><a href="/categories/acgn/">N - Novel</a></li>
+          </ul>
+        </li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="position-relative">
+      <a href="https://github.com/suhan42" class="mx-2" target="_blank"><span class="bi-github"></span></a>
+      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+
+      <a class="toggle"><span class="bi-list"></span></a>
+
+      <div class="search-form-wrap js-search-form-wrap">
+        <form action="" class="search-form">
+          <span class="icon bi-search"></span>
+          <input type="text" placeholder="Search" class="form-control">
+          <button class="btn js-search-close"><span class="bi-x"></span></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+  <main id="main">
+    <section>
+      <div class="container">
+        
+<div class="row">
+  <div class="col-md-10">
+    <h3 class="category-title">vi 与 vim</h3><hr>
+    <div class="d-md-flex post-entry-1">
+      <div>
+        <div class="post-meta">
+          <span class="date">it</span> <span class="mx-1">&bullet;</span>
+          <span>2023-01-22</span>
+        </div>
+        <div class="post-content">
+          <h1>vi/vim 的使用</h1>
+<p>vi和vim都是Linux中的编辑器，不同的是vim比较高级，可以视为vi的升级版本。vi使用于文本编辑，但是vim更适用于coding</p>
+<p>基本上 vi/vim 共分为三种模式，分别是命令模式（Command mode），输入模式（Insert mode）和底线命令模式（Last line mode）。 这三种模式的作用分别是：</p>
+<h2>※命令模式：</h2>
+<p>用户刚刚启动 vi/vim，便进入了命令模式。</p>
+<p>此状态下敲击键盘动作会被Vim识别为命令，而非输入字符。比如我们此时按下i，并不会输入一个字符，i被当作了一个命令。</p>
+<p>以下是常用的几个命令：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i(a,o)</td>
+<td>切换到输入模式，以输入字符。</td>
+</tr>
+<tr>
+<td>x</td>
+<td>删除当前光标所在处的字符。</td>
+</tr>
+<tr>
+<td>:</td>
+<td>切换到底线命令模式，以在最底一行输入命令。</td>
+</tr>
+<tr>
+<td>yy</td>
+<td>复制当前一行的内容</td>
+</tr>
+<tr>
+<td>p</td>
+<td>拷贝 yy 的内容</td>
+</tr>
+<tr>
+<td>dd</td>
+<td>删除一行</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>移动光标到第一行</td>
+</tr>
+<tr>
+<td>G</td>
+<td>移动到最后一行</td>
+</tr>
+<tr>
+<td>u</td>
+<td>撤销(相当于Ctrl+z)</td>
+</tr>
+<tr>
+<td>ctrl+r</td>
+<td>反撤销</td>
+</tr>
+</tbody>
+</table>
+<p>若想要编辑文本：启动Vim，进入了命令模式，按下i，切换到输入模式。</p>
+<p>命令模式只有一些最基本的命令，因此仍要依靠底线命令模式输入更多命令。</p>
+<h2>※输入模式</h2>
+<p>在命令模式下按下i就进入了输入模式。</p>
+<p>在输入模式中，可以使用以下按键：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>字符按键以及Shift组合</td>
+<td>输入字符</td>
+</tr>
+<tr>
+<td>ENTER</td>
+<td>回车键，换行</td>
+</tr>
+<tr>
+<td>BACK SPACE</td>
+<td>退格键，删除光标前一个字符</td>
+</tr>
+<tr>
+<td>DEL</td>
+<td>删除键，删除光标后一个字符</td>
+</tr>
+<tr>
+<td>上下左右</td>
+<td>方向键，在文本中移动光标</td>
+</tr>
+<tr>
+<td>HOME/END</td>
+<td>移动光标到行首/行尾</td>
+</tr>
+<tr>
+<td>Page Up/Page Down</td>
+<td>上/下翻页</td>
+</tr>
+<tr>
+<td>Insert</td>
+<td>切换光标为输入/替换模式，光标将变成竖线/下划线</td>
+</tr>
+<tr>
+<td>ESC</td>
+<td>退出输入模式，切换到命令模式</td>
+</tr>
+</tbody>
+</table>
+<h2>※底线命令模式</h2>
+<p>在命令模式下按下:（英文冒号）就进入了底线命令模式。</p>
+<p>底线命令模式可以输入单个或多个字符的命令，可用的命令非常多。</p>
+<p>在底线命令模式中，基本的命令有（已经省略了冒号）：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>q</td>
+<td>退出程序</td>
+</tr>
+<tr>
+<td>w</td>
+<td>保存文件</td>
+</tr>
+<tr>
+<td>wq</td>
+<td>保存退出</td>
+</tr>
+<tr>
+<td>q!</td>
+<td>不保存退出</td>
+</tr>
+<tr>
+<td>set number</td>
+<td>显示行号</td>
+</tr>
+<tr>
+<td>set nonumber</td>
+<td>不显示行号</td>
+</tr>
+<tr>
+<td>n</td>
+<td>定位到第 n 行</td>
+</tr>
+<tr>
+<td>/xxx</td>
+<td>搜索xxx</td>
+</tr>
+<tr>
+<td>n</td>
+<td>来回切换搜到的xxx内容</td>
+</tr>
+<tr>
+<td>noh</td>
+<td>取消搜索后的高亮</td>
+</tr>
+</tbody>
+</table>
+<p>替换</p>
+<p>n,$s/旧内容/新内容/g</p>
+<p>​	n 		从第n行开始
+​	$s 		末尾
+​	g 		表示全局替换</p>
+<p>按ESC键可随时退出底线命令模式。</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<div class="col-md-2">
+  <div class="aside-block">
+    <h3 class="aside-title">Video</h3>
+    <div class="video-post">
+      <a href="https://www.bilibili.com" class="glightbox link-video">
+        <span class="bi-play-fill"></span>
+        <img src="/assets/images/gd.jpg" alt="" class="img-fluid">
+      </a>
+    </div>
+  </div>
+
+  <div class="aside-block">
+    <h3 class="aside-title">Categories</h3>
+    <ul class="aside-links list-unstyled">
+      
+      <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i>acgn</a></li>
+      
+      <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i>essay</a></li>
+      
+      <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i>it</a></li>
+      
+    </ul>
+  </div>
+
+  <div class="aside-block">
+    <h3 class="aside-title">Tags</h3>
+    <ul class="aside-tags list-unstyled">
+      
+      <li><a href="/tags/c/">#c</a></li>
+    
+      <li><a href="/tags/cpp/">#cpp</a></li>
+    
+      <li><a href="/tags/database/">#database</a></li>
+    
+      <li><a href="/tags/english/">#english</a></li>
+    
+      <li><a href="/tags/essay/">#essay</a></li>
+    
+      <li><a href="/tags/game/">#game</a></li>
+    
+      <li><a href="/tags/git/">#git</a></li>
+    
+      <li><a href="/tags/guide/">#guide</a></li>
+    
+      <li><a href="/tags/hexo/">#hexo</a></li>
+    
+      <li><a href="/tags/jekyll/">#jekyll</a></li>
+    
+      <li><a href="/tags/linux/">#linux</a></li>
+    
+      <li><a href="/tags/markdown/">#markdown</a></li>
+    
+      <li><a href="/tags/marked/">#marked</a></li>
+    
+      <li><a href="/tags/mysql/">#mysql</a></li>
+    
+      <li><a href="/tags/note/">#note</a></li>
+    
+      <li><a href="/tags/shell/">#shell</a></li>
+    
+      <li><a href="/tags/static-site/">#static-site</a></li>
+    
+      <li><a href="/tags/vim/">#vim</a></li>
+    
+      <li><a href="/tags/white-album-2/">#white-album-2</a></li>
+    
+      <li><a href="/tags/workflow/">#workflow</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+</div>
+
+      </div>
+    </section>
+  </main>
+
+  
+<footer id="footer" class="footer">
+  <div class="footer-content">
+    <div class="container">
+      <div class="row g-2">
+        <div class="col-lg-5">
+          <h3 class="footer-heading">About suhan</h3>
+          <p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p>
+          <p><a href="/about/" class="footer-link-more">Learn More</a></p>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h3 class="footer-heading">Navigation</h3>
+          <ul class="footer-links list-unstyled">
+            <li><a href="/"><i class="bi bi-chevron-right"></i> Home</a></li>
+            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> It</a></li>
+            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> Acgn</a></li>
+            <li><a href="/about/"><i class="bi bi-chevron-right"></i> About</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h3 class="footer-heading">Categories</h3>
+          <ul class="footer-links list-unstyled">
+            
+            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> acgn</a></li>
+            
+            <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i> essay</a></li>
+            
+            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> it</a></li>
+            
+          </ul>
+        </div>
+
+        <div class="col-lg-3">
+          虚以待位
+          ？？？
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-legal">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <div class="copyright">&copy; Copyright <strong><span>suhan42</span></strong>. All Rights Reserved</div>
+        </div>
+        <div class="col-md-6">
+          <div class="social-links mb-3 mb-lg-0 text-center text-md-end">
+            <a href="https://github.com/suhan42" class="github" target="_blank"><i class="bi bi-github"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+
+  <script src="/assets/vendor/jquery-1.11.0.min.js"></script>
+  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js"></script>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/me.js"></script>
+</body>
+</html>

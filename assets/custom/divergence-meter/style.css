@@ -1,0 +1,50 @@
+* {
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden;
+}
+
+body {
+	height: 100%;
+	width: 100%;
+	background-color: #000;
+}
+
+.text {
+	color: #972B0F;
+	font-size: 40px;
+	list-style: 4cm;
+
+	text-align: center;
+	margin-top: 40px;
+}
+
+.divergence-day {
+	position: absolute;
+	/* top: 50%; */
+	left: 50%;
+	margin: -120px 0 0 -175px;
+	background-color: #000;
+}
+.divergence-day div {
+	float: left;
+	height: 305px;
+	width: 100px;
+}
+
+.divergence-meter {
+	position: absolute;
+	/* top: 50%; */
+	top: 550px;
+	left: 50%;
+	margin: -153px 0 0 -416px;
+	background-color: #000;
+}
+.divergence-meter div {
+	float: left;
+	height: 307px;
+	width: 104px;
+}
+.divergence-meter,.divergence-day .frame {
+	background-image: url(image/empty.jpg);
+}
