@@ -2,8 +2,8 @@
 // 仅注册构建规则和目录结构，不承载业务内容。
 
 export default function (eleventyConfig) {
-  // 把根目录 assets/ 原样复制到输出目录的 assets/ 下。
-  eleventyConfig.addPassthroughCopy({ "assets": "assets" });
+  // 把根目录 assets/ 原样复制到输出目录的 assets/ 下；src/static/ 的内容（.nojekyll）复制到输出根目录。
+  eleventyConfig.addPassthroughCopy({ "assets": "assets", "src/static": "." });
 
   // 日期显示过滤器：把 JS Date 或 ISO 字符串格式化为 YYYY-MM-DD，用于列表和文章页。
   eleventyConfig.addFilter("dateDisplay", (value) => {

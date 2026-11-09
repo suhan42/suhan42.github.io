@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于 Git 使用 - Suhan</title>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css" rel="stylesheet">
+  <link href="/assets/css/variables.css" rel="stylesheet">
+  <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/css/me.css" rel="stylesheet">
+  <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
+  
+</head>
+<body>
+  
+<header id="header" class="header d-flex align-items-center fixed-top">
+  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+    <a href="/" class="logo d-flex align-items-center">
+      <img src="/assets/images/suhan.png" alt="">
+      <h2>Suhan</h2>
+    </a>
+
+    <nav id="navbar" class="main-nav navbar">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/categories/it/">IT</a></li>
+        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
+          <ul>
+            <li><a href="/categories/acgn/">A - Animation</a></li>
+            <li><a href="/categories/acgn/">C - Comic</a></li>
+            <li><a href="/categories/acgn/">G - Game</a></li>
+            <li><a href="/categories/acgn/">N - Novel</a></li>
+          </ul>
+        </li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="position-relative">
+      <a href="https://github.com/suhan42" class="mx-2" target="_blank"><span class="bi-github"></span></a>
+      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+
+      <a class="toggle"><span class="bi-list"></span></a>
+
+      <div class="search-form-wrap js-search-form-wrap">
+        <form action="" class="search-form">
+          <span class="icon bi-search"></span>
+          <input type="text" placeholder="Search" class="form-control">
+          <button class="btn js-search-close"><span class="bi-x"></span></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+  <main id="main">
+    <section>
+      <div class="container">
+        
+<div class="row">
+  <div class="col-md-10">
+    <h3 class="category-title">关于 Git 使用</h3><hr>
+    <div class="d-md-flex post-entry-1">
+      <div>
+        <div class="post-meta">
+          <span class="date">it</span> <span class="mx-1">&bullet;</span>
+          <span>2023-01-23</span>
+        </div>
+        <div class="post-content">
+          <h2>什么是Git</h2>
+<p>Git是分布式版本控制系统，那么它就没有中央服务器的，每个人的电脑就是一个完整的版本库，这样，工作的时候就不需要联网了，因为版本都是在自己的电脑上。既然每个人的电脑都有一个完整的版本库，那多个人如何协作呢？比如说自己在电脑上改了文件A，其他人也在电脑上改了文件A，这时，你们两之间只需把各自的修改推送给对方，就可以互相看到对方的修改了。</p>
+<h2>工作原理</h2>
+<p><img src="/assets/images/git/work.png" alt="work"></p>
+<p><img src="/assets/images/git/git1.jpg" alt="git1"></p>
+<h2>常用操作</h2>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>git init</td>
+<td>初始化仓库</td>
+</tr>
+<tr>
+<td>git clone</td>
+<td>拷贝一份远程仓库，也就是下载一个项目。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>git add</td>
+<td>添加文件到暂存区</td>
+</tr>
+<tr>
+<td>git status</td>
+<td>查看仓库当前的状态，显示有变更的文件。</td>
+</tr>
+<tr>
+<td>git diff</td>
+<td>比较文件的不同，即暂存区和工作区的差异。</td>
+</tr>
+<tr>
+<td>git commit</td>
+<td>提交暂存区到本地仓库。</td>
+</tr>
+<tr>
+<td>git reset</td>
+<td>回退版本。</td>
+</tr>
+<tr>
+<td>git rm</td>
+<td>删除工作区文件。</td>
+</tr>
+<tr>
+<td>git mv</td>
+<td>移动或重命名工作区文件。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>git log</td>
+<td>查看历史提交记录</td>
+</tr>
+<tr>
+<td>git blame <file></td>
+<td>以列表形式查看指定文件的历史修改记录</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>git remote</td>
+<td>远程仓库操作</td>
+</tr>
+<tr>
+<td>git fetch</td>
+<td>从远程获取代码库</td>
+</tr>
+<tr>
+<td>git pull</td>
+<td>下载远程代码并合并</td>
+</tr>
+<tr>
+<td>git push</td>
+<td>上传远程代码并合并</td>
+</tr>
+</tbody>
+</table>
+<h2>Git使用</h2>
+<h3>登录</h3>
+<p>打开<code>git bash</code>之后，输入：</p>
+<pre><code class="language-shell">git config --global user.email &quot;你的邮箱&quot;
+git config --global user.name &quot;你的名字&quot;
+</code></pre>
+<p>（注意<code>&quot;</code>前面是有空格的，没有提示信息表示成功）
+输入完后再接着执行</p>
+<p><img src="/assets/images/git/user.png" alt="user"></p>
+<p>注意<code>git config --globa</code>l参数，有了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，当然你也可以对某个仓库指定的不同的用户名和邮箱，根据个人情况设置。</p>
+<pre><code class="language-shell">git config --global user.name
+</code></pre>
+<p>设置仓库局部用户名和邮箱</p>
+<pre><code class="language-bash">#one 仓库
+git config user.name &quot;one_name&quot;;
+git config user.email &quot;one_email&quot;
+#two 仓库
+git config user.name &quot;two_name&quot;;
+git config user.email &quot;two_email&quot;
+</code></pre>
+<p>查看信息</p>
+<pre><code class="language-bash">git config -l  #查看所有配置
+git config --system --list #查看系统配置
+git config --global --list #查看用户（全局）配置
+</code></pre>
+<p>即可成功!</p>
+<h3>远程仓库</h3>
+<p>先注册github账号，由于你的本地Git仓库和github仓库之间的传输是通过SSH加密的，所以需要一点设置：</p>
+<ol>
+<li>创建SSH Key。在用户主目录下，看看有没有<code>.ssh</code>目录，如果有，再看看这个目录下有没有<code>id_rsa</code>和<code>id_rsa.pub</code>这两个文件。
+<ol>
+<li>如果有的话，直接跳过此如下命令。</li>
+<li>如果没有的话，打开cmd命令行，输入如下命令：</li>
+</ol>
+</li>
+</ol>
+<pre><code class="language-shell">ssh-keygen -t rsa -C &quot;youremail@example.com&quot;
+</code></pre>
+<p><img src="/assets/images/git/ssh.png" alt="sshGet"></p>
+<pre><code class="language-shell">Enter file in which to save the key (C:\Users\cenha/.ssh/id_rsa): #设置密钥的文件名，不设置默认下面的名字
+
+Enter passphrase (empty for no passphrase): #设置密钥的密码，直接回车为不设置
+
+Enter same passphrase again: #再输入一遍密码，未设置密码直接回车
+</code></pre>
+<p>这两步演示的时候是直接按的回车，
+而如果这里是空的话，确实之后就不需要输入密码了。
+passphrase这个并非是gitlab的密码，而是git的安全口令
+我觉得这个口令更多的是为了保证每次使用git的时候更安全，所以自然就需要每次输入
+那么如果你使用的时候不想输入passphrase的话，则不需要设置安全口令。</p>
+<p>（你自己的邮箱地址，推荐和注册github的邮箱保持一致）, 我本地已经有了这些文件，如下所示：</p>
+<p><img src="/assets/images/git/sshId.png" alt=""></p>
+<p><code>id_rsa</code>是私钥，不能泄露出去，<code>id_rsa.pub</code>是公钥，可以放心地告诉任何人。</p>
+<ol start="2">
+<li>
+<p>登录Gitee，右上角：设置→SSH公钥，输入你的标题和公钥，点击确定。</p>
+<p>（登录github，右上角：设置→settings→SSH and GPR keys→New SSH key，然后输入title，输入上面的公钥id_rsa.pub，然后点击保存。点击 Add Key，你就应该可以看到已经添加的key。）</p>
+</li>
+<li>
+<p>在git bash中测试ssh（github需要这一步，gitee不需要）</p>
+</li>
+</ol>
+<pre><code class="language-bash">ssh -T git@github.com
+</code></pre>
+<h3>上传本地仓库</h3>
+<p>在本地的电脑上新建一个文件夹，在这个文件夹里面右键选择<code>Git Bash Here</code></p>
+<ol>
+<li>要添加文件到版本库，首先需要将这个目录变为git可以管理的仓库，在命令框里面输入：</li>
+</ol>
+<pre><code class="language-shell">git init
+</code></pre>
+<p>这时会有一个隐藏文件夹<code>.git</code>出现</p>
+<ol start="2">
+<li>把要上传的项目复制到新建的文件夹里面，将项目上传的本地仓库，输入:</li>
+</ol>
+<pre><code class="language-shell">git add 01.txt
+git commit -m &quot;备注&quot;
+</code></pre>
+<p>这里以01.txt为例子</p>
+<p><code>git add</code>：将文件提交到暂存区</p>
+<p><code>git commit -m</code>：将暂存区文件提交到仓库（引号内为注释）</p>
+<blockquote>
+<p>在 Linux 系统中，commit 信息使用单引号 <code>'</code>，Windows 系统，commit 信息使用双引号 <code>&quot;</code>。所以在 git bash 中 <strong>git commit -m '提交说明'</strong> 这样是可以的，在 Windows 命令行中就要使用双引号 <strong>git commit -m &quot;提交说明</strong>。</p>
+</blockquote>
+<h3>上传远程仓库</h3>
+<pre><code class="language-shell">git remote add origin https://...
+
+git push -u origin master
+</code></pre>
+<p><code>git remote add origin https://...</code>是将你本地的仓库和github仓库进行关联，关联一次之后无法再次关联，报错：<code>error: remote origin already exists.</code></p>
+<p><code>-u</code>是表示第一次上传</p>
+<p><img src="/assets/images/git/successful.png" alt="successful"></p>
+<h3>分支管理</h3>
+<p>使用分支意味着你可以从开发主线上分离开来，然后在不影响主线的同时继续工作。</p>
+<ul>
+<li>创建分支命令：</li>
+</ul>
+<pre><code class="language-shell">git branch (branchname)
+</code></pre>
+<p>单单使用<code>git branch</code>的时候是列出分支。当你执行 <strong>git init</strong> 的时候，默认情况下 Git 就会为你创建 <strong>master</strong> 分支。</p>
+<ul>
+<li>切换分支命令</li>
+</ul>
+<pre><code class="language-shell">git checkout (branchname)
+</code></pre>
+<p>当你切换分支的时候，Git 会用该分支的最后提交的快照替换你的工作目录的内容， 所以多个分支不需要多个目录。</p>
+<p>我们也可以使用<code>git checkout -b (branchname)</code>命令来创建新分支并立即切换到该分支下，从而在该分支中操作。</p>
+<ul>
+<li>合并分支命令</li>
+</ul>
+<pre><code class="language-shell">git merge (branchname)
+</code></pre>
+<p>一旦某分支有了独立内容，你终究会希望将它合并回到你的主分支。 你可以使用上面的命令把这个分支合并到master分支。</p>
+<ul>
+<li>删除分支命令</li>
+</ul>
+<pre><code class="language-shell">git branch -d (branchname)
+</code></pre>
+<p>合并并不仅仅是简单的文件添加、移除的操作，Git也会合并修改。我们可以用 git add 要告诉 Git 文件冲突已经解决。</p>
+<ul>
+<li>查看分支</li>
+</ul>
+<pre><code class="language-bash">git branch -v
+</code></pre>
+<blockquote>
+<p>分支切换问题Please commit your changes or stash them before you switch branches.</p>
+</blockquote>
+<p>因为当前的分支dev 最初也是从master 分支上衍生出来的。而此时你要再从该分支上切换到其主分支。那么你需要先把该dev分支上的改动提交后才能切换，但是该dev分支上还没有完成全部的修改，你不想提交。那么此时你就要选择 stash (存放)它们（你在当前分支上改动的却没有提交commit的内容）。
+所以第一步，在当前分支上执行 <code>git stash</code> 命令。将当前分支存起来</p>
+<pre><code class="language-bash">git stash
+
+#然后再切换分支
+git checkout (branchname)
+</code></pre>
+<p>这时候再执行 <code>git status</code> 命令，显示没有东西需要提交，接着就可以在主分支master上创建并切换到新的分支去修复另一个Bug了。</p>
+<pre><code class="language-bash">git status
+git stash list #命令去查看我们“存储”的列表。
+
+#之后
+git stash drop #来删除
+</code></pre>
+<h3>查看修改</h3>
+<ul>
+<li>检查该版本库是否有文件未提交：</li>
+</ul>
+<pre><code class="language-shell">git status：检查当前文件状态
+</code></pre>
+<ul>
+<li>检查文件是否被修改</li>
+</ul>
+<pre><code class="language-shell">git diff 01.txt
+</code></pre>
+<p><code>git diff</code>：查看文件修改的内容</p>
+<p><code>git log</code>：获得历史修改记录</p>
+<p><code>git log --pretty=oneline</code>：使记录只显示主要的内容，一行显示</p>
+<ul>
+<li>返回版本</li>
+</ul>
+<pre><code class="language-SHELL">cat：查看文件内容
+
+git reset --hard HEAD^：回退到上一个版本
+
+git reflog：获取历史版本号
+
+git reset --hard 版本号：回退到该版本号对应的版本
+</code></pre>
+<p>**PS：**如果要回退到上上个版本，可以使用git reset --hard HEAD^^命令，但是这样稍显麻烦，如果回退到100个版本之前，只需要执行这个命令即可：git reset --hard HEAD~100；</p>
+<h3>标签</h3>
+<p>如果你达到一个重要的阶段，并希望永远记住那个特别的提交快照，你可以使用 git tag 给它打上标签。</p>
+<p>比如说，我们想为我们的项目发布一个&quot;1.0&quot;版本。 我们可以用 git tag -a v1.0 命令给最新一次提交打上（HEAD）&quot;v1.0&quot;的标签。</p>
+<p>-a 选项意为&quot;创建一个带注解的标签&quot;。 不用 -a 选项也可以执行的，但它不会记录这标签是啥时候打的，谁打的，也不会让你添加个标签的注解。 我推荐一直创建带注解的标签。</p>
+<pre><code class="language-shell">git tag -a v1.0
+</code></pre>
+<p>如果我们要查看所有标签可以使用以下命令：</p>
+<pre><code class="language-shell">$ git tag
+v0.9
+v1.0
+</code></pre>
+<p>指定标签信息命令：</p>
+<pre><code class="language-shell">git tag -a &lt;tagname&gt; -m &quot;我是标签&quot;
+</code></pre>
+<p>PGP签名标签命令：</p>
+<pre><code class="language-shell">git tag -s &lt;tagname&gt; -m &quot;我是标签&quot;
+</code></pre>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<div class="col-md-2">
+  <div class="aside-block">
+    <h3 class="aside-title">Video</h3>
+    <div class="video-post">
+      <a href="https://www.bilibili.com" class="glightbox link-video">
+        <span class="bi-play-fill"></span>
+        <img src="/assets/images/gd.jpg" alt="" class="img-fluid">
+      </a>
+    </div>
+  </div>
+
+  <div class="aside-block">
+    <h3 class="aside-title">Categories</h3>
+    <ul class="aside-links list-unstyled">
+      
+      <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i>acgn</a></li>
+      
+      <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i>essay</a></li>
+      
+      <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i>it</a></li>
+      
+    </ul>
+  </div>
+
+  <div class="aside-block">
+    <h3 class="aside-title">Tags</h3>
+    <ul class="aside-tags list-unstyled">
+      
+      <li><a href="/tags/c/">#c</a></li>
+    
+      <li><a href="/tags/cpp/">#cpp</a></li>
+    
+      <li><a href="/tags/database/">#database</a></li>
+    
+      <li><a href="/tags/english/">#english</a></li>
+    
+      <li><a href="/tags/essay/">#essay</a></li>
+    
+      <li><a href="/tags/game/">#game</a></li>
+    
+      <li><a href="/tags/git/">#git</a></li>
+    
+      <li><a href="/tags/guide/">#guide</a></li>
+    
+      <li><a href="/tags/hexo/">#hexo</a></li>
+    
+      <li><a href="/tags/jekyll/">#jekyll</a></li>
+    
+      <li><a href="/tags/linux/">#linux</a></li>
+    
+      <li><a href="/tags/markdown/">#markdown</a></li>
+    
+      <li><a href="/tags/marked/">#marked</a></li>
+    
+      <li><a href="/tags/mysql/">#mysql</a></li>
+    
+      <li><a href="/tags/note/">#note</a></li>
+    
+      <li><a href="/tags/shell/">#shell</a></li>
+    
+      <li><a href="/tags/static-site/">#static-site</a></li>
+    
+      <li><a href="/tags/vim/">#vim</a></li>
+    
+      <li><a href="/tags/white-album-2/">#white-album-2</a></li>
+    
+      <li><a href="/tags/workflow/">#workflow</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+</div>
+
+      </div>
+    </section>
+  </main>
+
+  
+<footer id="footer" class="footer">
+  <div class="footer-content">
+    <div class="container">
+      <div class="row g-2">
+        <div class="col-lg-5">
+          <h3 class="footer-heading">About suhan</h3>
+          <p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p>
+          <p><a href="/about/" class="footer-link-more">Learn More</a></p>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h3 class="footer-heading">Navigation</h3>
+          <ul class="footer-links list-unstyled">
+            <li><a href="/"><i class="bi bi-chevron-right"></i> Home</a></li>
+            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> It</a></li>
+            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> Acgn</a></li>
+            <li><a href="/about/"><i class="bi bi-chevron-right"></i> About</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h3 class="footer-heading">Categories</h3>
+          <ul class="footer-links list-unstyled">
+            
+            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> acgn</a></li>
+            
+            <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i> essay</a></li>
+            
+            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> it</a></li>
+            
+          </ul>
+        </div>
+
+        <div class="col-lg-3">
+          虚以待位
+          ？？？
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-legal">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <div class="copyright">&copy; Copyright <strong><span>suhan42</span></strong>. All Rights Reserved</div>
+        </div>
+        <div class="col-md-6">
+          <div class="social-links mb-3 mb-lg-0 text-center text-md-end">
+            <a href="https://github.com/suhan42" class="github" target="_blank"><i class="bi bi-github"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+
+  <script src="/assets/vendor/jquery-1.11.0.min.js"></script>
+  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js"></script>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/me.js"></script>
+</body>
+</html>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>marked 造轮子 - Suhan</title>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css" rel="stylesheet">
+  <link href="/assets/css/variables.css" rel="stylesheet">
+  <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/css/me.css" rel="stylesheet">
+  <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
+  
+</head>
+<body>
+  
+<header id="header" class="header d-flex align-items-center fixed-top">
+  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+    <a href="/" class="logo d-flex align-items-center">
+      <img src="/assets/images/suhan.png" alt="">
+      <h2>Suhan</h2>
+    </a>
+
+    <nav id="navbar" class="main-nav navbar">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/categories/it/">IT</a></li>
+        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
+          <ul>
+            <li><a href="/categories/acgn/">A - Animation</a></li>
+            <li><a href="/categories/acgn/">C - Comic</a></li>
+            <li><a href="/categories/acgn/">G - Game</a></li>
+            <li><a href="/categories/acgn/">N - Novel</a></li>
+          </ul>
+        </li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="position-relative">
+      <a href="https://github.com/suhan42" class="mx-2" target="_blank"><span class="bi-github"></span></a>
+      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+
+      <a class="toggle"><span class="bi-list"></span></a>
+
+      <div class="search-form-wrap js-search-form-wrap">
+        <form action="" class="search-form">
+          <span class="icon bi-search"></span>
+          <input type="text" placeholder="Search" class="form-control">
+          <button class="btn js-search-close"><span class="bi-x"></span></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+  <main id="main">
+    <section>
+      <div class="container">
+        
+<div class="row">
+  <div class="col-md-10">
+    <h3 class="category-title">marked 造轮子</h3><hr>
+    <div class="d-md-flex post-entry-1">
+      <div>
+        <div class="post-meta">
+          <span class="date">it</span> <span class="mx-1">&bullet;</span>
+          <span>2023-01-23</span>
+        </div>
+        <div class="post-content">
+          <h1>造轮子</h1>
+<p>hexo固然好用，但是在使用的过程总还是有一些问题，比如</p>
+<ol>
+<li>git经常unable to access，push需要借助git desktop才能稳定。(主要原因)</li>
+<li>hexo虽然有很多主题，也可以设置不被渲染的html，但是你打算使用你自己写的前端。</li>
+<li>想搞一搞（bushi</li>
+</ol>
+<p>那么你可以看看下面的内容，尝试自己使用marked造一个小轮子（小hexo）</p>
+<h2>marked</h2>
+<p><a href="https://github.com/markedjs/marked">marked</a>是一个JavaScript编写的全功能Markdown解析和编译器。目的是快速的编译超大块的Markdown文本而不必担心结果会出乎意料或者花费很长时间。</p>
+<p>marked最初是为Node.JS编写，现在已完全兼容客户端浏览器。</p>
+<p>新版本号称速度比 C 语言写的 Markdown 转换工具 <a href="http://www.oschina.net/p/discount">Discount</a> 还要快。</p>
+<h3>使用</h3>
+<p>安装marked在目标文件夹下</p>
+<pre><code class="language-bash">npm install marked --save
+</code></pre>
+<h3>marked参数说明</h3>
+<pre><code>-o, –output [output]: 指定输出文件，默认为当前控制台
+-i, –input [input]: 指定输入文件或最后一个参数，默认为当前控制台输入
+-t, –tokens: 输出token流代替HTML
+–pedantic: 只解析符合markdown.pl定义的，不修正markdown的错误
+–gfm: 启动Github样式的Markdown，参考 https://help.github.com/articles/github-flavored-markdown/
+–breaks: 支持Github换行符，必须打开gfm选项
+–tables: 支持Github表格，必须打开gfm选项
+–sanitize: 原始输出，忽略HTML标签
+–smart-lists: 优化列表输出
+–lang-prefix [prefix]: 设置前置样式
+–no-etc: 选择的反正标识
+–silent: 不输出错误信息
+-h, –help: 帮助信息
+</code></pre>
+<h3>API使用</h3>
+<p>接下来，我通过API来调用marked解析markdown文本。</p>
+<p>新建一个脚本文件mark1.js</p>
+<pre><code class="language-javascript">var marked = require('marked');
+console.log(marked.parse('I am using __markdown__.'));
+</code></pre>
+<p>运行脚本mark1.js。</p>
+<pre><code>&lt;p&gt;I am using &lt;strong&gt;markdown&lt;/strong&gt;.&lt;/p&gt;
+</code></pre>
+<p>下面再用API读取md1.md的文本，进行解析，然后输出为HTML，新建mark2.js文件。</p>
+<pre><code class="language-javascript">var marked = require('marked');
+var fs = require(&quot;fs&quot;);  //读取md文件内容
+
+// console.log(marked.parse('I am using __markdown__.'));
+
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  gfm: true,
+  tables: true,
+  breaks: true,
+  pedantic: false,
+  smartLists: true,
+  smartypants: false
+});
+
+//读取md
+fs.readFile('m1.md', 'utf-8', function (err, data) {
+  if (err) throw err;
+  var lexed = marked.lexer(data);
+  var html = marked.parser(lexed);
+
+  //创建文件，并写入html
+  fs.writeFile('md1.html', html, function(err) {
+    if (err) throw err;
+    console.log(&quot;数据写入成功！&quot;);
+  });
+});
+</code></pre>
+<p>运行之后，就会在该目录下生成一个md1.html文件，其中的内容就是m1.md的内容转码为html后的样子。</p>
+<h3>自定义渲染</h3>
+<p>自定义渲染选项允许你以自定义的方式渲染内容，并把之前的规则设置覆盖掉。</p>
+<p>块级标签支持以下渲染：</p>
+<ul>
+<li>code(string code, string language)</li>
+<li>blockquote(string quote)</li>
+<li>html(string html)</li>
+<li>heading(string text, number level)</li>
+<li>hr()</li>
+<li>list(string body, boolean ordered)</li>
+<li>listitem(string text)</li>
+<li>paragraph(string text)</li>
+<li>table(string header, string body)</li>
+<li>tablerow(string content)</li>
+<li>tablecell(string content, object flags)</li>
+</ul>
+<p>行级标签支持以下渲染：</p>
+<ul>
+<li>strong(string text)</li>
+<li>em(string text)</li>
+<li>codespan(string code)</li>
+<li>br()</li>
+<li>del(string text)</li>
+<li>link(string href, string title, string text)</li>
+<li>image(string href, string title, string text)</li>
+</ul>
+<p>例如</p>
+<pre><code class="language-javascript">// 添加自定义渲染
+var my_renderer = new marked.Renderer()
+my_renderer.link = function (href, title, text) {
+    return `&lt;a href=&quot;${href}&quot; title=&quot;${title || text}&quot; target=&quot;_blank&quot;&gt;${text}&lt;/a&gt;`
+}
+
+	//表格下面两个返回方式的结果不一样，个人更喜欢后者
+my_renderer.table = function (header, body) {
+    return '&lt;table class=&quot;table table-striped&quot;&gt;'+header+body+'&lt;/table&gt;'
+    //return `&lt;table class=&quot;table table-hover table-bordered&quot;&gt;${header}${body}&lt;/table&gt;`;
+}
+
+marked.setOptions({ 
+  renderer: my_renderer,	//自定义
+  gfm: true,
+  tables: true,
+  breaks: true,
+  pedantic: false,
+  smartLists: true,
+  smartypants: false,
+})
+</code></pre>
+<h3>常见问题</h3>
+<blockquote>
+<h5>Uncaught TypeError TypeError: marked is not a function</h5>
+<p>解决方案：修改使用方法</p>
+<pre><code class="language-javascript">console.log(marked('I am using __markdown__.'));
+
+//改为
+console.log(marked.parse('I am using __markdown__.'));
+</code></pre>
+</blockquote>
+<blockquote>
+<h5>sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: https://marked.js.org/#/USING_ADVANCED.md#options</h5>
+<p>解决方案：sanitize被弃用了，在setOptions中删去sanitize设置</p>
+</blockquote>
+<p>中文资料很少，可以看看下面这些。但是下面这些也是之前的文章了，现在marked已经发生了很多变化，所以还是建议看最新的官方文档。当然我这篇也可以满足基本使用了（笑）。</p>
+<p><a href="https://blog.csdn.net/fens/article/details/84634655">Marked高效的Markdown解析器_Fens的博客</a></p>
+<p><a href="https://cloud.tencent.com/developer/article/1961057">使用marked解析markdown为html</a></p>
+<h2>highlight.js</h2>
+<p>代码高亮的库选用的是highlight.js</p>
+<pre><code class="language-bash">npm install highlight.js --save
+</code></pre>
+<p>把highlight加入到js里面</p>
+<pre><code class="language-javascript">const highlight = require('highlight.js')
+
+marked.setOptions({
+    highlight: function(code) {
+        return highlight.highlightAuto(code).value
+    }
+})
+</code></pre>
+<p>同时，在生成的html中引用highlight中对应的css就可以了。</p>
+<pre><code class="language-html">&lt;link href=&quot;node_modules/highlight.js/styles/github.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;&gt;
+</code></pre>
+<p>再写一个code的css外框</p>
+<pre><code class="language-css">pre {
+	background-color: #F6F8FF;
+	border-radius: 16px;
+	font-size: 16px;
+	padding: 29px 22px 22px 22px;
+	margin-top: 22px;
+	margin-bottom: 22px;
+	line-height: 1.2;
+	overflow-x: auto;
+}
+code {
+	position: relative;
+	background-color: unset !important;
+}
+</code></pre>
+<p>大功告成</p>
+<h3>出现的问题</h3>
+<h4>code代码不换行</h4>
+<p>解决方法，修改css中code</p>
+<pre><code class="language-css">code {
+	position: relative;
+	background-color: unset !important;
+	
+	/*元素内的空白保留，并允许换行*/
+	white-space: pre-wrap !important;
+	/*是否允许在单词内断句*/
+	word-wrap: break-word !important;
+	/*强调怎么样断句*/
+	/*word-break: break-all !important;*/
+}
+</code></pre>
+<p><a href="https://blog.csdn.net/qq_44787816/article/details/114340701">markDown转换html后code不换行问题_遇见的昨天的博客-CSDN博客_markdownsharp转换后不能换行</a></p>
+<h4>在本地预览有高亮，但是在github pages没有高亮</h4>
+<h2>★完善网页和渲染</h2>
+<p>需要添加的功能：</p>
+<ul>
+<li>
+<p>[x] 加上header与footer进行渲染</p>
+</li>
+<li>
+<p>[x] 获取一个文件夹的md文件进行批量转码生成post文章，获取文件名当作title标题完善文章</p>
+</li>
+<li>
+<p>[x] 添加文件修改时间</p>
+</li>
+<li>
+<p>[x] 对比post内容，不一致再进行html的生成，一致则不需要生成</p>
+</li>
+<li>
+<p>[x] home（index.html）页面根据html文件（即文章）数量和内容，修改home页面的预览。在<code>home.js</code>
+使用js读取本地文件并将内容展示到页面</p>
+<ul>
+<li>[ ] 这里的文本预览只能获取html的第一个<code>&lt;P&gt;</code>标签。（等待完善）</li>
+</ul>
+</li>
+<li>
+<p>[x] home页面分页</p>
+</li>
+<li>
+<p>关于图片处理</p>
+<ul>
+<li>[x] markdown图片正确转码html</li>
+<li>[x] 获取html中的img作为home页的预览图</li>
+<li>[x] 以有无img作为区分，区分渲染</li>
+</ul>
+</li>
+<li>
+<p>[ ] post页面文章目录</p>
+</li>
+<li>
+<p>[ ] tags标签</p>
+</li>
+</ul>
+<hr>
+<p>这个时候已经可以把markdown转码为html并新建文件进行存储了，而且也有了代码高亮。但是网页只有markdown的内容，并没有header和footer，这不是一个完整的网页。</p>
+<p>所以我们这时候就可以设计一个自己想要的完整的网页，并预留出一个post div来存放markdown的内容，实现<code>hexo generate</code>把markdown渲染成html的功能。</p>
+<h3>加上header与footer进行渲染</h3>
+<pre><code class="language-javascript">var marked = require('marked');
+var fs = require(&quot;fs&quot;); //读取md文件内容
+const highlight = require('highlight.js');
+
+var my_renderer = new marked.Renderer();
+my_renderer.table = function (header, body) {
+  return `&lt;table class=&quot;table table-hover table-bordered&quot;&gt;${header}${body}&lt;/table&gt;`;
+};
+
+marked.setOptions({
+  renderer: my_renderer,
+  gfm: true,
+  tables: true,
+  breaks: true,
+  pedantic: false,
+  smartLists: true,
+  smartypants: false,
+  highlight: function(code) {
+    return highlight.highlightAuto(code).value;
+  },
+  
+});
+
+
+//读取md
+fs.readFile('README.md', 'utf-8', function (err, data) {
+  if (err) throw err;
+  var lexed = marked.lexer(data);
+  var html = marked.parser(lexed);
+
+  var title = 'test1';
+
+  //前部header网页，这里是示例，大家请自行设计自己喜欢的网页
+  var header = '&lt;!DOCTYPE html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;'+
+    '&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;&gt;&lt;title&gt;'+
+    title+
+    '&lt;/title&gt;&lt;base target=&quot;_blank&quot;&gt;&lt;/head&gt;'+
+    '&lt;body&gt;&lt;header id=&quot;header&quot; class=&quot;header d-flex align-items-center fixed-top&quot;&gt;...&lt;/header&gt;&lt;main id=&quot;main&quot;&gt;';
+  
+    
+    //后面的footer
+  var footer = '&lt;/main&gt;'+
+  '&lt;footer id=&quot;footer&quot; class=&quot;footer&quot;&gt;...&lt;/footer&gt;'+
+  '&lt;/body&gt;&lt;/html&gt;';
+
+
+  //创建文件，并写入html
+  fs.writeFile('./html/test1.html', header+html+footer, function(err) {
+    if (err) throw err;
+    console.log(&quot;数据写入成功！&quot;);
+  });
+});
+</code></pre>
+<p>这样就构建了一个基本的html网页，但是，我们需要批量操作，把一个文件夹里面的所有markdown都转换成html，并且获取文件的名字作为title。</p>
+<h3>fs遍历markdown文件</h3>
+<p>遍历文件夹</p>
+<pre><code class="language-javascript">var path = './markdown';
+fs.readdir(path, 'utf-8', function(err, files){
+  if (err) throw err;
+  files.forEach(function(file_name){
+    fs.stat(path+'/'+file_name, (err, stat)=&gt;{
+      if(stat.isFile()){
+        console.log('文件名:', file_name);
+      }else{
+        console.log('文件夹名:', file_name);
+      }
+    })
+  })
+})
+</code></pre>
+<p>通过遍历文件夹获取所有文件，然后遍历文件的内容，进行markdown转换</p>
+<pre><code class="language-javascript">var marked = require('marked');
+var fs = require(&quot;fs&quot;); //读取md文件内容
+const highlight = require('highlight.js');
+
+var my_renderer = new marked.Renderer();
+my_renderer.table = function (header, body) {
+  return `&lt;table class=&quot;table table-hover table-bordered&quot;&gt;${header}${body}&lt;/table&gt;`;
+};
+
+marked.setOptions({
+  renderer: my_renderer,
+  gfm: true,
+  tables: true,
+  breaks: true,
+  pedantic: false,
+  smartLists: true,
+  smartypants: false,
+  highlight: function(code) {
+    return highlight.highlightAuto(code).value;
+  },
+  
+});
+
+
+//读取md
+//markdown存放位置
+var path = './markdown';
+
+fs.readdir(path, 'utf-8', function(err, files){
+  if (err) throw err;
+  //获取每一个文件名字
+  files.forEach(function(file_name){
+    fs.stat(path+'/'+file_name, (err, stat)=&gt;{
+      if (err) throw err;
+
+      if(stat.isFile()){
+
+        fs.readFile(path+'/'+file_name, 'utf-8', function (err, data) {
+          if(err) throw err;
+          var lexed = marked.lexer(data);
+          var html = marked.parser(lexed);
+        
+          //去掉后缀获取文章标题
+          var title = file_name.substring(0, file_name.lastIndexOf(&quot;.&quot;));
+          var tag = 'acg';
+          var time = stat.mtime.toString(); //修改时间
+          time = time.substring(0, time.lastIndexOf(&quot;GMT&quot;));
+        
+          var header = 'header内容'+title+'在这里面添加信息，例如时间time和标签tag'+time+tag;
+          var footer = 'footer内容’;
+        
+          //创建文件，并写入html
+          fs.writeFile('./html/'+title+'.html', header+html+footer, function(err) {
+            if(err) throw err;
+            console.log(&quot;数据写入成功！&quot;);
+          });
+        });
+      }
+    })
+  })
+})
+</code></pre>
+<h3>如果文本没有变化则不需要重新渲染</h3>
+<pre><code class="language-javascript">//判断文件是否存在
+fs.access('./html/'+title+'.html', fs.constants.F_OK, (err) =&gt; { 
+    if(err) {
+        //不存在，则创建文件，并写入html
+        writeNewFile(title, header, html, footer);
+    }else {
+        console.log('-'+title+'.html存在于当前目录中');
+        //文件存在，则比对文件内容，判断是否需要重写
+        fs.readFile('./html/'+title+'.html', 'utf-8', function (err, data){
+            if(err) throw err;
+            if(data != header+html+footer){
+                console.log(' - 但是文件已修改');
+                writeNewFile(title, header, html, footer);
+            }
+        })
+    }
+});
+</code></pre>
+<h3>遍历html文件夹，生成home页面的目录页</h3>
+<ol>
+<li>fs遍历html文件，生成JSON文件</li>
+</ol>
+<pre><code class="language-javascript">/*================================
+markdown转html转换好了之后，统计html文件数量，生成目录数据
+================================= */
+function get_home_data(){
+  var fs = require(&quot;fs&quot;);
+
+  //所有文件要展示在home页面的内容
+  let home_data = []
+
+  //读取html
+  var path = './html';
+  let files = fs.readdirSync(path, 'utf-8');
+
+  //遍历文件
+  files.forEach(file_name =&gt;{
+    var file = fs.statSync(path+'/'+file_name);
+    if(file.isFile()){
+      
+      var time = file.mtime.toString(); 
+      time = time.substring(0, time.lastIndexOf(&quot; GMT&quot;));
+
+      // 由于readFile是异步读取文件，所以就相当于读取三个文件并打印的操作在同时进行，受延迟等影响，每次执行打印的顺序不固定。而readFileSync()是同步读取，所以按照顺序读取并打印a.txt、b.txt、c.txt，上一个文件未读取时不会读取下一个文件，所有这里使用readFileSync()
+      var summary = fs.readFileSync(path+'/'+file_name, 'utf-8').toString();
+      summary = summary.substring(summary.indexOf(&quot;&lt;p&gt;&quot;)+3, summary.indexOf(&quot;&lt;/p&gt;&quot;))
+      
+      const data = {};
+      //去掉后缀获取文章标题
+      data.title = file_name.substring(0, file_name.lastIndexOf(&quot;.&quot;));
+      data.tag = 'null';
+      data.time = time;
+      data.summary = summary;
+      data.url = path+'/'+file_name;
+
+      home_data.push(data);
+    }
+  })
+  return home_data;
+}
+
+
+let home_data = get_home_data();
+var string_data = JSON.stringify(home_data, null, 2)
+
+// 生成home页面目录数据
+var fs2 = require(&quot;fs&quot;);
+fs2.writeFileSync('./home_data.json', string_data);
+</code></pre>
+<ol start="2">
+<li>获取生成的json文件，生成目录并分页到home页</li>
+</ol>
+<p>这里的内容我感觉没有写好。使用js的XMLHttpRequest或者jQ都一直出错，无法正常拿到json的内容。现在是使用静态文件手动添加的方式，生成数据表。</p>
+<h2>code-prettify</h2>
+<p><a href="https://github.com/googlearchive/code-prettify">code-prettify</a></p>
+<p>已经使用了highlight了，等有时间再看看code-prettify。(doge.jpg)</p>
+<h2>mathjax</h2>
+<p>marked + mathjax 实现支持数学公式的 markdown 转 html</p>
+<h1>待解决</h1>
+<p>highlight在本地预览有高亮，但是在github pages没有高亮</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<div class="col-md-2">
+  <div class="aside-block">
+    <h3 class="aside-title">Video</h3>
+    <div class="video-post">
+      <a href="https://www.bilibili.com" class="glightbox link-video">
+        <span class="bi-play-fill"></span>
+        <img src="/assets/images/gd.jpg" alt="" class="img-fluid">
+      </a>
+    </div>
+  </div>
+
+  <div class="aside-block">
+    <h3 class="aside-title">Categories</h3>
+    <ul class="aside-links list-unstyled">
+      
+      <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i>acgn</a></li>
+      
+      <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i>essay</a></li>
+      
+      <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i>it</a></li>
+      
+    </ul>
+  </div>
+
+  <div class="aside-block">
+    <h3 class="aside-title">Tags</h3>
+    <ul class="aside-tags list-unstyled">
+      
+      <li><a href="/tags/c/">#c</a></li>
+    
+      <li><a href="/tags/cpp/">#cpp</a></li>
+    
+      <li><a href="/tags/database/">#database</a></li>
+    
+      <li><a href="/tags/english/">#english</a></li>
+    
+      <li><a href="/tags/essay/">#essay</a></li>
+    
+      <li><a href="/tags/game/">#game</a></li>
+    
+      <li><a href="/tags/git/">#git</a></li>
+    
+      <li><a href="/tags/guide/">#guide</a></li>
+    
+      <li><a href="/tags/hexo/">#hexo</a></li>
+    
+      <li><a href="/tags/jekyll/">#jekyll</a></li>
+    
+      <li><a href="/tags/linux/">#linux</a></li>
+    
+      <li><a href="/tags/markdown/">#markdown</a></li>
+    
+      <li><a href="/tags/marked/">#marked</a></li>
+    
+      <li><a href="/tags/mysql/">#mysql</a></li>
+    
+      <li><a href="/tags/note/">#note</a></li>
+    
+      <li><a href="/tags/shell/">#shell</a></li>
+    
+      <li><a href="/tags/static-site/">#static-site</a></li>
+    
+      <li><a href="/tags/vim/">#vim</a></li>
+    
+      <li><a href="/tags/white-album-2/">#white-album-2</a></li>
+    
+      <li><a href="/tags/workflow/">#workflow</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+</div>
+
+      </div>
+    </section>
+  </main>
+
+  
+<footer id="footer" class="footer">
+  <div class="footer-content">
+    <div class="container">
+      <div class="row g-2">
+        <div class="col-lg-5">
+          <h3 class="footer-heading">About suhan</h3>
+          <p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p>
+          <p><a href="/about/" class="footer-link-more">Learn More</a></p>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h3 class="footer-heading">Navigation</h3>
+          <ul class="footer-links list-unstyled">
+            <li><a href="/"><i class="bi bi-chevron-right"></i> Home</a></li>
+            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> It</a></li>
+            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> Acgn</a></li>
+            <li><a href="/about/"><i class="bi bi-chevron-right"></i> About</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h3 class="footer-heading">Categories</h3>
+          <ul class="footer-links list-unstyled">
+            
+            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> acgn</a></li>
+            
+            <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i> essay</a></li>
+            
+            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> it</a></li>
+            
+          </ul>
+        </div>
+
+        <div class="col-lg-3">
+          虚以待位
+          ？？？
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-legal">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <div class="copyright">&copy; Copyright <strong><span>suhan42</span></strong>. All Rights Reserved</div>
+        </div>
+        <div class="col-md-6">
+          <div class="social-links mb-3 mb-lg-0 text-center text-md-end">
+            <a href="https://github.com/suhan42" class="github" target="_blank"><i class="bi bi-github"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+
+  <script src="/assets/vendor/jquery-1.11.0.min.js"></script>
+  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js"></script>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/me.js"></script>
+</body>
+</html>
