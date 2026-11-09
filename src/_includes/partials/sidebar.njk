@@ -1,0 +1,30 @@
+{# 侧栏组件：视频入口、分类和标签由模板传入的集合派生，不硬编码 #}
+<div class="col-md-2">
+  <div class="aside-block">
+    <h3 class="aside-title">Video</h3>
+    <div class="video-post">
+      <a href="https://www.bilibili.com" class="glightbox link-video">
+        <span class="bi-play-fill"></span>
+        <img src="/assets/images/gd.jpg" alt="" class="img-fluid">
+      </a>
+    </div>
+  </div>
+
+  <div class="aside-block">
+    <h3 class="aside-title">Categories</h3>
+    <ul class="aside-links list-unstyled">
+      {% for category in collections.categories %}
+      <li><a href="/categories/{{ category }}/"><i class="bi bi-chevron-right"></i>{{ category }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="aside-block">
+    <h3 class="aside-title">Tags</h3>
+    <ul class="aside-tags list-unstyled">
+      {% for tag in collections.allTags %}
+      <li><a href="/tags/{{ tag }}/">#{{ tag }}</a></li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>

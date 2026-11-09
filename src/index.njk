@@ -1,0 +1,25 @@
+---
+layout: layouts/base.njk
+title: Suhan
+pagination:
+  data: collections.publishedPosts
+  size: 5
+  alias: pagePosts
+eleventyComputed:
+  permalink: "{% if pagination.pageNumber == 0 %}/{% else %}/page/{{ pagination.pageNumber + 1 }}/{% endif %}"
+---
+
+{% set slugSuffix = '' %}
+<div class="row">
+  <div class="col-md-10">
+    <h3 class="category-title">content | become a Sigma</h3><hr>
+
+    {% for post in pagePosts %}
+      {% include "partials/post-card.njk" %}
+    {% endfor %}
+
+    {% include "partials/pagination.njk" %}
+  </div>
+
+  {% include "partials/sidebar.njk" %}
+</div>

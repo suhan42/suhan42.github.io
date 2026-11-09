@@ -1,0 +1,25 @@
+{# 分页组件：由 Eleventy pagination 数据驱动，页码和上一页/下一页状态自动计算 #}
+<div class="text-start py-4">
+  <div class="custom-pagination pagination-container">
+    <div class="pagination">
+      {% for pageEntry in pagination.pages %}
+      {% set pageNum = loop.index %}
+      {% if pageNum == pagination.pageNumber + 1 %}
+      <a class="active">{{ pageNum }}</a>
+      {% else %}
+      {% if pageNum == 1 %}
+      <a href="/">{{ pageNum }}</a>
+      {% else %}
+      <a href="/page/{{ pageNum }}/">{{ pageNum }}</a>
+      {% endif %}
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% if pagination.href.previous %}
+    <a href="{{ pagination.href.previous }}" class="page-change prev">Previous</a>
+    {% endif %}
+    {% if pagination.href.next %}
+    <a href="{{ pagination.href.next }}" class="page-change next">Next</a>
+    {% endif %}
+  </div>
+</div>

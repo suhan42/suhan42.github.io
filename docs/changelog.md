@@ -41,6 +41,24 @@
 - 创建 `.gitattributes`，统一文本文件 LF 提交格式。
 - `node_modules` 从 git 索引移除（1320 个文件），本地保留。
 
+#### P3：页面模板与视觉迁移
+
+- 新增 `src/index.njk` 首页模板，使用 Eleventy pagination 每页 5 篇，第 1 页输出 `/`，后续页输出 `/page/N/`。
+- `eleventy.config.js` 新增 `dateDisplay` 过滤器和 `publishedPosts`、`categories`、`allTags` 三个 collection，draft 文章不进入首页集合。
+- 新增 partials：`site-header.njk`、`site-footer.njk`、`sidebar.njk`、`post-card.njk`、`pagination.njk`，header 和 footer 只维护一份。
+- 完善 `post.njk` 文章页 layout，渲染标题、日期、分类和正文。
+- About 页迁移为 `src/content/pages/about.html`，输出 `/about/`。
+- 三个自定义页迁入 `src/content/custom/`：divergence 输出 `/custom/divergence-meter/`，box 输出 `/custom/css-box/`，fireworks 输出 `/custom/happy-new-year/`。
+- divergence 独立资源（样式、脚本、数字图片）迁至 `assets/custom/divergence-meter/`。
+- css-box 页面的旧相对路径统一改为 `/assets/` 站点绝对路径，消除新路由下的 404。
+- 复制 `js/` 到 `assets/js/`（`site.js`、`me.js`），静态资源统一由 `assets/` 提供。
+- 构建通过：16 个页面 + 97 个静态资源文件。
+- 过程中修复：pagination 集合引用需用 `collections.publishedPosts`；collection 不能互相引用，`categories` 和 `allTags` 用同样过滤逻辑独立派生；`layout: none` 不是合法值，自定义页不写 layout。
+
+#### 文档
+
+- 重写 `README.md` 为完整总资料：项目定位、快速开始、项目结构、写作流程、路由规则、构建发布和文档索引。
+- 更新 `AGENTS.md`：把文档更新规则从"主动判断"改为"必须同步更新 changelog 并检查相关文档"，禁止推迟到提交确认时集中补做。
 #### 架构决策
 
 - 文章型 HTML 与独立型 HTML 的边界：按"是否需要进入文章集合"分类，不按文件扩展名分类。

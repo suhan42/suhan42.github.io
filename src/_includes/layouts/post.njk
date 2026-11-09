@@ -2,16 +2,20 @@
 layout: layouts/base.njk
 ---
 
-<h3 class="category-title">{{ title }}</h3><hr>
-
-<div class="d-md-flex post-entry-1">
-  <div>
-    <div class="post-meta">
-      <span class="date">{{ category }}</span> <span class="mx-1">&bullet;</span>
-      <span>{{ date }}</span>
-    </div>
-    <div class="post-content">
-      {{ content | safe }}
+<div class="row">
+  <div class="col-md-10">
+    <h3 class="category-title">{{ title }}</h3><hr>
+    <div class="d-md-flex post-entry-1">
+      <div>
+        <div class="post-meta">
+          <span class="date">{{ category }}</span> <span class="mx-1">&bullet;</span>
+          <span>{{ date | dateDisplay }}</span>
+        </div>
+        <div class="post-content">
+          {{ content | safe }}
+        </div>
+      </div>
     </div>
   </div>
+  {% include "partials/sidebar.njk" %}
 </div>

@@ -1,0 +1,40 @@
+{# 站点公共头部，由 base.njk 引入，所有页面共享同一结构 #}
+<header id="header" class="header d-flex align-items-center fixed-top">
+  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+    <a href="/" class="logo d-flex align-items-center">
+      <img src="/assets/images/suhan.png" alt="">
+      <h2>{{ site.title }}</h2>
+    </a>
+
+    <nav id="navbar" class="main-nav navbar">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/categories/it/">IT</a></li>
+        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
+          <ul>
+            <li><a href="/categories/acgn/">A - Animation</a></li>
+            <li><a href="/categories/acgn/">C - Comic</a></li>
+            <li><a href="/categories/acgn/">G - Game</a></li>
+            <li><a href="/categories/acgn/">N - Novel</a></li>
+          </ul>
+        </li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="position-relative">
+      <a href="{{ site.social.github }}" class="mx-2" target="_blank"><span class="bi-github"></span></a>
+      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+
+      <a class="toggle"><span class="bi-list"></span></a>
+
+      <div class="search-form-wrap js-search-form-wrap">
+        <form action="" class="search-form">
+          <span class="icon bi-search"></span>
+          <input type="text" placeholder="Search" class="form-control">
+          <button class="btn js-search-close"><span class="bi-x"></span></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</header>

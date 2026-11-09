@@ -1,0 +1,31 @@
+{# 文章卡片组件：显示封面图、日期、分类、标题和摘要；无封面时渲染纯文字卡 #}
+{% if post.cover %}
+<div class="d-md-flex post-entry-2 small-img">
+  <a href="{{ post.url }}" class="me-4">
+    <img src="{{ post.cover }}" alt="{{ post.title }}" class="img-fluid post-img">
+  </a>
+  <div>
+    <div class="post-meta">
+      <span class="date">{{ post.data.category }}</span><span class="mx-1">&bullet;</span>
+      <span>{{ post.data.date | dateDisplay }}</span>
+    </div>
+    <a href="{{ post.url }}">
+      <h4>{{ post.data.title }}</h4>
+      <p>{{ post.data.summary }}</p>
+    </a>
+  </div>
+</div>
+{% else %}
+<div class="d-md-flex post-entry-2 small-img">
+  <div>
+    <div class="post-meta">
+      <span class="date">{{ post.data.category }}</span><span class="mx-1">&bullet;</span>
+      <span>{{ post.data.date | dateDisplay }}</span>
+    </div>
+    <a href="{{ post.url }}">
+      <h4>{{ post.data.title }}</h4>
+      <p>{{ post.data.summary }}</p>
+    </a>
+  </div>
+</div>
+{% endif %}
