@@ -1,79 +1,159 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="night">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
   <title>MySQL 自查表 - Suhan</title>
 
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
+
   <link href="/assets/images/suhan.png" rel="icon">
-  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css" rel="stylesheet">
-  <link href="/assets/css/variables.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
-  <link href="/assets/css/me.css" rel="stylesheet">
   <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
-  
 </head>
 <body>
-  
-<header id="header" class="header d-flex align-items-center fixed-top">
-  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-    <a href="/" class="logo d-flex align-items-center">
-      <img src="/assets/images/suhan.png" alt="">
-      <h2>Suhan</h2>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
     </a>
 
-    <nav id="navbar" class="main-nav navbar">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/categories/it/">IT</a></li>
-        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
-          <ul>
-            <li><a href="/categories/acgn/">A - Animation</a></li>
-            <li><a href="/categories/acgn/">C - Comic</a></li>
-            <li><a href="/categories/acgn/">G - Game</a></li>
-            <li><a href="/categories/acgn/">N - Novel</a></li>
-          </ul>
-        </li>
-        <li><a href="/about/">About</a></li>
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
       </ul>
     </nav>
 
-    <div class="position-relative">
-      <a href="https://github.com/suhan42" class="mx-2" target="_blank"><span class="bi-github"></span></a>
-      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
 
-      <a class="toggle"><span class="bi-list"></span></a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
 
-      <div class="search-form-wrap js-search-form-wrap">
-        <form action="" class="search-form">
-          <span class="icon bi-search"></span>
-          <input type="text" placeholder="Search" class="form-control">
-          <button class="btn js-search-close"><span class="bi-x"></span></button>
-        </form>
-      </div>
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
     </div>
   </div>
 </header>
 
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#%E5%AE%89%E8%A3%85">安装</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%AD%97%E7%AC%A6%E9%9B%86">字符集</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%8E%92%E5%BA%8F%E8%AF%B4%E6%98%8E">排序说明</a></li>
+<li class="toc-item toc-level-1"><a href="#%E8%AF%AD%E8%A8%80">语言</a></li>
+<li class="toc-item toc-level-2"><a href="#database">DATABASE</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E5%BA%93">查看所有库</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%96%B0%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93">新建数据库</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BF%AE%E6%94%B9%E6%95%B0%E6%8D%AE%E5%BA%93">修改数据库</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE%E5%BA%93">删除数据库</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%9E%E6%8E%A5%E6%95%B0%E6%8D%AE%E5%BA%93">连接数据库</a></li>
+<li class="toc-item toc-level-2"><a href="#table">TABLE</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%88%9B%E5%BB%BA%E8%A1%A8">创建表</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9F%A5%E7%9C%8B%E5%BA%93%E6%89%80%E6%9C%89%E8%A1%A8">查看库所有表</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%88%A0%E9%99%A4%E8%A1%A8">删除表</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9F%A5%E7%9C%8B%E8%A1%A8%E4%BF%A1%E6%81%AF">查看表信息</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%87%8D%E5%91%BD%E5%90%8D%E8%A1%A8">重命名表</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BF%AE%E6%94%B9%E8%A1%A8%E5%AD%97%E6%AE%B5%E5%88%97">修改表字段（列）</a></li>
+<li class="toc-item toc-level-4"><a href="#%E8%A1%A8%E4%B8%AD%E6%B7%BB%E5%8A%A0%E5%AD%97%E6%AE%B5add">表中添加字段ADD</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BF%AE%E6%94%B9%E5%AD%97%E6%AE%B5%E5%90%8Dchange">修改字段名CHANGE</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BF%AE%E6%94%B9%E9%BB%98%E8%AE%A4%E5%80%BCalter">修改默认值ALTER</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BF%AE%E6%94%B9%E5%AD%97%E6%AE%B5%E7%B1%BB%E5%9E%8Bmodify">修改字段类型MODIFY</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%88%A0%E9%99%A4%E5%AD%97%E6%AE%B5">删除字段</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%95%B0%E6%8D%AE%E6%9B%B4%E6%96%B0">数据更新</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AEinsert">插入数据INSERT</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BF%AE%E6%94%B9%E6%95%B0%E6%8D%AEupdate">修改数据UPDATE</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AEdelete">删除数据DELETE</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%95%B0%E6%8D%AE%E6%9F%A5%E8%AF%A2select">数据查询SELECT</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%85%B3%E7%B3%BB%E8%BF%90%E7%AE%97">关系运算</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%89%80%E6%9C%89%E6%95%B0%E6%8D%AE">所有数据</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%8A%95%E5%BD%B1">投影</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%88%AB%E5%90%8D">别名</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%99%90%E5%AE%9A%E6%9F%A5%E8%AF%A2where">限定查询WHERE</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AF%94%E8%BE%83%E8%BF%90%E7%AE%97">比较运算</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%A8%A1%E7%B3%8A%E6%9F%A5%E8%AF%A2">模糊查询</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%AD%90%E6%9F%A5%E8%AF%A2">子查询</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%88%86%E7%BB%84%E6%9F%A5%E8%AF%A2group-by">分组查询GROUP BY</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%87%E6%BB%A4%E5%88%86%E7%BB%84having">过滤分组HAVING</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%8E%92%E5%BA%8Forder-by">排序ORDER BY</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%88%86%E9%A1%B5limit">分页LIMIT</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2">多表查询</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BA%A4%E5%8F%89%E8%BF%9E%E6%8E%A5">交叉连接</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%86%85%E8%BF%9E%E6%8E%A5">内连接</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%A4%96%E8%BF%9E%E6%8E%A5">外连接</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%BB%93%E6%9E%9C%E9%9B%86%E5%90%88%E5%B9%B6">结果集合并</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%AE%A1%E7%AE%97%E5%88%97%E5%80%BC-%E5%87%BD%E6%95%B0">计算列值-函数</a></li>
+<li class="toc-item toc-level-2"><a href="#%E7%BA%A6%E6%9D%9F">约束</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%A7%86%E5%9B%BE">视图</a></li>
+<li class="toc-item toc-level-2"><a href="#%E7%B4%A2%E5%BC%95">索引</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%A7%A6%E5%8F%91%E5%99%A8">触发器</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D">备份与恢复</a></li>
+<li class="toc-item toc-level-2"><a href="#linux%E9%98%B2%E7%81%AB%E5%A2%99%E4%BF%AE%E6%94%B9">Linux防火墙修改</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%85%B6%E4%BB%96%E6%9C%BA%E5%99%A8%E8%BF%9E%E6%8E%A5%E6%9C%AC%E5%9C%B0%E7%9A%84mysql">其他机器连接本地的MySQL</a></li>
+<li class="toc-item toc-level-2"><a href="#linux%E7%A6%81%E6%AD%A2%E6%9B%B4%E6%96%B0%E6%8E%A8%E8%8D%90%E8%AE%BE%E7%BD%AE">Linux禁止更新（推荐设置）</a></li>
+</ol>
+    </nav>
+  </details>
 
-  <main id="main">
-    <section>
-      <div class="container">
-        
-<div class="row">
-  <div class="col-md-10">
-    <h3 class="category-title">MySQL 自查表</h3><hr>
-    <div class="d-md-flex post-entry-1">
-      <div>
-        <div class="post-meta">
-          <span class="date">it</span> <span class="mx-1">&bullet;</span>
-          <span>2023-01-22</span>
-        </div>
-        <div class="post-content">
-          <p>目录</p>
-<p>[TOC]</p>
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">it</a>
+      <time datetime="2023-01-22">2023-01-22</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/mysql/">#mysql</a>
+      <a href="/tags/database/">#database</a>
+      <a href="/tags/note/">#note</a>
+    </div>
+
+    <h1 class="post-title">MySQL 自查表</h1>
+
+    <div class="post-body">
 <p>结构化查询语言SQL（Structured Query Language）</p>
 <p>核心SQL的四个组成部分：</p>
 <ol>
@@ -88,7 +168,7 @@
 <li>WAMP</li>
 </ul>
 <p>MySQL中不分大小写</p>
-<h2>安装</h2>
+<h2 id="安装">安装</h2>
 <p>检查安装
 rpm -qa | grep mysql</p>
 <p>linux管理命令</p>
@@ -132,10 +212,10 @@ mysql&gt; exit
 <p>查看所有编码字符</p>
 <pre><code class="language-sql">show variables like &quot;%character%&quot;;
 </code></pre>
-<h3>字符集</h3>
+<h3 id="字符集">字符集</h3>
 <p><strong>一般选择utf8.下面介绍一下utf8与utfmb4的区别。</strong></p>
 <p>utf8mb4兼容utf8，且比utf8能表示更多的字符。至于什么时候用，看你的做什么项目了，到 http://blog.csdn.net/leelyliu/article/details/52879685 看unicode编码区从1 ～ 126就属于传统utf8区，当然utf8mb4也兼容这个区，126行以下就是utf8mb4扩充区，什么时候你需要存储那些字符，你才用utf8mb4,否则只是浪费空间。</p>
-<h3>排序说明</h3>
+<h3 id="排序说明">排序说明</h3>
 <p>排序一般分为两种： utf_bin和utf_general_ci</p>
 <p>bin 是二进制, a 和 A 会别区别对待.</p>
 <p>例如你运行:</p>
@@ -150,7 +230,7 @@ mysql&gt; exit
 <p>utf8_general_ci校对速度快，但准确度稍差。 （准确度够用，一般建库选择这个）</p>
 <p>utf8_unicode_ci准确度高，但校对速度稍慢。</p>
 <hr>
-<h2>语言</h2>
+<h2 id="语言">语言</h2>
 <ol>
 <li>数据库</li>
 <li>表</li>
@@ -165,15 +245,15 @@ mysql&gt; exit
 <p><code>expr</code>常量、变量、表达式</p>
 <p><code>select_expr</code>要查询的内容</p>
 <hr>
-<h3>DATABASE</h3>
-<h4>查看所有库</h4>
+<h3 id="database">DATABASE</h3>
+<h4 id="查看所有库">查看所有库</h4>
 <ul>
 <li><code>like</code>关键字用于匹配名称</li>
 <li><code>where</code>关键字用于指定查找范围条件</li>
 </ul>
 <pre><code class="language-sql">SHOW DATABASES [LIKE 'pattern'|WHERE expr];
 </code></pre>
-<h4>新建数据库</h4>
+<h4 id="新建数据库">新建数据库</h4>
 <ul>
 <li><code>if not exists</code>表示查看是否已存在，避免出现创建已存在的数据库时出现的错误</li>
 </ul>
@@ -182,16 +262,16 @@ CREATE SCHEMA 库名称;
 
 CREATE {DATABASE|SCHEMA} [IF NOT EXISTS] db_name
 </code></pre>
-<h4>修改数据库</h4>
+<h4 id="修改数据库">修改数据库</h4>
 <pre><code class="language-sql">ALTER DATABASE 库名称;
 </code></pre>
-<h4>删除数据库</h4>
+<h4 id="删除数据库">删除数据库</h4>
 <ul>
 <li><code>IF EXISTS</code>判断是否存在，避免出现删除不存在的数据库时出现的错误</li>
 </ul>
 <pre><code class="language-sql">drop database [IF EXISTS] 数据库名称;
 </code></pre>
-<h4>连接数据库</h4>
+<h4 id="连接数据库">连接数据库</h4>
 <pre><code class="language-sql">use 数据库名称;
 </code></pre>
 <p>查看当前数据库信息</p>
@@ -228,7 +308,7 @@ Uptime:                 47 min 55 sec
 14.时间
 </code></pre>
 <hr>
-<h3>TABLE</h3>
+<h3 id="table">TABLE</h3>
 <table>
 <thead>
 <tr>
@@ -289,7 +369,7 @@ Uptime:                 47 min 55 sec
 <li>对于同一用户不能用相同的表名称</li>
 <li>不能使用保留字</li>
 </ol>
-<h4>创建表</h4>
+<h4 id="创建表">创建表</h4>
 <p>（表创建定义+表选项+分区选项...）</p>
 <pre><code class="language-sql">create table 表名称(
 	字段名称 数据类型 [DEFAULT 默认值],
@@ -328,50 +408,50 @@ PRIMARY KEY(id, id2)
 </code></pre>
 </li>
 </ul>
-<h4>查看库所有表</h4>
+<h4 id="查看库所有表">查看库所有表</h4>
 <pre><code class="language-sql">SHOW [FULL] TABLE [FROM 库名称] [LIKE 'pattern'|WHERE expr];
 </code></pre>
-<h4>删除表</h4>
+<h4 id="删除表">删除表</h4>
 <pre><code class="language-sql">drop table 表名;
 </code></pre>
-<h4>查看表信息</h4>
+<h4 id="查看表信息">查看表信息</h4>
 <pre><code class="language-sql">SHOW [FULL] COLUMNS {FROM|IN} 表名 [{FROM|IN} 数据库名] [LIKE 'pattern'|WHERE expr];
 
 或者简写：
 {DESCRIBE|desc} 表名称;
 </code></pre>
-<h4>重命名表</h4>
+<h4 id="重命名表">重命名表</h4>
 <pre><code class="language-sql">rename table 旧表名 to 新表名;
 
 alter table 旧表名 rename [to] 新的表名;
 </code></pre>
-<h4>修改表字段（列）</h4>
-<h5>表中添加字段ADD</h5>
+<h4 id="修改表字段列">修改表字段（列）</h4>
+<h5 id="表中添加字段add">表中添加字段ADD</h5>
 <pre><code class="language-sql">alter table 操作的表名 
 add [column] 字段名称 字段类型 [NOT NULL] [default 默认内容][添加位置（after 后者字段）];
 </code></pre>
 <ul>
 <li>添加位置那里，<code>AFTER</code>则会添加到后者字段的后面，还可以使用<code>first</code>添加到表的第一列，否则则默认添加到<strong>末尾</strong>。</li>
 </ul>
-<h5>修改字段名CHANGE</h5>
+<h5 id="修改字段名change">修改字段名CHANGE</h5>
 <pre><code class="language-sql">alter table 表名字 
 change [column] 字段原名 字段新名 字段类型 [NOT NULL][DEFAULT],
 change 字段原名2 字段新名2 字段类型2;
 </code></pre>
 <p>可以同时修改多个字段，只需要用逗号隔开</p>
-<h5>修改默认值ALTER</h5>
+<h5 id="修改默认值alter">修改默认值ALTER</h5>
 <pre><code class="language-sql">alter table 表 ALTER [COLUMN] 字段名 SET DEFAULT 默认值;
 </code></pre>
-<h5>修改字段类型MODIFY</h5>
+<h5 id="修改字段类型modify">修改字段类型MODIFY</h5>
 <p>只能修改字段类型，通过<code>FIRST</code>和<code>AFTER</code>在表中的位置，不能修改字段名</p>
 <pre><code class="language-sql">alter table 表 modify [COLUMN] 字段名 字段类型 FIRST;
 </code></pre>
-<h5>删除字段</h5>
+<h5 id="删除字段">删除字段</h5>
 <pre><code class="language-sql">alter table 表名 drop [COLUMN] 字段名;
 </code></pre>
 <hr>
-<h3>数据更新</h3>
-<h4>插入数据INSERT</h4>
+<h3 id="数据更新">数据更新</h3>
+<h4 id="插入数据insert">插入数据INSERT</h4>
 <ul>
 <li><code>IDENTITY</code>属性的，系统会自动生成序列号值来唯一标识</li>
 <li><code>DEFAULT</code>默认属性，可以填<strong>DEFAULT</strong>来设置为默认值</li>
@@ -390,12 +470,12 @@ insert into user_1 values(0,'admin',1,DEFAULT);
 <p>插入子查询数据</p>
 <pre><code class="language-sql">INSERT 表 select ...
 </code></pre>
-<h4>修改数据UPDATE</h4>
+<h4 id="修改数据update">修改数据UPDATE</h4>
 <pre><code class="language-SQL">update 表 set 列名1='内容', 行名2='内容' [where 条件][order by...][limit...];
 例子：
 update user_1 set name='user' where id=1;
 </code></pre>
-<h4>删除数据DELETE</h4>
+<h4 id="删除数据delete">删除数据DELETE</h4>
 <p>delete删除的是表内的数据，不是关于表的定义</p>
 <pre><code class="language-SQL">delete from 表 [where 条件][order by...][limit...];
 例子：
@@ -405,8 +485,8 @@ delete from user_1 where id=0010;
 delete from user_1;
 </code></pre>
 <hr>
-<h3>数据查询SELECT</h3>
-<h4>关系运算</h4>
+<h3 id="数据查询select">数据查询SELECT</h3>
+<h4 id="关系运算">关系运算</h4>
 <p>传统集合运算：</p>
 <ol>
 <li>并union（∪）</li>
@@ -462,17 +542,17 @@ $$</p>
 <ul>
 <li><code>distinct</code>和<code>distinctrow</code>是同义词，用于消除查询结果集中的<strong>重复</strong>的数据，没有指定这些选项则默认为<code>ALL</code></li>
 </ul>
-<h4>所有数据</h4>
+<h4 id="所有数据">所有数据</h4>
 <p>使用<code>*</code>通配符</p>
 <pre><code class="language-sql">select * from 表名;
 </code></pre>
-<h4>投影</h4>
+<h4 id="投影">投影</h4>
 <p>显示<strong>部分</strong>数据</p>
 <pre><code class="language-sql">select 字段名 from 表名;
 例子：
 select id, name from user_1;
 </code></pre>
-<h4>别名</h4>
+<h4 id="别名">别名</h4>
 <p>在打出e.后会自动出现后面的英文字段名，方便。</p>
 <pre><code class="language-sql">select 别名.字段 [AS] 列别名, 别名.字段 [AS] 列别名 from 表 别名;
 例子：
@@ -493,8 +573,8 @@ select concat(&quot;内容1:&quot;, name, &quot;内容2:&quot;, job) as '工作�
 则显示：
 内容1:name内容2:job
 </code></pre>
-<h4>限定查询WHERE</h4>
-<h5>比较运算</h5>
+<h4 id="限定查询where">限定查询WHERE</h4>
+<h5 id="比较运算">比较运算</h5>
 <table>
 <thead>
 <tr>
@@ -557,15 +637,15 @@ select * from emp where sal=2000 or sal=8000;
 select * from emp where comm is not null;			-- comm不是空
 select * from emp where comm is null;				-- comm是空
 </code></pre>
-<h5>模糊查询</h5>
+<h5 id="模糊查询">模糊查询</h5>
 <pre><code class="language-sql">select * from 表 where 字段 like 'm%';					-- 以 s 开头的
 select * from emp where job like '_m%';				  -- 第二的字母是m
 select * from emp where job like '%m%';				  -- 包含 m 的
 select * from emp where job not like 'm%';			  -- 不是m开头的
 </code></pre>
-<h5>子查询</h5>
+<h5 id="子查询">子查询</h5>
 <p>子查询就是指在一个完整的查询语句中，嵌套若干个不同功能的小查询，从而完成一个复杂的查询。把一个查询的结果当成另一个查询的条件。</p>
-<h4>分组查询GROUP BY</h4>
+<h4 id="分组查询group-by">分组查询GROUP BY</h4>
 <p>将结果集的数据行根据选择列的值进行逻辑分组，汇总表内容的子集，即实现对每个组的的聚合计算。</p>
 <pre><code class="language-SQL">SELECT 1,2 count&lt;*&gt; as '总数' FROM 表 group by {col_name|expr|position} [ASC|DESC], ...[WITH ROLLUP];
 例子：
@@ -576,16 +656,16 @@ SELECT 1,2 count&lt;id&gt; as '总数' FROM 表 group by 1,2;
 <li><code>DESC</code>表示<strong>降序</strong>分组</li>
 <li><code>with rollup</code>指定在结果集中不仅包含分组后的数据行，还包含汇总行，以及所有分组的整体汇总行</li>
 </ul>
-<h4>过滤分组HAVING</h4>
+<h4 id="过滤分组having">过滤分组HAVING</h4>
 <pre><code class="language-sql">SELECT 1,2 FROM 表 GROUP BY 1,2 HAVING 条件;
 </code></pre>
-<h4>排序ORDER BY</h4>
+<h4 id="排序order-by">排序ORDER BY</h4>
 <pre><code class="language-SQL">select * from 表 order by 字段;							-- 由小到大排序
 select * from 表 order by 字段 desc;						-- 由大到小排序
 例子：
 SELECT * FROM 表 ORDER BY 字段1 EDSC, 字段2 DESC;
 </code></pre>
-<h4>分页LIMIT</h4>
+<h4 id="分页limit">分页LIMIT</h4>
 <p>当select返回的结果集中行数有很多时，使用<code>limit</code>来限制用户对结果数据的浏览和操纵</p>
 <ul>
 <li><code>offset</code>偏移量：从第几行开始显示（从0开始）</li>
@@ -596,14 +676,14 @@ SELECT * FROM 表 ORDER BY 字段1 EDSC, 字段2 DESC;
 SELECT * 1,2 FROM 表 ORDER BY 1 LIMIT 4,3;				-- 从第5行开始输出3行
 SELECT * 1,2 FROM 表 ORDER BY 1 LIMIT 3 OFFSET 4;
 </code></pre>
-<h4>多表查询</h4>
-<h5>交叉连接</h5>
+<h4 id="多表查询">多表查询</h4>
+<h5 id="交叉连接">交叉连接</h5>
 <p>会产生<strong>笛卡尔积</strong>效应：</p>
 <p>如果表1有100条数据，表2有100条数据，那么结果集就有100*100=10000条</p>
 <pre><code class="language-sql">select * from 表1,表2;
 select * from 表1 cross join 表2;
 </code></pre>
-<h5>内连接</h5>
+<h5 id="内连接">内连接</h5>
 <p>添加表与表之间的<strong>关联条件</strong>，消除笛卡尔积效应：</p>
 <pre><code class="language-sql">select * from 表1 e, 表2 d where e.字段1 = d.字段1;
 SELECT * FROM table1 e inner join table2 d on e.字段 = d.字段;
@@ -622,7 +702,7 @@ SELECT * FROM table1 e inner join table2 d on e.字段 = d.字段;
 </ol>
 <pre><code class="language-sql">select e.1, e.2, e.3, m.1, m.2 from 表1 e, 表1 m where e.3 = m.2;
 </code></pre>
-<h5>外连接</h5>
+<h5 id="外连接">外连接</h5>
 <p>连接的两张表分为基表、参考表</p>
 <ol>
 <li>左链接</li>
@@ -636,7 +716,7 @@ SELECT * FROM table1 e inner join table2 d on e.字段 = d.字段;
 <p>以右面的数据为主（基表）</p>
 <pre><code class="language-sql">select e.1, e.2, d.1, d.2 from emp1 e right [OUTER] join emp2 d on e.3 = d.3;
 </code></pre>
-<h4>结果集合并</h4>
+<h4 id="结果集合并">结果集合并</h4>
 <pre><code class="language-sql">select * from 表;
 union							-- 两个查询显示在一个结果里面,重复不显示
 select * from 表;
@@ -645,7 +725,7 @@ select * from 表;
 union ALL						-- 返回查询结果的全部内容,重复数据也会显示
 select * from dept;
 </code></pre>
-<h4>计算列值-函数</h4>
+<h4 id="计算列值-函数">计算列值-函数</h4>
 <pre><code class="language-sql">select id+1000 FROM user_1;
 </code></pre>
 <table>
@@ -778,7 +858,7 @@ select * from dept;
 <pre><code class="language-sql">select now() '时间' from 表 where empno=7369;
 </code></pre>
 <hr>
-<h3>约束</h3>
+<h3 id="约束">约束</h3>
 <p>三种：</p>
 <ol>
 <li>实体完整性约束</li>
@@ -858,7 +938,7 @@ alter table 表 drop index 字段						   -- 删除唯一约束
 </tbody>
 </table>
 <hr>
-<h3>视图</h3>
+<h3 id="视图">视图</h3>
 <p>随着数据变化的虚拟表：视图是存储在数据字典里的一条select语句</p>
 <p>视图的<strong>优点</strong>：</p>
 <ol>
@@ -901,7 +981,7 @@ desc 试图名字;
 <ul>
 <li><code>IF EXISTS</code>可以防止因为删除不存在的视图时而出现的问题</li>
 </ul>
-<h3>索引</h3>
+<h3 id="索引">索引</h3>
 <p>给字段添加索引是为了提高查询效率，但不是所有的字段都可以添加索引，创建索引有以下特点
 创建建索引列的特点：</p>
 <ol>
@@ -916,7 +996,7 @@ alter table emp add index sal_index(sal);
 alter table 表名 drop index 索引名;					删除索引
 alter table emp drop index sal_index;
 </code></pre>
-<h3>触发器</h3>
+<h3 id="触发器">触发器</h3>
 <p>每个表的一个时刻下每一个事件仅有一个触发器</p>
 <pre><code class="language-sql">CREATE TRIGGER trigger_name 
 trigger_time 
@@ -949,7 +1029,7 @@ DELETE只有OLD</li>
 <p>删除</p>
 <pre><code class="language-sql">DROP TRIGGER 触发器的名字
 </code></pre>
-<h3>备份与恢复</h3>
+<h3 id="备份与恢复">备份与恢复</h3>
 <p>导出一整个数据库：</p>
 <pre><code class="language-cmd">C:\WINDOWS\system32&gt; mysqldump -u 用户名 -p 数据库名 &gt; 导出的文件名
 C:\WINDOWS\system32&gt; mysqldump -u root -p user &gt; c:\java\demo.sql
@@ -963,168 +1043,43 @@ C:\WINDOWS\system32&gt; mysqldump -u root -p user user_1 &gt; c:\java\demo.sql
 <pre><code class="language-cmd">mysql&gt; Source 脚本目录(给决定路径)
 mysql&gt; Source C:\java\demo.sql
 </code></pre>
-<h3>Linux防火墙修改</h3>
+<h3 id="linux防火墙修改">Linux防火墙修改</h3>
 <pre><code class="language-shell">vim /usr/lib/firewalld/services/ssh.xml
  &lt;port protocol=&quot;tcp&quot; port=&quot;3306&quot;/&gt;
 systemctl restart firewalld
 </code></pre>
-<h3>其他机器连接本地的MySQL</h3>
+<h3 id="其他机器连接本地的mysql">其他机器连接本地的MySQL</h3>
 <pre><code class="language-shell">mysql&gt; GRANT ALL PRIVILEGES ON *.* TO root@&quot;%&quot; IDENTIFIED BY &quot;root&quot; with grant option;
 </code></pre>
 <p><code>.</code>就是所有</p>
-<h3>Linux禁止更新（推荐设置）</h3>
+<h3 id="linux禁止更新推荐设置">Linux禁止更新（推荐设置）</h3>
 <p>我们在安装之后，为了能够正常运行，我们会禁止MySQL进行更新。因为在yum更新了MySQL之后，MySQL会自动重启，这对于我们上线部署项目来说是没有必要的，所以我们可以屏蔽更新。</p>
 <p>vim /etc/yum.conf
 exclude=mysql-community-client,mysql-community-common,mysql-community-libs,mysql-community-server</p>
-
-        </div>
-      </div>
     </div>
-  </div>
-  
-<div class="col-md-2">
-  <div class="aside-block">
-    <h3 class="aside-title">Video</h3>
-    <div class="video-post">
-      <a href="https://www.bilibili.com" class="glightbox link-video">
-        <span class="bi-play-fill"></span>
-        <img src="/assets/images/gd.jpg" alt="" class="img-fluid">
-      </a>
-    </div>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Categories</h3>
-    <ul class="aside-links list-unstyled">
-      
-      <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i>acgn</a></li>
-      
-      <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i>essay</a></li>
-      
-      <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i>it</a></li>
-      
-    </ul>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Tags</h3>
-    <ul class="aside-tags list-unstyled">
-      
-      <li><a href="/tags/c/">#c</a></li>
-    
-      <li><a href="/tags/cpp/">#cpp</a></li>
-    
-      <li><a href="/tags/database/">#database</a></li>
-    
-      <li><a href="/tags/english/">#english</a></li>
-    
-      <li><a href="/tags/essay/">#essay</a></li>
-    
-      <li><a href="/tags/game/">#game</a></li>
-    
-      <li><a href="/tags/git/">#git</a></li>
-    
-      <li><a href="/tags/guide/">#guide</a></li>
-    
-      <li><a href="/tags/hexo/">#hexo</a></li>
-    
-      <li><a href="/tags/jekyll/">#jekyll</a></li>
-    
-      <li><a href="/tags/linux/">#linux</a></li>
-    
-      <li><a href="/tags/markdown/">#markdown</a></li>
-    
-      <li><a href="/tags/marked/">#marked</a></li>
-    
-      <li><a href="/tags/mysql/">#mysql</a></li>
-    
-      <li><a href="/tags/note/">#note</a></li>
-    
-      <li><a href="/tags/shell/">#shell</a></li>
-    
-      <li><a href="/tags/static-site/">#static-site</a></li>
-    
-      <li><a href="/tags/vim/">#vim</a></li>
-    
-      <li><a href="/tags/white-album-2/">#white-album-2</a></li>
-    
-      <li><a href="/tags/workflow/">#workflow</a></li>
-    
-    </ul>
-  </div>
+  </article>
 </div>
-
-</div>
-
-      </div>
-    </section>
   </main>
 
-  
-<footer id="footer" class="footer">
-  <div class="footer-content">
-    <div class="container">
-      <div class="row g-2">
-        <div class="col-lg-5">
-          <h3 class="footer-heading">About suhan</h3>
-          <p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p>
-          <p><a href="/about/" class="footer-link-more">Learn More</a></p>
-        </div>
 
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Navigation</h3>
-          <ul class="footer-links list-unstyled">
-            <li><a href="/"><i class="bi bi-chevron-right"></i> Home</a></li>
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> It</a></li>
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> Acgn</a></li>
-            <li><a href="/about/"><i class="bi bi-chevron-right"></i> About</a></li>
-          </ul>
-        </div>
-
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Categories</h3>
-          <ul class="footer-links list-unstyled">
-            
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> acgn</a></li>
-            
-            <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i> essay</a></li>
-            
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> it</a></li>
-            
-          </ul>
-        </div>
-
-        <div class="col-lg-3">
-          虚以待位
-          ？？？
-        </div>
-      </div>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
     </div>
-  </div>
 
-  <div class="footer-legal">
-    <div class="container">
-      <div class="row justify-content-between">
-        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-          <div class="copyright">&copy; Copyright <strong><span>suhan42</span></strong>. All Rights Reserved</div>
-        </div>
-        <div class="col-md-6">
-          <div class="social-links mb-3 mb-lg-0 text-center text-md-end">
-            <a href="https://github.com/suhan42" class="github" target="_blank"><i class="bi bi-github"></i></a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
   </div>
 </footer>
 
-<a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-
-  <script src="/assets/vendor/jquery-1.11.0.min.js"></script>
-  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js"></script>
+  <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/site.js"></script>
-  <script src="/assets/js/me.js"></script>
 </body>
 </html>

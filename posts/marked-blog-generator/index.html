@@ -1,78 +1,128 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="night">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
   <title>marked 造轮子 - Suhan</title>
 
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
+      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+    })();
+  </script>
+
   <link href="/assets/images/suhan.png" rel="icon">
-  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/vendor/hc-mobile-nav/hc-mobile-nav.css" rel="stylesheet">
-  <link href="/assets/css/variables.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
-  <link href="/assets/css/me.css" rel="stylesheet">
   <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
-  
 </head>
 <body>
-  
-<header id="header" class="header d-flex align-items-center fixed-top">
-  <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-    <a href="/" class="logo d-flex align-items-center">
-      <img src="/assets/images/suhan.png" alt="">
-      <h2>Suhan</h2>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
     </a>
 
-    <nav id="navbar" class="main-nav navbar">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/categories/it/">IT</a></li>
-        <li class="dropdown"><a href="/categories/acgn/"><span>ACGN</span><i class="nav-down bi bi-chevron-down dropdown-indicator"></i></a>
-          <ul>
-            <li><a href="/categories/acgn/">A - Animation</a></li>
-            <li><a href="/categories/acgn/">C - Comic</a></li>
-            <li><a href="/categories/acgn/">G - Game</a></li>
-            <li><a href="/categories/acgn/">N - Novel</a></li>
-          </ul>
-        </li>
-        <li><a href="/about/">About</a></li>
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
       </ul>
     </nav>
 
-    <div class="position-relative">
-      <a href="https://github.com/suhan42" class="mx-2" target="_blank"><span class="bi-github"></span></a>
-      <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
 
-      <a class="toggle"><span class="bi-list"></span></a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+      </button>
 
-      <div class="search-form-wrap js-search-form-wrap">
-        <form action="" class="search-form">
-          <span class="icon bi-search"></span>
-          <input type="text" placeholder="Search" class="form-control">
-          <button class="btn js-search-close"><span class="bi-x"></span></button>
-        </form>
-      </div>
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
     </div>
   </div>
 </header>
 
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#%E9%80%A0%E8%BD%AE%E5%AD%90">造轮子</a></li>
+<li class="toc-item toc-level-2"><a href="#marked">marked</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BD%BF%E7%94%A8">使用</a></li>
+<li class="toc-item toc-level-3"><a href="#marked%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">marked参数说明</a></li>
+<li class="toc-item toc-level-3"><a href="#api%E4%BD%BF%E7%94%A8">API使用</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B2%E6%9F%93">自定义渲染</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98">常见问题</a></li>
+<li class="toc-item toc-level-5"><a href="#uncaught-typeerror-typeerror-marked-is-not-a-function">Uncaught TypeError TypeError: marked is not a function</a></li>
+<li class="toc-item toc-level-5"><a href="#sanitize-and-sanitizer-parameters-are-deprecated-since-version-070-should-not-be-used-and-will-be-removed-in-the-future-read-more-here-httpsmarkedjsorgusing-advancedmdoptions">sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: https://marked.js.org/#/USING_ADVANCED.md#options</a></li>
+<li class="toc-item toc-level-2"><a href="#highlightjs">highlight.js</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%87%BA%E7%8E%B0%E7%9A%84%E9%97%AE%E9%A2%98">出现的问题</a></li>
+<li class="toc-item toc-level-4"><a href="#code%E4%BB%A3%E7%A0%81%E4%B8%8D%E6%8D%A2%E8%A1%8C">code代码不换行</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%9C%A8%E6%9C%AC%E5%9C%B0%E9%A2%84%E8%A7%88%E6%9C%89%E9%AB%98%E4%BA%AE%E4%BD%86%E6%98%AF%E5%9C%A8github-pages%E6%B2%A1%E6%9C%89%E9%AB%98%E4%BA%AE">在本地预览有高亮，但是在github pages没有高亮</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%AE%8C%E5%96%84%E7%BD%91%E9%A1%B5%E5%92%8C%E6%B8%B2%E6%9F%93">★完善网页和渲染</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8A%A0%E4%B8%8Aheader%E4%B8%8Efooter%E8%BF%9B%E8%A1%8C%E6%B8%B2%E6%9F%93">加上header与footer进行渲染</a></li>
+<li class="toc-item toc-level-3"><a href="#fs%E9%81%8D%E5%8E%86markdown%E6%96%87%E4%BB%B6">fs遍历markdown文件</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%A6%82%E6%9E%9C%E6%96%87%E6%9C%AC%E6%B2%A1%E6%9C%89%E5%8F%98%E5%8C%96%E5%88%99%E4%B8%8D%E9%9C%80%E8%A6%81%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93">如果文本没有变化则不需要重新渲染</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%81%8D%E5%8E%86html%E6%96%87%E4%BB%B6%E5%A4%B9%E7%94%9F%E6%88%90home%E9%A1%B5%E9%9D%A2%E7%9A%84%E7%9B%AE%E5%BD%95%E9%A1%B5">遍历html文件夹，生成home页面的目录页</a></li>
+<li class="toc-item toc-level-2"><a href="#code-prettify">code-prettify</a></li>
+<li class="toc-item toc-level-2"><a href="#mathjax">mathjax</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%BE%85%E8%A7%A3%E5%86%B3">待解决</a></li>
+</ol>
+    </nav>
+  </details>
 
-  <main id="main">
-    <section>
-      <div class="container">
-        
-<div class="row">
-  <div class="col-md-10">
-    <h3 class="category-title">marked 造轮子</h3><hr>
-    <div class="d-md-flex post-entry-1">
-      <div>
-        <div class="post-meta">
-          <span class="date">it</span> <span class="mx-1">&bullet;</span>
-          <span>2023-01-23</span>
-        </div>
-        <div class="post-content">
-          <h1>造轮子</h1>
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">it</a>
+      <time datetime="2023-01-23">2023-01-23</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/marked/">#marked</a>
+      <a href="/tags/markdown/">#markdown</a>
+      <a href="/tags/static-site/">#static-site</a>
+    </div>
+
+    <h1 class="post-title">marked 造轮子</h1>
+
+    <div class="post-body">
+<h1 id="造轮子">造轮子</h1>
 <p>hexo固然好用，但是在使用的过程总还是有一些问题，比如</p>
 <ol>
 <li>git经常unable to access，push需要借助git desktop才能稳定。(主要原因)</li>
@@ -80,15 +130,15 @@
 <li>想搞一搞（bushi</li>
 </ol>
 <p>那么你可以看看下面的内容，尝试自己使用marked造一个小轮子（小hexo）</p>
-<h2>marked</h2>
+<h2 id="marked">marked</h2>
 <p><a href="https://github.com/markedjs/marked">marked</a>是一个JavaScript编写的全功能Markdown解析和编译器。目的是快速的编译超大块的Markdown文本而不必担心结果会出乎意料或者花费很长时间。</p>
 <p>marked最初是为Node.JS编写，现在已完全兼容客户端浏览器。</p>
 <p>新版本号称速度比 C 语言写的 Markdown 转换工具 <a href="http://www.oschina.net/p/discount">Discount</a> 还要快。</p>
-<h3>使用</h3>
+<h3 id="使用">使用</h3>
 <p>安装marked在目标文件夹下</p>
 <pre><code class="language-bash">npm install marked --save
 </code></pre>
-<h3>marked参数说明</h3>
+<h3 id="marked参数说明">marked参数说明</h3>
 <pre><code>-o, –output [output]: 指定输出文件，默认为当前控制台
 -i, –input [input]: 指定输入文件或最后一个参数，默认为当前控制台输入
 -t, –tokens: 输出token流代替HTML
@@ -103,7 +153,7 @@
 –silent: 不输出错误信息
 -h, –help: 帮助信息
 </code></pre>
-<h3>API使用</h3>
+<h3 id="api使用">API使用</h3>
 <p>接下来，我通过API来调用marked解析markdown文本。</p>
 <p>新建一个脚本文件mark1.js</p>
 <pre><code class="language-javascript">var marked = require('marked');
@@ -142,7 +192,7 @@ fs.readFile('m1.md', 'utf-8', function (err, data) {
 });
 </code></pre>
 <p>运行之后，就会在该目录下生成一个md1.html文件，其中的内容就是m1.md的内容转码为html后的样子。</p>
-<h3>自定义渲染</h3>
+<h3 id="自定义渲染">自定义渲染</h3>
 <p>自定义渲染选项允许你以自定义的方式渲染内容，并把之前的规则设置覆盖掉。</p>
 <p>块级标签支持以下渲染：</p>
 <ul>
@@ -191,9 +241,9 @@ marked.setOptions({
   smartypants: false,
 })
 </code></pre>
-<h3>常见问题</h3>
+<h3 id="常见问题">常见问题</h3>
 <blockquote>
-<h5>Uncaught TypeError TypeError: marked is not a function</h5>
+<h5 id="uncaught-typeerror-typeerror-marked-is-not-a-function">Uncaught TypeError TypeError: marked is not a function</h5>
 <p>解决方案：修改使用方法</p>
 <pre><code class="language-javascript">console.log(marked('I am using __markdown__.'));
 
@@ -202,13 +252,13 @@ console.log(marked.parse('I am using __markdown__.'));
 </code></pre>
 </blockquote>
 <blockquote>
-<h5>sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: https://marked.js.org/#/USING_ADVANCED.md#options</h5>
+<h5 id="sanitize-and-sanitizer-parameters-are-deprecated-since-version-070-should-not-be-used-and-will-be-removed-in-the-future-read-more-here-httpsmarkedjsorgusing-advancedmdoptions">sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: https://marked.js.org/#/USING_ADVANCED.md#options</h5>
 <p>解决方案：sanitize被弃用了，在setOptions中删去sanitize设置</p>
 </blockquote>
 <p>中文资料很少，可以看看下面这些。但是下面这些也是之前的文章了，现在marked已经发生了很多变化，所以还是建议看最新的官方文档。当然我这篇也可以满足基本使用了（笑）。</p>
 <p><a href="https://blog.csdn.net/fens/article/details/84634655">Marked高效的Markdown解析器_Fens的博客</a></p>
 <p><a href="https://cloud.tencent.com/developer/article/1961057">使用marked解析markdown为html</a></p>
-<h2>highlight.js</h2>
+<h2 id="highlightjs">highlight.js</h2>
 <p>代码高亮的库选用的是highlight.js</p>
 <pre><code class="language-bash">npm install highlight.js --save
 </code></pre>
@@ -241,8 +291,8 @@ code {
 }
 </code></pre>
 <p>大功告成</p>
-<h3>出现的问题</h3>
-<h4>code代码不换行</h4>
+<h3 id="出现的问题">出现的问题</h3>
+<h4 id="code代码不换行">code代码不换行</h4>
 <p>解决方法，修改css中code</p>
 <pre><code class="language-css">code {
 	position: relative;
@@ -257,8 +307,8 @@ code {
 }
 </code></pre>
 <p><a href="https://blog.csdn.net/qq_44787816/article/details/114340701">markDown转换html后code不换行问题_遇见的昨天的博客-CSDN博客_markdownsharp转换后不能换行</a></p>
-<h4>在本地预览有高亮，但是在github pages没有高亮</h4>
-<h2>★完善网页和渲染</h2>
+<h4 id="在本地预览有高亮但是在github-pages没有高亮">在本地预览有高亮，但是在github pages没有高亮</h4>
+<h2 id="完善网页和渲染">★完善网页和渲染</h2>
 <p>需要添加的功能：</p>
 <ul>
 <li>
@@ -301,7 +351,7 @@ code {
 <hr>
 <p>这个时候已经可以把markdown转码为html并新建文件进行存储了，而且也有了代码高亮。但是网页只有markdown的内容，并没有header和footer，这不是一个完整的网页。</p>
 <p>所以我们这时候就可以设计一个自己想要的完整的网页，并预留出一个post div来存放markdown的内容，实现<code>hexo generate</code>把markdown渲染成html的功能。</p>
-<h3>加上header与footer进行渲染</h3>
+<h3 id="加上header与footer进行渲染">加上header与footer进行渲染</h3>
 <pre><code class="language-javascript">var marked = require('marked');
 var fs = require(&quot;fs&quot;); //读取md文件内容
 const highlight = require('highlight.js');
@@ -356,7 +406,7 @@ fs.readFile('README.md', 'utf-8', function (err, data) {
 });
 </code></pre>
 <p>这样就构建了一个基本的html网页，但是，我们需要批量操作，把一个文件夹里面的所有markdown都转换成html，并且获取文件的名字作为title。</p>
-<h3>fs遍历markdown文件</h3>
+<h3 id="fs遍历markdown文件">fs遍历markdown文件</h3>
 <p>遍历文件夹</p>
 <pre><code class="language-javascript">var path = './markdown';
 fs.readdir(path, 'utf-8', function(err, files){
@@ -435,7 +485,7 @@ fs.readdir(path, 'utf-8', function(err, files){
   })
 })
 </code></pre>
-<h3>如果文本没有变化则不需要重新渲染</h3>
+<h3 id="如果文本没有变化则不需要重新渲染">如果文本没有变化则不需要重新渲染</h3>
 <pre><code class="language-javascript">//判断文件是否存在
 fs.access('./html/'+title+'.html', fs.constants.F_OK, (err) =&gt; { 
     if(err) {
@@ -454,7 +504,7 @@ fs.access('./html/'+title+'.html', fs.constants.F_OK, (err) =&gt; {
     }
 });
 </code></pre>
-<h3>遍历html文件夹，生成home页面的目录页</h3>
+<h3 id="遍历html文件夹生成home页面的目录页">遍历html文件夹，生成home页面的目录页</h3>
 <ol>
 <li>fs遍历html文件，生成JSON文件</li>
 </ol>
@@ -509,162 +559,37 @@ fs2.writeFileSync('./home_data.json', string_data);
 <li>获取生成的json文件，生成目录并分页到home页</li>
 </ol>
 <p>这里的内容我感觉没有写好。使用js的XMLHttpRequest或者jQ都一直出错，无法正常拿到json的内容。现在是使用静态文件手动添加的方式，生成数据表。</p>
-<h2>code-prettify</h2>
+<h2 id="code-prettify">code-prettify</h2>
 <p><a href="https://github.com/googlearchive/code-prettify">code-prettify</a></p>
 <p>已经使用了highlight了，等有时间再看看code-prettify。(doge.jpg)</p>
-<h2>mathjax</h2>
+<h2 id="mathjax">mathjax</h2>
 <p>marked + mathjax 实现支持数学公式的 markdown 转 html</p>
-<h1>待解决</h1>
+<h1 id="待解决">待解决</h1>
 <p>highlight在本地预览有高亮，但是在github pages没有高亮</p>
-
-        </div>
-      </div>
     </div>
-  </div>
-  
-<div class="col-md-2">
-  <div class="aside-block">
-    <h3 class="aside-title">Video</h3>
-    <div class="video-post">
-      <a href="https://www.bilibili.com" class="glightbox link-video">
-        <span class="bi-play-fill"></span>
-        <img src="/assets/images/gd.jpg" alt="" class="img-fluid">
-      </a>
-    </div>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Categories</h3>
-    <ul class="aside-links list-unstyled">
-      
-      <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i>acgn</a></li>
-      
-      <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i>essay</a></li>
-      
-      <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i>it</a></li>
-      
-    </ul>
-  </div>
-
-  <div class="aside-block">
-    <h3 class="aside-title">Tags</h3>
-    <ul class="aside-tags list-unstyled">
-      
-      <li><a href="/tags/c/">#c</a></li>
-    
-      <li><a href="/tags/cpp/">#cpp</a></li>
-    
-      <li><a href="/tags/database/">#database</a></li>
-    
-      <li><a href="/tags/english/">#english</a></li>
-    
-      <li><a href="/tags/essay/">#essay</a></li>
-    
-      <li><a href="/tags/game/">#game</a></li>
-    
-      <li><a href="/tags/git/">#git</a></li>
-    
-      <li><a href="/tags/guide/">#guide</a></li>
-    
-      <li><a href="/tags/hexo/">#hexo</a></li>
-    
-      <li><a href="/tags/jekyll/">#jekyll</a></li>
-    
-      <li><a href="/tags/linux/">#linux</a></li>
-    
-      <li><a href="/tags/markdown/">#markdown</a></li>
-    
-      <li><a href="/tags/marked/">#marked</a></li>
-    
-      <li><a href="/tags/mysql/">#mysql</a></li>
-    
-      <li><a href="/tags/note/">#note</a></li>
-    
-      <li><a href="/tags/shell/">#shell</a></li>
-    
-      <li><a href="/tags/static-site/">#static-site</a></li>
-    
-      <li><a href="/tags/vim/">#vim</a></li>
-    
-      <li><a href="/tags/white-album-2/">#white-album-2</a></li>
-    
-      <li><a href="/tags/workflow/">#workflow</a></li>
-    
-    </ul>
-  </div>
+  </article>
 </div>
-
-</div>
-
-      </div>
-    </section>
   </main>
 
-  
-<footer id="footer" class="footer">
-  <div class="footer-content">
-    <div class="container">
-      <div class="row g-2">
-        <div class="col-lg-5">
-          <h3 class="footer-heading">About suhan</h3>
-          <p>悠久的时间啊，不懈行走中的愚蠢的旅人啊；壮烈的火焰啊，将一切化为灰烬的悲哀罪人啊。红色外衣披于身，铭刻此伤永不愈；在纠缠凌乱的锁状牢狱，细数吾之罪。时间，即是罪恶！</p>
-          <p><a href="/about/" class="footer-link-more">Learn More</a></p>
-        </div>
 
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Navigation</h3>
-          <ul class="footer-links list-unstyled">
-            <li><a href="/"><i class="bi bi-chevron-right"></i> Home</a></li>
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> It</a></li>
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> Acgn</a></li>
-            <li><a href="/about/"><i class="bi bi-chevron-right"></i> About</a></li>
-          </ul>
-        </div>
-
-        <div class="col-6 col-lg-2">
-          <h3 class="footer-heading">Categories</h3>
-          <ul class="footer-links list-unstyled">
-            
-            <li><a href="/categories/acgn/"><i class="bi bi-chevron-right"></i> acgn</a></li>
-            
-            <li><a href="/categories/essay/"><i class="bi bi-chevron-right"></i> essay</a></li>
-            
-            <li><a href="/categories/it/"><i class="bi bi-chevron-right"></i> it</a></li>
-            
-          </ul>
-        </div>
-
-        <div class="col-lg-3">
-          虚以待位
-          ？？？
-        </div>
-      </div>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
     </div>
-  </div>
 
-  <div class="footer-legal">
-    <div class="container">
-      <div class="row justify-content-between">
-        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-          <div class="copyright">&copy; Copyright <strong><span>suhan42</span></strong>. All Rights Reserved</div>
-        </div>
-        <div class="col-md-6">
-          <div class="social-links mb-3 mb-lg-0 text-center text-md-end">
-            <a href="https://github.com/suhan42" class="github" target="_blank"><i class="bi bi-github"></i></a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
   </div>
 </footer>
 
-<a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-
-  <script src="/assets/vendor/jquery-1.11.0.min.js"></script>
-  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/assets/vendor/hc-mobile-nav/hc-mobile-nav.js"></script>
+  <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/site.js"></script>
-  <script src="/assets/js/me.js"></script>
 </body>
 </html>

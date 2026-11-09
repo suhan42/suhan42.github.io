@@ -3,7 +3,8 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>新年快乐！！！</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy New Year - Suhan</title>
 
 <style>
 html,body{
@@ -13,23 +14,106 @@ html,body{
 	overflow:hidden;
 	background:#000;
 }
+
+.wish{
+	position:fixed;
+	inset:0;
+	z-index:9998;
+	display:grid;
+	place-items:center;
+	pointer-events:none;
+	color:#fff;
+	margin:0;
+	font-family:"Noto Serif SC", "Songti SC", serif;
+	font-size:clamp(28px, 5vw, 64px);
+	font-weight:500;
+	letter-spacing:0.14em;
+	text-shadow:0 0 24px rgb(255 238 160 / 45%);
+	animation:wish-fade 7s ease both;
+}
+
+.back{
+	position:fixed;
+	top:20px;
+	left:20px;
+	z-index:10001;
+	display:inline-flex;
+	align-items:center;
+	min-height:34px;
+	padding:4px 12px;
+	border:1px solid rgb(255 255 255 / 18%);
+	border-radius:999px;
+	background:rgb(0 0 0 / 38%);
+	color:rgb(255 255 255 / 62%);
+	font-family:system-ui, sans-serif;
+	font-size:12px;
+	text-decoration:none;
+	backdrop-filter:blur(8px);
+	transition:color 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+
+.back:hover,
+.back:focus-visible{
+	border-color:rgb(255 255 255 / 40%);
+	background:rgb(0 0 0 / 62%);
+	color:#fff;
+}
+
+@keyframes wish-fade{
+	0%{ opacity:0; transform:translateY(12px); }
+	18%, 72%{ opacity:1; transform:translateY(0); }
+	100%{ opacity:0; transform:translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce){
+	.wish{ animation:none; opacity:1; }
+}
 </style>
 
 </head>
 <body>
+<a class="back" href="/">← Suhan</a>
+<h1 class="wish">HAPPY NEW YEAR</h1>
 <canvas id="canvas" style="position:absolute;width:100%;height:100%;z-index:8888"></canvas>
-<canvas style="position:absolute;width:100%;height:100%;z-index:9999" class="canvas" ></canvas>
-<div class="overlay">
-  <div class="tabs">
-    <div class="tabs-labels"><span class="tabs-label">Commands</span><span class="tabs-label">Info</span><span class="tabs-label">Share</span></div>
-
-    <div class="tabs-panels">
-      <ul class="tabs-panel commands">
-      </ul>
-    </div>
-  </div>
-</div>
 <script>
+var audioContext=null;
+
+function unlockAudio(){
+	if(!audioContext){
+		var AudioCtor=window.AudioContext||window.webkitAudioContext;
+		if(AudioCtor) audioContext=new AudioCtor();
+	}
+	if(audioContext && audioContext.state==="suspended") audioContext.resume();
+}
+
+function playPop(volume){
+	if(!audioContext || audioContext.state!=="running") return;
+	var now=audioContext.currentTime;
+	var duration=0.14;
+	var buffer=audioContext.createBuffer(1,Math.floor(audioContext.sampleRate*duration),audioContext.sampleRate);
+	var data=buffer.getChannelData(0);
+	for(var i=0;i<data.length;++i){
+		data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,3);
+	}
+	var source=audioContext.createBufferSource();
+	var filter=audioContext.createBiquadFilter();
+	var gain=audioContext.createGain();
+	source.buffer=buffer;
+	filter.type="lowpass";
+	filter.frequency.setValueAtTime(1400,now);
+	filter.frequency.exponentialRampToValueAtTime(260,now+duration);
+	gain.gain.setValueAtTime(Math.min(0.18,Math.max(0.01,volume)),now);
+	gain.gain.exponentialRampToValueAtTime(0.001,now+duration);
+	source.connect(filter);
+	filter.connect(gain);
+	gain.connect(audioContext.destination);
+	source.start(now);
+	source.stop(now+duration);
+}
+
+window.addEventListener("pointerdown",unlockAudio,{once:true});
+window.addEventListener("keydown",unlockAudio,{once:true});
+
 function initVars(){
 
 	pi=Math.PI;
@@ -44,17 +128,22 @@ function initVars(){
 	seedTimer=0;seedInterval=5,seedLife=100;gravity=.02;
 	seeds=new Array();
 	sparkPics=new Array();
-	s="https://cantelope.org/NYE/";
-	for(i=1;i<=10;++i){
-		sparkPic=new Image();
-		sparkPic.src=s+"spark"+i+".png";
+	var sparkColors=["#ff8844","#8844ff","#88ffff","#ffffff","#44ff88","#ff4444","#ff8844","#8844ff","#ffffff","#4444ff"];
+	for(i=0;i<sparkColors.length;++i){
+		sparkPic=document.createElement("canvas");
+		sparkPic.width=64;
+		sparkPic.height=64;
+		sparkCtx=sparkPic.getContext("2d");
+		sparkGradient=sparkCtx.createRadialGradient(32,32,0,32,32,32);
+		sparkGradient.addColorStop(0,"#ffffff");
+		sparkGradient.addColorStop(0.18,sparkColors[i]);
+		sparkGradient.addColorStop(0.55,sparkColors[i] + "aa");
+		sparkGradient.addColorStop(1,sparkColors[i] + "00");
+		sparkCtx.fillStyle=sparkGradient;
+		sparkCtx.fillRect(0,0,64,64);
 		sparkPics.push(sparkPic);
 	}
 	sparks=new Array();
-	pow1=new Audio(s+"pow1.ogg");
-	pow2=new Audio(s+"pow2.ogg");
-	pow3=new Audio(s+"pow3.ogg");
-	pow4=new Audio(s+"pow4.ogg");
 	frames = 0;
 }
 
@@ -151,15 +240,8 @@ function splode(x,y,z){
 		spark.trail=new Array();
 		sparks.push(spark);
 	}
-	switch(parseInt(Math.random()*4)){
-		case 0:	pow=new Audio(s+"pow1.ogg"); break;
-		case 1:	pow=new Audio(s+"pow2.ogg"); break;
-		case 2:	pow=new Audio(s+"pow3.ogg"); break;
-		case 3:	pow=new Audio(s+"pow4.ogg"); break;
-	}
 	d=Math.sqrt((x-playerX)*(x-playerX)+(y-playerY)*(y-playerY)+(z-playerZ)*(z-playerZ));
-	pow.volume=1.5/(1+d/10);
-	pow.play();
+	playPop(1.3/(1+d/10)/10);
 }
 
 function doLogic(){
@@ -229,6 +311,7 @@ function rgb(col){
 function draw(){
 
 	ctx.clearRect(0,0,cx*2,cy*2);
+	var renderScale=Math.min(1,canvas.width/900);
 
 	ctx.fillStyle="#ff8";
 	for(i=-100;i<100;i+=3){
@@ -236,7 +319,7 @@ function draw(){
 			x=i;z=j;y=25;
 			point=rasterizePoint(x,y,z);
 			if(point.d!=-1){
-				size=250/(1+point.d);
+				size=250/(1+point.d)*renderScale;
 				d = Math.sqrt(x * x + z * z);
 				a = 0.75 - Math.pow(d / 100, 6) * 0.75;
 				if(a>0){
@@ -250,7 +333,7 @@ function draw(){
 	for(i=0;i<seeds.length;++i){
 		point=rasterizePoint(seeds[i].x,seeds[i].y,seeds[i].z);
 		if(point.d!=-1){
-			size=200/(1+point.d);
+			size=200/(1+point.d)*renderScale;
 			ctx.fillRect(point.x-size/2,point.y-size/2,size,size);
 		}
 	}
@@ -258,7 +341,7 @@ function draw(){
 	for(i=0;i<sparks.length;++i){
 		point=rasterizePoint(sparks[i].x,sparks[i].y,sparks[i].z);
 		if(point.d!=-1){
-			size=sparks[i].radius*200/(1+point.d);
+			size=sparks[i].radius*200/(1+point.d)*renderScale;
 			if(sparks[i].alpha<0)sparks[i].alpha=0;
 			if(sparks[i].trail.length){
 				point1.x=point.x;
@@ -315,9 +398,9 @@ window.addEventListener("resize",()=>{
 });
 
 initVars();
+splode(0,20,0);
 frame();
 </script>
-<script src="js/index.js"></script>
 
 </body>
 </html>
