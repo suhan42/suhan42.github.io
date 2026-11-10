@@ -20,9 +20,14 @@ suhan42.github.io/
 │  ├─ current-analysis.md
 │  ├─ target-architecture.md
 │  ├─ migration-plan.md
-│  └─ release-checklist.md
+│  ├─ content-inventory.md
+│  ├─ legacy-url-map.md
+│  ├─ release-checklist.md
+│  └─ changelog.md
 │
 ├─ assets/
+│  ├─ custom/
+│  │  └─ divergence-meter/
 │  ├─ css/
 │  │  ├─ main.css
 │  │  ├─ variables.css
@@ -38,7 +43,7 @@ suhan42.github.io/
 │     ├─ bootstrap/
 │     ├─ bootstrap-icons/
 │     ├─ hc-mobile-nav/
-│     ├─ jquery/
+│     ├─ jquery-1.11.0.min.js
 │     └─ highlight-github.css
 │
 ├─ scripts/
@@ -67,11 +72,8 @@ suhan42.github.io/
 │  ├─ content/
 │  │  ├─ posts/
 │  │  │  ├─ posts.11tydata.json
-│  │  │  ├─ 2023-01-22-linux-command.md
-│  │  │  ├─ 2023-01-22-c-reference.md
-│  │  │  ├─ 2023-01-23-marked-ruouzi.md
-│  │  │  ├─ 2023-09-26-heartbreak.md
-│  │  │  └─ 2023-01-22-wa2-playthrough-guide.html
+│  │  │  ├─ *.md
+│  │  │  └─ 文章型 *.html
 │  │  ├─ pages/
 │  │  │  └─ about.html
 │  │  └─ custom/
@@ -86,12 +88,15 @@ suhan42.github.io/
 │  ├─ category.njk
 │  ├─ feed.njk
 │  ├─ sitemap.njk
-│  └─ search-index.njk
+│  ├─ search-index.njk
+│  └─ static/
+│     └─ .nojekyll
 │
 ├─ site/
 │  ├─ index.html
+│  ├─ .nojekyll
 │  ├─ posts/
-│  │  └─ marked-ruouzi/
+│  │  └─ marked-blog-generator/
 │  │     └─ index.html
 │  ├─ tags/
 │  ├─ categories/
@@ -100,13 +105,13 @@ suhan42.github.io/
 │  ├─ data/
 │  ├─ feed.xml
 │  ├─ sitemap.xml
-│  └─ 404.html
+│  ├─ 404.html
+│  ├─ htmls/
+│  ├─ views/
+│  └─ plugins/
 │
-├─ .editorconfig
-├─ .eleventyignore
 ├─ .gitattributes
 ├─ .gitignore
-├─ .nojekyll
 ├─ eleventy.config.js
 ├─ package.json
 ├─ package-lock.json
@@ -115,7 +120,7 @@ suhan42.github.io/
 └─ README.md
 ```
 
-`src/` 是 Eleventy 输入根目录，`site/` 是输出根目录。根目录 `assets/` 通过 passthrough copy 输出到 `site/assets/`。这样模板、内容和站点资源分层明确，构建器不会扫描整份仓库文档或历史产物。
+`src/` 是 Eleventy 输入根目录，`site/` 是输出根目录。根目录 `assets/` 通过 passthrough copy 输出到 `site/assets/`，`src/static/` 输出到 `site/` 根目录，当前包含 `.nojekyll`。这样模板、内容和站点资源分层明确，构建器不会扫描整份仓库文档或历史产物。
 
 ## Eleventy 配置边界
 
@@ -123,7 +128,7 @@ suhan42.github.io/
 
 ```js
 export default function (eleventyConfig) {
-  eleventyConfig.addPassthroughCopy({ assets: "assets" });
+  eleventyConfig.addPassthroughCopy({ "assets": "assets", "src/static": "." });
 
   return {
     dir: {
@@ -140,11 +145,11 @@ export default function (eleventyConfig) {
 }
 ```
 
-`.eleventyignore` 用于排除不需要进入构建的遗留文件。因为输入目录是 `src/`，根目录的 `docs/`、`node_modules/` 和旧构建脚本天然不参与模板扫描。
+当前没有 `.eleventyignore`。因为输入目录是 `src/`，根目录的 `docs/`、`node_modules/` 和旧构建脚本天然不参与模板扫描；如果后续新增根目录输入，再按实际需要建立忽略文件。
 
-Eleventy 的文章集合通过 `addCollection("posts")` 从 `src/content/posts/*.md` 构建，按 `date` 倒序排序，只保留 `status === "published"` 的文章。分类和标签聚合页从这个集合重新派生，不依赖 Eleventy 的 `tags` 概念充当业务分类。
+Eleventy 的文章集合通过 `addCollection("publishedPosts")` 从 `src/content/posts/*.md` 和 `*.html` 构建，按 `date` 倒序排序，只保留 `status === "published"` 的文章。分类和标签聚合页分别通过 `categories` 和 `allTags` 集合从文章源派生，不依赖 Eleventy 的 `tags` 概念充当业务分类。
 
-代码高亮继续复用已有 highlight.js 依赖，在 Eleventy 的 Markdown 渲染配置中接入。高亮样式复制到 `assets/vendor/highlight-github.css`，页面只引用输出后的站点路径，不引用 `node_modules`。
+当前构建配置没有接入 highlight.js；`assets/vendor/highlight-github.css` 仍由 `base.njk` 引用，但生成的代码块没有 `hljs` 标记。是否需要恢复高亮能力，应在发布收尾时单独确认，不能把样式表存在等同于高亮已经生效。
 
 ## 内容模型
 
@@ -154,7 +159,7 @@ Eleventy 的文章集合通过 `addCollection("posts")` 从 `src/content/posts/*
 ---
 title: marked 造轮子
 date: 2023-01-23
-slug: marked-ruouzi
+slug: marked-blog-generator
 category: it
 tags:
   - marked
@@ -308,9 +313,9 @@ npm run publish:pages
 
 `node_modules/` 必须从 git 索引移除并加入 `.gitignore`。依赖通过 `package.json` 和 `package-lock.json` 固定，发布前由人工执行 `npm ci`。构建期依赖使用 devDependencies；站点只复制必要的 CSS、字体、图片和脚本到 `assets/vendor/`。
 
-`assets/` 存放站点实际需要的静态资源。Bootstrap、bootstrap-icons、hc-mobile-nav、jQuery 和 highlight 样式只保留发布需要的文件。旧生成脚本、旧 `htmls/`、重复 `home_data.json` 和不再使用的 `require.js` 在迁移完成并确认后删除。
+`assets/` 存放站点实际需要的静态资源。当前基础模板只使用 `bootstrap-icons`、`highlight-github.css` 和站点自己的 CSS/JS；`assets/vendor/` 仍保留 Bootstrap、hc-mobile-nav 和 jQuery 文件，是否删除需要按实际引用复核。旧生成脚本、`tools/`、`htmls/`、重复的 `home_data.json` 和旧的 `require.js` 已在 P5 清理提交中退役。
 
-`.editorconfig`、`.gitattributes` 和 `.gitignore` 统一 UTF-8、LF 提交和忽略规则。新文件禁止 BOM。文档、注释和提交信息使用中文。
+`.gitattributes` 和 `.gitignore` 统一 LF 提交、二进制文件和忽略规则。新文件禁止 BOM。文档、注释和提交信息使用中文。
 
 ## 非功能要求
 
@@ -332,4 +337,4 @@ npm run publish:pages
 
 ## 发布后边界
 
-迁移完成后的旧职责如下：`posts/` 移入 `src/content/posts/`；`htmls/` 删除或只保留旧 URL 跳转页；`home_data.json` 由 Eleventy collection 和模板替代；`pagination-container.js` 由 Eleventy pagination 替代；`PostToHtml_and_CreateHomeData.js` 和 `tools/` 下的历史转换脚本退役；`marked` 不再作为站点构建依赖。
+迁移完成后的旧职责如下：`posts/` 已移入 `src/content/posts/`；`htmls/` 已退役，只在 `site/` 中生成旧 URL 跳转页；`home_data.json` 由 Eleventy collection 和模板替代；`pagination-container.js` 由 Eleventy pagination 替代；`PostToHtml_and_CreateHomeData.js` 和 `tools/` 下的历史转换脚本已在 `16f781b` 删除；`marked` 不再作为站点构建依赖。`views/fireworks2.html` 已随 `views/` 删除，但保留或退役结论仍待确认。

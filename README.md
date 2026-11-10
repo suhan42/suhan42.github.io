@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-项目正在从旧的自研生成器迁移到 Eleventy 架构，迁移分支为 `migration/eleventy-v1`，回滚点为本地标签 `pre-eleventy-migration`。当前进度和阶段边界见 `docs/migration-plan.md`。
+Eleventy 迁移已完成并上线。源码、配置和 `site/` 构建产物以 `main` 为准，GitHub Pages 从 `gh-pages` 分支根目录发布；迁移前快照保存在 `pre-eleventy-migration` 标签。当前收尾项和发布记录见 `docs/release-checklist.md`。
 
 ## 快速开始
 
@@ -30,11 +30,19 @@ npm run serve          # 本地预览，默认 http://localhost:8080
 | `src/_includes/partials/` | 可复用组件：header、footer、sidebar、文章卡、分页 |
 | `src/_data/` | 站点配置 `site.json` 和特殊页元数据 `custom-pages.json` |
 | `assets/` | 站点静态资源：主题 CSS、主题脚本、图片和 vendor 库 |
+| `src/static/` | 构建期复制到输出根目录的静态文件，当前包含 `.nojekyll` |
 | `site/` | Eleventy 构建产物，提交到仓库；通过 `gh-pages` 分支根目录发布 |
-| `docs/` | 项目文档：现状分析、目标架构、迁移计划、发布清单 |
+| `docs/` | 项目文档：现状分析、目标架构、迁移计划、内容清单、旧 URL 映射、发布清单和变更日志 |
 | `scripts/` | 内容校验、构建清理与页面发布辅助脚本 |
 
-旧的 `posts/`、`htmls/`、`views/`、`plugins/` 目录在 P5 清理阶段确认后删除，当前仅作为迁移前快照保留。
+旧的自研生成链路（根目录生成脚本、`tools/`、`posts/`、`htmls/`、`views/`、`plugins/`）已从工作区移除，历史内容保留在 `pre-eleventy-migration` 标签和 git 历史中。
+
+## 当前内容
+
+- 文章源 10 个：9 篇 `published`，1 篇 `draft`（`test.md`，slug 为 `photo-test`）。
+- 分类 3 个：`acgn`、`essay`、`it`；标签页 20 个。
+- 独立特殊页 3 个：`divergence-meter`、`happy-new-year`、`css-box`。
+- `site/` 当前包含 55 个 HTML 页面和 14 个旧 URL 跳转页。
 
 ## 写作流程
 
@@ -60,7 +68,7 @@ status: published                     # 或 draft，draft 不进首页和公开�
 2. `date` 是唯一排序依据，禁止依赖文件修改时间。
 3. `summary` 可选；缺省时列表、RSS 和搜索索引统一取正文第一段生成展示摘要，需要精确控制时再显式填写。
 4. 站内图片引用统一写作 `/assets/images/...`，禁止 `./`、`../` 和反斜杠路径。
-5. 文章型 HTML（如《白色相簿2》攻略）与 Markdown 同等对待，都放 `posts/` 且要求完整 front matter；独立交互页放 `custom/`，不进文章集合。
+5. 文章型 HTML（如《白色相簿2》攻略）与 Markdown 同等对待，都放 `src/content/posts/` 且要求完整 front matter；独立交互页放 `src/content/custom/`，不进文章集合。
 
 写完后执行：
 
@@ -126,7 +134,7 @@ GitHub Pages 设置固定为 `Settings → Pages → Deploy from a branch → gh
 | `docs/current-analysis.md` | 迁移前的现状分析和框架对比证据 |
 | `docs/target-architecture.md` | 目标架构唯一事实来源 |
 | `docs/migration-plan.md` | 阶段任务、当前进度和回滚边界 |
-| `docs/content-inventory.md` | 内容清点表和候选元数据 |
+| `docs/content-inventory.md` | 当前文章源、特殊页和内容待确认项 |
 | `docs/legacy-url-map.md` | 旧 URL 清单和跳转策略 |
 | `docs/release-checklist.md` | 人工发布验收清单 |
 | `docs/changelog.md` | 具体变更日志 |

@@ -6,16 +6,25 @@
 
 ## 当前进度（给后续 AI 的交接记录）
 
-截至 2026-11-09，迁移分支 `migration/eleventy-v1` 的完成状态：
+截至 2026-11-10，`main` 已包含迁移合并提交，线上新站已生效；迁移前快照为 `pre-eleventy-migration`。当前状态：
 
 | 阶段 | 状态 | 说明 |
 |---|---|---|
 | P0 基线 | √ | 备份标签 `pre-eleventy-migration`、迁移分支和清点文档已完成 |
-| P1 内容正式化 | √ | 9 篇 Markdown + 1 篇文章型 HTML 全部有完整 front matter；`test.md` 为 draft |
+| P1 内容正式化 | 部分完成 | 9 篇 Markdown + 1 篇文章型 HTML 全部有完整 front matter；`test.md` 为 draft；日期、分类和标签的来源确认未形成完整记录 |
 | P2 Eleventy 骨架 | √ | Eleventy 3.1.8 安装、目录结构、最小模板、内容校验和首次构建通过 |
 | P3 页面模板与视觉 | √ | 首页、header/footer/sidebar、分页、文章页和双主题视觉重做完成 |
 | P4 站点能力 | √ | 归档、分类页、标签页、RSS、sitemap、搜索索引和输出校验完成 |
-| P5 清理与发布 | 进行中 | 旧 URL 跳转、`site/` 提交和 `gh-pages` 发布分支已落地，待 Pages 发布源切换与线上验收 |
+| P5 清理与发布 | 收尾中 | 旧链路已删除，`site/` 已提交，`gh-pages` 与 `site/` 树一致，线上新站已返回新路由，文档已按现状回填；待人工视觉/移动端验收、日期与受控集合确认、旧页退役结论和提交确认 |
+
+当前剩余收尾项：
+
+1. 人工浏览器验收首页、9 篇 published 文章、3 个自定义页、双主题和移动端。
+2. 确认 `views/fireworks2.html` 的退役或保留结论；该文件已随 `views/` 删除，当前没有跳转目标。
+3. 补齐日期、受控分类和受控标签的确认记录；当前 front matter 值已在站点使用，但不能把旧数据或 `mtime` 当作确认证据。
+4. 复核 `assets/vendor/` 中尚未被基础模板加载的 Bootstrap、hc-mobile-nav 和 jQuery 文件是否删除。
+5. 确认代码块高亮能力：当前只引入 `highlight-github.css`，构建配置没有接入 highlight.js。
+6. 生成拟提交文案；只有项目所有者明确要求时才执行 `git commit`。
 
 关键决策记录：
 
@@ -304,6 +313,13 @@ P5 是唯一的大规模清理阶段。所有删除、移动退役和旧 URL 兼
 12. 生成拟提交信息；只有项目所有者明确要求执行提交时才运行 `git commit`。
 13. 人工将 `migration/eleventy-v1` 合并回 `main`。
 14. 本地确认 `site/` 内容后推送 `main`，再由 `site/` 子树同步到 `gh-pages`，并在 Pages 设置中将发布源切换为 `gh-pages` 根目录。
+
+### P5 执行记录（2026-11-10）
+
+- 旧生成脚本、`tools/`、`home_data.json` 和 `htmls/` 已在 `16f781b` 清理；`node_modules` 当前 git 跟踪数量为 0。
+- `main` 与 `origin/main` 同步；`site/` 共 177 个跟踪文件，当前输出 55 个 HTML 页面和 14 个旧 URL 跳转页。
+- `gh-pages` 与 `main` 中 `site/` 子树一致；线上首页、文章页、自定义页和旧 URL 均返回 HTTP 200。
+- GitHub Pages 设置页仍建议人工截图复核，仓库内只能验证发布产物和线上行为，不能直接读取 Pages Source 配置。
 
 ### 发布命令边界
 

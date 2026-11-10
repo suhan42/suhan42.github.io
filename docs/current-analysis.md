@@ -4,9 +4,11 @@
 
 本文记录本次迁移前的项目现状、真实运行链路、已确认的技术风险，以及 Hexo、Jekyll 和 Eleventy 的对比结论。它是开发计划与目标架构的证据基础，不是日常写作或发布手册。
 
+本文是迁移前快照。文中相对链接指向的旧脚本、`posts/`、`htmls/` 和 `home_data.json` 已从当前工作区移除，需要查看原文时从 `pre-eleventy-migration` 标签或 git 历史读取；当前内容状态见 [content-inventory.md](content-inventory.md)。
+
 ## 结论摘要
 
-当前项目不是“Markdown 直接上传到 GitHub Pages 就能发布”的简单静态站，而是一个自研的轻量静态博客生成器。主链路已经在线上可用，但内容元数据、路由、模板、依赖资产和前端数据源都需要正式化。
+迁移前的项目不是“Markdown 直接上传到 GitHub Pages 就能发布”的简单静态站，而是一个自研的轻量静态博客生成器。迁移前主链路已经在线上可用，但内容元数据、路由、模板、依赖资产和前端数据源都需要正式化。
 
 现有方向不需要推翻：项目已经实现了“Markdown 转 HTML、生成首页数据、渲染目录和分页”的最低配静态博客流程。真正的问题是没有把文章当作完整数据对象管理。因此，短期应先把内容源正式化；如果项目目标继续是长期维护的个人博客，中期迁移到 Eleventy 是合理方案。
 
@@ -16,7 +18,7 @@
 
 开始本次分析时，工作区干净，分支为 `main`，与 `origin/main` 同步。线上站点 `https://suhan42.github.io` 返回 HTTP 200。README 与 `posts/` 下的 Markdown 文件均为 UTF-8 无 BOM；git 中按 LF 存储，Windows 工作区检出为 CRLF。
 
-### 当前运行链路
+### 迁移前运行链路
 
 当前生产链路可以概括为：
 
@@ -30,9 +32,9 @@ home_data.json
 index.html 首页目录、摘要、封面和分页
 ```
 
-[PostToHtml_and_CreateHomeData.js](../PostToHtml_and_CreateHomeData.js) 同步读取 `posts/`，使用 marked 和 highlight.js 转换文章，拼入生成模板后写入 `htmls/`。随后脚本扫描 `htmls/` 生成 [home_data.json](../home_data.json)。首页由 [pagination-container.js](../pagination-container.js) 渲染文章目录和分页。
+`PostToHtml_and_CreateHomeData.js` 同步读取 `posts/`，使用 marked 和 highlight.js 转换文章，拼入生成模板后写入 `htmls/`。随后脚本扫描 `htmls/` 生成 `home_data.json`。首页由 `pagination-container.js` 渲染文章目录和分页；这些文件已从当前工作区移除，原文可从 `pre-eleventy-migration` 标签查看。
 
-根目录的 `PostToHtml_and_CreateHomeData.js` 是当前有效入口。`tools/` 下的旧脚本读取过 `markdown/`、输出到 `html/`、读取过 `view/footer.html`，与当前目录名不一致，应视为历史实验脚本，不代表当前链路。
+根目录的 `PostToHtml_and_CreateHomeData.js` 是迁移前的有效入口。`tools/` 下的旧脚本读取过 `markdown/`、输出到 `html/`、读取过 `view/footer.html`，与当时的目录名不一致，应视为历史实验脚本，不代表迁移前的主链路。
 
 ### 内容源与元数据
 

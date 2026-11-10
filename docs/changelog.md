@@ -4,6 +4,17 @@
 
 ## 2026-11-10
 
+### 文档对账与当前状态收口
+
+- 按仓库实际状态重写 `README.md` 的当前状态：迁移已完成并上线，`main` 承载源码和 `site/`，`gh-pages` 承载发布产物。
+- 更新 `docs/migration-plan.md`：P5 改为收尾中，补充旧链路清理、`site/` 与 `gh-pages` 一致性、线上抽查和剩余收尾项。
+- 更新 `docs/release-checklist.md`：回填旧脚本删除、`node_modules` 退出跟踪、Pages 发布行为等状态；保留日期、受控分类/标签、人工视觉验收和提交确认等未完成项。
+- 重写 `docs/legacy-url-map.md`：记录 14 个已生成跳转页和 `views/fireworks2.html` 的待确认状态。
+- 重写 `docs/content-inventory.md`：改为当前 `src/content/posts/` 和 `src/content/custom/` 的实际清单，历史 P0 快照只保留在 git 历史和 `pre-eleventy-migration` 标签。
+- 修正 `docs/target-architecture.md`：按实际目录更新文件树、`.nojekyll` 位置、集合名称和依赖说明，移除不存在的 `.eleventyignore`、`.editorconfig` 和根目录 `.nojekyll` 描述。
+- 当前验证：`validate:content` 通过 10 个文件，`validate:output` 通过 55 个 HTML 页面；`site/` 177 个跟踪文件，`gh-pages` 与 `main` 中 `site/` 子树一致。
+- 当前待确认：日期和受控分类/标签的确认记录、`views/fireworks2.html` 的退役结论、vendor 未使用资源清理、代码高亮能力。
+
 ### 发布链路修正
 
 - 确认 GitHub Pages 构建失败的原因是发布源指向 `main` 根目录，内置 Jekyll 扫描到 `src/archive.njk` 后按 Liquid 解析 Nunjucks 语法并报错。
@@ -11,7 +22,7 @@
 - 更新发布文档：GitHub Pages 发布源固定为 `gh-pages` 根目录，后续人工构建、提交并推送 `main` 后，用 `npm run publish:pages` 同步发布产物。
 - 补充发布源决策：记录 `main`、`gh-pages`、Pages 设置和构建分支的职责边界，并写明 Actions、`main` 的 `/docs`、根目录直出等替代方案不采用的原因。
 - 新增 `scripts/publish-pages.mjs` 和 npm 发布脚本：发布前检查 `main` 分支、`site/` 提交状态、必需产物和远端配置，默认只检查，确认后才推送 `gh-pages`。
-- 本地验证通过：内容校验 10 个文件、构建 44 个输出文件、输出校验 55 个 HTML 页面。
+- 当时本地验证通过：内容校验 10 个文件、构建 44 个输出文件、输出校验 55 个 HTML 页面。
 
 ## 2026-11-09
 
