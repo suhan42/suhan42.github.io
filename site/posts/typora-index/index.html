@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>typora 手册 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#%E4%B8%80typora%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%E6%8C%87%E5%8D%97">一、Typora基本语法指南</a></li>
+<li class="toc-item toc-level-2"><a href="#typora%E7%AE%80%E4%BB%8B">Typora简介</a></li>
+<li class="toc-item toc-level-2"><a href="#markdown%E4%BB%8B%E7%BB%8D">Markdown介绍</a></li>
+<li class="toc-item toc-level-2"><a href="#typora%E5%9F%BA%E6%9C%AC%E6%8A%80%E5%B7%A7">Typora基本技巧</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE">常用快捷键</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%8F%9C%E5%8D%95">菜单</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8C%BA%E5%9F%9F%E5%85%83%E7%B4%A0">区域元素</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%AE%B5%E8%90%BD">段落</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%A0%87%E9%A2%98">标题</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%AD%97%E4%BD%93">字体</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%96%9C%E4%BD%93">斜体</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%8A%A0%E7%B2%97">加粗</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%88%A0%E9%99%A4%E7%BA%BF">删除线</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%B8%8B%E5%88%92%E7%BA%BF">下划线</a></li>
+<li class="toc-item toc-level-4"><a href="#%E9%AB%98%E4%BA%AE">高亮</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BB%A3%E7%A0%81">代码</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%95%B0%E5%AD%A6%E5%BC%8F">数学式</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%8B%E6%A0%87">下标</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%8A%E6%A0%87">上标</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%A1%A8%E6%83%85">表情</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%A1%A8%E6%A0%BC">表格</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%88%86%E5%89%B2%E7%BA%BF">分割线</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BC%95%E7%94%A8">引用</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%84%9A%E6%B3%A8">脚注</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%93%BE%E6%8E%A5">链接</a></li>
+<li class="toc-item toc-level-4"><a href="#%E8%B6%85%E9%93%BE%E6%8E%A5">超链接</a></li>
+<li class="toc-item toc-level-4"><a href="#%E9%AB%98%E7%BA%A7%E9%93%BE%E6%8E%A5%E6%8A%80%E5%B7%A7">高级链接技巧</a></li>
+<li class="toc-item toc-level-3"><a href="#urls">URLs</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BA%8F%E5%88%97">序列</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%8F%AF%E9%80%89%E5%BA%8F%E5%88%97">可选序列</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9B%BE%E7%89%87">图片</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7">高级技巧</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%AD%97%E5%85%B8">字典</a></li>
+<li class="toc-item toc-level-3"><a href="#callouts">Callouts</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">it</a>
+      <time datetime="2026-10-22">2026-10-22</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/markdown/">#markdown</a>
+      <a href="/tags/typora/">#typora</a>
+    </div>
+
+    <h1 class="post-title">typora 手册</h1>
+
+    <div class="post-body">
+<h1 id="一typora基本语法指南">一、Typora基本语法指南</h1>
+<h2 id="typora简介">Typora简介</h2>
+<p>Typora是一款轻便简洁的Markdown编辑器，支持即时渲染技术，这也是与其他Markdown编辑器最显著的区别。即时渲染使得你写Markdown就想是写Word文档一样流畅自如，不像其他编辑器的有编辑栏和显示栏。</p>
+<ul>
+<li>Typora删除了预览窗口，以及所有其他不必要的干扰。取而代之的是实时预览。</li>
+<li>Markdown的语法因不同的解析器或编辑器而异，Typora使用的是GitHub Flavored Markdown。</li>
+</ul>
+<h2 id="markdown介绍">Markdown介绍</h2>
+<ul>
+<li>Markdown 是一种轻量级标记语言，它允许人们使用易读易写的纯文本格式编写文档。</li>
+<li>Markdown 语言在 2004 由约翰·格鲁伯（英语：John Gruber）创建。</li>
+<li>Markdown 编写的文档可以导出 HTML 、Word、图像、PDF、Epub 等多种格式的文档。</li>
+<li>Markdown 编写的文档后缀为 <code>.md</code>, <code>.markdown</code>。</li>
+</ul>
+<h2 id="typora基本技巧">Typora基本技巧</h2>
+<h3 id="常用快捷键">常用快捷键</h3>
+<ul>
+<li>加粗：<kbd>Ctrl/Command</kbd> + <kbd>B</kbd></li>
+<li>撤销：<kbd>Ctrl/Command</kbd> + <kbd>Z</kbd></li>
+<li>字体倾斜：<kbd>Ctrl/Command</kbd> + <kbd>I</kbd></li>
+<li>下划线：<code>Ctrl+U</code></li>
+<li>多级标题： <code>Ctrl + 1~6</code></li>
+<li>有序列表：<code>Ctrl + Shift + [</code></li>
+<li>无序列表：<code>Ctrl + Shift + ]</code></li>
+<li>降级快捷键 ：<code>Tab</code></li>
+<li>升级快捷键：<code>Shift + Tab</code></li>
+<li>插入链接： <code>Ctrl + K</code></li>
+<li>插入公式： <code>Ctrl + Shift + M</code></li>
+<li>行内代码： <code>Ctrl + Shift + K</code></li>
+<li>插入图片： <code>Ctrl + Shift + I</code></li>
+<li>返回Typora顶部：<code>Ctrl+Home</code></li>
+<li>返回Typora底部 ：<code>Ctrl+End</code></li>
+<li>创建表格 ：<code>Ctrl+T</code></li>
+<li>选中某句话 ：<code>Ctrl+L</code></li>
+<li>选中某个单词 ：<code>Ctrl+D</code></li>
+<li>选中相同格式的文字 ：<code>Ctrl+E</code></li>
+<li>搜索: <code>Ctrl+F</code></li>
+<li>搜索并替换 ：<code>Ctrl+H</code></li>
+<li>删除线 ：<code>Alt+Shift+5</code></li>
+<li>引用 ：<code>Ctrl+Shift+Q</code></li>
+<li>生成目录：<code>[TOC]+Enter</code></li>
+</ul>
+<p>注：一些实体符号需要在实体符号之前加” \ ”才能够显示</p>
+<h3 id="菜单">菜单</h3>
+<p>输入[TOC]即可产生菜单，菜单会自动更新</p>
+<h3 id="区域元素">区域元素</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>YAML FONT Matters</span></span></code></pre>
+<p>在文章的最上方输入---，按换行键产生，然后在里面输入内容即可。</p>
+<h3 id="段落">段落</h3>
+<p>按换行键[Enter]建立新的一行,按<code>Shift</code>+<code>Enter</code>可以创建一个比段落间距更小的行间距。可在行尾插入打断线，禁止向后插入</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>打断线&#x3C;br/>后面的内容将自动换行</span></span></code></pre>
+<h3 id="标题">标题</h3>
+<p>开头#的个数表示，空格+文字。标题有1~6个级别，#表示开始，按换行键结束</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span># 一级标题 快捷键为 Ctrl + 1</span></span>
+<span class="line"><span class="line-number">2</span><span>## 二级标题 快捷键为 Ctrl + 2</span></span>
+<span class="line"><span class="line-number">3</span><span>......</span></span>
+<span class="line"><span class="line-number">4</span><span>###### 六级标题 快捷键为 Ctrl + 6</span></span></code></pre>
+<p><a href="#%E6%A0%87%E9%A2%98">标题展示</a></p>
+<h3 id="字体">字体</h3>
+<h4 id="斜体">斜体</h4>
+<p>以**或__括住</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>*这是斜体字体1*_这是斜体字体2_</span></span></code></pre>
+<p><em>这是斜体字体1</em>
+<em>这是斜体字体2</em></p>
+<h4 id="加粗">加粗</h4>
+<p>开头<code>**</code>，结尾<code>**</code>。
+或者开头<code>__</code>,结尾<code>__</code>(两个短横线)。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>**这是加粗字体1** __这是加粗字体2__</span></span></code></pre>
+<p><strong>这是加粗字体1</strong>
+<strong>这是加粗字体2</strong></p>
+<h4 id="删除线">删除线</h4>
+<p>开头<code>~~</code>，结尾<code>~~</code>。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>~~这是错误文字~~</span></span></code></pre>
+<p><s>这是错误文字</s></p>
+<h4 id="下划线">下划线</h4>
+<p>使用HTML标签<u>下划线</u></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>&#x3C;u>下划线&#x3C;/u></span></span></code></pre>
+<p><u>下划线</u></p>
+<h4 id="高亮">高亮</h4>
+<p><code>==内容==</code>，需要自己在偏好设置里面打开这项功能</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>==高亮==</span></span></code></pre>
+<p><mark>高亮内容</mark></p>
+<h3 id="代码">代码</h3>
+<p>行内输入代码块快捷键： <code>Ctrl + Shift + K</code></p>
+<ol>
+<li>开头```+语言名，开启代码块，换行键换行，光标下移键跳出
+示例：</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"hello,python!"")</span></span></code></pre>
+<ol>
+<li>用两个`在正常段落中表示代码
+例如：</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>Use the `printf()`function.</span></span></code></pre>
+<p>Use the <code>printf()</code>function.</p>
+<h3 id="数学式">数学式</h3>
+<p>打开Typora选择数学模块</p>
+<ul>
+<li>点击“段落”—&gt;“公式块”</li>
+<li>快捷键Ctrl+Shift+m</li>
+<li><code>“$$”+回车</code></li>
+</ul>
+<p>以上三种方式都能打开数学公式的编辑栏。</p>
+<p>示例：<span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>x</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></msub><mi>exp</mi><mo>⁡</mo><mo stretchy="false">(</mo><mo>−</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lim_{x\to\infty}\exp(-x)=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">lim</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mrel mtight">→</span><span class="mord mtight">∞</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">exp</span><span class="mopen">(</span><span class="mord">−</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></span>.</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>输入$，然后按ESC键，之后输入Tex命令，可预览</span></span>
+<span class="line"><span class="line-number">2</span><span>例如：</span></span>
+<span class="line"><span class="line-number">3</span><span>$\lim_{x\to\infty}\exp(-x)=0$</span></span></code></pre>
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">Γ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∫</mo><mn>0</mn><mi mathvariant="normal">∞</mi></msubsup><msup><mi>t</mi><mrow><mi>z</mi><mo>−</mo><mn>1</mn></mrow></msup><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup><mi>d</mi><mi>t</mi><mtext> </mtext><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">Γ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.3262em;vertical-align:-0.9119em;"></span><span class="mop"><span class="mop op-symbol large-op" style="margin-right:0.4445em;position:relative;top:-0.0011em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4143em;"><span style="top:-1.7881em;margin-left:-0.4445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span><span style="top:-3.8129em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">∞</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9119em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.044em;">z</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8436em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight">t</span></span></span></span></span></span></span></span></span><span class="mord mathnormal">d</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">.</span></span></span></span></span></div><h3 id="下标">下标</h3>
+<p>使用~~括住内容。需要自己在偏好设置里面打开这项功能</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>H~2~O</span></span></code></pre>
+<p>H<sub>2</sub>O</p>
+<h3 id="上标">上标</h3>
+<p>使用^括住内容。需要自己在偏好设置里面打开这项功能</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>y^2^=4</span></span></code></pre>
+<p>y<sup>2</sup>=4</p>
+<h3 id="表情">表情</h3>
+<p>Typora语法支持添加emoji表情，输入不同的符号码（两个冒号包围的字符）可以显示出不同的表情。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>以:开始，然后输入表情的英文单词,以：结尾，将直接输入该表情.例如：</span></span>
+<span class="line"><span class="line-number">2</span><span>:smile</span></span>
+<span class="line"><span class="line-number">3</span><span>:cry</span></span>
+<span class="line"><span class="line-number">4</span><span>:happy</span></span></code></pre>
+<p>:cry
+:happy</p>
+<h3 id="表格">表格</h3>
+<p>开头|+列名+|+列名+|+换行键，创建一个2*2表格，<code>Ctrl+Enter</code>可建立新行。</p>
+<p>示例：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>|第一列|第二列|</span></span></code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">这是一个表格</th>
+<th style="text-align:center">表头1</th>
+<th style="text-align:center">表头2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">A</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">A1</td>
+</tr>
+<tr>
+<td style="text-align:center">B</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">B2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="分割线">分割线</h3>
+<p>输入 <code>***</code> 或者 <code>---</code>,按换行键换行，即可绘制一条水平线。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>***---</span></span></code></pre>
+<hr>
+<p>上下是水平线</p>
+<h3 id="引用">引用</h3>
+<p>开头&gt;表示，空格+文字，按换行键换行，双按换行跳出</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>> 引注1</span></span>
+<span class="line"><span class="line-number">2</span><span>> ···</span></span>
+<span class="line"><span class="line-number">3</span><span>> 引注2</span></span>
+<span class="line"><span class="line-number">4</span><span>>还有一行，双按换行键跳出引注模式</span></span></code></pre>
+<p>示例：</p>
+<blockquote>
+<p>引注1
+···
+引注2还有一行，双按换行键跳出引注模式</p>
+</blockquote>
+<p>普通引用</p>
+<blockquote>
+<p>空格 + 引用文字：在引用的文字前加&gt;+空格即可，引用可以嵌套。</p>
+</blockquote>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>> 引用文本前使用 [大于号+空格]</span></span>
+<span class="line"><span class="line-number">2</span><span>> 这行可以不加，新起一行都要加上哦</span></span>
+<span class="line"><span class="line-number">3</span><span>>这是引用的内容</span></span>
+<span class="line"><span class="line-number">4</span><span>>>这是引用的内容</span></span></code></pre>
+<p>示例：</p>
+<blockquote>
+<p>引用文本前使用 [大于号+空格]这行可以不加，新起一行都要加上哦
+这是引用的内容
+这是引用的内容</p>
+</blockquote>
+<p>列表中使用</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>* 第一项</span></span>
+<span class="line"><span class="line-number">2</span><span>> 引用1</span></span>
+<span class="line"><span class="line-number">3</span><span>> 引用2</span></span>
+<span class="line"><span class="line-number">4</span><span>* 第二项</span></span></code></pre>
+<p>示例：</p>
+<ul>
+<li>第一项</li>
+</ul>
+<blockquote>
+<p>引用1引用2</p>
+</blockquote>
+<ul>
+<li>第二项</li>
+</ul>
+<p>引用里嵌套引用</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>> 最外层引用</span></span>
+<span class="line"><span class="line-number">2</span><span>> > 多一个</span></span>
+<span class="line"><span class="line-number">3</span><span>> 嵌套一层引用</span></span>
+<span class="line"><span class="line-number">4</span><span>> > > 可以嵌套很多层</span></span></code></pre>
+<p>引用里嵌套列表</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>> - 这是引用里嵌套的一个列表</span></span>
+<span class="line"><span class="line-number">2</span><span>> - 还可以有子列表</span></span>
+<span class="line"><span class="line-number">3</span><span>>     * 子列表需要从 - 之后延后四个空格开始</span></span></code></pre>
+<p>引用里嵌套代码块</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>>     同样的，在前面加四个空格形成代码块</span></span>
+<span class="line"><span class="line-number">2</span><span>> ```</span></span>
+<span class="line"><span class="line-number">3</span><span>> 或者使用 ``` 形成代码块</span></span>
+<span class="line"><span class="line-number">4</span><span>> ```</span></span></code></pre>
+<h3 id="脚注">脚注</h3>
+<p>在需要添加脚注的文字后面+[+^+序列+]，注释的产生可以鼠标放置其上单击自动产生，添加信息</p>
+<p>或人工添加+[+^+序列+]+:</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>脚注产生的方法[^footnote].</span></span>
+<span class="line"><span class="line-number">2</span><span>[^footnote]:这个就是"脚注"</span></span></code></pre>
+<p>脚注产生的方法<a href="%E8%BF%99%E4%B8%AA%E5%B0%B1%E6%98%AF%22%E8%84%9A%E6%B3%A8%22%E9%93%BE%E6%8E%A5">^footnote</a>.</p>
+<h3 id="链接">链接</h3>
+<p>输入网址，单击链接，展开后可编辑
+ctr+单击，打开链接
+例如：<a href="https://link.zhihu.com/?target=https%3A//www.baidu.com">https://www.baidu.com</a></p>
+<p>常用链接方法</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>文字链接 [链接名称](http://链接网址)网址链接 &#x3C;http://链接网址></span></span></code></pre>
+<p>示例效果：百度</p>
+<h4 id="超链接">超链接</h4>
+<p>格式1：用[ ]括住要超链接的内容，紧接着用( )括住超链接源+名字，超链接源后面+超链接命名
+同样ctrl+单击，打开链接例如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>这是[百度](https://www.baidu.com)官网</span></span></code></pre>
+<p>这是<a href="https://www.baidu.com">百度</a>官网</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>This is [an example](http://example.com/ "Title") inline link.</span></span>
+<span class="line"><span class="line-number">2</span><span>[This link](http://example.net/) has no title attribute.</span></span></code></pre>
+<p>This is an example inline link.This link has no title attribute.</p>
+<h4 id="高级链接技巧">高级链接技巧</h4>
+<p>使用[+超链接文字+]+[+标签+]，创建可定义链接
+ctrl+单击，打开链接。示例1：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>这是[百度][id]:https://www.baidu.com</span></span></code></pre>
+<p>这是[百度][id]:https://www.baidu.com</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>这个链接用 1 作为网址变量 [Google][1].</span></span>
+<span class="line"><span class="line-number">2</span><span>这个链接用 yahoo 作为网址变量 [Yahoo!][yahoo].</span></span>
+<span class="line"><span class="line-number">3</span><span>然后在文档的结尾为变量赋值（网址）</span></span>
+<span class="line"><span class="line-number">4</span><span>[1]: http://www.google.com/</span></span>
+<span class="line"><span class="line-number">5</span><span>[yahoo]: http://www.yahoo.com/</span></span></code></pre>
+<h3 id="urls">URLs</h3>
+<p>用&lt;&gt;括住url，可手动设置url对于标准URLs，可自动识别</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>&#x3C;www.baidu.com></span></span></code></pre>
+<p>&lt;www.baidu.com&gt;</p>
+<h3 id="序列">序列</h3>
+<p>开头*/+/- 加空格+文字，可以创建无序序列，换行键换行，删除键+shift+tab跳出
+开头1.加空格+后接文字，可以创建有序序列例：</p>
+<ul>
+<li>第一个无序序列</li>
+<li>第二个无序序列</li>
+<li>······</li>
+</ul>
+<ol>
+<li>第一个有序序列</li>
+<li>第二个有序序列</li>
+<li>······</li>
+</ol>
+<h4 id="可选序列">可选序列</h4>
+<p>开头序列+空格+[ ]+空格+文字，换行键换行，删除键+shift+tab跳出例如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>- [ ] 第一个可选序列</span></span>
+<span class="line"><span class="line-number">2</span><span>- [ ] 第二个可选序列</span></span>
+<span class="line"><span class="line-number">3</span><span>- [ ] 第三个可选序列</span></span>
+<span class="line"><span class="line-number">4</span><span>- [x] 第四个可选序列</span></span></code></pre>
+<ul>
+<li>第一个可选序列</li>
+<li>第二个可选序列</li>
+<li>第三个可选序列</li>
+<li>第四个可选序列
+总结：先输入减号，然后输入空格，之后就变成了黑色圆点，在输入[]，在中间加个空格，回车就可以注：任务列表无快捷键，可以点击菜单栏段落，任务列表。</li>
+</ul>
+<h3 id="图片">图片</h3>
+<blockquote>
+<p>Typora文本文档中有使用图片内容，如果需要发布在各个兼容Markdown的软件平台，需要预先上传文档中的图片至图床，再通过对图床的图片链接调用，才能正常显示，否则各个平台将无法看到该文档图片。
+免费图床网址：<a href="https://link.zhihu.com/?target=https%3A//sm.ms/">https://sm.ms/</a>图床设置：[Typora图床自动上传图片设置篇]</p>
+</blockquote>
+<ol>
+<li>手动添加：跟链接的方法区别在于前面加了个感叹号 <code>!</code>，这样是不是觉得好记多了呢？</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>![图片名称](http://图片网址)</span></span></code></pre>
+<ol start="2">
+<li>当然，你也可以像网址那样对图片网址使用变量</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>这个链接用 1 作为网址变量 [Google][1].</span></span>
+<span class="line"><span class="line-number">2</span><span>然后在文档的结尾位变量赋值（网址）</span></span>
+<span class="line"><span class="line-number">3</span><span></span></span>
+<span class="line"><span class="line-number">4</span><span>[1]: http://www.google.com/logo.png</span></span></code></pre>
+<ol start="3">
+<li>除了以上2种方式之外，还可以直接将图片拖拽进来，自动生成链接。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>![显示的文字](C:\Users\Hider\Desktop\echart.png "图片标题")</span></span>
+<span class="line"><span class="line-number">2</span><span>![显示的文字](C:\Users\Hider\Desktop\echart.png)</span></span></code></pre>
+<h2 id="高级技巧">高级技巧</h2>
+<h3 id="字典">字典</h3>
+<p>位置</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>%APPDATA%\Typora\typora-dictionaries</span></span></code></pre>
+<h3 id="callouts">Callouts</h3>
+<blockquote class="callout callout-note" data-callout-label="Note">
+<p>This is a note callout. Useful for neutral supporting information. Purclaude styles blockquotes with a semi-transparent purple background.</p>
+</blockquote>
+<blockquote class="callout callout-tip" data-callout-label="Tip">
+<p>Use callouts to highlight workflow hints, writing advice, or small reminders.</p>
+</blockquote>
+<blockquote class="callout callout-important" data-callout-label="Important">
+<p>Important callouts should stand out clearly without overwhelming nearby content.</p>
+</blockquote>
+<blockquote class="callout callout-warning" data-callout-label="Warning">
+<p>Warning callouts help draw attention to risky assumptions or breaking changes.</p>
+</blockquote>
+<blockquote class="callout callout-caution" data-callout-label="Caution">
+<p>Caution callouts are useful for destructive operations or irreversible decisions.</p>
+</blockquote>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

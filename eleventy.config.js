@@ -3,6 +3,10 @@
 import { readFileSync } from "node:fs";
 import { bundledLanguages, createHighlighter } from "shiki";
 import { transformerRenderLineNumber } from "@shikijs/transformers";
+import markPlugin from "./scripts/markdown-it-mark.mjs";
+import markdownItKatex from "./scripts/markdown-it-katex.mjs";
+import markdownItSubSup from "./scripts/markdown-it-subsup.mjs";
+import markdownItGithubAlerts from "./scripts/markdown-it-github-alerts.mjs";
 
 const customPages = JSON.parse(readFileSync(new URL("./src/_data/custom-pages.json", import.meta.url), "utf8"));
 
@@ -93,6 +97,10 @@ export default function (eleventyConfig) {
 
   // 让 markdown-it 使用 Shiki 生成构建期 HTML，页面运行时不加载高亮库。
   eleventyConfig.amendLibrary("md", (md) => {
+    md.use(markPlugin);
+    md.use(markdownItKatex);
+    md.use(markdownItSubSup);
+    md.use(markdownItGithubAlerts);
     md.options.highlight = highlightCode;
   });
 

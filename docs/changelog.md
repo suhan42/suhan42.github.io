@@ -14,6 +14,9 @@
 - 修正 `docs/target-architecture.md`：按实际目录更新文件树、`.nojekyll` 位置、集合名称和依赖说明，移除不存在的 `.eleventyignore`、`.editorconfig` 和根目录 `.nojekyll` 描述。
 - 当前验证：`validate:content` 通过 10 个文件，`validate:output` 通过 55 个 HTML 页面；`site/` 177 个跟踪文件，`gh-pages` 与 `main` 中 `site/` 子树一致。
 - 当前待确认：日期和受控分类/标签的确认记录、`views/fireworks2.html` 的退役结论、vendor 未使用资源清理、代码高亮视觉验收。
+- `validate:output` 改为从 `src/content/posts/` 的 front matter 动态读取 published/draft，移除写死的 10 篇和 `photo-test` 文件名；新增共享 `scripts/front-matter.mjs`。
+- 新增 `src/_data/themes.json` 作为主题名称、标签、theme-color 和系统默认主题的唯一来源；菜单、首帧脚本和 `theme.js` 都从该文件读取。
+- 新增 `scripts/test-markdown.mjs` 和 `npm run test:markdown`，覆盖自定义 Markdown 规则及代码保护边界，共 12 项 fixture。
 - 新增 `docs/markdown代码块渲染分析.md`：确定 Shiki 4.6.0 直接接管 markdown-it 的方案，记录 Node >=20 与 markdown-it 15 的版本冲突、markdown-it 15 / Eleventy 4 canary 的升级风险、直接接入方式、Node 18 回退到 Shiki 3.3.0 的路径，以及 Typora 仅作为视觉参考的边界。
 - 新增 `docs/archive/` 归档目录，将迁移前的 `docs/current-analysis.md` 移入 `docs/archive/2026-11-migration/`；活动文档继续保留在 `docs/` 根目录。
 
@@ -28,9 +31,34 @@
 ### 四套站点主题
 
 - 保留原有 `night` 夜航深色和 `paper` 纸墨浅色，不覆盖旧色板。
-- 新增 `nocturne` 和 `nocturne-bright` 两套主题，分别接入 Nocturne 深色和 Nocturne Bright 浅色的字体栈、背景、表面、正文、标题分级色、链接、强调、行内代码、引用、表格、列表、分隔线、图片和标记色。
+- 新增 `nocturne` 和 `nocturne-bright` 两套主题，分别接入 Nocturne 深色和 Nocturne Bright 浅色的字体栈、背景、表面、正文、标题分级色、链接、下划线、强调、行内代码、引用、表格、列表、分隔线、图片和标记色。
 - 主题入口从单按钮改为原生 `details` 菜单，支持四套主题选择、localStorage 持久化、系统主题跟随、外部点击关闭和 Esc 关闭。
 - `theme-color`、Works 印章强调色和 Shiki 代码块背景/行号选择器同步覆盖四套主题。
+- 链接下划线和 `==` 高亮按主题使用独立强调色：夜航蓝、纸墨棕、Nocturne 紫、Nocturne Bright 紫。
+
+### Markdown 行内高亮
+
+- 在 `eleventy.config.js` 接入 `scripts/markdown-it-mark.mjs`，支持 `==文字==` 生成 `<mark>`，不新增第三方依赖。
+- 规则支持嵌套强调和连续高亮，并避免把普通 `==` 比较表达式误判为高亮。
+- `night` / `paper` 增加高对比度 `<mark>` 样式，Nocturne 两套主题使用紫色高亮；高亮文字加粗并支持多行克隆背景。
+- 新增 `typora手册.md`，修正 `mrakdown` 标签拼写、补充正式摘要并清理行尾空格；当前 published 文章为 10 篇，标签页为 21 个。
+
+### KaTeX 数学公式
+
+- 安装 `katex@0.19.1`，在 `eleventy.config.js` 接入 `scripts/markdown-it-katex.mjs`，支持行内 `$...$` 和块级 `$$...$$`。
+- 公式在构建期生成 KaTeX HTML，不依赖 MathJax 客户端脚本；无效公式会显示错误标记并由输出校验拦截。
+- 将 KaTeX 样式和字体复制到 `assets/vendor/katex/`，页面只引用站点本地资源，不引用 `node_modules`。
+
+### Typora 上下标
+
+- 新增 `scripts/markdown-it-subsup.mjs`，支持 `H~2~O` 下标和 `y^2^=4` 上标。
+- 单字符 `~` / `^` 走上下标规则，双 `~~` 继续交给删除线；行内代码和 KaTeX 公式不会被误处理。
+
+### GitHub/Typora Callouts
+
+- 新增 `scripts/markdown-it-github-alerts.mjs`，把 `> [!NOTE]`、`> [!TIP]`、`> [!IMPORTANT]`、`> [!WARNING]`、`> [!CAUTION]` 转成 callout。
+- 五种 callout 使用高饱和语义色作为标题、图标和左边框颜色，并增加 Bootstrap Icons 图标。
+- 文章源里的 callout marker 会在构建时移除，不再显示为字面量 `[!NOTE]`。
 
 ### 发布链路修正
 

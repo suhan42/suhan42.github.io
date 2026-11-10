@@ -7,12 +7,14 @@
   "devDependencies": {
     "@11ty/eleventy": "^3.1.8",
     "@shikijs/transformers": "4.6.0",
+    "katex": "0.19.1",
     "playwright": "^1.65.0",
     "shiki": "4.6.0"
   },
   "scripts": {
     "validate:content": "node scripts/validate-content.mjs",
     "validate:output": "node scripts/validate-output.mjs",
+    "test:markdown": "node scripts/test-markdown.mjs",
     "publish:pages:check": "node scripts/publish-pages.mjs --check",
     "publish:pages": "node scripts/publish-pages.mjs",
     "clean": "node scripts/clean-site.mjs",

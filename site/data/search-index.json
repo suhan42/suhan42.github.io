@@ -1,6 +1,13 @@
 
 [
   {
+    "title": "typora 手册",
+    "url": "/posts/typora-index/",
+    "date": "2026-10-22",
+    "category": "it",
+    "tags": ["markdown","typora"],
+    "summary": "Typora 常用 Markdown 语法、快捷键、表格、数学公式和导出技巧整理。"
+  },  {
     "title": "what did you learn from your heartbreak",
     "url": "/posts/learn-from-heartbreak/",
     "date": "2023-09-26",

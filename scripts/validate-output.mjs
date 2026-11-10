@@ -3,6 +3,7 @@
 
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { parseFrontMatter } from './front-matter.mjs';
 
 const SITE_DIR = 'site';
 const errors = [];
@@ -21,6 +22,23 @@ function walkDirectory(dir) {
   return files;
 }
 
+// 从内容源读取 slug 和 status，输出校验不依赖写死的文章数量或 draft 文件名。
+function getContentStatusSets() {
+  const contentDir = 'src/content/posts';
+  const contentFiles = walkDirectory(contentDir).filter(file => /\.(md|html)$/.test(file));
+  const published = new Set();
+  const drafts = new Set();
+
+  for (const filePath of contentFiles) {
+    const { data, error } = parseFrontMatter(readFileSync(filePath, 'utf8'));
+    if (error || !data || !data.slug) continue;
+    if (data.status === 'published') published.add(data.slug);
+    if (data.status === 'draft') drafts.add(data.slug);
+  }
+
+  return { published, drafts };
+}
+
 const allFiles = walkDirectory(SITE_DIR);
 const htmlFiles = allFiles.filter(f => f.endsWith('.html'));
 let shikiPageCount = 0;
@@ -36,6 +54,10 @@ for (const filePath of htmlFiles) {
 
   if (content.includes('<pre class="shiki')) {
     shikiPageCount += 1;
+  }
+
+  if (content.includes('katex-error')) {
+    errors.push(`${relativePath}: KaTeX 公式渲染错误`);
   }
 
   if (/<pre><code class="language-/.test(content)) {
@@ -83,13 +105,28 @@ if (shikiPageCount === 0) {
   errors.push('未发现任何 Shiki 代码块，Markdown 高亮可能未生效');
 }
 
-// 检查 published 文章页数量与预期一致（当前 9 篇 published + 1 篇 draft photo-test 也生成页面，但不在集合中）。
+if (!existsSync(join(SITE_DIR, 'assets/vendor/katex/katex.min.css'))) {
+  errors.push('site/assets/vendor/katex/katex.min.css: KaTeX 样式缺失');
+}
+
+const katexFontsDir = join(SITE_DIR, 'assets/vendor/katex/fonts');
+if (!existsSync(katexFontsDir) || readdirSync(katexFontsDir).length === 0) {
+  errors.push('site/assets/vendor/katex/fonts: KaTeX 字体缺失');
+}
+
+// 检查 published 文章页与内容源一致；draft 页面可以生成，但不能混入 published 集合。
 const postsDir = join(SITE_DIR, 'posts');
 const postDirs = readdirSync(postsDir, { withFileTypes: true }).filter(e => e.isDirectory());
-const expectedPublished = 9;
-const publishedPages = postDirs.filter(d => d.name !== 'photo-test');
-if (publishedPages.length !== expectedPublished) {
-  errors.push(`published 文章页数量不符：期望 ${expectedPublished}，实际 ${publishedPages.length}`);
+const postSlugs = new Set(postDirs.map(dir => dir.name));
+const { published, drafts } = getContentStatusSets();
+const missingPublished = [...published].filter(slug => !postSlugs.has(slug));
+if (missingPublished.length > 0) {
+  errors.push(`published 文章页缺失：${missingPublished.join(', ')}`);
+}
+
+const unknownPosts = [...postSlugs].filter(slug => !published.has(slug) && !drafts.has(slug));
+if (unknownPosts.length > 0) {
+  errors.push(`存在未登记状态的文章页：${unknownPosts.join(', ')}`);
 }
 
 if (errors.length > 0) {
@@ -98,4 +135,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`输出校验通过：${htmlFiles.length} 个 HTML 页面，${shikiPageCount} 个页面包含 Shiki 代码块，链接和资源完整，无 node_modules 引用，无反斜杠路径。`);
+console.log(`输出校验通过：${htmlFiles.length} 个 HTML 页面，${published.size} 篇 published，${shikiPageCount} 个页面包含 Shiki 代码块，链接和资源完整，无 node_modules 引用，无反斜杠路径。`);

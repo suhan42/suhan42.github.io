@@ -26,10 +26,9 @@
           <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
         </summary>
         <div class="theme-menu" role="group" aria-label="主题选择">
-          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>夜航深色</button>
-          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>纸墨浅色</button>
-          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>Nocturne 深色</button>
-          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>Nocturne Bright</button>
+          {% for theme in themes %}
+          <button type="button" class="theme-option" data-theme-option="{{ theme.id }}" aria-pressed="false"><span class="theme-swatch" style="--swatch: {{ theme.color }}" aria-hidden="true"></span>{{ theme.label }}</button>
+          {% endfor %}
         </div>
       </details>
 

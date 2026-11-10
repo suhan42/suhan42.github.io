@@ -3,6 +3,7 @@
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { parseFrontMatter } from './front-matter.mjs';
 
 const POSTS_DIR = 'src/content/posts';
 const REQUIRED_FIELDS = ['title', 'date', 'slug', 'category', 'status'];
@@ -12,35 +13,6 @@ const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}(?:T[\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?$/;
 
 const slugs = new Set();
 const errors = [];
-
-function parseFrontMatter(content) {
-  if (!content.startsWith('---')) {
-    return { data: null, error: '缺少 front matter 起始标记 ---' };
-  }
-  const endIndex = content.indexOf('---', 3);
-  if (endIndex === -1) {
-    return { data: null, error: '缺少 front matter 结束标记 ---' };
-  }
-  const fmText = content.slice(3, endIndex).trim();
-  const lines = fmText.split('\n');
-  const data = {};
-  let currentKey = null;
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    if (trimmed.startsWith('- ')) {
-      if (currentKey) {
-        if (!Array.isArray(data[currentKey])) data[currentKey] = [];
-        data[currentKey].push(trimmed.slice(2).trim());
-      }
-    } else if (trimmed.includes(':')) {
-      const idx = trimmed.indexOf(':');
-      currentKey = trimmed.slice(0, idx).trim();
-      data[currentKey] = trimmed.slice(idx + 1).trim();
-    }
-  }
-  return { data, error: null };
-}
 
 function walkDirectory(dir) {
   const entries = readdirSync(dir, { withFileTypes: true });

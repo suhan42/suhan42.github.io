@@ -8,11 +8,11 @@
 
 | 项目 | 数量或状态 |
 |---|---:|
-| 文章源 | 10 |
-| published 文章 | 9 |
+| 文章源 | 11 |
+| published 文章 | 10 |
 | draft 文章 | 1（`test.md`，slug `photo-test`） |
 | 受控分类（当前使用） | 3（`acgn`、`essay`、`it`） |
-| 标签页 | 20 |
+| 标签页 | 21 |
 | 独立特殊页 | 3 |
 
 ## 文章源
@@ -31,6 +31,7 @@
 | `src/content/posts/《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理].html` | 《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理] | 2023-01-22 | `wa2-playthrough-guide` | `acgn` | `game`, `white-album-2`, `guide` | published |
 | `src/content/posts/关于Git使用.md` | 关于 Git 使用 | 2023-01-23 | `about-git` | `it` | `git`, `workflow` | published |
 | `src/content/posts/静态博客框架之Hexo & Jekyll.md` | 静态博客框架之 Hexo 与 Jekyll | 2023-01-22 | `hexo-and-jekyll` | `it` | `static-site`, `hexo`, `jekyll` | published |
+| `src/content/posts/typora手册.md` | typora 手册 | 2026-10-22 | `typora-index` | `it` | `markdown`, `typora` | published |
 
 ## 独立特殊页
 
@@ -46,5 +47,5 @@
 
 1. 日期来源：当前 front matter 日期已经生效，但缺少逐项的三方确认记录。
 2. 受控分类：当前实际使用 `acgn`、`essay`、`it`，是否作为最终集合需项目所有者确认。
-3. 受控标签：当前由文章标签派生 20 个标签页，是否作为最终集合需项目所有者确认。
+3. 受控标签：当前由文章标签派生 21 个标签页，是否作为最终集合需项目所有者确认。
 4. `views/fireworks2.html`：迁移前未进入首页，文件已随 `views/` 删除，当前没有回退路由或退役结论。

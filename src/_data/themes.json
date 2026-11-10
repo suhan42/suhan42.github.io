@@ -1,0 +1,28 @@
+[
+  {
+    "id": "night",
+    "label": "夜航深色",
+    "color": "#0b0d14",
+    "scheme": "dark",
+    "default": true
+  },
+  {
+    "id": "paper",
+    "label": "纸墨浅色",
+    "color": "#f7f4ee",
+    "scheme": "light",
+    "default": true
+  },
+  {
+    "id": "nocturne",
+    "label": "Nocturne 深色",
+    "color": "#211d25",
+    "scheme": "dark"
+  },
+  {
+    "id": "nocturne-bright",
+    "label": "Nocturne Bright",
+    "color": "#fbf8ff",
+    "scheme": "light"
+  }
+]

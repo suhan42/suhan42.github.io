@@ -46,19 +46,27 @@ suhan42.github.io/
 │  └─ vendor/
 │     ├─ bootstrap/
 │     ├─ bootstrap-icons/
+│     ├─ katex/
 │     ├─ hc-mobile-nav/
 │     └─ jquery-1.11.0.min.js
 │
 ├─ scripts/
+│  ├─ front-matter.mjs
 │  ├─ validate-content.mjs
 │  ├─ validate-output.mjs
+│  ├─ test-markdown.mjs
 │  ├─ clean-site.mjs
 │  ├─ generate-redirects.mjs
+│  ├─ markdown-it-mark.mjs
+│  ├─ markdown-it-katex.mjs
+│  ├─ markdown-it-subsup.mjs
+│  ├─ markdown-it-github-alerts.mjs
 │  └─ publish-pages.mjs
 │
 ├─ src/
 │  ├─ _data/
 │  │  ├─ site.json
+│  │  ├─ themes.json
 │  │  └─ custom-pages.json
 │  │
 │  ├─ _includes/

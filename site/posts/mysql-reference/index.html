@@ -8,6 +8,7 @@
   <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
   <title>MySQL 自查表 - Suhan</title>
 
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
   <script>
     // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
     (() => {
@@ -17,24 +18,21 @@
       } catch (error) {
         stored = null;
       }
-      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
-      const themeNames = ["night", "paper", "nocturne", "nocturne-bright"];
-      const themeColors = {
-        night: "#0b0d14",
-        paper: "#f7f4ee",
-        nocturne: "#211d25",
-        "nocturne-bright": "#fbf8ff"
-      };
-      const theme = themeNames.includes(stored) ? stored : systemTheme;
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
       document.documentElement.dataset.theme = theme;
       const themeColor = document.querySelector('meta[name="theme-color"]');
-      if (themeColor) themeColor.content = themeColors[theme];
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
     })();
   </script>
 
   <link href="/assets/images/suhan.png" rel="icon">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
 </head>
 <body>
   <a class="visually-hidden" href="#main">跳到主要内容</a>
@@ -66,10 +64,10 @@
           <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
         </summary>
         <div class="theme-menu" role="group" aria-label="主题选择">
-          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>夜航深色</button>
-          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>纸墨浅色</button>
-          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>Nocturne 深色</button>
-          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>Nocturne Bright</button>
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
         </div>
       </details>
 
@@ -482,22 +480,13 @@ rpm -qa | grep mysql</p>
 <ol>
 <li><strong>选择select</strong></li>
 </ol>
-<p>$$
-σ_{条件}(表)
-$$</p>
-<ol start="2">
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>σ</mi><mtext>条件</mtext></msub><mo stretchy="false">(</mo><mtext>表</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">σ_{条件}(表)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">条件</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord cjk_fallback">表</span><span class="mclose">)</span></span></span></span></span></div><ol start="2">
 <li><strong>投影projection</strong></li>
 </ol>
-<p>$$
-π_{字段}(表)
-$$</p>
-<ol start="3">
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>π</mi><mtext>字段</mtext></msub><mo stretchy="false">(</mo><mtext>表</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">π_{字段}(表)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">字段</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord cjk_fallback">表</span><span class="mclose">)</span></span></span></span></span></div><ol start="3">
 <li><strong>连接join</strong></li>
 </ol>
-<p>$$
-R&gt;<em>{iθj}&lt;S=σ</em>{iθj}(R×S)
-$$</p>
-<ul>
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>R</mi><msub><mo>&gt;</mo><mrow><mi>i</mi><mi>θ</mi><mi>j</mi></mrow></msub><mo>&lt;</mo><mi>S</mi><mo>=</mo><msub><mi>σ</mi><mrow><mi>i</mi><mi>θ</mi><mi>j</mi></mrow></msub><mo stretchy="false">(</mo><mi>R</mi><mo>×</mo><mi>S</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">R&gt;_{iθj}&lt;S=σ_{iθj}(R×S)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel"><span class="mrel">&gt;</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span><span class="katex-base"><span class="katex-strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mclose">)</span></span></span></span></span></div><ul>
 <li>R、S代表两个字段</li>
 <li>i、j代表两个字段第i列和第j列的属性</li>
 <li>θ代表运算符</li>
@@ -506,10 +495,7 @@ $$</p>
 <ol start="4">
 <li><strong>除division</strong></li>
 </ol>
-<p>$$
-R÷S
-$$</p>
-<hr>
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>R</mi><mo>÷</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">R÷S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span></span></div><hr>
 <p>select可以进行各种运算，例如执行下面的语句：</p>
 <pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <p>会返回数值<strong>2</strong></p>

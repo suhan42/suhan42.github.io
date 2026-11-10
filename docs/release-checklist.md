@@ -12,7 +12,7 @@
 
 截至 2026-11-10，迁移主链路和发布产物已落地，当前不再是“是否迁移”的阶段：
 
-- 本地校验：`validate:content` 通过 10 个文件，`validate:output` 通过 55 个 HTML 页面。
+- 本地校验：`validate:content` 通过 11 个文件，`validate:output` 通过 57 个 HTML 页面。
 - 发布产物：`main` 与 `origin/main` 同步，`site/` 与 `gh-pages` 树一致，`publish:pages:check` 通过。
 - 线上抽查：首页、文章页、自定义页和旧 URL 返回 HTTP 200；RSS 9 条、sitemap 35 个 URL、搜索索引 9 条，draft 未进入公开索引。
 - 当前剩余：人工视觉/移动端验收、日期与受控分类/标签确认、`views/fireworks2.html` 退役结论、vendor 未使用文件清理、代码高亮视觉验收和提交文案。
@@ -39,7 +39,7 @@
 | slug 全站唯一且符合规范 | √ | 内容校验确认只允许小写英文、数字和连字符 |
 | 摘要兜底策略确认 | √ | `summary` 可选，缺省时列表、RSS 和搜索索引取正文第一段 |
 | 受控分类集确认 | 待确认 | 实际使用 `acgn`、`essay`、`it`，是否作为最终受控集需项目所有者确认 |
-| 受控标签集确认 | 待确认 | 当前生成 20 个标签页，是否作为最终受控集需项目所有者确认 |
+| 受控标签集确认 | 待确认 | 当前生成 21 个标签页，是否作为最终受控集需项目所有者确认 |
 | 封面路径统一为 `/assets/images/...` | √ | 内容校验和输出校验均通过，无 Windows 反斜杠 |
 
 P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求在 P1 阶段验证。
@@ -51,9 +51,10 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | 新依赖获得确认 | √ | `@11ty/eleventy@^3.1.8` 安装为 devDependency |
 | `src/` 输入目录与 `site/` 输出目录建立 | √ | 目录职责见目标架构文档 |
 | 内容迁入 `src/content/posts/` | √ | 10 个文件使用 git 移动保留历史 |
-| published posts collection 数量正确 | √ | 输出校验确认 9 篇 published |
+| published posts collection 数量正确 | √ | 输出校验从内容源动态读取 status，并核对全部 published 页面，不再写死数量或 draft 文件名 |
 | draft 不进入公开集合 | √ | `test.md` 仍生成独立页，但不进入首页、RSS、sitemap 和搜索索引 |
-| 内容校验脚本可用 | √ | `npm run validate:content` 通过 10 个文件 |
+| 内容校验脚本可用 | √ | `npm run validate:content` 通过 11 个文件 |
+| Markdown 规则回归测试可用 | √ | `npm run test:markdown` 覆盖高亮、数学、上下标、Callouts、删除线和代码保护，共 12 项 |
 | 站点资源不引用 `node_modules` | √ | 旧 highlight 样式已删除；当前构建不引用 `node_modules` |
 | 构建产物只在迁移分支本地验证 | √ | `npm run build` 生成 10 个文章页和静态资源 |
 | `.gitignore` 建立 | √ | 阻止 `node_modules/` 被提交；`site/` 作为发布产物提交 |
@@ -73,7 +74,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | 移动端导航可用 | √ | 原生 details 菜单、主题按钮、外部点击和 Esc 关闭均验证通过 |
 | 自定义页面资源完整 | √ | Divergence 无 404 且手机端两行显示；烟花页无外部依赖和脚本错误；CSS Box 使用独立浅色骨架 |
 | 关于页迁移完成 | √ | 新阅读线和主题变量下版式正常 |
-| 站内链接抽查无 404 | √ | `npm run validate:output` 通过 55 个 HTML 页面 |
+| 站内链接抽查无 404 | √ | `npm run validate:output` 通过 57 个 HTML 页面 |
 
 ## P4：站点能力
 
@@ -81,13 +82,13 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 |---|---|---|
 | 归档页生成 | √ | `/archive/` 按年份分组，2023 年 9 篇 |
 | 分类页生成 | √ | `/categories/{acgn,essay,it}/` 三个页面，文章列表正确 |
-| 标签页生成 | √ | `/tags/{tag}/` 20 个页面，由 collection 派生 |
-| 搜索索引生成 | √ | `/data/search-index.json` 9 篇 published，draft 排除，JSON 格式有效 |
+| 标签页生成 | √ | `/tags/{tag}/` 21 个页面，由 collection 派生 |
+| 搜索索引生成 | √ | `/data/search-index.json` 10 篇 published，draft 排除，JSON 格式有效 |
 | RSS 生成 | √ | `/feed.xml` 9 条 item，RFC 822 日期 |
 | sitemap 生成 | √ | `/sitemap.xml` 35 个 URL |
 | 404 页面生成 | √ | `/404.html` 继承站点骨架 |
 | SEO 基础字段生成 | √ | 页面 title 组合站点名；description 和 Open Graph 留到后续增强 |
-| 输出校验脚本通过 | √ | `npm run validate:output` 通过 55 个 HTML 页面，链接和资源完整 |
+| 输出校验脚本通过 | √ | `npm run validate:output` 通过 57 个 HTML 页面，链接和资源完整 |
 
 ## P5：清理与发布
 
@@ -107,7 +108,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | README 更新完成 | √ | 写作流程、front matter、构建、发布和旧 URL 策略 |
 | AGENTS.md 更新完成 | √ | 源目录、输出目录和人工发布边界 |
 | CLAUDE.md 引用 AGENTS.md | √ | `@AGENTS.md` |
-| 本地完整构建通过 | √ | 内容校验 10 个文件、输出校验 55 个 HTML 页面，构建产物与当前 `site/` 一致 |
+| 本地完整构建通过 | √ | 内容校验 11 个文件、输出校验 57 个 HTML 页面，构建产物与当前 `site/` 一致 |
 | 发布检查脚本通过 | √ | `npm run publish:pages:check` 确认 `main`、`site/` 提交状态、必需产物和远端配置 |
 | 人工抽查通过 | 部分完成 | 已做只读 HTTP 抽查；首页、文章、自定义页、旧 URL 正常；视觉、四套主题、移动端和每篇文章仍需人工浏览器验收 |
 | 拟提交信息已生成 | √ | 本次 Shiki 高亮接入的拟提交文案已生成，未执行 commit |
