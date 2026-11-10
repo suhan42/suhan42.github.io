@@ -1,6 +1,6 @@
 # 发布验收清单
 
-更新时间：2026-11-09
+更新时间：2026-11-10
 
 本清单服务于人工发布流程，不使用 CI/CD。P0 只建立迁移前的基线检查；P2 到 P5 的具体命令在对应阶段实现后逐步启用。每个检查项必须由人确认，不允许因为脚本通过就跳过人工验收。
 
@@ -47,7 +47,7 @@
 | 内容校验脚本可用 | √ | `npm run validate:content` 通过 10 个文件 |
 | 站点资源不引用 `node_modules` | √ | highlight 样式复制到 `assets/vendor/` |
 | 构建产物只在迁移分支本地验证 | √ | `npm run build` 生成 10 个文章页和静态资源 |
-| `.gitignore` 建立 | √ | 阻止 `node_modules/` 和 `site/` 被提交 |
+| `.gitignore` 建立 | √ | 阻止 `node_modules/` 被提交；`site/` 作为发布产物提交 |
 | `.gitattributes` 统一文本文件 LF 提交 | √ | Markdown、HTML、JS、JSON、CSS、Nunjucks 和配置文件 |
 | `node_modules` 退出 git 追踪 | √ | 1320 个文件从索引移除，本地保留；比原计划提前到 P2，因为安装后不处理会导致后续提交包含全部依赖 |
 
@@ -88,15 +88,18 @@
 | 删除旧脚本、旧数据和旧产物 | 待确认 | 逐项列出后再执行 |
 | `node_modules` 退出 git 跟踪 | 待确认 | 不删除本地依赖目录 |
 | 未使用依赖清理 | 待确认 | 至少复核 marked、require.js 和旧高亮引用 |
-| `.nojekyll` 存在于发布根 | 待验证 | 避免非必要 Jekyll 处理 |
-| README 更新完成 | 待验证 | 写作流程、front matter、构建、发布和旧 URL 策略 |
-| AGENTS.md 更新完成 | 待验证 | 源目录、输出目录和人工发布边界 |
-| CLAUDE.md 引用 AGENTS.md | 待验证 | `@AGENTS.md` |
-| 本地完整构建通过 | 待验证 | `npm ci` 后执行内容校验、构建和输出校验 |
+| `.nojekyll` 存在于发布根 | √ | `gh-pages` 根目录包含 `.nojekyll`，避免非必要 Jekyll 处理 |
+| GitHub Pages 发布源为 `gh-pages` 根目录 | 待确认 | 切换源后重新构建，确认不再扫描 `src/` 和 Nunjucks 模板 |
+| `gh-pages` 不合并回 `main` | √ | 发布分支只承载静态产物，源码和构建输入仍以 `main` 为准 |
+| README 更新完成 | √ | 写作流程、front matter、构建、发布和旧 URL 策略 |
+| AGENTS.md 更新完成 | √ | 源目录、输出目录和人工发布边界 |
+| CLAUDE.md 引用 AGENTS.md | √ | `@AGENTS.md` |
+| 本地完整构建通过 | √ | 内容校验 10 个文件、构建 44 个输出文件、输出校验 55 个 HTML 页面 |
+| 发布检查脚本通过 | √ | `npm run publish:pages:check` 确认 `main`、`site/` 提交状态、必需产物和远端配置 |
 | 人工抽查通过 | 待验证 | 首页、每篇文章、自定义页、移动端和旧 URL |
 | 拟提交信息已生成 | 待验证 | 不默认执行 commit |
 | 项目所有者明确要求执行提交 | 待确认 | 只有明确要求后才运行 `git commit` |
-| 合并迁移分支到 main | 待确认 | 合并后人工推送发布 |
+| 合并迁移分支到 main | √ | `origin/main` 已包含迁移合并提交 |
 
 ## 发布前最终检查
 
@@ -108,9 +111,13 @@ npm ci
 npm run validate:content
 npm run build
 npm run validate:output
+# 用户确认提交并推送 main 后，同步发布分支：
+git push origin main
+npm run publish:pages:check
+npm run publish:pages
 ```
 
-P2 完成前，上述 npm 脚本可能尚未存在；此时不得伪造通过状态，只能在对应阶段完成后更新本清单。
+GitHub Pages 发布源必须是 `gh-pages` 分支的 `/ (root)`，不能指向 `main` 根目录。切换发布源后必须重新触发一次构建，确认不再出现 Jekyll 解析 `src/archive.njk` 的错误。
 
 发布前还必须人工抽查：
 

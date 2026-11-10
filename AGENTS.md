@@ -3,7 +3,7 @@
 > 本文件是项目级固定开发准则，面向后续所有 AI 协作会话；全局指南的通用规则依然适用，冲突时以更严格者为准。
 
 创建日期：2026-11-06
-修改日期：2026-11-09
+修改日期：2026-11-10
 
 ## 0. 核心信条
 
@@ -90,9 +90,9 @@ status: published 或 draft
 
 ## 4. 构建与发布
 
-- 构建产物 `site/` 提交到仓库；构建、验收和发布由人工执行，不使用 CI/CD。
-- 发布命令在 P2 实现后固定为：`npm ci` → `npm run validate:content` → `npm run build` → `npm run validate:output` → 人工验收 → 用户明确要求提交时才 `git commit`。
-- 发布产物必须在迁移分支本地构建和验收通过后合并回 `main`，再由用户确认推送。
+- 构建产物 `site/` 提交到仓库；GitHub Pages 发布源固定为 `gh-pages` 分支根目录（由 `site/` 子树生成），不得把 `main` 根目录设为 Pages 源，也不得把 `gh-pages` 合并回 `main`；构建、验收和发布由人工执行，不使用 CI/CD。
+- 发布命令固定为：`npm ci` → `npm run validate:content` → `npm run build` → `npm run validate:output` → 人工验收 → 用户明确要求提交时才 `git commit` → 推送 `main` → `npm run publish:pages:check` → `npm run publish:pages`。
+- 发布产物必须在本地构建和验收通过，合并到 `main` 并经用户确认推送后，再同步到 `gh-pages` 发布分支。
 
 ## 5. 已知坑与边界
 

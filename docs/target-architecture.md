@@ -1,6 +1,6 @@
 # Eleventy 目标架构
 
-更新时间：2026-11-09
+更新时间：2026-11-10
 
 本文定义迁移完成后的规范文件树、目录职责、内容数据模型、模板体系、构建输出、路由规则和 GitHub Pages 发布边界。它描述目标状态；阶段任务、删除顺序和回滚边界见 [migration-plan.md](migration-plan.md)。
 
@@ -44,7 +44,9 @@ suhan42.github.io/
 ├─ scripts/
 │  ├─ validate-content.mjs
 │  ├─ validate-output.mjs
-│  └─ clean-site.mjs
+│  ├─ clean-site.mjs
+│  ├─ generate-redirects.mjs
+│  └─ publish-pages.mjs
 │
 ├─ src/
 │  ├─ _data/
@@ -264,7 +266,26 @@ base.njk
 
 ## 构建输出与发布
 
-`site/` 是唯一提交到 git 的构建产物。目录应包含构建出的 HTML、XML、JSON、复制后的静态资源、`.nojekyll` 和为旧 URL 生成的跳转页。GitHub Pages 从 `main` 分支根目录发布，所以 `site/` 不能通过项目站点子路径访问，而是用户主站点根目录的组成部分。
+`site/` 是唯一提交到 git 的构建产物。目录应包含构建出的 HTML、XML、JSON、复制后的静态资源、`.nojekyll` 和为旧 URL 生成的跳转页。GitHub Pages 的发布源固定为 `gh-pages` 分支根目录，该分支由 `site/` 子树生成；`main` 保留源码、配置和构建产物，不直接作为 Pages 发布源。发布分支根目录必须包含 `.nojekyll`，避免 Jekyll 试图解析 Nunjucks 模板。
+
+### 发布口径
+
+- `main`：源码、配置和 `site/` 构建产物的唯一主分支，不作为 Pages 发布源。
+- `gh-pages`：唯一 Pages 发布分支，根目录只放 `site/` 的完整静态产物，不合并回 `main`。
+- GitHub Pages：`Deploy from a branch → gh-pages → / (root)`，发布根目录必须包含 `.nojekyll`。
+- 构建可以发生在任意工作分支，但实际发布必须以合并并验收后的 `main` 中 `site/` 为准；未合并分支不得更新 `gh-pages`。
+
+### 为什么采用 gh-pages
+
+GitHub Pages 的 Branch source 只允许根目录或 `/docs`，不能直接选择 `site/` 子目录。若把 `main` 根目录设为发布源，Pages 会用 Jekyll 扫描整个仓库，读取 `src/archive.njk` 后按 Liquid 解析 Nunjucks 语法并失败；这不是模板本身损坏。`gh-pages` 根目录让 Pages 只看到静态产物，同时保持无 CI/CD 和源码/发布分层。
+
+| 方案 | 结论 | 原因 |
+|---|---|---|
+| `gh-pages` 分支根目录 | 采用 | 满足 Branch source 只支持根目录或 `/docs` 的限制，发布目录独立，且不需要 CI/CD |
+| GitHub Actions | 不采用 | 会引入自动化流水线，违反项目禁用 CI/CD 的约束 |
+| `main` 的 `/docs` | 不采用 | `docs/` 已承载项目文档，迁移发布目录会和文档职责冲突 |
+| 构建到仓库根目录 | 不采用 | 源码、文档和站点文件混在一起，且根目录内容会被公开访问 |
+| 其他托管平台 | 不在当前范围 | 会改变现有 GitHub Pages 方案，不属于本次迁移目标 |
 
 标准命令设计如下：
 
@@ -273,9 +294,13 @@ npm ci
 npm run validate:content
 npm run build
 npm run validate:output
+npm run publish:pages:check
+npm run publish:pages
 ```
 
 `validate:content` 校验 front matter、必填字段、slug 唯一性、日期格式、图片路径和状态枚举。`build` 先清理 `site/`，再执行 Eleventy 构建。`validate:output` 检查输出文件、失效链接、反斜杠路径、对 `node_modules` 的引用和 published 文章数量。
+
+`publish:pages:check` 校验当前分支为 `main`、`site/` 没有未提交改动、发布根目录包含 `index.html` 和 `.nojekyll`，但不会推送。`publish:pages` 只发布已经提交到当前 HEAD 的 `site/` 内容；必须先由项目所有者确认提交并推送 `main`，未提交的本地构建不会自动进入发布分支。
 
 `clean-site.mjs` 使用 Node.js 标准库清理 `site/`，不使用跨平台含义不稳定的 shell 删除命令。所有脚本必须有中文注释，错误直接 fail-fast，不静默继续。
 

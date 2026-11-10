@@ -2,6 +2,17 @@
 
 最新内容放前面；同一天合并写，聚焦具体内容，不记录过多 git 操作。
 
+## 2026-11-10
+
+### 发布链路修正
+
+- 确认 GitHub Pages 构建失败的原因是发布源指向 `main` 根目录，内置 Jekyll 扫描到 `src/archive.njk` 后按 Liquid 解析 Nunjucks 语法并报错。
+- 创建并推送 `gh-pages` 分支，由 `site/` 子树生成；分支根目录直接包含 `index.html`、`.nojekyll` 和完整静态产物。
+- 更新发布文档：GitHub Pages 发布源固定为 `gh-pages` 根目录，后续人工构建、提交并推送 `main` 后，用 `npm run publish:pages` 同步发布产物。
+- 补充发布源决策：记录 `main`、`gh-pages`、Pages 设置和构建分支的职责边界，并写明 Actions、`main` 的 `/docs`、根目录直出等替代方案不采用的原因。
+- 新增 `scripts/publish-pages.mjs` 和 npm 发布脚本：发布前检查 `main` 分支、`site/` 提交状态、必需产物和远端配置，默认只检查，确认后才推送 `gh-pages`。
+- 本地验证通过：内容校验 10 个文件、构建 44 个输出文件、输出校验 55 个 HTML 页面。
+
 ## 2026-11-09
 
 ### 站点视觉重做

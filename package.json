@@ -8,6 +8,8 @@
   "scripts": {
     "validate:content": "node scripts/validate-content.mjs",
     "validate:output": "node scripts/validate-output.mjs",
+    "publish:pages:check": "node scripts/publish-pages.mjs --check",
+    "publish:pages": "node scripts/publish-pages.mjs",
     "clean": "node scripts/clean-site.mjs",
     "build": "npm run clean && npx @11ty/eleventy && node scripts/generate-redirects.mjs",
     "serve": "npx @11ty/eleventy --serve"
