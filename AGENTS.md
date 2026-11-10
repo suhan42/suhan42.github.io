@@ -88,6 +88,16 @@ status: published 或 draft
 
 `node_modules/` 不进入 git；站点资源不引用 `node_modules` 内文件。highlight 样式复制到 `assets/vendor/`。
 
+### 3.5 设计参考
+
+进行页面、组件或交互设计时，可参考以下站点中的组件、页面结构和交互案例，重点学习信息层级、布局密度、排版、留白、色彩和交互状态：
+
+- [RareUI](https://www.rareui.com/)
+- [ExpoKit Components](https://expokit.in/docs/components)
+- [beUI](https://beui.dev/)
+
+参考对象是这些站点的设计实现，不是其业务内容本身。只借鉴设计原则和交互模式，不复制品牌标识、插画、文案或整页布局；不得覆盖本站既有的夜航/纸墨双主题与内容优先原则。前端或模板改动完成后仍按发布清单进行人工视觉和交互验收。
+
 ## 4. 构建与发布
 
 - 构建产物 `site/` 提交到仓库；GitHub Pages 发布源固定为 `gh-pages` 分支根目录（由 `site/` 子树生成），不得把 `main` 根目录设为 Pages 源，也不得把 `gh-pages` 合并回 `main`；构建、验收和发布由人工执行，不使用 CI/CD。

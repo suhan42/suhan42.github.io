@@ -100,6 +100,7 @@ npm ci
 npm run validate:content
 npm run build
 npm run validate:output
+
 git status --short        # 人工确认变更
 git commit                # 仅在用户明确要求时执行
 git push origin main      # 仅在用户明确要求时执行
