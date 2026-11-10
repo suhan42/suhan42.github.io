@@ -34,6 +34,17 @@ surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/�
   --sigil: #7b96c4;
   --positive: #4cc38a;
   --negative: #e5484d;
+  --warning: #d9a04a;
+  --callout-note: #7fb2ff;
+  --callout-tip: #3ddc97;
+  --callout-important: #b48cff;
+  --callout-warning: #ffb84d;
+  --callout-caution: #ff5f6d;
+  --underline: #7b96c4;
+  --underline-soft: rgba(123, 150, 196, 0.38);
+  --mark-bg: rgba(123, 150, 196, 0.56);
+  --mark-text: #f4f7ff;
+  --mark-border: rgba(173, 196, 235, 0.9);
 }
 
 /* paper 主题：暖纸面 + 墨色文本，适合日间阅读。 */
@@ -54,6 +65,17 @@ surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/�
   --sigil: #8a5a2c;
   --positive: #16a34a;
   --negative: #dc2626;
+  --warning: #a66b1f;
+  --callout-note: #2f6fbd;
+  --callout-tip: #168452;
+  --callout-important: #7542bd;
+  --callout-warning: #b86b00;
+  --callout-caution: #c53030;
+  --underline: #8a5a2c;
+  --underline-soft: rgba(138, 90, 44, 0.38);
+  --mark-bg: rgba(196, 132, 58, 0.4);
+  --mark-text: #2b1a0b;
+  --mark-border: rgba(138, 90, 44, 0.72);
 }
 
 /* nocturne 主题：紫黑底、蓝色链接和紫色标记。 */
@@ -65,8 +87,8 @@ surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/�
   --text: #e8e6ec;
   --text-2: #d4d0da;
   --text-3: #938f9b;
-  --hairline: rgba(232, 230, 236, 0.10);
-  --ring: rgba(232, 230, 236, 0.14);
+  --hairline: #2e2935;
+  --ring: #3a3344;
   --accent: #8dc8fb;
   --accent-ink: #211d25;
   --ink: #e8e6ec;
@@ -74,6 +96,14 @@ surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/�
   --sigil: #b080ff;
   --positive: #80ffb5;
   --negative: #ff8080;
+  --warning: #ffcf99;
+  --callout-note: #8dc8fb;
+  --callout-tip: #80ffb5;
+  --callout-important: #b080ff;
+  --callout-warning: #ffcf99;
+  --callout-caution: #ff8080;
+  --underline: #b080ff;
+  --underline-soft: rgba(176, 128, 255, 0.38);
   --font-ui: -apple-system, BlinkMacSystemFont, "Inter", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
   --font-mono: "Cascadia Code", "Fira Code", "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
@@ -106,9 +136,9 @@ surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/�
   --table-hover: rgba(176, 128, 255, 0.1);
   --hr-primary: rgba(176, 128, 255, 0.55);
   --hr-cyan: rgba(128, 244, 255, 0.38);
-  --mark-bg: rgba(128, 255, 181, 0.18);
-  --mark-text: #c8ffd9;
-  --mark-border: rgba(128, 255, 181, 0.34);
+  --mark-bg: rgba(176, 128, 255, 0.56);
+  --mark-text: #fff6ff;
+  --mark-border: rgba(212, 197, 249, 0.92);
   --list-marker: #7138cc;
   --image-border: #2e2935;
 }
@@ -122,8 +152,8 @@ surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/�
   --text: #2d2834;
   --text-2: #4f4859;
   --text-3: #817789;
-  --hairline: rgba(45, 40, 52, 0.12);
-  --ring: rgba(45, 40, 52, 0.16);
+  --hairline: #e6ddeb;
+  --ring: #d3c7e0;
   --accent: #276fa9;
   --accent-ink: #fbf8ff;
   --ink: #2d2834;
@@ -131,6 +161,14 @@ surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/�
   --sigil: #7542bd;
   --positive: #168452;
   --negative: #c33c3c;
+  --warning: #9a5a16;
+  --callout-note: #276fa9;
+  --callout-tip: #168452;
+  --callout-important: #7542bd;
+  --callout-warning: #9a5a16;
+  --callout-caution: #c33c3c;
+  --underline: #7542bd;
+  --underline-soft: rgba(117, 66, 189, 0.3);
   --font-ui: -apple-system, BlinkMacSystemFont, "Inter", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
   --font-mono: "Cascadia Code", "Fira Code", "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
@@ -163,9 +201,9 @@ surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/�
   --table-hover: rgba(117, 66, 189, 0.1);
   --hr-primary: rgba(117, 66, 189, 0.55);
   --hr-cyan: rgba(0, 132, 148, 0.38);
-  --mark-bg: rgba(22, 132, 82, 0.18);
-  --mark-text: #0f633d;
-  --mark-border: rgba(22, 132, 82, 0.34);
+  --mark-bg: rgba(117, 66, 189, 0.34);
+  --mark-text: #2d1a4d;
+  --mark-border: rgba(117, 66, 189, 0.68);
   --list-marker: #7542bd;
   --image-border: #e6ddeb;
 }
@@ -441,22 +479,7 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
   height: 14px;
   border: 1px solid var(--hairline);
   border-radius: 50%;
-}
-
-[data-theme-option="night"] .theme-swatch {
-  background-color: #0b0d14;
-}
-
-[data-theme-option="paper"] .theme-swatch {
-  background-color: #f7f4ee;
-}
-
-[data-theme-option="nocturne"] .theme-swatch {
-  background-color: #211d25;
-}
-
-[data-theme-option="nocturne-bright"] .theme-swatch {
-  background-color: #fbf8ff;
+  background-color: var(--swatch);
 }
 
 /* 移动导航用 details 原生折叠，避免第三方菜单依赖。 */
@@ -1301,13 +1324,20 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: color-mix(in srgb, var(--accent) 38%, transparent);
+  text-decoration-color: var(--underline-soft);
   transition: color 140ms var(--ease), text-decoration-color 140ms var(--ease);
 }
 
 .post-body a:hover,
 .post-body a:focus-visible {
-  text-decoration-color: currentColor;
+  text-decoration-color: var(--underline);
+}
+
+.post-body u,
+.post-body ins {
+  text-decoration-color: var(--underline);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
 }
 
 .post-body blockquote {
@@ -1367,6 +1397,20 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .post-body pre.shi
   user-select: none;
 }
 
+.post-body .math-display {
+  margin: 1.2rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.post-body .math-display .katex-display {
+  margin: 0;
+}
+
+.post-body .math-inline {
+  white-space: nowrap;
+}
+
 html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .line-number {
   color: var(--text-3) !important;
   background-color: transparent !important;
@@ -1380,6 +1424,17 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
   padding: 2px 5px;
   border-radius: 4px;
   background-color: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.post-body mark {
+  padding: 0.1em 0.3em;
+  border: 1px solid var(--mark-border);
+  border-radius: 3px;
+  background-color: var(--mark-bg);
+  color: var(--mark-text);
+  font-weight: 700;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .post-body table {
@@ -1729,7 +1784,7 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body a {
   color: var(--accent);
   text-decoration: none;
-  border-bottom: 1px solid var(--link-underline);
+  border-bottom: 1px solid var(--underline-soft);
   border-radius: 3px;
 }
 
@@ -1737,7 +1792,7 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body a:focus-visible {
   color: var(--link-cyan);
   background-color: var(--link-hover-bg);
-  border-bottom-color: var(--link-hover-line);
+  border-bottom-color: var(--underline);
   text-decoration: none;
 }
 
@@ -1814,14 +1869,6 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
   background: linear-gradient(90deg, transparent, var(--hr-primary), var(--hr-cyan), transparent);
 }
 
-:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body mark {
-  padding: 0.1em 0.3em;
-  border: 1px solid var(--mark-border);
-  border-radius: 3px;
-  background-color: var(--mark-bg);
-  color: var(--mark-text);
-}
-
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body img {
   border: 1px solid var(--image-border);
   border-radius: 6px;
@@ -1830,4 +1877,84 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body sup,
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body sub {
   color: var(--link-cyan);
+}
+
+/* GitHub/Typora callouts：标题、边框和浅色背景都取当前主题的语义色。 */
+.post-body blockquote.callout {
+  --callout-color: var(--callout-note);
+  position: relative;
+  margin: 1.2rem 0;
+  padding: 2.2rem 1.2rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--callout-color) 55%, var(--hairline));
+  border-left: 4px solid var(--callout-color);
+  border-radius: 0 8px 8px 0;
+  background-color: color-mix(in srgb, var(--callout-color) 15%, var(--surface));
+  color: var(--text-2);
+}
+
+.post-body blockquote.callout::before {
+  content: "\f431";
+  position: absolute;
+  top: 0.7rem;
+  left: 1.2rem;
+  color: var(--callout-color);
+  font-family: "bootstrap-icons";
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.post-body blockquote.callout::after {
+  content: attr(data-callout-label);
+  position: absolute;
+  top: 0.7rem;
+  left: 2.7rem;
+  color: var(--callout-color);
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.post-body blockquote.callout p {
+  margin: 0;
+  color: inherit;
+}
+
+.post-body blockquote.callout-tip {
+  --callout-color: var(--callout-tip);
+}
+
+.post-body blockquote.callout-important {
+  --callout-color: var(--callout-important);
+}
+
+.post-body blockquote.callout-warning {
+  --callout-color: var(--callout-warning);
+}
+
+.post-body blockquote.callout-caution {
+  --callout-color: var(--callout-caution);
+}
+
+.post-body blockquote.callout-note::before {
+  content: "\f431";
+}
+
+.post-body blockquote.callout-tip::before {
+  content: "\f46b";
+}
+
+.post-body blockquote.callout-important::before {
+  content: "\f530";
+}
+
+.post-body blockquote.callout-warning::before {
+  content: "\f33b";
+}
+
+.post-body blockquote.callout-caution::before {
+  content: "\f627";
 }

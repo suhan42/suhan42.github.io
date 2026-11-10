@@ -7,6 +7,14 @@
     <description>Suhan 的个人博客</description>
     <language>zh-CN</language>
     <item>
+      <title>typora 手册</title>
+      <link>https://suhan42.github.io/posts/typora-index/</link>
+      <guid>https://suhan42.github.io/posts/typora-index/</guid>
+      <pubDate>Thu, 22 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Typora 常用 Markdown 语法、快捷键、表格、数学公式和导出技巧整理。</description>
+      <category>it</category>
+    </item>
+    <item>
       <title>what did you learn from your heartbreak</title>
       <link>https://suhan42.github.io/posts/learn-from-heartbreak/</link>
       <guid>https://suhan42.github.io/posts/learn-from-heartbreak/</guid>

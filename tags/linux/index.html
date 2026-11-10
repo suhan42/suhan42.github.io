@@ -8,6 +8,7 @@
   <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
   <title>Tag: linux - Suhan</title>
 
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
   <script>
     // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
     (() => {
@@ -17,24 +18,21 @@
       } catch (error) {
         stored = null;
       }
-      const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
-      const themeNames = ["night", "paper", "nocturne", "nocturne-bright"];
-      const themeColors = {
-        night: "#0b0d14",
-        paper: "#f7f4ee",
-        nocturne: "#211d25",
-        "nocturne-bright": "#fbf8ff"
-      };
-      const theme = themeNames.includes(stored) ? stored : systemTheme;
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
       document.documentElement.dataset.theme = theme;
       const themeColor = document.querySelector('meta[name="theme-color"]');
-      if (themeColor) themeColor.content = themeColors[theme];
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
     })();
   </script>
 
   <link href="/assets/images/suhan.png" rel="icon">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
 </head>
 <body>
   <a class="visually-hidden" href="#main">跳到主要内容</a>
@@ -66,10 +64,10 @@
           <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
         </summary>
         <div class="theme-menu" role="group" aria-label="主题选择">
-          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>夜航深色</button>
-          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>纸墨浅色</button>
-          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>Nocturne 深色</button>
-          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>Nocturne Bright</button>
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
         </div>
       </details>
 

@@ -1,25 +1,20 @@
-// 主题选择脚本：night、paper、nocturne、nocturne-bright 四套色板。
+// 主题选择脚本：从 base.njk 输出的主题配置读取四套色板。
 // 这里负责手动选择、持久化、按钮状态、系统主题跟随和菜单关闭。
 (function initThemePicker() {
   const root = document.documentElement;
   const toggle = document.querySelector("[data-theme-toggle]");
   const picker = document.querySelector("[data-theme-picker]");
   const options = Array.from(document.querySelectorAll("[data-theme-option]"));
-  if (!toggle || !picker || options.length === 0) return;
+  const configElement = document.getElementById("theme-config");
+  if (!toggle || !picker || options.length === 0 || !configElement) return;
 
   const systemQuery = window.matchMedia("(prefers-color-scheme: light)");
   const themeColor = document.querySelector('meta[name="theme-color"]');
-  const themeColors = {
-    night: "#0b0d14",
-    paper: "#f7f4ee",
-    nocturne: "#211d25",
-    "nocturne-bright": "#fbf8ff"
-  };
-  const themeLabels = {
-    night: "夜航深色",
-    paper: "纸墨浅色",
-    nocturne: "Nocturne 深色",
-    "nocturne-bright": "Nocturne Bright"
+  const themeConfig = JSON.parse(configElement.textContent);
+  const themeColors = Object.fromEntries(themeConfig.map(theme => [theme.id, theme.color]));
+  const themeLabels = Object.fromEntries(themeConfig.map(theme => [theme.id, theme.label]));
+  const defaultThemeForScheme = (scheme) => {
+    return themeConfig.find(theme => theme.scheme === scheme && theme.default)?.id || themeConfig[0].id;
   };
 
   const readStoredTheme = () => {
@@ -35,7 +30,7 @@
   };
 
   const applyTheme = (theme, persist) => {
-    const nextTheme = normalizeTheme(theme) || "night";
+    const nextTheme = normalizeTheme(theme) || themeConfig[0].id;
     root.dataset.theme = nextTheme;
     for (const option of options) {
       const active = option.dataset.themeOption === nextTheme;
@@ -67,7 +62,7 @@
 
   systemQuery.addEventListener("change", (event) => {
     if (readStoredTheme()) return;
-    applyTheme(event.matches ? "paper" : "night", false);
+    applyTheme(defaultThemeForScheme(event.matches ? "light" : "dark"), false);
   });
 
   document.addEventListener("click", (event) => {
