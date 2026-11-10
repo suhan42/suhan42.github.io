@@ -201,9 +201,9 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body {
   color: var(--body-text);
   font-family: var(--font-ui);
-  font-size: 1rem;
-  font-weight: 300;
-  line-height: 1.8;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.75;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h1,
@@ -300,7 +300,7 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body strong {
   color: var(--strong-color);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body em {
