@@ -28,7 +28,6 @@
   <link href="/assets/images/suhan.png" rel="icon">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
-  <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
 </head>
 <body>
   <a class="visually-hidden" href="#main">跳到主要内容</a>
@@ -136,61 +135,56 @@
 <p>新版本号称速度比 C 语言写的 Markdown 转换工具 <a href="http://www.oschina.net/p/discount">Discount</a> 还要快。</p>
 <h3 id="使用">使用</h3>
 <p>安装marked在目标文件夹下</p>
-<pre><code class="language-bash">npm install marked --save
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">npm</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> marked</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --save</span></span></code></pre>
 <h3 id="marked参数说明">marked参数说明</h3>
-<pre><code>-o, –output [output]: 指定输出文件，默认为当前控制台
--i, –input [input]: 指定输入文件或最后一个参数，默认为当前控制台输入
--t, –tokens: 输出token流代替HTML
-–pedantic: 只解析符合markdown.pl定义的，不修正markdown的错误
-–gfm: 启动Github样式的Markdown，参考 https://help.github.com/articles/github-flavored-markdown/
-–breaks: 支持Github换行符，必须打开gfm选项
-–tables: 支持Github表格，必须打开gfm选项
-–sanitize: 原始输出，忽略HTML标签
-–smart-lists: 优化列表输出
-–lang-prefix [prefix]: 设置前置样式
-–no-etc: 选择的反正标识
-–silent: 不输出错误信息
--h, –help: 帮助信息
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>-o, –output [output]: 指定输出文件，默认为当前控制台</span></span>
+<span class="line"><span class="line-number">2</span><span>-i, –input [input]: 指定输入文件或最后一个参数，默认为当前控制台输入</span></span>
+<span class="line"><span class="line-number">3</span><span>-t, –tokens: 输出token流代替HTML</span></span>
+<span class="line"><span class="line-number">4</span><span>–pedantic: 只解析符合markdown.pl定义的，不修正markdown的错误</span></span>
+<span class="line"><span class="line-number">5</span><span>–gfm: 启动Github样式的Markdown，参考 https://help.github.com/articles/github-flavored-markdown/</span></span>
+<span class="line"><span class="line-number">6</span><span>–breaks: 支持Github换行符，必须打开gfm选项</span></span>
+<span class="line"><span class="line-number">7</span><span>–tables: 支持Github表格，必须打开gfm选项</span></span>
+<span class="line"><span class="line-number">8</span><span>–sanitize: 原始输出，忽略HTML标签</span></span>
+<span class="line"><span class="line-number">9</span><span>–smart-lists: 优化列表输出</span></span>
+<span class="line"><span class="line-number">10</span><span>–lang-prefix [prefix]: 设置前置样式</span></span>
+<span class="line"><span class="line-number">11</span><span>–no-etc: 选择的反正标识</span></span>
+<span class="line"><span class="line-number">12</span><span>–silent: 不输出错误信息</span></span>
+<span class="line"><span class="line-number">13</span><span>-h, –help: 帮助信息</span></span></code></pre>
 <h3 id="api使用">API使用</h3>
 <p>接下来，我通过API来调用marked解析markdown文本。</p>
 <p>新建一个脚本文件mark1.js</p>
-<pre><code class="language-javascript">var marked = require('marked');
-console.log(marked.parse('I am using __markdown__.'));
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'marked'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">parse</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'I am using __markdown__.'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span></code></pre>
 <p>运行脚本mark1.js。</p>
-<pre><code>&lt;p&gt;I am using &lt;strong&gt;markdown&lt;/strong&gt;.&lt;/p&gt;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>&#x3C;p>I am using &#x3C;strong>markdown&#x3C;/strong>.&#x3C;/p></span></span></code></pre>
 <p>下面再用API读取md1.md的文本，进行解析，然后输出为HTML，新建mark2.js文件。</p>
-<pre><code class="language-javascript">var marked = require('marked');
-var fs = require(&quot;fs&quot;);  //读取md文件内容
-
-// console.log(marked.parse('I am using __markdown__.'));
-
-marked.setOptions({
-  renderer: new marked.Renderer(),
-  gfm: true,
-  tables: true,
-  breaks: true,
-  pedantic: false,
-  smartLists: true,
-  smartypants: false
-});
-
-//读取md
-fs.readFile('m1.md', 'utf-8', function (err, data) {
-  if (err) throw err;
-  var lexed = marked.lexer(data);
-  var html = marked.parser(lexed);
-
-  //创建文件，并写入html
-  fs.writeFile('md1.html', html, function(err) {
-    if (err) throw err;
-    console.log(&quot;数据写入成功！&quot;);
-  });
-});
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'marked'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fs </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"fs"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);  </span><span style="color:#6A737D;--shiki-dark:#6A737D">//读取md文件内容</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">// console.log(marked.parse('I am using __markdown__.'));</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">setOptions</span><span style="color:#24292E;--shiki-dark:#E1E4E8">({</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  renderer: </span><span style="color:#D73A49;--shiki-dark:#F97583">new</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Renderer</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(),</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  gfm: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  tables: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  breaks: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  pedantic: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  smartLists: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  smartypants: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">});</span></span>
+<span class="line"><span class="line-number">15</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#6A737D;--shiki-dark:#6A737D">//读取md</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">readFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'m1.md'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'utf-8'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">data</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">  if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> lexed </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">lexer</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(data);</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> html </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">parser</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(lexed);</span></span>
+<span class="line"><span class="line-number">21</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#6A737D;--shiki-dark:#6A737D">  //创建文件，并写入html</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">writeFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'md1.html'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, html, </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"数据写入成功！"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  });</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#24292E;--shiki-dark:#E1E4E8">});</span></span></code></pre>
 <p>运行之后，就会在该目录下生成一个md1.html文件，其中的内容就是m1.md的内容转码为html后的样子。</p>
 <h3 id="自定义渲染">自定义渲染</h3>
 <p>自定义渲染选项允许你以自定义的方式渲染内容，并把之前的规则设置覆盖掉。</p>
@@ -219,37 +213,35 @@ fs.readFile('m1.md', 'utf-8', function (err, data) {
 <li>image(string href, string title, string text)</li>
 </ul>
 <p>例如</p>
-<pre><code class="language-javascript">// 添加自定义渲染
-var my_renderer = new marked.Renderer()
-my_renderer.link = function (href, title, text) {
-    return `&lt;a href=&quot;${href}&quot; title=&quot;${title || text}&quot; target=&quot;_blank&quot;&gt;${text}&lt;/a&gt;`
-}
-
-	//表格下面两个返回方式的结果不一样，个人更喜欢后者
-my_renderer.table = function (header, body) {
-    return '&lt;table class=&quot;table table-striped&quot;&gt;'+header+body+'&lt;/table&gt;'
-    //return `&lt;table class=&quot;table table-hover table-bordered&quot;&gt;${header}${body}&lt;/table&gt;`;
-}
-
-marked.setOptions({ 
-  renderer: my_renderer,	//自定义
-  gfm: true,
-  tables: true,
-  breaks: true,
-  pedantic: false,
-  smartLists: true,
-  smartypants: false,
-})
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">// 添加自定义渲染</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_renderer </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#D73A49;--shiki-dark:#F97583"> new</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Renderer</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">my_renderer.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">link</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#E36209;--shiki-dark:#FFAB70">href</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">title</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">text</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `&#x3C;a href="${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">href</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}" title="${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">title</span><span style="color:#D73A49;--shiki-dark:#F97583"> ||</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> text</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}" target="_blank">${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">text</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}&#x3C;/a>`</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6A737D;--shiki-dark:#6A737D">	//表格下面两个返回方式的结果不一样，个人更喜欢后者</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">my_renderer.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">table</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#E36209;--shiki-dark:#FFAB70">header</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">body</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '&#x3C;table class="table table-striped">'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">header</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">body</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'&#x3C;/table>'</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6A737D;--shiki-dark:#6A737D">    //return `&#x3C;table class="table table-hover table-bordered">${header}${body}&#x3C;/table>`;</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">12</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">setOptions</span><span style="color:#24292E;--shiki-dark:#E1E4E8">({ </span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  renderer: my_renderer,	</span><span style="color:#6A737D;--shiki-dark:#6A737D">//自定义</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  gfm: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  tables: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  breaks: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  pedantic: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  smartLists: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  smartypants: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#24292E;--shiki-dark:#E1E4E8">})</span></span></code></pre>
 <h3 id="常见问题">常见问题</h3>
 <blockquote>
 <h5 id="uncaught-typeerror-typeerror-marked-is-not-a-function">Uncaught TypeError TypeError: marked is not a function</h5>
 <p>解决方案：修改使用方法</p>
-<pre><code class="language-javascript">console.log(marked('I am using __markdown__.'));
-
-//改为
-console.log(marked.parse('I am using __markdown__.'));
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">marked</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'I am using __markdown__.'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">//改为</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">parse</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'I am using __markdown__.'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span></code></pre>
 </blockquote>
 <blockquote>
 <h5 id="sanitize-and-sanitizer-parameters-are-deprecated-since-version-070-should-not-be-used-and-will-be-removed-in-the-future-read-more-here-httpsmarkedjsorgusing-advancedmdoptions">sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: https://marked.js.org/#/USING_ADVANCED.md#options</h5>
@@ -260,52 +252,47 @@ console.log(marked.parse('I am using __markdown__.'));
 <p><a href="https://cloud.tencent.com/developer/article/1961057">使用marked解析markdown为html</a></p>
 <h2 id="highlightjs">highlight.js</h2>
 <p>代码高亮的库选用的是highlight.js</p>
-<pre><code class="language-bash">npm install highlight.js --save
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">npm</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> highlight.js</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --save</span></span></code></pre>
 <p>把highlight加入到js里面</p>
-<pre><code class="language-javascript">const highlight = require('highlight.js')
-
-marked.setOptions({
-    highlight: function(code) {
-        return highlight.highlightAuto(code).value
-    }
-})
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> highlight</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'highlight.js'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">setOptions</span><span style="color:#24292E;--shiki-dark:#E1E4E8">({</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">    highlight</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">code</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> highlight.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">highlightAuto</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(code).value</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">})</span></span></code></pre>
 <p>同时，在生成的html中引用highlight中对应的css就可以了。</p>
-<pre><code class="language-html">&lt;link href=&quot;node_modules/highlight.js/styles/github.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;&gt;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">link</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> href</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"node_modules/highlight.js/styles/github.css"</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> rel</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"stylesheet"</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> type</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"text/css"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
 <p>再写一个code的css外框</p>
-<pre><code class="language-css">pre {
-	background-color: #F6F8FF;
-	border-radius: 16px;
-	font-size: 16px;
-	padding: 29px 22px 22px 22px;
-	margin-top: 22px;
-	margin-bottom: 22px;
-	line-height: 1.2;
-	overflow-x: auto;
-}
-code {
-	position: relative;
-	background-color: unset !important;
-}
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#22863A;--shiki-dark:#85E89D">pre</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	background-color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">#F6F8FF</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	border-radius</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">16</span><span style="color:#D73A49;--shiki-dark:#F97583">px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	font-size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">16</span><span style="color:#D73A49;--shiki-dark:#F97583">px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	padding</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">29</span><span style="color:#D73A49;--shiki-dark:#F97583">px</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 22</span><span style="color:#D73A49;--shiki-dark:#F97583">px</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 22</span><span style="color:#D73A49;--shiki-dark:#F97583">px</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 22</span><span style="color:#D73A49;--shiki-dark:#F97583">px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	margin-top</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">22</span><span style="color:#D73A49;--shiki-dark:#F97583">px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	margin-bottom</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">22</span><span style="color:#D73A49;--shiki-dark:#F97583">px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	line-height</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">1.2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	overflow-x</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">auto</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#22863A;--shiki-dark:#85E89D">code</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	position</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">relative</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	background-color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">unset</span><span style="color:#D73A49;--shiki-dark:#F97583"> !important</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
 <p>大功告成</p>
 <h3 id="出现的问题">出现的问题</h3>
 <h4 id="code代码不换行">code代码不换行</h4>
 <p>解决方法，修改css中code</p>
-<pre><code class="language-css">code {
-	position: relative;
-	background-color: unset !important;
-	
-	/*元素内的空白保留，并允许换行*/
-	white-space: pre-wrap !important;
-	/*是否允许在单词内断句*/
-	word-wrap: break-word !important;
-	/*强调怎么样断句*/
-	/*word-break: break-all !important;*/
-}
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#22863A;--shiki-dark:#85E89D">code</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	position</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">relative</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	background-color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">unset</span><span style="color:#D73A49;--shiki-dark:#F97583"> !important</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6A737D;--shiki-dark:#6A737D">	/*元素内的空白保留，并允许换行*/</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	white-space</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">pre-wrap</span><span style="color:#D73A49;--shiki-dark:#F97583"> !important</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6A737D;--shiki-dark:#6A737D">	/*是否允许在单词内断句*/</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	word-wrap</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">break-word</span><span style="color:#D73A49;--shiki-dark:#F97583"> !important</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6A737D;--shiki-dark:#6A737D">	/*强调怎么样断句*/</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6A737D;--shiki-dark:#6A737D">	/*word-break: break-all !important;*/</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
 <p><a href="https://blog.csdn.net/qq_44787816/article/details/114340701">markDown转换html后code不换行问题_遇见的昨天的博客-CSDN博客_markdownsharp转换后不能换行</a></p>
 <h4 id="在本地预览有高亮但是在github-pages没有高亮">在本地预览有高亮，但是在github pages没有高亮</h4>
 <h2 id="完善网页和渲染">★完善网页和渲染</h2>
@@ -352,209 +339,204 @@ code {
 <p>这个时候已经可以把markdown转码为html并新建文件进行存储了，而且也有了代码高亮。但是网页只有markdown的内容，并没有header和footer，这不是一个完整的网页。</p>
 <p>所以我们这时候就可以设计一个自己想要的完整的网页，并预留出一个post div来存放markdown的内容，实现<code>hexo generate</code>把markdown渲染成html的功能。</p>
 <h3 id="加上header与footer进行渲染">加上header与footer进行渲染</h3>
-<pre><code class="language-javascript">var marked = require('marked');
-var fs = require(&quot;fs&quot;); //读取md文件内容
-const highlight = require('highlight.js');
-
-var my_renderer = new marked.Renderer();
-my_renderer.table = function (header, body) {
-  return `&lt;table class=&quot;table table-hover table-bordered&quot;&gt;${header}${body}&lt;/table&gt;`;
-};
-
-marked.setOptions({
-  renderer: my_renderer,
-  gfm: true,
-  tables: true,
-  breaks: true,
-  pedantic: false,
-  smartLists: true,
-  smartypants: false,
-  highlight: function(code) {
-    return highlight.highlightAuto(code).value;
-  },
-  
-});
-
-
-//读取md
-fs.readFile('README.md', 'utf-8', function (err, data) {
-  if (err) throw err;
-  var lexed = marked.lexer(data);
-  var html = marked.parser(lexed);
-
-  var title = 'test1';
-
-  //前部header网页，这里是示例，大家请自行设计自己喜欢的网页
-  var header = '&lt;!DOCTYPE html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;'+
-    '&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;&gt;&lt;title&gt;'+
-    title+
-    '&lt;/title&gt;&lt;base target=&quot;_blank&quot;&gt;&lt;/head&gt;'+
-    '&lt;body&gt;&lt;header id=&quot;header&quot; class=&quot;header d-flex align-items-center fixed-top&quot;&gt;...&lt;/header&gt;&lt;main id=&quot;main&quot;&gt;';
-  
-    
-    //后面的footer
-  var footer = '&lt;/main&gt;'+
-  '&lt;footer id=&quot;footer&quot; class=&quot;footer&quot;&gt;...&lt;/footer&gt;'+
-  '&lt;/body&gt;&lt;/html&gt;';
-
-
-  //创建文件，并写入html
-  fs.writeFile('./html/test1.html', header+html+footer, function(err) {
-    if (err) throw err;
-    console.log(&quot;数据写入成功！&quot;);
-  });
-});
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'marked'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fs </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"fs"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">); </span><span style="color:#6A737D;--shiki-dark:#6A737D">//读取md文件内容</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> highlight</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'highlight.js'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_renderer </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#D73A49;--shiki-dark:#F97583"> new</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Renderer</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">my_renderer.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">table</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#E36209;--shiki-dark:#FFAB70">header</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">body</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">  return</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `&#x3C;table class="table table-hover table-bordered">${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">header</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">body</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}&#x3C;/table>`</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">setOptions</span><span style="color:#24292E;--shiki-dark:#E1E4E8">({</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  renderer: my_renderer,</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  gfm: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  tables: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  breaks: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  pedantic: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  smartLists: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  smartypants: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#6F42C1;--shiki-dark:#B392F0">  highlight</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">code</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> highlight.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">highlightAuto</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(code).value;</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  },</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  </span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#24292E;--shiki-dark:#E1E4E8">});</span></span>
+<span class="line"><span class="line-number">23</span></span>
+<span class="line"><span class="line-number">24</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#6A737D;--shiki-dark:#6A737D">//读取md</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#24292E;--shiki-dark:#E1E4E8">fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">readFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'README.md'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'utf-8'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">data</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#D73A49;--shiki-dark:#F97583">  if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> lexed </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">lexer</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(data);</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> html </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">parser</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(lexed);</span></span>
+<span class="line"><span class="line-number">30</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> title </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'test1'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">32</span></span>
+<span class="line"><span class="line-number">33</span><span style="color:#6A737D;--shiki-dark:#6A737D">  //前部header网页，这里是示例，大家请自行设计自己喜欢的网页</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> header </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '&#x3C;!DOCTYPE html>&#x3C;head>&#x3C;meta charset="utf-8">'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span></span>
+<span class="line"><span class="line-number">35</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    '&#x3C;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">&#x3C;title>'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span></span>
+<span class="line"><span class="line-number">36</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    title</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span></span>
+<span class="line"><span class="line-number">37</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    '&#x3C;/title>&#x3C;base target="_blank">&#x3C;/head>'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    '&#x3C;body>&#x3C;header id="header" class="header d-flex align-items-center fixed-top">...&#x3C;/header>&#x3C;main id="main">'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">39</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  </span></span>
+<span class="line"><span class="line-number">40</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">41</span><span style="color:#6A737D;--shiki-dark:#6A737D">    //后面的footer</span></span>
+<span class="line"><span class="line-number">42</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> footer </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '&#x3C;/main>'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span></span>
+<span class="line"><span class="line-number">43</span><span style="color:#032F62;--shiki-dark:#9ECBFF">  '&#x3C;footer id="footer" class="footer">...&#x3C;/footer>'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span></span>
+<span class="line"><span class="line-number">44</span><span style="color:#032F62;--shiki-dark:#9ECBFF">  '&#x3C;/body>&#x3C;/html>'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">45</span></span>
+<span class="line"><span class="line-number">46</span></span>
+<span class="line"><span class="line-number">47</span><span style="color:#6A737D;--shiki-dark:#6A737D">  //创建文件，并写入html</span></span>
+<span class="line"><span class="line-number">48</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">writeFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'./html/test1.html'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, header</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">html</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">footer, </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">49</span><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">50</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"数据写入成功！"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">51</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  });</span></span>
+<span class="line"><span class="line-number">52</span><span style="color:#24292E;--shiki-dark:#E1E4E8">});</span></span></code></pre>
 <p>这样就构建了一个基本的html网页，但是，我们需要批量操作，把一个文件夹里面的所有markdown都转换成html，并且获取文件的名字作为title。</p>
 <h3 id="fs遍历markdown文件">fs遍历markdown文件</h3>
 <p>遍历文件夹</p>
-<pre><code class="language-javascript">var path = './markdown';
-fs.readdir(path, 'utf-8', function(err, files){
-  if (err) throw err;
-  files.forEach(function(file_name){
-    fs.stat(path+'/'+file_name, (err, stat)=&gt;{
-      if(stat.isFile()){
-        console.log('文件名:', file_name);
-      }else{
-        console.log('文件夹名:', file_name);
-      }
-    })
-  })
-})
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> path </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> './markdown'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">readdir</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(path, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'utf-8'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">files</span><span style="color:#24292E;--shiki-dark:#E1E4E8">){</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">  if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  files.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">forEach</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">file_name</span><span style="color:#24292E;--shiki-dark:#E1E4E8">){</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">stat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(path</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'/'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">file_name, (</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">stat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span><span style="color:#D73A49;--shiki-dark:#F97583">=></span><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">      if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(stat.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">isFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()){</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'文件名:'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, file_name);</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      }</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'文件夹名:'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, file_name);</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      }</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    })</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  })</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">})</span></span></code></pre>
 <p>通过遍历文件夹获取所有文件，然后遍历文件的内容，进行markdown转换</p>
-<pre><code class="language-javascript">var marked = require('marked');
-var fs = require(&quot;fs&quot;); //读取md文件内容
-const highlight = require('highlight.js');
-
-var my_renderer = new marked.Renderer();
-my_renderer.table = function (header, body) {
-  return `&lt;table class=&quot;table table-hover table-bordered&quot;&gt;${header}${body}&lt;/table&gt;`;
-};
-
-marked.setOptions({
-  renderer: my_renderer,
-  gfm: true,
-  tables: true,
-  breaks: true,
-  pedantic: false,
-  smartLists: true,
-  smartypants: false,
-  highlight: function(code) {
-    return highlight.highlightAuto(code).value;
-  },
-  
-});
-
-
-//读取md
-//markdown存放位置
-var path = './markdown';
-
-fs.readdir(path, 'utf-8', function(err, files){
-  if (err) throw err;
-  //获取每一个文件名字
-  files.forEach(function(file_name){
-    fs.stat(path+'/'+file_name, (err, stat)=&gt;{
-      if (err) throw err;
-
-      if(stat.isFile()){
-
-        fs.readFile(path+'/'+file_name, 'utf-8', function (err, data) {
-          if(err) throw err;
-          var lexed = marked.lexer(data);
-          var html = marked.parser(lexed);
-        
-          //去掉后缀获取文章标题
-          var title = file_name.substring(0, file_name.lastIndexOf(&quot;.&quot;));
-          var tag = 'acg';
-          var time = stat.mtime.toString(); //修改时间
-          time = time.substring(0, time.lastIndexOf(&quot;GMT&quot;));
-        
-          var header = 'header内容'+title+'在这里面添加信息，例如时间time和标签tag'+time+tag;
-          var footer = 'footer内容’;
-        
-          //创建文件，并写入html
-          fs.writeFile('./html/'+title+'.html', header+html+footer, function(err) {
-            if(err) throw err;
-            console.log(&quot;数据写入成功！&quot;);
-          });
-        });
-      }
-    })
-  })
-})
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'marked'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fs </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"fs"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">); </span><span style="color:#6A737D;--shiki-dark:#6A737D">//读取md文件内容</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> highlight</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'highlight.js'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_renderer </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#D73A49;--shiki-dark:#F97583"> new</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Renderer</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">my_renderer.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">table</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#E36209;--shiki-dark:#FFAB70">header</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">body</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">  return</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `&#x3C;table class="table table-hover table-bordered">${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">header</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">body</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}&#x3C;/table>`</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">setOptions</span><span style="color:#24292E;--shiki-dark:#E1E4E8">({</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  renderer: my_renderer,</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  gfm: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  tables: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  breaks: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  pedantic: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  smartLists: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  smartypants: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#6F42C1;--shiki-dark:#B392F0">  highlight</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">code</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> highlight.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">highlightAuto</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(code).value;</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  },</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  </span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#24292E;--shiki-dark:#E1E4E8">});</span></span>
+<span class="line"><span class="line-number">23</span></span>
+<span class="line"><span class="line-number">24</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#6A737D;--shiki-dark:#6A737D">//读取md</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#6A737D;--shiki-dark:#6A737D">//markdown存放位置</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> path </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> './markdown'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">28</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#24292E;--shiki-dark:#E1E4E8">fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">readdir</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(path, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'utf-8'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">files</span><span style="color:#24292E;--shiki-dark:#E1E4E8">){</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#D73A49;--shiki-dark:#F97583">  if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#6A737D;--shiki-dark:#6A737D">  //获取每一个文件名字</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  files.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">forEach</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">file_name</span><span style="color:#24292E;--shiki-dark:#E1E4E8">){</span></span>
+<span class="line"><span class="line-number">33</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">stat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(path</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'/'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">file_name, (</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">stat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span><span style="color:#D73A49;--shiki-dark:#F97583">=></span><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#D73A49;--shiki-dark:#F97583">      if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">35</span></span>
+<span class="line"><span class="line-number">36</span><span style="color:#D73A49;--shiki-dark:#F97583">      if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(stat.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">isFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()){</span></span>
+<span class="line"><span class="line-number">37</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">readFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(path</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'/'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">file_name, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'utf-8'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">data</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">39</span><span style="color:#D73A49;--shiki-dark:#F97583">          if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">40</span><span style="color:#D73A49;--shiki-dark:#F97583">          var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> lexed </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">lexer</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(data);</span></span>
+<span class="line"><span class="line-number">41</span><span style="color:#D73A49;--shiki-dark:#F97583">          var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> html </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> marked.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">parser</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(lexed);</span></span>
+<span class="line"><span class="line-number">42</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">43</span><span style="color:#6A737D;--shiki-dark:#6A737D">          //去掉后缀获取文章标题</span></span>
+<span class="line"><span class="line-number">44</span><span style="color:#D73A49;--shiki-dark:#F97583">          var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> title </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> file_name.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">substring</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, file_name.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">lastIndexOf</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"."</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
+<span class="line"><span class="line-number">45</span><span style="color:#D73A49;--shiki-dark:#F97583">          var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tag </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'acg'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">46</span><span style="color:#D73A49;--shiki-dark:#F97583">          var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> time </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stat.mtime.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">toString</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); </span><span style="color:#6A737D;--shiki-dark:#6A737D">//修改时间</span></span>
+<span class="line"><span class="line-number">47</span><span style="color:#24292E;--shiki-dark:#E1E4E8">          time </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> time.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">substring</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, time.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">lastIndexOf</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"GMT"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
+<span class="line"><span class="line-number">48</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">49</span><span style="color:#D73A49;--shiki-dark:#F97583">          var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> header </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'header内容'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">title</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'在这里面添加信息，例如时间time和标签tag'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">time</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">tag;</span></span>
+<span class="line"><span class="line-number">50</span><span style="color:#D73A49;--shiki-dark:#F97583">          var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> footer </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'footer内容’</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">;</span></span>
+<span class="line"><span class="line-number">51</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">52</span><span style="color:#6A737D;--shiki-dark:#6A737D">          //创建文件，并写入html</span></span>
+<span class="line"><span class="line-number">53</span><span style="color:#24292E;--shiki-dark:#E1E4E8">          fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">writeFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'./html/'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">title</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'.html'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, header</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">html</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">footer, </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span class="line-number">54</span><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">55</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"数据写入成功！"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">56</span><span style="color:#24292E;--shiki-dark:#E1E4E8">          });</span></span>
+<span class="line"><span class="line-number">57</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        });</span></span>
+<span class="line"><span class="line-number">58</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      }</span></span>
+<span class="line"><span class="line-number">59</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    })</span></span>
+<span class="line"><span class="line-number">60</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  })</span></span>
+<span class="line"><span class="line-number">61</span><span style="color:#24292E;--shiki-dark:#E1E4E8">})</span></span></code></pre>
 <h3 id="如果文本没有变化则不需要重新渲染">如果文本没有变化则不需要重新渲染</h3>
-<pre><code class="language-javascript">//判断文件是否存在
-fs.access('./html/'+title+'.html', fs.constants.F_OK, (err) =&gt; { 
-    if(err) {
-        //不存在，则创建文件，并写入html
-        writeNewFile(title, header, html, footer);
-    }else {
-        console.log('-'+title+'.html存在于当前目录中');
-        //文件存在，则比对文件内容，判断是否需要重写
-        fs.readFile('./html/'+title+'.html', 'utf-8', function (err, data){
-            if(err) throw err;
-            if(data != header+html+footer){
-                console.log(' - 但是文件已修改');
-                writeNewFile(title, header, html, footer);
-            }
-        })
-    }
-});
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">//判断文件是否存在</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">access</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'./html/'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">title</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'.html'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, fs.constants.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">F_OK</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, (</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">=></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> { </span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(err) {</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">        //不存在，则创建文件，并写入html</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">        writeNewFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(title, header, html, footer);</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'-'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">title</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'.html存在于当前目录中'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6A737D;--shiki-dark:#6A737D">        //文件存在，则比对文件内容，判断是否需要重写</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">readFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'./html/'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">title</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'.html'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'utf-8'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#E36209;--shiki-dark:#FFAB70">err</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">data</span><span style="color:#24292E;--shiki-dark:#E1E4E8">){</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(err) </span><span style="color:#D73A49;--shiki-dark:#F97583">throw</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> err;</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(data </span><span style="color:#D73A49;--shiki-dark:#F97583">!=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> header</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">html</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">footer){</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">' - 但是文件已修改'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6F42C1;--shiki-dark:#B392F0">                writeNewFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(title, header, html, footer);</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        })</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">});</span></span></code></pre>
 <h3 id="遍历html文件夹生成home页面的目录页">遍历html文件夹，生成home页面的目录页</h3>
 <ol>
 <li>fs遍历html文件，生成JSON文件</li>
 </ol>
-<pre><code class="language-javascript">/*================================
-markdown转html转换好了之后，统计html文件数量，生成目录数据
-================================= */
-function get_home_data(){
-  var fs = require(&quot;fs&quot;);
-
-  //所有文件要展示在home页面的内容
-  let home_data = []
-
-  //读取html
-  var path = './html';
-  let files = fs.readdirSync(path, 'utf-8');
-
-  //遍历文件
-  files.forEach(file_name =&gt;{
-    var file = fs.statSync(path+'/'+file_name);
-    if(file.isFile()){
-      
-      var time = file.mtime.toString(); 
-      time = time.substring(0, time.lastIndexOf(&quot; GMT&quot;));
-
-      // 由于readFile是异步读取文件，所以就相当于读取三个文件并打印的操作在同时进行，受延迟等影响，每次执行打印的顺序不固定。而readFileSync()是同步读取，所以按照顺序读取并打印a.txt、b.txt、c.txt，上一个文件未读取时不会读取下一个文件，所有这里使用readFileSync()
-      var summary = fs.readFileSync(path+'/'+file_name, 'utf-8').toString();
-      summary = summary.substring(summary.indexOf(&quot;&lt;p&gt;&quot;)+3, summary.indexOf(&quot;&lt;/p&gt;&quot;))
-      
-      const data = {};
-      //去掉后缀获取文章标题
-      data.title = file_name.substring(0, file_name.lastIndexOf(&quot;.&quot;));
-      data.tag = 'null';
-      data.time = time;
-      data.summary = summary;
-      data.url = path+'/'+file_name;
-
-      home_data.push(data);
-    }
-  })
-  return home_data;
-}
-
-
-let home_data = get_home_data();
-var string_data = JSON.stringify(home_data, null, 2)
-
-// 生成home页面目录数据
-var fs2 = require(&quot;fs&quot;);
-fs2.writeFileSync('./home_data.json', string_data);
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">/*================================</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">markdown转html转换好了之后，统计html文件数量，生成目录数据</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">================================= */</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> get_home_data</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(){</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fs </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"fs"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6A737D;--shiki-dark:#6A737D">  //所有文件要展示在home页面的内容</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">  let</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> home_data </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> []</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6A737D;--shiki-dark:#6A737D">  //读取html</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> path </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> './html'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">  let</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> files </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">readdirSync</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(path, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'utf-8'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">13</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#6A737D;--shiki-dark:#6A737D">  //遍历文件</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  files.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">forEach</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">file_name</span><span style="color:#D73A49;--shiki-dark:#F97583"> =></span><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">    var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> file </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">statSync</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(path</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'/'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">file_name);</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(file.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">isFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()){</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      </span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">      var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> time </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> file.mtime.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">toString</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); </span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      time </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> time.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">substring</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, time.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">lastIndexOf</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">" GMT"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
+<span class="line"><span class="line-number">21</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#6A737D;--shiki-dark:#6A737D">      // 由于readFile是异步读取文件，所以就相当于读取三个文件并打印的操作在同时进行，受延迟等影响，每次执行打印的顺序不固定。而readFileSync()是同步读取，所以按照顺序读取并打印a.txt、b.txt、c.txt，上一个文件未读取时不会读取下一个文件，所有这里使用readFileSync()</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#D73A49;--shiki-dark:#F97583">      var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> summary </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fs.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">readFileSync</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(path</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'/'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">file_name, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'utf-8'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">).</span><span style="color:#6F42C1;--shiki-dark:#B392F0">toString</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      summary </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> summary.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">substring</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(summary.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">indexOf</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"&#x3C;p>"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, summary.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">indexOf</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"&#x3C;/p>"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">))</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      </span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#D73A49;--shiki-dark:#F97583">      const</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> data</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {};</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#6A737D;--shiki-dark:#6A737D">      //去掉后缀获取文章标题</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      data.title </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> file_name.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">substring</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, file_name.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">lastIndexOf</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"."</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      data.tag </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'null'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      data.time </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> time;</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      data.summary </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> summary;</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      data.url </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> path</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'/'</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">file_name;</span></span>
+<span class="line"><span class="line-number">33</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      home_data.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">push</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(data);</span></span>
+<span class="line"><span class="line-number">35</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span class="line-number">36</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  })</span></span>
+<span class="line"><span class="line-number">37</span><span style="color:#D73A49;--shiki-dark:#F97583">  return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> home_data;</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">39</span></span>
+<span class="line"><span class="line-number">40</span></span>
+<span class="line"><span class="line-number">41</span><span style="color:#D73A49;--shiki-dark:#F97583">let</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> home_data </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> get_home_data</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
+<span class="line"><span class="line-number">42</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> string_data </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> JSON</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">stringify</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(home_data, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">null</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">43</span></span>
+<span class="line"><span class="line-number">44</span><span style="color:#6A737D;--shiki-dark:#6A737D">// 生成home页面目录数据</span></span>
+<span class="line"><span class="line-number">45</span><span style="color:#D73A49;--shiki-dark:#F97583">var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fs2 </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> require</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"fs"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">46</span><span style="color:#24292E;--shiki-dark:#E1E4E8">fs2.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">writeFileSync</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'./home_data.json'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, string_data);</span></span></code></pre>
 <ol start="2">
 <li>获取生成的json文件，生成目录并分页到home页</li>
 </ol>

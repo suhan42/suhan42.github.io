@@ -15,7 +15,7 @@
 - 本地校验：`validate:content` 通过 10 个文件，`validate:output` 通过 55 个 HTML 页面。
 - 发布产物：`main` 与 `origin/main` 同步，`site/` 与 `gh-pages` 树一致，`publish:pages:check` 通过。
 - 线上抽查：首页、文章页、自定义页和旧 URL 返回 HTTP 200；RSS 9 条、sitemap 35 个 URL、搜索索引 9 条，draft 未进入公开索引。
-- 当前剩余：人工视觉/移动端验收、日期与受控分类/标签确认、`views/fireworks2.html` 退役结论、vendor 未使用文件清理、代码高亮能力确认和提交文案。
+- 当前剩余：人工视觉/移动端验收、日期与受控分类/标签确认、`views/fireworks2.html` 退役结论、vendor 未使用文件清理、代码高亮视觉验收和提交文案。
 
 ## P0：迁移前基线
 
@@ -54,7 +54,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | published posts collection 数量正确 | √ | 输出校验确认 9 篇 published |
 | draft 不进入公开集合 | √ | `test.md` 仍生成独立页，但不进入首页、RSS、sitemap 和搜索索引 |
 | 内容校验脚本可用 | √ | `npm run validate:content` 通过 10 个文件 |
-| 站点资源不引用 `node_modules` | √ | highlight 样式复制到 `assets/vendor/` |
+| 站点资源不引用 `node_modules` | √ | 旧 highlight 样式已删除；当前构建不引用 `node_modules` |
 | 构建产物只在迁移分支本地验证 | √ | `npm run build` 生成 10 个文章页和静态资源 |
 | `.gitignore` 建立 | √ | 阻止 `node_modules/` 被提交；`site/` 作为发布产物提交 |
 | `.gitattributes` 统一文本文件 LF 提交 | √ | Markdown、HTML、JS、JSON、CSS、Nunjucks 和配置文件 |
@@ -97,6 +97,10 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | 删除旧脚本、旧数据和旧产物 | √ | `16f781b` 已删除根目录生成脚本、`tools/`、`home_data.json` 和 `htmls/`；确认记录见 git 历史 |
 | `node_modules` 退出 git 跟踪 | √ | `git ls-files node_modules` 当前为 0 |
 | 未使用依赖清理 | 部分完成 | `package.json` 只保留 `@11ty/eleventy` 和 `playwright`；`assets/vendor/` 仍有 Bootstrap、hc-mobile-nav 和 jQuery 文件，基础模板未加载，是否删除待确认 |
+| 代码块高亮方案确认 | √ | 选择 Shiki 4.6.0 直接接管 markdown-it，避免 `@shikijs/markdown-it@4.6.0` 的 markdown-it 15 依赖；详见 [markdown代码块渲染分析.md](markdown代码块渲染分析.md) |
+| 代码块高亮实现 | √ | Shiki 4.6.0 直接接管 markdown-it，使用 `github-light` / `github-dark` 双主题、`bundledLanguages` 全语言集和行号；旧 `highlight-github.css` 已删除；`npm run build` 和 `npm run validate:output` 通过 |
+| 代码块视觉验收 | 部分完成 | Playwright 已检查 C 自查表和 MySQL 自查表：`night` / `paper` 的 token、背景、行号正常，390px 下代码块内部横向滚动正常；MySQL 文章长 URL 造成的 46px 页面横向溢出属既有正文问题，待单独处理 |
+| Node.js 最低版本 >=20 | √ | `package.json` 和 `package-lock.json` 根包声明 `engines.node >=20`；README、AGENTS.md 和迁移文档已同步 |
 | `.nojekyll` 存在于发布根 | √ | `gh-pages` 根目录包含 `.nojekyll`，避免非必要 Jekyll 处理 |
 | GitHub Pages 发布源为 `gh-pages` 根目录 | √（建议人工复核设置页） | 线上已输出新站，`main` 根目录没有 `index.html`，说明当前不是 `main` 根目录发布；仓库内无法直接读取 Pages Source 配置 |
 | `gh-pages` 不合并回 `main` | √ | 发布分支只承载静态产物，源码和构建输入仍以 `main` 为准 |
@@ -106,7 +110,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | 本地完整构建通过 | √ | 内容校验 10 个文件、输出校验 55 个 HTML 页面，构建产物与当前 `site/` 一致 |
 | 发布检查脚本通过 | √ | `npm run publish:pages:check` 确认 `main`、`site/` 提交状态、必需产物和远端配置 |
 | 人工抽查通过 | 部分完成 | 已做只读 HTTP 抽查；首页、文章、自定义页、旧 URL 正常；视觉、双主题、移动端和每篇文章仍需人工浏览器验收 |
-| 拟提交信息已生成 | 待生成 | 文档整理完成后生成，不默认执行 commit |
+| 拟提交信息已生成 | √ | 本次 Shiki 高亮接入的拟提交文案已生成，未执行 commit |
 | 项目所有者明确要求执行提交 | 待确认 | 只有明确要求后才运行 `git commit` |
 | 合并迁移分支到 main | √ | `origin/main` 已包含迁移合并提交 |
 

@@ -1115,6 +1115,46 @@ hr {
   line-height: 1.6;
 }
 
+/* Shiki 高亮：构建期输出 token，night 使用 dark CSS 变量，paper 保留 light 默认色。 */
+.post-body pre.shiki {
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background-color: var(--surface-2);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+html[data-theme="night"] .post-body pre.shiki,
+html[data-theme="night"] .post-body pre.shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style, inherit) !important;
+  font-weight: var(--shiki-dark-font-weight, inherit) !important;
+  text-decoration: var(--shiki-dark-text-decoration, inherit) !important;
+}
+
+html[data-theme="paper"] .post-body pre.shiki {
+  background-color: var(--surface-2) !important;
+}
+
+.post-body pre.shiki .line-number {
+  display: inline-block;
+  min-width: 2.5em;
+  margin-right: 1em;
+  color: var(--text-3);
+  text-align: right;
+  user-select: none;
+}
+
+html[data-theme="night"] .post-body pre.shiki .line-number {
+  color: var(--text-3) !important;
+  background-color: transparent !important;
+}
+
 .post-body code {
   font-family: var(--font-mono);
 }

@@ -15,7 +15,7 @@
 | P2 Eleventy 骨架 | √ | Eleventy 3.1.8 安装、目录结构、最小模板、内容校验和首次构建通过 |
 | P3 页面模板与视觉 | √ | 首页、header/footer/sidebar、分页、文章页和双主题视觉重做完成 |
 | P4 站点能力 | √ | 归档、分类页、标签页、RSS、sitemap、搜索索引和输出校验完成 |
-| P5 清理与发布 | 收尾中 | 旧链路已删除，`site/` 已提交，`gh-pages` 与 `site/` 树一致，线上新站已返回新路由，文档已按现状回填；待人工视觉/移动端验收、日期与受控集合确认、旧页退役结论和提交确认 |
+| P5 清理与发布 | 收尾中 | 旧链路已删除，`site/` 已提交，`gh-pages` 与 `site/` 树一致，线上新站已返回新路由，代码高亮已接入；待人工视觉/移动端验收、日期与受控集合确认、旧页退役结论和提交确认 |
 
 当前剩余收尾项：
 
@@ -23,7 +23,7 @@
 2. 确认 `views/fireworks2.html` 的退役或保留结论；该文件已随 `views/` 删除，当前没有跳转目标。
 3. 补齐日期、受控分类和受控标签的确认记录；当前 front matter 值已在站点使用，但不能把旧数据或 `mtime` 当作确认证据。
 4. 复核 `assets/vendor/` 中尚未被基础模板加载的 Bootstrap、hc-mobile-nav 和 jQuery 文件是否删除。
-5. 确认代码块高亮能力：当前只引入 `highlight-github.css`，构建配置没有接入 highlight.js。
+5. 按 [markdown代码块渲染分析.md](markdown代码块渲染分析.md) 完成 Shiki 的人工视觉确认：C、C++、SQL、Shell、双主题、移动端和行号；Playwright 初步检查已通过。
 6. 生成拟提交文案；只有项目所有者明确要求时才执行 `git commit`。
 
 关键决策记录：
@@ -37,7 +37,7 @@
 
 环境差异记录：
 
-- 本机 Node.js 已从 v22.19.0 切换到 v24.22.2（通过 nvm 管理），Eleventy 3.x 要求 >=18，兼容。
+- 项目最低 Node.js 已提升到 >=20（`package.json` 的 `engines`）；本机 Node.js 为 v24.22.2，满足要求。Eleventy 3.x 本身仍支持 >=18。
 - PowerShell 5.1 在当前 sandbox 下读中文文件显示乱码，是显示层问题，文件本身编码正确；用 Node 或字节级检查确认编码。
 
 后续 AI 进入时，先读本节确认进度，再读 [changelog.md](changelog.md) 了解已完成的具体操作，不要重复已完成阶段。
@@ -160,7 +160,7 @@ P1 修改的是内容源。若迁移中止，front matter 对旧生成器无害�
 1. 使用 npm 包 `@11ty/eleventy@^3.1.8`。
 2. Eleventy 安装为 devDependency。
 3. 构建输出目录命名为 `site/`。
-4. 当前 Node.js `v22.19.0` 满足 Eleventy 3.x 的运行要求。
+4. 当前 Node.js `v24.22.2` 满足 Eleventy 3.x 的运行要求；Shiki 4.6 接入后项目最低版本为 >=20。
 
 ### 任务
 
@@ -178,7 +178,7 @@ P1 修改的是内容源。若迁移中止，front matter 对旧生成器无害�
 7. 实现 draft 过滤策略：`status` 不等于 `published` 的文章不进入 published posts collection、首页、RSS、sitemap 和搜索索引。
 8. 实现 `validate-content.mjs`，校验必填字段、slug 格式、slug 唯一性、date 格式、status 枚举、图片路径和重复 permalink。
 9. 将站点需要的 CSS、图片、字体、vendor 样式复制或整理到 `assets/`，并配置 passthrough 到 `site/assets/`。
-10. 将 highlight.js 样式复制为 `assets/vendor/highlight-github.css`，消除对 `node_modules` 的站点引用。
+10. 删除旧 highlight 样式；Shiki 接入后不再复制 highlight.js 样式，也不引用 `node_modules`。
 11. 输出最小文章页数据，验证 collection 数量、排序和 permalink。
 
 ### 依赖策略
@@ -320,6 +320,7 @@ P5 是唯一的大规模清理阶段。所有删除、移动退役和旧 URL 兼
 - `main` 与 `origin/main` 同步；`site/` 共 177 个跟踪文件，当前输出 55 个 HTML 页面和 14 个旧 URL 跳转页。
 - `gh-pages` 与 `main` 中 `site/` 子树一致；线上首页、文章页、自定义页和旧 URL 均返回 HTTP 200。
 - GitHub Pages 设置页仍建议人工截图复核，仓库内只能验证发布产物和线上行为，不能直接读取 Pages Source 配置。
+- Shiki 4.6.0 已通过 `eleventy.config.js` 直接接管 markdown-it，加载 `bundledLanguages` 全语言集；旧 `highlight-github.css` 已删除，`npm run build` 和 `npm run validate:output` 通过。
 
 ### 发布命令边界
 

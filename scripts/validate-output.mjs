@@ -1,4 +1,4 @@
-// 输出校验脚本：检查 site/ 构建产物中的死链、反斜杠路径、node_modules 引用和 published 文章数量。
+// 输出校验脚本：检查 site/ 构建产物中的死链、反斜杠路径、node_modules 引用、Shiki 代码块和 published 文章数量。
 // 发现任何问题 fail-fast 退出，不静默通过。
 
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
@@ -23,11 +23,24 @@ function walkDirectory(dir) {
 
 const allFiles = walkDirectory(SITE_DIR);
 const htmlFiles = allFiles.filter(f => f.endsWith('.html'));
+let shikiPageCount = 0;
 
 // 检查 HTML 页面中的站点内部链接是否指向存在的文件。
 for (const filePath of htmlFiles) {
   const content = readFileSync(filePath, 'utf8');
   const relativePath = filePath.replace(/\\/g, '/').replace(/^site\//, '/');
+
+  if (content.includes('highlight-github')) {
+    errors.push(`${relativePath}: 仍引用已删除的 highlight-github.css`);
+  }
+
+  if (content.includes('<pre class="shiki')) {
+    shikiPageCount += 1;
+  }
+
+  if (/<pre><code class="language-/.test(content)) {
+    errors.push(`${relativePath}: 存在未经过 Shiki 的代码块`);
+  }
 
   if (content.includes('node_modules')) {
     // marked 造轮子文章正文里的代码示例是合法内容，排除该文件中的代码块场景。
@@ -62,6 +75,14 @@ for (const filePath of htmlFiles) {
   }
 }
 
+if (existsSync(join(SITE_DIR, 'assets/vendor/highlight-github.css'))) {
+  errors.push('site/assets/vendor/highlight-github.css: 旧样式文件仍存在');
+}
+
+if (shikiPageCount === 0) {
+  errors.push('未发现任何 Shiki 代码块，Markdown 高亮可能未生效');
+}
+
 // 检查 published 文章页数量与预期一致（当前 9 篇 published + 1 篇 draft photo-test 也生成页面，但不在集合中）。
 const postsDir = join(SITE_DIR, 'posts');
 const postDirs = readdirSync(postsDir, { withFileTypes: true }).filter(e => e.isDirectory());
@@ -77,4 +98,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`输出校验通过：${htmlFiles.length} 个 HTML 页面，链接和资源完整，无 node_modules 引用，无反斜杠路径。`);
+console.log(`输出校验通过：${htmlFiles.length} 个 HTML 页面，${shikiPageCount} 个页面包含 Shiki 代码块，链接和资源完整，无 node_modules 引用，无反斜杠路径。`);

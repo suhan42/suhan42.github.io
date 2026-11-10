@@ -4,7 +4,9 @@
 
 本文记录本次迁移前的项目现状、真实运行链路、已确认的技术风险，以及 Hexo、Jekyll 和 Eleventy 的对比结论。它是开发计划与目标架构的证据基础，不是日常写作或发布手册。
 
-本文是迁移前快照。文中相对链接指向的旧脚本、`posts/`、`htmls/` 和 `home_data.json` 已从当前工作区移除，需要查看原文时从 `pre-eleventy-migration` 标签或 git 历史读取；当前内容状态见 [content-inventory.md](content-inventory.md)。
+归档说明：本文只保留迁移前证据，不再参与当前发布流程。
+
+本文是迁移前快照。文中相对链接指向的旧脚本、`posts/`、`htmls/` 和 `home_data.json` 已从当前工作区移除，需要查看原文时从 `pre-eleventy-migration` 标签或 git 历史读取；当前内容状态见 [content-inventory.md](../../content-inventory.md)。
 
 ## 结论摘要
 
@@ -113,4 +115,4 @@ Eleventy 是零客户端框架的静态站点生成器，支持 Markdown、front
 
 纯浏览器解析 Markdown 不作为主方案：GitHub Pages 对裸 Markdown 内容协商支持不可靠，SEO 弱，首屏依赖客户端解析，分类、标签、分页和搜索逻辑会继续堆积在客户端。
 
-目标文件树、目录职责、数据模型、模板体系和发布输出见 [target-architecture.md](target-architecture.md)。阶段拆分、验收标准、回滚边界和风险控制见 [migration-plan.md](migration-plan.md)。
+目标文件树、目录职责、数据模型、模板体系和发布输出见 [target-architecture.md](../../target-architecture.md)。阶段拆分、验收标准、回滚边界和风险控制见 [migration-plan.md](../../migration-plan.md)。

@@ -19,7 +19,7 @@
 ## 1. 文档分工与维护
 
 - `README.md` 做"总资料"（最详细，包含项目结构、快速开始、写作流程和发布方式）；`AGENTS.md` 只做 AI/agent 的参考和行为规范文档；`CLAUDE.md` 引用 `@AGENTS.md`。
-- `docs/current-analysis.md` 是迁移前的现状分析证据；`docs/target-architecture.md` 是目标架构唯一事实来源；`docs/migration-plan.md` 是阶段任务和回滚边界；`docs/content-inventory.md` 是内容清点表；`docs/legacy-url-map.md` 是旧 URL 清单；`docs/release-checklist.md` 是人工发布验收清单。
+- `docs/archive/2026-11-migration/current-analysis.md` 是迁移前的现状分析证据；`docs/target-architecture.md` 是目标架构唯一事实来源；`docs/migration-plan.md` 是阶段任务和回滚边界；`docs/content-inventory.md` 是内容清点表；`docs/legacy-url-map.md` 是旧 URL 清单；`docs/release-checklist.md` 是人工发布验收清单。
 - 文档中有创建日期和修改日期。
 - 每次修改代码、模板、配置或脚本后，主动判断是否需要更新 `docs/changelog.md` 和相关文档（README、目标架构、迁移计划、发布清单、内容清点表）；结构性变更、新功能、目录调整或依赖变更必须更新，小修小补可跳过。不需要更新时在最终回复中简要说明判断结果即可。
 - 文档表格、清单和状态快照中的完成状态统一用 `√` 表示，不写"已完成"；清理过时描述时直接删除旧描述，不逐条改写"不再使用"。**Markdown 任务列表语法例外**：`- [ ]` / `- [x]` 复选框是语法关键字，完成项写 `- [x]`、未完成写 `- [ ]`，不能把 `√` 塞进方括号；`√` 约定只适用于表格单元格和状态行等非 checkbox 语境。
@@ -27,7 +27,7 @@
 ## 2. 工具与验证（固定命令）
 
 - 工具顺序：`git status --short` 确认现场 → `rg --files` 或 glob 找文件 → 读文件 → `rg` 查关键字 → `apply_patch` 改文件 → 验证。不用 `cat > file` 这类整文件覆盖写法。
-- Node.js 版本要求 >= 18；构建期依赖通过 npm 管理，不使用 Python 或 Ruby 构建工具。
+- Node.js 版本要求 >= 20；构建期依赖通过 npm 管理，不使用 Python 或 Ruby 构建工具。
 - Eleventy 构建命令在 P2 实现后通过 `npm run build` 触发；P2 完成前不得伪造验证结果，如实报告当前可用命令。
 - 前端或模板改动后按发布清单逐项人工验收，不跳过视觉和交互检查。
 - 收尾必跑 `git diff --check`。

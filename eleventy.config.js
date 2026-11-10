@@ -1,8 +1,40 @@
 // Eleventy 构建配置：输入目录 src/，输出目录 site/。
 // 仅注册构建规则和目录结构，不承载业务内容；配置按 ES Module 执行。
 import { readFileSync } from "node:fs";
+import { bundledLanguages, createHighlighter } from "shiki";
+import { transformerRenderLineNumber } from "@shikijs/transformers";
 
 const customPages = JSON.parse(readFileSync(new URL("./src/_data/custom-pages.json", import.meta.url), "utf8"));
+
+// 构建期只创建一次高亮器，加载 Shiki 内置语言全集，后续文章新增语言不需要改配置。
+const highlighter = await createHighlighter({
+  themes: ["github-light", "github-dark"],
+  langs: Object.keys(bundledLanguages)
+});
+const loadedLanguages = new Set(highlighter.getLoadedLanguages());
+const warnedLanguages = new Set();
+
+// 未知语言回退到 text，并只提示一次，避免单篇文章的标记错误中断整站构建。
+function highlightCode(code, lang) {
+  const requested = (lang || "text").toLowerCase();
+  let language = requested;
+  if (language !== "text" && !loadedLanguages.has(language)) {
+    if (!warnedLanguages.has(language)) {
+      console.warn(`[Shiki] 未加载语言 "${language}"，按 text 渲染。`);
+      warnedLanguages.add(language);
+    }
+    language = "text";
+  }
+
+  return highlighter.codeToHtml(code.replace(/\n$/, ""), {
+    lang: language,
+    themes: {
+      light: "github-light",
+      dark: "github-dark"
+    },
+    transformers: [transformerRenderLineNumber()]
+  });
+}
 
 // 把标题内的实体和标签转成纯文本，用于生成目录文案。
 function headingText(value) {
@@ -58,6 +90,11 @@ function renderTableOfContents(headings) {
 export default function (eleventyConfig) {
   // 清理 Nunjucks 块标签两侧的缩进与换行，避免构建产物出现只有空格的尾随行。
   eleventyConfig.setNunjucksEnvironmentOptions({ trimBlocks: true, lstripBlocks: true });
+
+  // 让 markdown-it 使用 Shiki 生成构建期 HTML，页面运行时不加载高亮库。
+  eleventyConfig.amendLibrary("md", (md) => {
+    md.options.highlight = highlightCode;
+  });
 
   // 把根目录 assets/ 原样复制到输出目录的 assets/ 下；src/static/ 的内容（.nojekyll）复制到输出根目录。
   eleventyConfig.addPassthroughCopy({ "assets": "assets", "src/static": "." });

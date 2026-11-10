@@ -17,13 +17,17 @@
 ```text
 suhan42.github.io/
 ├─ docs/
-│  ├─ current-analysis.md
+│  ├─ archive/
+│  │  ├─ README.md
+│  │  └─ 2026-11-migration/
+│  │     └─ current-analysis.md
 │  ├─ target-architecture.md
 │  ├─ migration-plan.md
 │  ├─ content-inventory.md
 │  ├─ legacy-url-map.md
 │  ├─ release-checklist.md
-│  └─ changelog.md
+│  ├─ changelog.md
+│  └─ markdown代码块渲染分析.md
 │
 ├─ assets/
 │  ├─ custom/
@@ -43,8 +47,7 @@ suhan42.github.io/
 │     ├─ bootstrap/
 │     ├─ bootstrap-icons/
 │     ├─ hc-mobile-nav/
-│     ├─ jquery-1.11.0.min.js
-│     └─ highlight-github.css
+│     └─ jquery-1.11.0.min.js
 │
 ├─ scripts/
 │  ├─ validate-content.mjs
@@ -149,7 +152,7 @@ export default function (eleventyConfig) {
 
 Eleventy 的文章集合通过 `addCollection("publishedPosts")` 从 `src/content/posts/*.md` 和 `*.html` 构建，按 `date` 倒序排序，只保留 `status === "published"` 的文章。分类和标签聚合页分别通过 `categories` 和 `allTags` 集合从文章源派生，不依赖 Eleventy 的 `tags` 概念充当业务分类。
 
-当前构建配置没有接入 highlight.js；`assets/vendor/highlight-github.css` 仍由 `base.njk` 引用，但生成的代码块没有 `hljs` 标记。是否需要恢复高亮能力，应在发布收尾时单独确认，不能把样式表存在等同于高亮已经生效。
+当前构建配置已接入 Shiki 4.6.0，直接接管 markdown-it 的 `highlight`，使用 `github-light` / `github-dark` 双主题、`bundledLanguages` 全语言集和行号；旧 `assets/vendor/highlight-github.css` 已删除。高亮方案和验收边界见 [markdown代码块渲染分析.md](markdown代码块渲染分析.md)；Playwright 初步截图已通过，人工最终确认尚未完成。
 
 ## 内容模型
 
@@ -313,7 +316,9 @@ npm run publish:pages
 
 `node_modules/` 必须从 git 索引移除并加入 `.gitignore`。依赖通过 `package.json` 和 `package-lock.json` 固定，发布前由人工执行 `npm ci`。构建期依赖使用 devDependencies；站点只复制必要的 CSS、字体、图片和脚本到 `assets/vendor/`。
 
-`assets/` 存放站点实际需要的静态资源。当前基础模板只使用 `bootstrap-icons`、`highlight-github.css` 和站点自己的 CSS/JS；`assets/vendor/` 仍保留 Bootstrap、hc-mobile-nav 和 jQuery 文件，是否删除需要按实际引用复核。旧生成脚本、`tools/`、`htmls/`、重复的 `home_data.json` 和旧的 `require.js` 已在 P5 清理提交中退役。
+项目最低 Node.js 版本为 `>=20`（`package.json` 的 `engines`）；Eleventy 3.1.8 本身仍支持 Node >=18，但 Shiki 4.6 接入要求 Node >=20。
+
+`assets/` 存放站点实际需要的静态资源。当前基础模板只使用 `bootstrap-icons` 和站点自己的 CSS/JS；旧 `highlight-github.css` 已删除，`assets/vendor/` 仍保留 Bootstrap、hc-mobile-nav 和 jQuery 文件，是否删除需要按实际引用复核。旧生成脚本、`tools/`、`htmls/`、重复的 `home_data.json` 和旧的 `require.js` 已在 P5 清理提交中退役。
 
 `.gitattributes` 和 `.gitignore` 统一 LF 提交、二进制文件和忽略规则。新文件禁止 BOM。文档、注释和提交信息使用中文。
 

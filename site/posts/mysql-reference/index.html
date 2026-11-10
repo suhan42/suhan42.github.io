@@ -28,7 +28,6 @@
   <link href="/assets/images/suhan.png" rel="icon">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="/assets/css/main.css" rel="stylesheet">
-  <link href="/assets/vendor/highlight-github.css" rel="stylesheet">
 </head>
 <body>
   <a class="visually-hidden" href="#main">跳到主要内容</a>
@@ -172,46 +171,37 @@
 <p>检查安装
 rpm -qa | grep mysql</p>
 <p>linux管理命令</p>
-<pre><code>systemcrl (start/restart/stop) mysql.service
-
-service mysqld start 			
-systemcrl start mysql.service  			开启MySQL服务
-（只要没有错误信息就表示已经正常启动了）
-systemcrl stop mysql.service			关闭MySQL服务
-systemctl restart mysql.servic			重启MySQL服务 
-service mysqld status 					查看服务状态
-
-systemcrl enable mysql.service 			设置开机自启动(一般默认都开着)
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>systemcrl (start/restart/stop) mysql.service</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>service mysqld start 			</span></span>
+<span class="line"><span class="line-number">4</span><span>systemcrl start mysql.service  			开启MySQL服务</span></span>
+<span class="line"><span class="line-number">5</span><span>（只要没有错误信息就表示已经正常启动了）</span></span>
+<span class="line"><span class="line-number">6</span><span>systemcrl stop mysql.service			关闭MySQL服务</span></span>
+<span class="line"><span class="line-number">7</span><span>systemctl restart mysql.servic			重启MySQL服务 </span></span>
+<span class="line"><span class="line-number">8</span><span>service mysqld status 					查看服务状态</span></span>
+<span class="line"><span class="line-number">9</span><span></span></span>
+<span class="line"><span class="line-number">10</span><span>systemcrl enable mysql.service 			设置开机自启动(一般默认都开着)</span></span></code></pre>
 <p>Windows
 管理员身份启动cmd</p>
-<pre><code>C:\WINDOWS\system32&gt; net start mysql57 			启动
-C:\WINDOWS\system32&gt; net stop mysql57 			关闭
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>C:\WINDOWS\system32> net start mysql57 			启动</span></span>
+<span class="line"><span class="line-number">2</span><span>C:\WINDOWS\system32> net stop mysql57 			关闭</span></span></code></pre>
 <hr>
 <p>SQL语句：</p>
 <p>登录mysql</p>
-<pre><code class="language-sql">mysql -p
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mysql </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">p</span></span></code></pre>
 <p>登录mysql的root</p>
-<pre><code class="language-sql">mysql -u root -p
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mysql </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">u </span><span style="color:#D73A49;--shiki-dark:#F97583">root</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">p</span></span></code></pre>
 <p>退出</p>
-<pre><code class="language-sql">mysql&gt; ctrl+c
-mysql&gt; exit
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mysql</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ctrl</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">c</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mysql</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> exit</span></span></code></pre>
 <p>使用</p>
-<pre><code class="language-sql">use mysql;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">use</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysql;</span></span></code></pre>
 <p>设置/重置MySQL登录密码</p>
-<pre><code class="language-sql">set password = password('我是密码');
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#D73A49;--shiki-dark:#F97583"> password</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#D73A49;--shiki-dark:#F97583"> password</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'我是密码'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
 <p>新刷系统权限</p>
-<pre><code class="language-sql">flush privileges;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">flush privileges;</span></span></code></pre>
 <p>查看所有编码字符</p>
-<pre><code class="language-sql">show variables like &quot;%character%&quot;;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show variables </span><span style="color:#D73A49;--shiki-dark:#F97583">like</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "%character%"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <h3 id="字符集">字符集</h3>
 <p><strong>一般选择utf8.下面介绍一下utf8与utfmb4的区别。</strong></p>
 <p>utf8mb4兼容utf8，且比utf8能表示更多的字符。至于什么时候用，看你的做什么项目了，到 http://blog.csdn.net/leelyliu/article/details/52879685 看unicode编码区从1 ～ 126就属于传统utf8区，当然utf8mb4也兼容这个区，126行以下就是utf8mb4扩充区，什么时候你需要存储那些字符，你才用utf8mb4,否则只是浪费空间。</p>
@@ -251,62 +241,56 @@ mysql&gt; exit
 <li><code>like</code>关键字用于匹配名称</li>
 <li><code>where</code>关键字用于指定查找范围条件</li>
 </ul>
-<pre><code class="language-sql">SHOW DATABASES [LIKE 'pattern'|WHERE expr];
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">SHOW DATABASES [LIKE 'pattern'|WHERE expr];</span></span></code></pre>
 <h4 id="新建数据库">新建数据库</h4>
 <ul>
 <li><code>if not exists</code>表示查看是否已存在，避免出现创建已存在的数据库时出现的错误</li>
 </ul>
-<pre><code class="language-sql">create database 数据库名称;
-CREATE SCHEMA 库名称;
-
-CREATE {DATABASE|SCHEMA} [IF NOT EXISTS] db_name
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> database</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 数据库名称</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> SCHEMA</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 库名称</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="color:#D73A49;--shiki-dark:#F97583">DATABASE</span><span style="color:#24292E;--shiki-dark:#E1E4E8">|</span><span style="color:#D73A49;--shiki-dark:#F97583">SCHEMA</span><span style="color:#24292E;--shiki-dark:#E1E4E8">} [IF NOT EXISTS] db_name</span></span></code></pre>
 <h4 id="修改数据库">修改数据库</h4>
-<pre><code class="language-sql">ALTER DATABASE 库名称;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">ALTER</span><span style="color:#D73A49;--shiki-dark:#F97583"> DATABASE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 库名称;</span></span></code></pre>
 <h4 id="删除数据库">删除数据库</h4>
 <ul>
 <li><code>IF EXISTS</code>判断是否存在，避免出现删除不存在的数据库时出现的错误</li>
 </ul>
-<pre><code class="language-sql">drop database [IF EXISTS] 数据库名称;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">drop</span><span style="color:#D73A49;--shiki-dark:#F97583"> database</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [IF EXISTS] 数据库名称;</span></span></code></pre>
 <h4 id="连接数据库">连接数据库</h4>
-<pre><code class="language-sql">use 数据库名称;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">use</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 数据库名称;</span></span></code></pre>
 <p>查看当前数据库信息</p>
-<pre><code class="language-sql">status
-
-Connection id:          11
-Current database:       user_0518
-Current user:           root@localhost
-SSL:                    Cipher in use is ECDHE-RSA-AES128-GCM-SHA256
-Using delimiter:        ;
-Server version:         5.7.30-log MySQL Community Server (GPL)
-Protocol version:       10
-Connection:             localhost via TCP/IP
-Server characterset:    latin1
-Db     characterset:    latin1
-Client characterset:    gbk
-Conn.  characterset:    gbk
-TCP port:               3306
-Uptime:                 47 min 55 sec
-
-1.当前链接的id号
-2.当前选择的使用的数据库
-3.当前链接的登录用户
-4.是否使用SSL
-5.行终结符是分号
-6.当前mysql服务器的版本号
-7.协议版本
-8.使用的链接类型
-9.服务器使用的字符类型
-10.数据库使用的字符类型
-11.客户端使用的字符类型
-12.链接使用的字符类型
-13.链接端口号
-14.时间
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">status</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">Connection</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> id:          </span><span style="color:#005CC5;--shiki-dark:#79B8FF">11</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Current </span><span style="color:#D73A49;--shiki-dark:#F97583">database</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:       user_0518</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Current user:           </span><span style="color:#D73A49;--shiki-dark:#F97583">root</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@localhost</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">SSL</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:                    Cipher </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#D73A49;--shiki-dark:#F97583"> use</span><span style="color:#D73A49;--shiki-dark:#F97583"> is</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ECDHE</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">RSA</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">AES128</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">GCM</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">SHA256</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">Using</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> delimiter:        ;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">Server</span><span style="color:#D73A49;--shiki-dark:#F97583"> version</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:         </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">30</span><span style="color:#D73A49;--shiki-dark:#F97583">-log</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> MySQL Community </span><span style="color:#D73A49;--shiki-dark:#F97583">Server</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (GPL)</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Protocol </span><span style="color:#D73A49;--shiki-dark:#F97583">version</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:       </span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">Connection</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:             localhost via </span><span style="color:#D73A49;--shiki-dark:#F97583">TCP/</span><span style="color:#24292E;--shiki-dark:#E1E4E8">IP</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">Server</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> characterset:    latin1</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Db     characterset:    latin1</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Client characterset:    gbk</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Conn.  characterset:    gbk</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">TCP</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> port:               </span><span style="color:#005CC5;--shiki-dark:#79B8FF">3306</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Uptime:                 </span><span style="color:#005CC5;--shiki-dark:#79B8FF">47</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> min </span><span style="color:#005CC5;--shiki-dark:#79B8FF">55</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sec</span></span>
+<span class="line"><span class="line-number">17</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.当前链接的id号</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.当前选择的使用的数据库</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.当前链接的登录用户</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.是否使用SSL</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.行终结符是分号</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#005CC5;--shiki-dark:#79B8FF">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.当前mysql服务器的版本号</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#005CC5;--shiki-dark:#79B8FF">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.协议版本</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#005CC5;--shiki-dark:#79B8FF">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.使用的链接类型</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#005CC5;--shiki-dark:#79B8FF">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.服务器使用的字符类型</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.数据库使用的字符类型</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#005CC5;--shiki-dark:#79B8FF">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.客户端使用的字符类型</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#005CC5;--shiki-dark:#79B8FF">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.链接使用的字符类型</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#005CC5;--shiki-dark:#79B8FF">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.链接端口号</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#005CC5;--shiki-dark:#79B8FF">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.时间</span></span></code></pre>
 <hr>
 <h3 id="table">TABLE</h3>
 <table>
@@ -371,23 +355,22 @@ Uptime:                 47 min 55 sec
 </ol>
 <h4 id="创建表">创建表</h4>
 <p>（表创建定义+表选项+分区选项...）</p>
-<pre><code class="language-sql">create table 表名称(
-	字段名称 数据类型 [DEFAULT 默认值],
-	字段名称 数据类型 [DEFAULT 默认值],
-	其他字段...,
-    [表级完整性约束条件]
-)[engine=引擎类型];
-
-
-创建表例子：
-mysql&gt; create table user_1(
-    -&gt; id int AUTO_INCREMENT PRIMARY KEY,
-    -&gt; name varchar(10) NOT NULL,
-    -&gt; sex char(5) DEFAULT 0,
-    -&gt; age int,
-    -&gt; )
-    -&gt; ;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 表名称</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	字段名称 数据类型 [DEFAULT 默认值],</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	字段名称 数据类型 [DEFAULT 默认值],</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	其他字段...,</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    [表级完整性约束条件]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)[engine=引擎类型];</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">创建表例子：</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mysql</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#D73A49;--shiki-dark:#F97583"> create</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1(</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">    -></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> id </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> AUTO_INCREMENT </span><span style="color:#D73A49;--shiki-dark:#F97583">PRIMARY KEY</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">    -></span><span style="color:#D73A49;--shiki-dark:#F97583"> name</span><span style="color:#D73A49;--shiki-dark:#F97583"> varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">NOT NULL</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">    -></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sex </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">DEFAULT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">    -></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> age </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">    -></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> )</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">    -></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ;</span></span></code></pre>
 <ul>
 <li>
 <p><code>TEMPORARY</code>关键字表示该语句创建的是<strong>临时表</strong>，默认是<strong>持久表</strong></p>
@@ -403,52 +386,42 @@ mysql&gt; create table user_1(
 </li>
 <li>
 <p><code>PRIMARY KEY</code>关键字设置表的<strong>主键</strong>，主键必须唯一，必须是NOT NULL，如果有多个主键，则用都逗号隔开。</p>
-<pre><code class="language-sql">PRIMARY KEY(id)
-PRIMARY KEY(id, id2)
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">PRIMARY KEY</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(id)</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">PRIMARY KEY</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(id, id2)</span></span></code></pre>
 </li>
 </ul>
 <h4 id="查看库所有表">查看库所有表</h4>
-<pre><code class="language-sql">SHOW [FULL] TABLE [FROM 库名称] [LIKE 'pattern'|WHERE expr];
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">SHOW [FULL] </span><span style="color:#D73A49;--shiki-dark:#F97583">TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [FROM 库名称] [LIKE 'pattern'|WHERE expr];</span></span></code></pre>
 <h4 id="删除表">删除表</h4>
-<pre><code class="language-sql">drop table 表名;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">drop</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表名;</span></span></code></pre>
 <h4 id="查看表信息">查看表信息</h4>
-<pre><code class="language-sql">SHOW [FULL] COLUMNS {FROM|IN} 表名 [{FROM|IN} 数据库名] [LIKE 'pattern'|WHERE expr];
-
-或者简写：
-{DESCRIBE|desc} 表名称;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">SHOW [FULL] COLUMNS {</span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8">|</span><span style="color:#D73A49;--shiki-dark:#F97583">IN</span><span style="color:#24292E;--shiki-dark:#E1E4E8">} 表名 [{FROM|IN} 数据库名] [LIKE 'pattern'|WHERE expr];</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">或者简写：</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">{DESCRIBE|</span><span style="color:#D73A49;--shiki-dark:#F97583">desc</span><span style="color:#24292E;--shiki-dark:#E1E4E8">} 表名称;</span></span></code></pre>
 <h4 id="重命名表">重命名表</h4>
-<pre><code class="language-sql">rename table 旧表名 to 新表名;
-
-alter table 旧表名 rename [to] 新的表名;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">rename </span><span style="color:#D73A49;--shiki-dark:#F97583">table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 旧表名 </span><span style="color:#D73A49;--shiki-dark:#F97583">to</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 新表名;</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 旧表名 rename [to] 新的表名;</span></span></code></pre>
 <h4 id="修改表字段列">修改表字段（列）</h4>
 <h5 id="表中添加字段add">表中添加字段ADD</h5>
-<pre><code class="language-sql">alter table 操作的表名 
-add [column] 字段名称 字段类型 [NOT NULL] [default 默认内容][添加位置（after 后者字段）];
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 操作的表名 </span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">add</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [column] 字段名称 字段类型 [NOT NULL] [default 默认内容][添加位置（after 后者字段）];</span></span></code></pre>
 <ul>
 <li>添加位置那里，<code>AFTER</code>则会添加到后者字段的后面，还可以使用<code>first</code>添加到表的第一列，否则则默认添加到<strong>末尾</strong>。</li>
 </ul>
 <h5 id="修改字段名change">修改字段名CHANGE</h5>
-<pre><code class="language-sql">alter table 表名字 
-change [column] 字段原名 字段新名 字段类型 [NOT NULL][DEFAULT],
-change 字段原名2 字段新名2 字段类型2;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表名字 </span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">change [column] 字段原名 字段新名 字段类型 [NOT NULL][DEFAULT],</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">change 字段原名2 字段新名2 字段类型2;</span></span></code></pre>
 <p>可以同时修改多个字段，只需要用逗号隔开</p>
 <h5 id="修改默认值alter">修改默认值ALTER</h5>
-<pre><code class="language-sql">alter table 表 ALTER [COLUMN] 字段名 SET DEFAULT 默认值;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">ALTER</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [COLUMN] 字段名 </span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#D73A49;--shiki-dark:#F97583"> DEFAULT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 默认值;</span></span></code></pre>
 <h5 id="修改字段类型modify">修改字段类型MODIFY</h5>
 <p>只能修改字段类型，通过<code>FIRST</code>和<code>AFTER</code>在表中的位置，不能修改字段名</p>
-<pre><code class="language-sql">alter table 表 modify [COLUMN] 字段名 字段类型 FIRST;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">modify</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [COLUMN] 字段名 字段类型 </span><span style="color:#D73A49;--shiki-dark:#F97583">FIRST</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <h5 id="删除字段">删除字段</h5>
-<pre><code class="language-sql">alter table 表名 drop [COLUMN] 字段名;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表名 </span><span style="color:#D73A49;--shiki-dark:#F97583">drop</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [COLUMN] 字段名;</span></span></code></pre>
 <hr>
 <h3 id="数据更新">数据更新</h3>
 <h4 id="插入数据insert">插入数据INSERT</h4>
@@ -457,33 +430,28 @@ change 字段原名2 字段新名2 字段类型2;
 <li><code>DEFAULT</code>默认属性，可以填<strong>DEFAULT</strong>来设置为默认值</li>
 <li><code>AUTO_INCREMENT</code>自增属性的，在insert语句中最后只会引用0，所以可以直接填<strong>0</strong></li>
 </ul>
-<pre><code class="language-sql">insert [into] 表(列1,列2) {values|value} ('内容','内容');
-例子：
-insert into user_1(id,name) values(1,'admin');
-
-如果插入所有数据，可以不指定插入的字段名：但是带有字段名更加安全。
-insert into user_1 values(0,'admin',1,DEFAULT);
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">insert</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [into] 表(列1,列2) {</span><span style="color:#D73A49;--shiki-dark:#F97583">values</span><span style="color:#24292E;--shiki-dark:#E1E4E8">|</span><span style="color:#D73A49;--shiki-dark:#F97583">value</span><span style="color:#24292E;--shiki-dark:#E1E4E8">} (</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'内容'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'内容'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">例子：</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">insert into</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1(id,</span><span style="color:#D73A49;--shiki-dark:#F97583">name</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">values</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'admin'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">如果插入所有数据，可以不指定插入的字段名：但是带有字段名更加安全。</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">insert into</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1 </span><span style="color:#D73A49;--shiki-dark:#F97583">values</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'admin'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#D73A49;--shiki-dark:#F97583">DEFAULT</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
 <p>插入部分列值数据：</p>
-<pre><code class="language-sql">INSERT 表 SET 列=&quot;内容&quot;;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">INSERT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 列</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"内容"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <p>插入子查询数据</p>
-<pre><code class="language-sql">INSERT 表 select ...
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">INSERT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ...</span></span></code></pre>
 <h4 id="修改数据update">修改数据UPDATE</h4>
-<pre><code class="language-SQL">update 表 set 列名1='内容', 行名2='内容' [where 条件][order by...][limit...];
-例子：
-update user_1 set name='user' where id=1;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">update</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 列名1</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'内容'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, 行名2</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'内容'</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [where 条件][order by...][limit...];</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">例子：</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">update</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1 </span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#D73A49;--shiki-dark:#F97583"> name=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'user'</span><span style="color:#D73A49;--shiki-dark:#F97583"> where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> id</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <h4 id="删除数据delete">删除数据DELETE</h4>
 <p>delete删除的是表内的数据，不是关于表的定义</p>
-<pre><code class="language-SQL">delete from 表 [where 条件][order by...][limit...];
-例子：
-delete from user_1 where id=0010;
-
-清空表：
-delete from user_1;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">delete</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 [where 条件][order by...][limit...];</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">例子：</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">delete</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1 </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> id</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0010</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">清空表：</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">delete</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1;</span></span></code></pre>
 <hr>
 <h3 id="数据查询select">数据查询SELECT</h3>
 <h4 id="关系运算">关系运算</h4>
@@ -528,51 +496,44 @@ R÷S
 $$</p>
 <hr>
 <p>select可以进行各种运算，例如执行下面的语句：</p>
-<pre><code class="language-sql">select 1+1;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <p>会返回数值<strong>2</strong></p>
 <p>必须按照下面的顺序：</p>
-<pre><code class="language-sql">SELECT [ALL|distinct|distinctrow] 字段名 FROM 表名
-[WHERE 条件]
-[group by ]
-[having]
-[order by]
-[limint]
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ALL|distinct|distinctrow] 字段名 </span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表名</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[WHERE 条件]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[group by ]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[having]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[order by]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[limint]</span></span></code></pre>
 <ul>
 <li><code>distinct</code>和<code>distinctrow</code>是同义词，用于消除查询结果集中的<strong>重复</strong>的数据，没有指定这些选项则默认为<code>ALL</code></li>
 </ul>
 <h4 id="所有数据">所有数据</h4>
 <p>使用<code>*</code>通配符</p>
-<pre><code class="language-sql">select * from 表名;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表名;</span></span></code></pre>
 <h4 id="投影">投影</h4>
 <p>显示<strong>部分</strong>数据</p>
-<pre><code class="language-sql">select 字段名 from 表名;
-例子：
-select id, name from user_1;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 字段名 </span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表名;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">例子：</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> id, </span><span style="color:#D73A49;--shiki-dark:#F97583">name</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1;</span></span></code></pre>
 <h4 id="别名">别名</h4>
 <p>在打出e.后会自动出现后面的英文字段名，方便。</p>
-<pre><code class="language-sql">select 别名.字段 [AS] 列别名, 别名.字段 [AS] 列别名 from 表 别名;
-例子：
-select e.sex, e.name from vipUser e;
-select e.sex as'性别', e.name '名字' from user_1 e;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 别名</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">字段</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [AS] 列别名, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">别名</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">字段</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [AS] 列别名 </span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 别名;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">例子：</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">sex</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">name</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> vipUser e;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">sex</span><span style="color:#D73A49;--shiki-dark:#F97583"> as</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'性别'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">name</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '名字'</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1 e;</span></span></code></pre>
 <p>数据别名</p>
-<pre><code class="language-sql">select e.sex 
-case when e.sex='0' then '女'
-else '男'
-end [as] '性别' from user_1 e;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">sex</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">case</span><span style="color:#D73A49;--shiki-dark:#F97583"> when</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">sex</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'0'</span><span style="color:#D73A49;--shiki-dark:#F97583"> then</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '女'</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '男'</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [as] </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'性别'</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1 e;</span></span></code></pre>
 <p>连接显示：</p>
-<pre><code class="language-sql">select concat(&quot;内容1:&quot;, 字段, &quot;内容2:&quot;, 字段) as '别名' from 表;
-例子：
-select concat(&quot;内容1:&quot;, name, &quot;内容2:&quot;, job) as '工作信息' from user_1;
-
-则显示：
-内容1:name内容2:job
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> concat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"内容1:"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, 字段, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"内容2:"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, 字段) </span><span style="color:#D73A49;--shiki-dark:#F97583">as</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '别名'</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">例子：</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> concat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"内容1:"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">name</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"内容2:"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, job) </span><span style="color:#D73A49;--shiki-dark:#F97583">as</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '工作信息'</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1;</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">则显示：</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">内容1:name内容2:job</span></span></code></pre>
 <h4 id="限定查询where">限定查询WHERE</h4>
 <h5 id="比较运算">比较运算</h5>
 <table>
@@ -613,81 +574,70 @@ select concat(&quot;内容1:&quot;, name, &quot;内容2:&quot;, job) as '工作�
 </tr>
 </tbody>
 </table>
-<pre><code class="language-sql">select * from 表 where 条件;
-
-select * from emp where sal&gt;=2000 and sal&lt;=8000;
-select * from emp where sal &lt;&gt; '2000';				-- 这里&lt;&gt;是!=的意思
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 条件;</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal</span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2000</span><span style="color:#D73A49;--shiki-dark:#F97583"> and</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">8000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;></span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '2000'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;				</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 这里&#x3C;>是!=的意思</span></span></code></pre>
 <ol>
 <li>between...and...</li>
 </ol>
 <p>仅限于数值、日期、时间</p>
-<pre><code class="language-sql">SELECT * FROM emp WHERE sal BETWEEN 2000 AND 8000;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal </span><span style="color:#D73A49;--shiki-dark:#F97583">BETWEEN</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2000</span><span style="color:#D73A49;--shiki-dark:#F97583"> AND</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 8000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <ol start="2">
 <li>IN</li>
 </ol>
-<pre><code class="language-SQL">select * from emp where sal in(2000,8000);
-select * from emp where sal=2000 or sal=8000;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">8000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2000</span><span style="color:#D73A49;--shiki-dark:#F97583"> or</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">8000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <ol start="3">
 <li>NULL</li>
 </ol>
-<pre><code class="language-SQL">select * from emp where sal not in(2000);			-- 不是2000的其他数据
-select * from emp where comm is not null;			-- comm不是空
-select * from emp where comm is null;				-- comm是空
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal </span><span style="color:#D73A49;--shiki-dark:#F97583">not</span><span style="color:#D73A49;--shiki-dark:#F97583"> in</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);			</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 不是2000的其他数据</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> comm </span><span style="color:#D73A49;--shiki-dark:#F97583">is not null</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;			</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- comm不是空</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> comm </span><span style="color:#D73A49;--shiki-dark:#F97583">is</span><span style="color:#D73A49;--shiki-dark:#F97583"> null</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;				</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- comm是空</span></span></code></pre>
 <h5 id="模糊查询">模糊查询</h5>
-<pre><code class="language-sql">select * from 表 where 字段 like 'm%';					-- 以 s 开头的
-select * from emp where job like '_m%';				  -- 第二的字母是m
-select * from emp where job like '%m%';				  -- 包含 m 的
-select * from emp where job not like 'm%';			  -- 不是m开头的
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 字段 </span><span style="color:#D73A49;--shiki-dark:#F97583">like</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'm%'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;					</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 以 s 开头的</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> job </span><span style="color:#D73A49;--shiki-dark:#F97583">like</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '_m%'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;				  </span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 第二的字母是m</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> job </span><span style="color:#D73A49;--shiki-dark:#F97583">like</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '%m%'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;				  </span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 包含 m 的</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> job </span><span style="color:#D73A49;--shiki-dark:#F97583">not</span><span style="color:#D73A49;--shiki-dark:#F97583"> like</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'm%'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;			  </span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 不是m开头的</span></span></code></pre>
 <h5 id="子查询">子查询</h5>
 <p>子查询就是指在一个完整的查询语句中，嵌套若干个不同功能的小查询，从而完成一个复杂的查询。把一个查询的结果当成另一个查询的条件。</p>
 <h4 id="分组查询group-by">分组查询GROUP BY</h4>
 <p>将结果集的数据行根据选择列的值进行逻辑分组，汇总表内容的子集，即实现对每个组的的聚合计算。</p>
-<pre><code class="language-SQL">SELECT 1,2 count&lt;*&gt; as '总数' FROM 表 group by {col_name|expr|position} [ASC|DESC], ...[WITH ROLLUP];
-例子：
-SELECT 1,2 count&lt;id&gt; as '总数' FROM 表 group by 1,2;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> count</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;*></span><span style="color:#D73A49;--shiki-dark:#F97583"> as</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '总数'</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">group by</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {col_name|expr|position} [ASC|DESC], ...[WITH ROLLUP];</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">例子：</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> count</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">id</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#D73A49;--shiki-dark:#F97583"> as</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '总数'</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">group by</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <ul>
 <li><code>ASC</code>表示<strong>升序</strong>分组，默认是升序</li>
 <li><code>DESC</code>表示<strong>降序</strong>分组</li>
 <li><code>with rollup</code>指定在结果集中不仅包含分组后的数据行，还包含汇总行，以及所有分组的整体汇总行</li>
 </ul>
 <h4 id="过滤分组having">过滤分组HAVING</h4>
-<pre><code class="language-sql">SELECT 1,2 FROM 表 GROUP BY 1,2 HAVING 条件;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">GROUP BY</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> HAVING</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 条件;</span></span></code></pre>
 <h4 id="排序order-by">排序ORDER BY</h4>
-<pre><code class="language-SQL">select * from 表 order by 字段;							-- 由小到大排序
-select * from 表 order by 字段 desc;						-- 由大到小排序
-例子：
-SELECT * FROM 表 ORDER BY 字段1 EDSC, 字段2 DESC;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">order by</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 字段;							</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 由小到大排序</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">order by</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 字段 </span><span style="color:#D73A49;--shiki-dark:#F97583">desc</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;						</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 由大到小排序</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">例子：</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">ORDER BY</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 字段1 EDSC, 字段2 </span><span style="color:#D73A49;--shiki-dark:#F97583">DESC</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <h4 id="分页limit">分页LIMIT</h4>
 <p>当select返回的结果集中行数有很多时，使用<code>limit</code>来限制用户对结果数据的浏览和操纵</p>
 <ul>
 <li><code>offset</code>偏移量：从第几行开始显示（从0开始）</li>
 </ul>
 <p>数量：显示几行</p>
-<pre><code class="language-sql">LIMIT {[offset,]行数|行数 OFFSET 从第几行-1}
-
-SELECT * 1,2 FROM 表 ORDER BY 1 LIMIT 4,3;				-- 从第5行开始输出3行
-SELECT * 1,2 FROM 表 ORDER BY 1 LIMIT 3 OFFSET 4;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">LIMIT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {[offset,]行数|行数 OFFSET 从第几行</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">ORDER BY</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> LIMIT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;				</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 从第5行开始输出3行</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">ORDER BY</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> LIMIT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> OFFSET </span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <h4 id="多表查询">多表查询</h4>
 <h5 id="交叉连接">交叉连接</h5>
 <p>会产生<strong>笛卡尔积</strong>效应：</p>
 <p>如果表1有100条数据，表2有100条数据，那么结果集就有100*100=10000条</p>
-<pre><code class="language-sql">select * from 表1,表2;
-select * from 表1 cross join 表2;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表1,表2;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表1 </span><span style="color:#D73A49;--shiki-dark:#F97583">cross join</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表2;</span></span></code></pre>
 <h5 id="内连接">内连接</h5>
 <p>添加表与表之间的<strong>关联条件</strong>，消除笛卡尔积效应：</p>
-<pre><code class="language-sql">select * from 表1 e, 表2 d where e.字段1 = d.字段1;
-SELECT * FROM table1 e inner join table2 d on e.字段 = d.字段;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表1 e, 表2 d </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">字段1</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">字段1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> table1 e </span><span style="color:#D73A49;--shiki-dark:#F97583">inner join</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> table2 d </span><span style="color:#D73A49;--shiki-dark:#F97583">on</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">字段</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">字段</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <p>内连接是系统默认的表连接，所以在from字句中可以省略<code>inner</code>只用<code>join</code>就可以</p>
 <ol>
 <li>等值连接</li>
@@ -700,34 +650,28 @@ SELECT * FROM table1 e inner join table2 d on e.字段 = d.字段;
 <ol start="3">
 <li>自链接</li>
 </ol>
-<pre><code class="language-sql">select e.1, e.2, e.3, m.1, m.2 from 表1 e, 表1 m where e.3 = m.2;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">m</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">m</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表1 e, 表1 m </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> m</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <h5 id="外连接">外连接</h5>
 <p>连接的两张表分为基表、参考表</p>
 <ol>
 <li>左链接</li>
 </ol>
 <p>以左边的数据为主（基表），右边数据（参考表）的如果匹配到了就显示，没有匹配到就用空值代替</p>
-<pre><code class="language-sql">select e.1, e.2, d.1, d.2 from emp1 e left [OUTER] join emp2 d on e.3 = d.3;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp1 e left [OUTER] </span><span style="color:#D73A49;--shiki-dark:#F97583">join</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp2 d </span><span style="color:#D73A49;--shiki-dark:#F97583">on</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <ol start="2">
 <li>右链接</li>
 </ol>
 <p>以右面的数据为主（基表）</p>
-<pre><code class="language-sql">select e.1, e.2, d.1, d.2 from emp1 e right [OUTER] join emp2 d on e.3 = d.3;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp1 e right [OUTER] </span><span style="color:#D73A49;--shiki-dark:#F97583">join</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp2 d </span><span style="color:#D73A49;--shiki-dark:#F97583">on</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <h4 id="结果集合并">结果集合并</h4>
-<pre><code class="language-sql">select * from 表;
-union							-- 两个查询显示在一个结果里面,重复不显示
-select * from 表;
-</code></pre>
-<pre><code class="language-sql">select * from dept;
-union ALL						-- 返回查询结果的全部内容,重复数据也会显示
-select * from dept;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">union</span><span style="color:#6A737D;--shiki-dark:#6A737D">							-- 两个查询显示在一个结果里面,重复不显示</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表;</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> dept;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">union ALL</span><span style="color:#6A737D;--shiki-dark:#6A737D">						-- 返回查询结果的全部内容,重复数据也会显示</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> dept;</span></span></code></pre>
 <h4 id="计算列值-函数">计算列值-函数</h4>
-<pre><code class="language-sql">select id+1000 FROM user_1;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> id</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1000</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user_1;</span></span></code></pre>
 <table>
 <thead>
 <tr>
@@ -855,8 +799,7 @@ select * from dept;
 </tbody>
 </table>
 <p>例如获取当前系统的时间：</p>
-<pre><code class="language-sql">select now() '时间' from 表 where empno=7369;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> now</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'时间'</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> empno</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">7369</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <hr>
 <h3 id="约束">约束</h3>
 <p>三种：</p>
@@ -866,45 +809,39 @@ select * from dept;
 <li>用户定义完整性约束</li>
 </ol>
 <p>主键</p>
-<pre><code class="language-sql">create table user_1(
-    id int primary key auto_increment,     	-- primary key主键约束，表示一个唯一的标识，auto_increment表示数据自增
-    name varchar(20) not null,				-- 非空约束，此字段的内容不允许为null
-    email varchar(50) unique, 				-- 唯一约束，此列的内容不允许出现重复
-    sex char(4),
-    phone varchar(20)
-);
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> user_1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    id </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> primary key</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> auto_increment,     	</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- primary key主键约束，表示一个唯一的标识，auto_increment表示数据自增</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">    name</span><span style="color:#D73A49;--shiki-dark:#F97583"> varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">not null</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,				</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 非空约束，此字段的内容不允许为null</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    email </span><span style="color:#D73A49;--shiki-dark:#F97583">varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">50</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">unique</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, 				</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 唯一约束，此列的内容不允许出现重复</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    sex </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">),</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    phone </span><span style="color:#D73A49;--shiki-dark:#F97583">varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
 <p>有<code>auto_increment</code>的数据不输入也会自增填入数据,必须是int类型,只能有一个和<code>primary key</code>搭配</p>
 <p>复合主键，在最后加上主键的定义</p>
-<pre><code class="language-sql">primary key(id1, id2)
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">primary key</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(id1, id2)</span></span></code></pre>
 <p>外键</p>
-<pre><code class="language-sql">foreign key (这个表里的字段名) references 关联表 (关联表的字段) [on delete restrict|cascade|set null|no action]
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">foreign key</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (这个表里的字段名) </span><span style="color:#D73A49;--shiki-dark:#F97583">references</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 关联表 (关联表的字段) [on delete restrict|cascade|set null|no action]</span></span></code></pre>
 <ul>
 <li><code>on delete restrict</code>因为子表中有引用，则父表不能删除</li>
 <li><code>on update cascade</code>更新后，级联更新</li>
 <li><code>on update set null</code>若父表更新，则子表内容变为空</li>
 <li><code>on delete no action</code>不允许有动作，与RESTRICT同义</li>
 </ul>
-<pre><code class="language-sql">create table worker(
-	id  int primary key auto_increment,
-	name varchar(30),
-	user_id int references work_1,
-);
-
-或者：
-foreign key (user_id) references work_1 (id) -- 外键约束，我们实际上使用的是上面一行（实际开发用的少）
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> worker</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	id  </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> primary key</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> auto_increment,</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">	name</span><span style="color:#D73A49;--shiki-dark:#F97583"> varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">30</span><span style="color:#24292E;--shiki-dark:#E1E4E8">),</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	user_id </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> references</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> work_1,</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">或者：</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">foreign key</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (user_id) </span><span style="color:#D73A49;--shiki-dark:#F97583">references</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> work_1 (id) </span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 外键约束，我们实际上使用的是上面一行（实际开发用的少）</span></span></code></pre>
 <p>命名约束</p>
-<pre><code class="language-sql">constraint 约束名字 foreign key (这个表里的字段名) references 关联表 (关联表的字段)
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">constraint</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 约束名字 </span><span style="color:#D73A49;--shiki-dark:#F97583">foreign key</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (这个表里的字段名) </span><span style="color:#D73A49;--shiki-dark:#F97583">references</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 关联表 (关联表的字段)</span></span></code></pre>
 <p>删加</p>
-<pre><code class="language-sql">alter table 表 add constraint 约束名 (字段名)			-- 添加约束
-alter table 表 add constraint unique (phone)			-- 给phone添加唯一约束
-
-alter table 表 drop index 字段						   -- 删除唯一约束
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">add</span><span style="color:#D73A49;--shiki-dark:#F97583"> constraint</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 约束名 (字段名)			</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 添加约束</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">add</span><span style="color:#D73A49;--shiki-dark:#F97583"> constraint</span><span style="color:#D73A49;--shiki-dark:#F97583"> unique</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (phone)			</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 给phone添加唯一约束</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表 </span><span style="color:#D73A49;--shiki-dark:#F97583">drop</span><span style="color:#D73A49;--shiki-dark:#F97583"> index</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 字段						   </span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 删除唯一约束</span></span></code></pre>
 <p>MySQL中约束:</p>
 <table>
 <thead>
@@ -950,34 +887,29 @@ alter table 表 drop index 字段						   -- 删除唯一约束
 <li><strong>更改数据格式</strong>：可以重新格式化检索出的数据，输出到其他应用程序之中</li>
 </ol>
 <p><strong>创建</strong></p>
-<pre><code class="language-sql">CREATE VIEW 视图名称 AS 子查询 [with check option]
-CREATE VIEW 视图名称 AS 子查询 with [cascaded|local] check option
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> VIEW</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 视图名称</span><span style="color:#D73A49;--shiki-dark:#F97583"> AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 子查询 [with check option]</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> VIEW</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 视图名称</span><span style="color:#D73A49;--shiki-dark:#F97583"> AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 子查询 </span><span style="color:#D73A49;--shiki-dark:#F97583">with</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [cascaded|local] </span><span style="color:#D73A49;--shiki-dark:#F97583">check</span><span style="color:#D73A49;--shiki-dark:#F97583"> option</span></span></code></pre>
 <ul>
 <li>加上<code>with check option</code>可以后续对视图数据进行修改</li>
 <li><code>CASCADED</code>为默认选型，他会对所有的视图进行检查</li>
 <li><code>LOCAL</code>则使CHECK OPTION 只对定义的视图进行检查</li>
 </ul>
 <p><strong>修改</strong></p>
-<pre><code class="language-sql">create or replace view 视图名称 as 查询语句 [with check option];
-或者
-alter view 视图名称  as 查询语句 [with check option];
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">create or replace</span><span style="color:#D73A49;--shiki-dark:#F97583"> view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 视图名称</span><span style="color:#D73A49;--shiki-dark:#F97583"> as</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 查询语句 [with check option];</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">或者</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> view</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 视图名称  </span><span style="color:#D73A49;--shiki-dark:#F97583">as</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 查询语句 [with check option];</span></span></code></pre>
 <p><strong>查看定义</strong></p>
-<pre><code class="language-sql">show create view 视图名字;
-或者
-desc 试图名字;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show </span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> view 视图名字;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">或者</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">desc</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 试图名字;</span></span></code></pre>
 <p><strong>查看</strong></p>
-<pre><code class="language-sql">SELECT * FROM VIEW 视图名称;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> VIEW 视图名称;</span></span></code></pre>
 <p><strong>数据更新</strong></p>
 <p>插入INSERT</p>
 <p>修改UPDATE</p>
 <p>删除DELETE</p>
 <p><strong>删除</strong></p>
-<pre><code class="language-sql">drop view [if exists] 视图名;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">drop</span><span style="color:#D73A49;--shiki-dark:#F97583"> view</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [if exists] 视图名;</span></span></code></pre>
 <ul>
 <li><code>IF EXISTS</code>可以防止因为删除不存在的视图时而出现的问题</li>
 </ul>
@@ -990,32 +922,29 @@ desc 试图名字;
 <li>在经常用在连接的列上，这些列主要是一些外键，可以加快连接的速度；</li>
 <li>在经常需要排序的列上创建索引，因为索引已经排序，这样查询可以利用索引的排序，加快排序查询时间</li>
 </ol>
-<pre><code class="language-sql">alter table 表名 add index 索引名(该表中的某字段);		添加索引
-alter table emp add index sal_index(sal);
-
-alter table 表名 drop index 索引名;					删除索引
-alter table emp drop index sal_index;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表名 </span><span style="color:#D73A49;--shiki-dark:#F97583">add</span><span style="color:#D73A49;--shiki-dark:#F97583"> index</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 索引名(该表中的某字段);		添加索引</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">add</span><span style="color:#D73A49;--shiki-dark:#F97583"> index</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal_index(sal);</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表名 </span><span style="color:#D73A49;--shiki-dark:#F97583">drop</span><span style="color:#D73A49;--shiki-dark:#F97583"> index</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 索引名;					删除索引</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">alter</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> emp </span><span style="color:#D73A49;--shiki-dark:#F97583">drop</span><span style="color:#D73A49;--shiki-dark:#F97583"> index</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sal_index;</span></span></code></pre>
 <h3 id="触发器">触发器</h3>
 <p>每个表的一个时刻下每一个事件仅有一个触发器</p>
-<pre><code class="language-sql">CREATE TRIGGER trigger_name 
-trigger_time 
-trigger_event ON tbl_name
-FOR EACH ROW
-trigger_stmt  
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> trigger_name</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">trigger_time </span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">trigger_event </span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tbl_name</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">FOR</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> EACH </span><span style="color:#D73A49;--shiki-dark:#F97583">ROW</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">trigger_stmt  </span></span></code></pre>
 <p>trigger_name：标识触发器名称，用户自行指定
 trigger_time：标识触发时机，取值为<strong>BEFORE</strong>或<strong>AFTER</strong>
 trigger_event：标识触发事件，取值为INSERT、UPDATE 或 DELETE
 tbl_name：标识建立触发器的表名，即在哪张表上建立触发器
 trigger_stmt：触发器程序体，可以是一句SQL语句，或者用 BEGIN 和 END 包含的多条语句。</p>
 <p>列：创建两种表t1,t2两种表中都有id,name字段，新加t1表记录后自动添加t2</p>
-<pre><code class="language-sql">CREATE TRIGGER triggen_1
-after
-insert ON t1
-FOR EACH ROW
-insert into t2(name) values(new.name);
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> triggen_1</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">after</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">insert</span><span style="color:#D73A49;--shiki-dark:#F97583"> ON</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> t1</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">FOR</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> EACH </span><span style="color:#D73A49;--shiki-dark:#F97583">ROW</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">insert into</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> t2(</span><span style="color:#D73A49;--shiki-dark:#F97583">name</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">values</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">new</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">name</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
 <ul>
 <li>NEW是新值，OLD是旧值
 INSERT只有NEW
@@ -1024,33 +953,26 @@ DELETE只有OLD</li>
 </ul>
 <p>注意：一般情况下，Mysql默认是以;号作为结束执行语句。在创建触发器过程中需要用到;号。为了解决这个问题，可以用到delimiter语句。例如<code>delimiter //</code>，可以将结束符号变成//，创建完触发器后再执行<code>delimiter ;</code>将结束符号改回成<code>;</code>号。</p>
 <p>查看</p>
-<pre><code class="language-sql">show TRIGGERS
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show TRIGGERS</span></span></code></pre>
 <p>删除</p>
-<pre><code class="language-sql">DROP TRIGGER 触发器的名字
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 触发器的名字</span></span></code></pre>
 <h3 id="备份与恢复">备份与恢复</h3>
 <p>导出一整个数据库：</p>
-<pre><code class="language-cmd">C:\WINDOWS\system32&gt; mysqldump -u 用户名 -p 数据库名 &gt; 导出的文件名
-C:\WINDOWS\system32&gt; mysqldump -u root -p user &gt; c:\java\demo.sql
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">C:\WINDOWS\system32</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysqldump -u 用户名 -p 数据库名 </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 导出的文件名</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">C:\WINDOWS\system32</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysqldump -u root -p user </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> c:\java\demo.sql</span></span></code></pre>
 <p>导出一张表：</p>
-<pre><code class="language-cmd">C:\WINDOWS\system32&gt; mysqldump -u 用户名 -p 数据库名 表名称 &gt; 导出的文件名
-C:\WINDOWS\system32&gt; mysqldump -u root -p user user_1 &gt; c:\java\demo.sql
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">C:\WINDOWS\system32</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysqldump -u 用户名 -p 数据库名 表名称 </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 导出的文件名</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">C:\WINDOWS\system32</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysqldump -u root -p user user_1 </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> c:\java\demo.sql</span></span></code></pre>
 <p>恢复：
 数据的回复必须要先登录,登录成功后新建一个数据库,进入到指定的数据库中执行如下命令</p>
-<pre><code class="language-cmd">mysql&gt; Source 脚本目录(给决定路径)
-mysql&gt; Source C:\java\demo.sql
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mysql</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Source 脚本目录(给决定路径)</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mysql</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Source C:\java\demo.sql</span></span></code></pre>
 <h3 id="linux防火墙修改">Linux防火墙修改</h3>
-<pre><code class="language-shell">vim /usr/lib/firewalld/services/ssh.xml
- &lt;port protocol=&quot;tcp&quot; port=&quot;3306&quot;/&gt;
-systemctl restart firewalld
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vim</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /usr/lib/firewalld/services/ssh.xml</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">port</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> protocol="tcp"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> port="3306"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">/</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">systemctl</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> restart</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> firewalld</span></span></code></pre>
 <h3 id="其他机器连接本地的mysql">其他机器连接本地的MySQL</h3>
-<pre><code class="language-shell">mysql&gt; GRANT ALL PRIVILEGES ON *.* TO root@&quot;%&quot; IDENTIFIED BY &quot;root&quot; with grant option;
-</code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">mysql</span><span style="color:#24292E;--shiki-dark:#E1E4E8">> </span><span style="color:#032F62;--shiki-dark:#9ECBFF">GRANT</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ALL</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PRIVILEGES</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ON</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> *</span><span style="color:#032F62;--shiki-dark:#9ECBFF">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">*</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> TO</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> root@"%"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> IDENTIFIED</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> BY</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "root"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> with</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> grant</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> option</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
 <p><code>.</code>就是所有</p>
 <h3 id="linux禁止更新推荐设置">Linux禁止更新（推荐设置）</h3>
 <p>我们在安装之后，为了能够正常运行，我们会禁止MySQL进行更新。因为在yum更新了MySQL之后，MySQL会自动重启，这对于我们上线部署项目来说是没有必要的，所以我们可以屏蔽更新。</p>

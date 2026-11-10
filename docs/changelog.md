@@ -13,7 +13,17 @@
 - 重写 `docs/content-inventory.md`：改为当前 `src/content/posts/` 和 `src/content/custom/` 的实际清单，历史 P0 快照只保留在 git 历史和 `pre-eleventy-migration` 标签。
 - 修正 `docs/target-architecture.md`：按实际目录更新文件树、`.nojekyll` 位置、集合名称和依赖说明，移除不存在的 `.eleventyignore`、`.editorconfig` 和根目录 `.nojekyll` 描述。
 - 当前验证：`validate:content` 通过 10 个文件，`validate:output` 通过 55 个 HTML 页面；`site/` 177 个跟踪文件，`gh-pages` 与 `main` 中 `site/` 子树一致。
-- 当前待确认：日期和受控分类/标签的确认记录、`views/fireworks2.html` 的退役结论、vendor 未使用资源清理、代码高亮能力。
+- 当前待确认：日期和受控分类/标签的确认记录、`views/fireworks2.html` 的退役结论、vendor 未使用资源清理、代码高亮视觉验收。
+- 新增 `docs/markdown代码块渲染分析.md`：确定 Shiki 4.6.0 直接接管 markdown-it 的方案，记录 Node >=20 与 markdown-it 15 的版本冲突、markdown-it 15 / Eleventy 4 canary 的升级风险、直接接入方式、Node 18 回退到 Shiki 3.3.0 的路径，以及 Typora 仅作为视觉参考的边界。
+- 新增 `docs/archive/` 归档目录，将迁移前的 `docs/current-analysis.md` 移入 `docs/archive/2026-11-migration/`；活动文档继续保留在 `docs/` 根目录。
+
+### Node 版本与旧高亮资源清理
+
+- `package.json` 和 `package-lock.json` 根包新增 `engines.node >=20`；README、AGENTS.md、迁移计划和发布清单同步最低版本要求。
+- 删除 `assets/vendor/highlight-github.css`，并从 `src/_includes/layouts/base.njk` 移除引用；重建 `site/` 后不再发布旧样式文件。
+- 安装 `shiki@4.6.0` 和 `@shikijs/transformers@4.6.0`，在 `eleventy.config.js` 直接接管 markdown-it 的 `highlight`，使用 `github-light` / `github-dark` 双主题、`bundledLanguages` 全语言集、统一小写语言名和行号。
+- 重建 `site/` 后代码块输出 `<pre class="shiki">`，行号和主题变量已生成；日志不再出现 SQL/SHELL 未知语言警告。
+- Playwright 检查通过：C 自查表和 MySQL 自查表在 `night` / `paper` 双主题下 token、背景和行号正常，390px 下代码块内部横向滚动正常；MySQL 文章长 URL 的页面横向溢出为既有正文问题，已单独记录。
 
 ### 发布链路修正
 

@@ -10,7 +10,7 @@ Eleventy 迁移已完成并上线。源码、配置和 `site/` 构建产物以 `
 
 ## 快速开始
 
-环境要求：Node.js >= 18（本机通过 nvm 管理）。
+环境要求：Node.js >= 20（本机通过 nvm 管理；Shiki 4.6 要求 Node.js >=20）。
 
 ```bash
 npm ci                 # 安装依赖
@@ -131,11 +131,13 @@ GitHub Pages 设置固定为 `Settings → Pages → Deploy from a branch → gh
 
 | 文档 | 内容 |
 |---|---|
-| `docs/current-analysis.md` | 迁移前的现状分析和框架对比证据 |
+| `docs/archive/2026-11-migration/current-analysis.md` | 迁移前的现状分析和框架对比证据（历史归档） |
 | `docs/target-architecture.md` | 目标架构唯一事实来源 |
 | `docs/migration-plan.md` | 阶段任务、当前进度和回滚边界 |
 | `docs/content-inventory.md` | 当前文章源、特殊页和内容待确认项 |
 | `docs/legacy-url-map.md` | 旧 URL 清单和跳转策略 |
 | `docs/release-checklist.md` | 人工发布验收清单 |
 | `docs/changelog.md` | 具体变更日志 |
+| `docs/markdown代码块渲染分析.md` | 代码块高亮方案、Shiki 版本兼容和接入步骤 |
+| `docs/archive/README.md` | 已结束计划的归档说明 |
 | `AGENTS.md` | AI/agent 行为规范 |
