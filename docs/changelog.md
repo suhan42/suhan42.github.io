@@ -23,6 +23,7 @@
 - 发布命令链补上 `test:markdown` 和 `test:theme`，`AGENTS.md`、`README.md`、`docs/release-checklist.md`、`docs/target-architecture.md`、`docs/migration-plan.md` 同步。
 - `README.md` 的样式说明更新为 `themes.css` / `main.css` / `markdown.css` 三份加载，并清理发布命令块里的多余空行。
 - 将 Markdown 正文、代码块、数学公式、表格和 Callouts 从 `main.css` 拆到 `assets/css/markdown.css`，页面按主题变量、基础组件、内容层顺序加载。
+- Nocturne 和 Nocturne Bright 的主要正文排版对齐 paper：`17px`、`400` 字重、`1.75` 行高，`strong` 对齐 `700`。
 - 新增 `docs/markdown代码块渲染分析.md`：确定 Shiki 4.6.0 直接接管 markdown-it 的方案，记录 Node >=20 与 markdown-it 15 的版本冲突、markdown-it 15 / Eleventy 4 canary 的升级风险、直接接入方式、Node 18 回退到 Shiki 3.3.0 的路径，以及 Typora 仅作为视觉参考的边界。
 - 新增 `docs/archive/` 归档目录，将迁移前的 `docs/current-analysis.md` 移入 `docs/archive/2026-11-migration/`；活动文档继续保留在 `docs/` 根目录。
 
