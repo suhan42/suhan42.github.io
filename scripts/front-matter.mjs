@@ -4,11 +4,11 @@ export function parseFrontMatter(content) {
   if (!content.startsWith("---")) {
     return { data: null, error: "缺少 front matter 起始标记 ---" };
   }
-  const endIndex = content.indexOf("---", 3);
-  if (endIndex === -1) {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+  if (!match) {
     return { data: null, error: "缺少 front matter 结束标记 ---" };
   }
-  const fmText = content.slice(3, endIndex).trim();
+  const fmText = match[1].trim();
   const lines = fmText.split("\n");
   const data = {};
   let currentKey = null;

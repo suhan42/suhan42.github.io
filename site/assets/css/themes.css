@@ -1,0 +1,199 @@
+/*
+设计系统：夜航深色（night）、纸墨浅色（paper）、Nocturne 深色（nocturne）和 Nocturne Bright 四套主题。
+布局从当前 Bootstrap 皮肤中剥离出来，只用系统自带的容器、间距和语义结构。
+surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/边框变化，不做位移和呼吸动效。
+*/
+
+:root {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --font-ui: "Inter", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "EB Garamond", "Noto Serif SC", serif;
+  --font-mono: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+  --max-width: 1200px;
+  --rail: 320px;
+}
+
+/* night 主题：以当前黑色取向为基础，用深色表面分层和 10% hairline 表达层级。 */
+:root,
+[data-theme="night"] {
+  color-scheme: dark;
+  --bg: #0b0d14;
+  --surface: #11141c;
+  --surface-2: #1a1e28;
+  --text: #eef0f5;
+  --text-2: #a3a9b8;
+  --text-3: #7a8296;
+  --hairline: rgba(238, 240, 245, 0.10);
+  --ring: rgba(238, 240, 245, 0.14);
+  --accent: #7b96c4;
+  --accent-ink: #0b0d14;
+  --ink: #eef0f5;
+  --ink-muted: #7a8296;
+  --positive: #4cc38a;
+  --negative: #e5484d;
+  --callout-note: #7fb2ff;
+  --callout-tip: #3ddc97;
+  --callout-important: #b48cff;
+  --callout-warning: #ffb84d;
+  --callout-caution: #ff5f6d;
+  --underline: #7b96c4;
+  --underline-soft: rgba(123, 150, 196, 0.38);
+  --mark-bg: rgba(123, 150, 196, 0.56);
+  --mark-text: #f4f7ff;
+  --mark-border: rgba(173, 196, 235, 0.9);
+}
+
+/* paper 主题：暖纸面 + 墨色文本，适合日间阅读。 */
+[data-theme="paper"] {
+  color-scheme: light;
+  --bg: #f7f4ee;
+  --surface: #fdfbf7;
+  --surface-2: #efe9df;
+  --text: #1f1b16;
+  --text-2: #5e554a;
+  --text-3: #7b7266;
+  --hairline: rgba(31, 27, 22, 0.12);
+  --ring: rgba(31, 27, 22, 0.16);
+  --accent: #8a5a2c;
+  --accent-ink: #fdfbf7;
+  --ink: #1f1b16;
+  --ink-muted: #7b7266;
+  --positive: #16a34a;
+  --negative: #dc2626;
+  --callout-note: #2f6fbd;
+  --callout-tip: #168452;
+  --callout-important: #7542bd;
+  --callout-warning: #b86b00;
+  --callout-caution: #c53030;
+  --underline: #8a5a2c;
+  --underline-soft: rgba(138, 90, 44, 0.38);
+  --mark-bg: rgba(196, 132, 58, 0.4);
+  --mark-text: #2b1a0b;
+  --mark-border: rgba(138, 90, 44, 0.72);
+}
+
+/* nocturne 主题：紫黑底、蓝色链接和紫色标记。 */
+[data-theme="nocturne"] {
+  color-scheme: dark;
+  --bg: #211d25;
+  --surface: #28242e;
+  --surface-2: #19161d;
+  --text: #e8e6ec;
+  --text-2: #d4d0da;
+  --text-3: #938f9b;
+  --hairline: #2e2935;
+  --ring: #3a3344;
+  --accent: #8dc8fb;
+  --accent-ink: #211d25;
+  --ink: #e8e6ec;
+  --ink-muted: #938f9b;
+  --positive: #80ffb5;
+  --negative: #ff8080;
+  --callout-note: #8dc8fb;
+  --callout-tip: #80ffb5;
+  --callout-important: #b080ff;
+  --callout-warning: #ffcf99;
+  --callout-caution: #ff8080;
+  --underline: #b080ff;
+  --underline-soft: rgba(176, 128, 255, 0.38);
+  --font-ui: -apple-system, BlinkMacSystemFont, "Inter", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  --font-mono: "Cascadia Code", "Fira Code", "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --body-text: #d4d0da;
+  --h1-color: #f0e8ff;
+  --h2-color: #fff2bf;
+  --h3-color: #64e0b3;
+  --h4-color: #ff7fa2;
+  --h5-color: #c8a8ff;
+  --h6-color: #b8a3bd;
+  --heading-border-strong: rgba(176, 128, 255, 0.5);
+  --heading-border: rgba(176, 128, 255, 0.38);
+  --strong-color: #b080ff;
+  --em-color: #c4b4ee;
+  --link-cyan: #80f4ff;
+  --link-underline: rgba(141, 200, 251, 0.32);
+  --link-hover-bg: rgba(128, 244, 255, 0.1);
+  --link-hover-line: rgba(128, 244, 255, 0.78);
+  --inline-code-bg: #28242e;
+  --inline-code-color: #ffcf99;
+  --inline-code-border: #2e2935;
+  --blockquote-border: #7138cc;
+  --blockquote-bg: rgba(113, 56, 204, 0.08);
+  --blockquote-text: #b3a3dd;
+  --table-head-bg: #2c2634;
+  --table-head-text: #e2d3fe;
+  --table-cell-text: #c8c4d0;
+  --table-border: #3a3344;
+  --table-stripe: rgba(40, 36, 46, 0.62);
+  --table-hover: rgba(176, 128, 255, 0.1);
+  --hr-primary: rgba(176, 128, 255, 0.55);
+  --hr-cyan: rgba(128, 244, 255, 0.38);
+  --mark-bg: rgba(176, 128, 255, 0.56);
+  --mark-text: #fff6ff;
+  --mark-border: rgba(212, 197, 249, 0.92);
+  --list-marker: #7138cc;
+  --image-border: #2e2935;
+}
+
+/* nocturne-bright 主题：浅紫纸面、蓝色链接和紫色标记。 */
+[data-theme="nocturne-bright"] {
+  color-scheme: light;
+  --bg: #fbf8ff;
+  --surface: #ffffff;
+  --surface-2: #f0eaf7;
+  --text: #2d2834;
+  --text-2: #4f4859;
+  --text-3: #817789;
+  --hairline: #e6ddeb;
+  --ring: #d3c7e0;
+  --accent: #276fa9;
+  --accent-ink: #fbf8ff;
+  --ink: #2d2834;
+  --ink-muted: #817789;
+  --positive: #168452;
+  --negative: #c33c3c;
+  --callout-note: #276fa9;
+  --callout-tip: #168452;
+  --callout-important: #7542bd;
+  --callout-warning: #9a5a16;
+  --callout-caution: #c33c3c;
+  --underline: #7542bd;
+  --underline-soft: rgba(117, 66, 189, 0.3);
+  --font-ui: -apple-system, BlinkMacSystemFont, "Inter", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  --font-mono: "Cascadia Code", "Fira Code", "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --body-text: #4f4859;
+  --h1-color: #2d2834;
+  --h2-color: #5b2f91;
+  --h3-color: #008494;
+  --h4-color: #b3316d;
+  --h5-color: #7542bd;
+  --h6-color: #817789;
+  --heading-border-strong: rgba(117, 66, 189, 0.42);
+  --heading-border: rgba(117, 66, 189, 0.38);
+  --strong-color: #7542bd;
+  --em-color: #6d4ea3;
+  --link-cyan: #008494;
+  --link-underline: rgba(39, 111, 169, 0.26);
+  --link-hover-bg: rgba(0, 132, 148, 0.08);
+  --link-hover-line: rgba(0, 132, 148, 0.56);
+  --inline-code-bg: #ffffff;
+  --inline-code-color: #9a5a16;
+  --inline-code-border: #e6ddeb;
+  --blockquote-border: #7542bd;
+  --blockquote-bg: rgba(88, 45, 150, 0.08);
+  --blockquote-text: #6d5d87;
+  --table-head-bg: #f5effa;
+  --table-head-text: #5b2f91;
+  --table-cell-text: #4f4859;
+  --table-border: #d3c7e0;
+  --table-stripe: rgba(255, 255, 255, 0.62);
+  --table-hover: rgba(117, 66, 189, 0.1);
+  --hr-primary: rgba(117, 66, 189, 0.55);
+  --hr-cyan: rgba(0, 132, 148, 0.38);
+  --mark-bg: rgba(117, 66, 189, 0.34);
+  --mark-text: #2d1a4d;
+  --mark-border: rgba(117, 66, 189, 0.68);
+  --list-marker: #7542bd;
+  --image-border: #e6ddeb;
+}

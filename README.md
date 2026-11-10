@@ -16,6 +16,7 @@
 npm ci                 # 安装依赖
 npm run validate:content  # 校验文章 front matter、slug 唯一性和路径规范
 npm run test:markdown  # 校验自定义 Markdown 规则和代码保护边界
+npm run test:theme     # 校验 themes.json 与 themes.css 的主题颜色一致
 npm run build          # 清理 site/ 并执行 Eleventy 构建
 npm run serve          # 本地预览，默认 http://localhost:8080
 ```
@@ -80,7 +81,7 @@ npm run build
 
 站点使用四套可切换主题：`night` 是夜航深色、`paper` 是纸墨浅色、`nocturne` 是 Nocturne 深色、`nocturne-bright` 是 Nocturne Bright 浅色。Nocturne 两套主题使用各自的标题/正文字体栈和完整正文组件规则，`night` / `paper` 保持原色板和原字体。`base.njk` 在首帧前恢复用户选择，没有保存值时跟随系统配色；`assets/js/theme.js` 负责菜单选择、持久化和无障碍标签更新。
 
-页面样式集中在 `assets/css/main.css`，基础站点不再加载 Bootstrap、jQuery 和 hc-mobile-nav。移动导航使用原生 `details`，主题菜单和移动菜单都支持键盘操作。
+页面样式按 `assets/css/themes.css`（主题变量）、`assets/css/main.css`（站点组件）、`assets/css/markdown.css`（正文内容层）三份加载，基础站点不再加载 Bootstrap、jQuery 和 hc-mobile-nav。移动导航使用原生 `details`，主题菜单和移动菜单都支持键盘操作。
 
 文章页目录由正文标题自动生成，不要求手写目录数据。桌面端显示在正文左侧并随页面滚动吸附，收起后正文从 880px 扩展到 1000px；移动端折叠在正文上方。Markdown 标题和文章型 HTML 里的标题都会参与生成。
 
@@ -103,12 +104,17 @@ npm run build
 ```bash
 npm ci						# 安装依赖
 npm run validate:content	# 校验文章 front matter、slug 唯一性和路径规范
+npm run test:markdown		# 校验自定义 Markdown 规则和代码保护边界
+npm run test:theme		# 校验 themes.json 与 themes.css 的主题颜色一致
+
 npm run build				# 清理 site/ 并执行 Eleventy 构建
 npm run validate:output		# 校验构建后的 site/
 
+# git
 git status --short			# 人工确认变更
 git commit					# 仅在用户明确要求时执行
 git push origin main 		# 仅在用户明确要求时执行
+
 npm run publish:pages:check  # 只检查，不推送
 npm run publish:pages        # 将已提交的 site/ 同步到 gh-pages
 ```

@@ -317,7 +317,7 @@ P5 是唯一的大规模清理阶段。所有删除、移动退役和旧 URL 兼
 ### P5 执行记录（2026-11-10）
 
 - 旧生成脚本、`tools/`、`home_data.json` 和 `htmls/` 已在 `16f781b` 清理；`node_modules` 当前 git 跟踪数量为 0。
-- `main` 与 `origin/main` 同步；`site/` 当前共 239 个文件，输出 57 个 HTML 页面和 14 个旧 URL 跳转页。
+- `main` 与 `origin/main` 同步；`site/` 当前共 201 个文件，输出 57 个 HTML 页面和 14 个旧 URL 跳转页。
 - `gh-pages` 与 `main` 中 `site/` 子树一致；线上首页、文章页、自定义页和旧 URL 均返回 HTTP 200。
 - GitHub Pages 设置页仍建议人工截图复核，仓库内只能验证发布产物和线上行为，不能直接读取 Pages Source 配置。
 - Shiki 4.6.0 已通过 `eleventy.config.js` 直接接管 markdown-it，加载 `bundledLanguages` 全语言集；旧 `highlight-github.css` 已删除，`npm run build` 和 `npm run validate:output` 通过。
@@ -329,6 +329,8 @@ P5 是唯一的大规模清理阶段。所有删除、移动退役和旧 URL 兼
 ```bash
 npm ci
 npm run validate:content
+npm run test:markdown
+npm run test:theme
 npm run build
 npm run validate:output
 git status --short

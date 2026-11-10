@@ -33,7 +33,9 @@ suhan42.github.io/
 │  ├─ custom/
 │  │  └─ divergence-meter/
 │  ├─ css/
+│  │  ├─ themes.css
 │  │  ├─ main.css
+│  │  ├─ markdown.css
 │  │  ├─ variables.css
 │  │  ├─ me.css
 │  │  ├─ change_colour.css
@@ -55,6 +57,8 @@ suhan42.github.io/
 │  ├─ validate-content.mjs
 │  ├─ validate-output.mjs
 │  ├─ test-markdown.mjs
+│  ├─ test-theme-config.mjs
+│  ├─ prune-katex-fonts.mjs
 │  ├─ clean-site.mjs
 │  ├─ generate-redirects.mjs
 │  ├─ markdown-it-mark.mjs
@@ -308,13 +312,15 @@ GitHub Pages 的 Branch source 只允许根目录或 `/docs`，不能直接选�
 ```bash
 npm ci
 npm run validate:content
+npm run test:markdown
+npm run test:theme
 npm run build
 npm run validate:output
 npm run publish:pages:check
 npm run publish:pages
 ```
 
-`validate:content` 校验 front matter、必填字段、slug 唯一性、日期格式、图片路径和状态枚举。`build` 先清理 `site/`，再执行 Eleventy 构建。`validate:output` 检查输出文件、失效链接、反斜杠路径、对 `node_modules` 的引用和 published 文章数量。
+`validate:content` 校验 front matter、必填字段、slug 唯一性、日期格式、图片路径和状态枚举。`test:markdown` 校验自定义 Markdown 规则和代码保护边界。`test:theme` 校验 `themes.json` 的 theme-color 与 `themes.css` 的主题背景一致。`build` 先清理 `site/`，再执行 Eleventy 构建。`validate:output` 检查输出文件、失效链接、反斜杠路径、对 `node_modules` 的引用和 published 文章数量。
 
 `publish:pages:check` 校验当前分支为 `main`、`site/` 没有未提交改动、发布根目录包含 `index.html` 和 `.nojekyll`，但不会推送。`publish:pages` 只发布已经提交到当前 HEAD 的 `site/` 内容；必须先由项目所有者确认提交并推送 `main`，未提交的本地构建不会自动进入发布分支。
 

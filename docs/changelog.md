@@ -17,6 +17,12 @@
 - `validate:output` 改为从 `src/content/posts/` 的 front matter 动态读取 published/draft，移除写死的 10 篇和 `photo-test` 文件名；新增共享 `scripts/front-matter.mjs`。
 - 新增 `src/_data/themes.json` 作为主题名称、标签、theme-color 和系统默认主题的唯一来源；菜单、首帧脚本和 `theme.js` 都从该文件读取。
 - 新增 `scripts/test-markdown.mjs` 和 `npm run test:markdown`，覆盖自定义 Markdown 规则及代码保护边界，共 12 项 fixture。
+- 输出校验补充相对路径资源和 `node_modules` 属性检查；front matter 结束标记改为只匹配独立一行；主题变量拆到 `assets/css/themes.css` 并增加 `npm run test:theme`。
+- KaTeX 字体精简为 20 个 woff2，移除 40 个 woff/ttf 文件和 CSS 回退；发布资源从 181 个降到 141 个，`site/` 当前共 201 个文件。
+- `scripts/prune-katex-fonts.mjs` 改为先校验 CSS 回退是否摘净再删除字体文件：正则不匹配时 fail-fast 退出并保留字体，避免留下指向已删文件的 404 引用。
+- 发布命令链补上 `test:markdown` 和 `test:theme`，`AGENTS.md`、`README.md`、`docs/release-checklist.md`、`docs/target-architecture.md`、`docs/migration-plan.md` 同步。
+- `README.md` 的样式说明更新为 `themes.css` / `main.css` / `markdown.css` 三份加载，并清理发布命令块里的多余空行。
+- 将 Markdown 正文、代码块、数学公式、表格和 Callouts 从 `main.css` 拆到 `assets/css/markdown.css`，页面按主题变量、基础组件、内容层顺序加载。
 - 新增 `docs/markdown代码块渲染分析.md`：确定 Shiki 4.6.0 直接接管 markdown-it 的方案，记录 Node >=20 与 markdown-it 15 的版本冲突、markdown-it 15 / Eleventy 4 canary 的升级风险、直接接入方式、Node 18 回退到 Shiki 3.3.0 的路径，以及 Typora 仅作为视觉参考的边界。
 - 新增 `docs/archive/` 归档目录，将迁移前的 `docs/current-analysis.md` 移入 `docs/archive/2026-11-migration/`；活动文档继续保留在 `docs/` 根目录。
 

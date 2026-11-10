@@ -1,0 +1,462 @@
+/*
+Markdown 内容层：文章正文、代码块、数学公式、表格和 Callouts。
+主题变量来自 themes.css，基础布局和站点组件来自 main.css。
+*/
+
+.post-body {
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.post-body p,
+.post-body ul,
+.post-body ol {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.post-body h1,
+.post-body h2,
+.post-body h3,
+.post-body h4,
+.post-body h5,
+.post-body h6 {
+  margin: 48px 0 16px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.post-body h1 {
+  font-size: 30px;
+}
+
+.post-body h2 {
+  font-size: 26px;
+}
+
+.post-body h3 {
+  font-size: 22px;
+}
+
+.post-body h4 {
+  font-size: 19px;
+}
+
+.post-body h5,
+.post-body h6 {
+  font-size: 17px;
+}
+
+.post-body img {
+  display: block;
+  margin: 24px auto;
+  border-radius: 12px;
+}
+
+.post-body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--underline-soft);
+  transition: color 140ms var(--ease), text-decoration-color 140ms var(--ease);
+}
+
+.post-body a:hover,
+.post-body a:focus-visible {
+  text-decoration-color: var(--underline);
+}
+
+.post-body u,
+.post-body ins {
+  text-decoration-color: var(--underline);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.post-body blockquote {
+  margin: 24px 0;
+  padding: 12px 20px;
+  border-left: 2px solid var(--accent);
+  background-color: var(--surface);
+  color: var(--text-2);
+}
+
+.post-body pre {
+  padding: 20px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background-color: var(--surface-2);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Shiki 高亮：构建期输出 token，深色主题使用 dark CSS 变量，浅色主题保留 light 默认色。 */
+.post-body pre.shiki {
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background-color: var(--surface-2);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki {
+  color: var(--shiki-dark) !important;
+  background-color: var(--surface-2) !important;
+}
+
+html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style, inherit) !important;
+  font-weight: var(--shiki-dark-font-weight, inherit) !important;
+  text-decoration: var(--shiki-dark-text-decoration, inherit) !important;
+}
+
+html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .post-body pre.shiki {
+  background-color: var(--surface-2) !important;
+}
+
+.post-body pre.shiki .line-number {
+  display: inline-block;
+  min-width: 2.5em;
+  margin-right: 1em;
+  color: var(--text-3);
+  text-align: right;
+  user-select: none;
+}
+
+.post-body .math-display {
+  margin: 1.2rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.post-body .math-display .katex-display {
+  margin: 0;
+}
+
+.post-body .math-inline {
+  white-space: nowrap;
+}
+
+html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .line-number {
+  color: var(--text-3) !important;
+  background-color: transparent !important;
+}
+
+.post-body code {
+  font-family: var(--font-mono);
+}
+
+.post-body :not(pre) > code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.post-body mark {
+  padding: 0.1em 0.3em;
+  border: 1px solid var(--mark-border);
+  border-radius: 3px;
+  background-color: var(--mark-bg);
+  color: var(--mark-text);
+  font-weight: 700;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.post-body table {
+  width: 100%;
+  margin: 24px 0;
+  border-collapse: collapse;
+}
+
+.post-body th,
+.post-body td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--hairline);
+  text-align: left;
+}
+
+.post-body th {
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.post-body hr {
+  margin: 40px 0;
+}
+
+.post-body > :first-child {
+  margin-top: 0;
+}
+
+/* Nocturne 两套主题的正文排版和组件细节；night/paper 不受这些规则影响。 */
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body {
+  color: var(--body-text);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h1,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h2,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h3,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h4,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h5,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h1 {
+  margin: 2.4rem 0 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--heading-border-strong);
+  color: var(--h1-color);
+  font-size: 2rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h2 {
+  margin: 0.6rem 0 1rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--heading-border);
+  color: var(--h2-color);
+  font-size: 1.6rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h3 {
+  margin: 0.6rem 0 1rem;
+  color: var(--h3-color);
+  font-size: 1.3rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h4 {
+  margin: 0.6rem 0 1rem;
+  color: var(--h4-color);
+  font-size: 1.1rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h5 {
+  margin: 0.6rem 0 1rem;
+  color: var(--h5-color);
+  font-size: 1rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h6 {
+  margin: 0.6rem 0 1rem;
+  color: var(--h6-color);
+  font-size: 0.92rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-page .post-title,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .simple-page > .post-title {
+  color: var(--h1-color);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-page .post-title,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .simple-page > .post-title {
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--heading-border-strong);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .hero-title {
+  color: var(--h1-color);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .section-title {
+  color: var(--h2-color);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--underline-soft);
+  border-radius: 3px;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body a:hover,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body a:focus-visible {
+  color: var(--link-cyan);
+  background-color: var(--link-hover-bg);
+  border-bottom-color: var(--underline);
+  text-decoration: none;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body strong {
+  color: var(--strong-color);
+  font-weight: 600;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body em {
+  color: var(--em-color);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body :not(pre) > code {
+  padding: 0.15em 0.45em;
+  border: 1px solid var(--inline-code-border);
+  border-radius: 4px;
+  background-color: var(--inline-code-bg);
+  color: var(--inline-code-color);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body blockquote {
+  margin: 1.2rem 0;
+  padding: 0.8rem 1.2rem;
+  border-left: 3px solid var(--blockquote-border);
+  border-radius: 0 6px 6px 0;
+  background-color: var(--blockquote-bg);
+  color: var(--blockquote-text);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body blockquote p {
+  color: var(--blockquote-text);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body table {
+  border: 1px solid var(--table-border);
+  font-size: 0.93rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body th {
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--table-border);
+  background-color: var(--table-head-bg);
+  color: var(--table-head-text);
+  font-size: 0.88rem;
+  letter-spacing: 0.01em;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body td {
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--table-border);
+  color: var(--table-cell-text);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body tr:nth-child(2n) td {
+  background-color: var(--table-stripe);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body tr:hover td {
+  background-color: var(--table-hover);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body ul li::marker,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body ol li::marker {
+  color: var(--list-marker);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body ol li::marker {
+  font-weight: 600;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body hr {
+  height: 2px;
+  margin: 2.4rem 0;
+  background: linear-gradient(90deg, transparent, var(--hr-primary), var(--hr-cyan), transparent);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body img {
+  border: 1px solid var(--image-border);
+  border-radius: 6px;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body sup,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body sub {
+  color: var(--link-cyan);
+}
+
+/* GitHub/Typora callouts：标题、边框和浅色背景都取当前主题的语义色。 */
+.post-body blockquote.callout {
+  --callout-color: var(--callout-note);
+  position: relative;
+  margin: 1.2rem 0;
+  padding: 2.2rem 1.2rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--callout-color) 55%, var(--hairline));
+  border-left: 4px solid var(--callout-color);
+  border-radius: 0 8px 8px 0;
+  background-color: color-mix(in srgb, var(--callout-color) 15%, var(--surface));
+  color: var(--text-2);
+}
+
+.post-body blockquote.callout::before {
+  content: "\f431";
+  position: absolute;
+  top: 0.7rem;
+  left: 1.2rem;
+  color: var(--callout-color);
+  font-family: "bootstrap-icons";
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.post-body blockquote.callout::after {
+  content: attr(data-callout-label);
+  position: absolute;
+  top: 0.7rem;
+  left: 2.7rem;
+  color: var(--callout-color);
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.post-body blockquote.callout p {
+  margin: 0;
+  color: inherit;
+}
+
+.post-body blockquote.callout-tip {
+  --callout-color: var(--callout-tip);
+}
+
+.post-body blockquote.callout-important {
+  --callout-color: var(--callout-important);
+}
+
+.post-body blockquote.callout-warning {
+  --callout-color: var(--callout-warning);
+}
+
+.post-body blockquote.callout-caution {
+  --callout-color: var(--callout-caution);
+}
+
+.post-body blockquote.callout-note::before {
+  content: "\f431";
+}
+
+.post-body blockquote.callout-tip::before {
+  content: "\f46b";
+}
+
+.post-body blockquote.callout-important::before {
+  content: "\f530";
+}
+
+.post-body blockquote.callout-warning::before {
+  content: "\f33b";
+}
+
+.post-body blockquote.callout-caution::before {
+  content: "\f627";
+}

@@ -2,7 +2,7 @@
 // 发现任何问题 fail-fast 退出，不静默通过。
 
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { parseFrontMatter } from './front-matter.mjs';
 
 const SITE_DIR = 'site';
@@ -64,35 +64,43 @@ for (const filePath of htmlFiles) {
     errors.push(`${relativePath}: 存在未经过 Shiki 的代码块`);
   }
 
-  if (content.includes('node_modules')) {
-    // marked 造轮子文章正文里的代码示例是合法内容，排除该文件中的代码块场景。
-    if (!filePath.includes('marked-blog-generator')) {
-      errors.push(`${relativePath}: 引用了 node_modules`);
-    }
-  }
-
   if (/src="[^"]*\\[^"]*"/.test(content) || /href="[^"]*\\[^"]*"/.test(content)) {
     errors.push(`${relativePath}: 存在 Windows 反斜杠路径`);
   }
 
-  const linkMatches = content.matchAll(/(?:href|src)="(\/[^"]*)"/g);
+  const linkMatches = content.matchAll(/(?:href|src)="([^"]*)"/g);
   for (const match of linkMatches) {
-    const url = match[1].split('#')[0].split('?')[0];
-    if (url.endsWith('.css') || url.endsWith('.js') || url.endsWith('.png') || url.endsWith('.jpg') || url.endsWith('.jpeg') || url.endsWith('.gif') || url.endsWith('.woff') || url.endsWith('.woff2')) {
-      const assetPath = join(SITE_DIR, url.slice(1));
-      if (!existsSync(assetPath)) {
-        errors.push(`${relativePath}: 资源不存在 ${url}`);
+    const rawUrl = match[1];
+    if (!rawUrl || rawUrl.startsWith('#') || /^(?:[a-z]+:|\/\/)/i.test(rawUrl)) continue;
+    const isSiteAbsolute = rawUrl.startsWith('/');
+    const isExplicitRelative = rawUrl.startsWith('./') || rawUrl.startsWith('../');
+    if (!isSiteAbsolute && !isExplicitRelative) continue;
+
+    const url = rawUrl.split('#')[0].split('?')[0];
+    if (!url) continue;
+    let decodedUrl;
+    try {
+      decodedUrl = decodeURIComponent(url);
+    } catch (error) {
+      decodedUrl = url;
+    }
+
+    if (decodedUrl.includes('node_modules')) {
+      errors.push(`${relativePath}: 引用了 node_modules`);
+      continue;
+    }
+
+    const targetPath = decodedUrl.startsWith('/')
+      ? join(SITE_DIR, decodedUrl.slice(1))
+      : resolve(dirname(filePath), decodedUrl);
+    const isDirectoryUrl = decodedUrl.endsWith('/');
+    const hasFileExtension = /\.[a-z0-9]+$/i.test(decodedUrl);
+    if (isDirectoryUrl || (!hasFileExtension && existsSync(join(targetPath, 'index.html')))) {
+      if (!existsSync(join(targetPath, 'index.html'))) {
+        errors.push(`${relativePath}: 页面链接 404 ${rawUrl}`);
       }
-    } else if (url.endsWith('/')) {
-      const indexPath = join(SITE_DIR, url.slice(1), 'index.html');
-      if (!existsSync(indexPath)) {
-        errors.push(`${relativePath}: 页面链接 404 ${url}`);
-      }
-    } else if (url.endsWith('.html')) {
-      const pagePath = join(SITE_DIR, url.slice(1));
-      if (!existsSync(pagePath)) {
-        errors.push(`${relativePath}: 页面链接 404 ${url}`);
-      }
+    } else if (!existsSync(targetPath)) {
+      errors.push(`${relativePath}: 资源或页面不存在 ${rawUrl}`);
     }
   }
 }
