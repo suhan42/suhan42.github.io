@@ -1,7 +1,7 @@
 @charset "utf-8";
 
 /*
-设计系统：夜航深色（night）与纸墨浅色（paper）两套主题。
+设计系统：夜航深色（night）、纸墨浅色（paper）、Nocturne 深色（nocturne）和 Nocturne Bright 四套主题。
 布局从当前 Bootstrap 皮肤中剥离出来，只用系统自带的容器、间距和语义结构。
 surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/边框变化，不做位移和呼吸动效。
 */
@@ -54,6 +54,120 @@ surface/ring/text/accent 都是主题变量；hover 只做 120-160ms 的颜色/�
   --sigil: #8a5a2c;
   --positive: #16a34a;
   --negative: #dc2626;
+}
+
+/* nocturne 主题：紫黑底、蓝色链接和紫色标记。 */
+[data-theme="nocturne"] {
+  color-scheme: dark;
+  --bg: #211d25;
+  --surface: #28242e;
+  --surface-2: #19161d;
+  --text: #e8e6ec;
+  --text-2: #d4d0da;
+  --text-3: #938f9b;
+  --hairline: rgba(232, 230, 236, 0.10);
+  --ring: rgba(232, 230, 236, 0.14);
+  --accent: #8dc8fb;
+  --accent-ink: #211d25;
+  --ink: #e8e6ec;
+  --ink-muted: #938f9b;
+  --sigil: #b080ff;
+  --positive: #80ffb5;
+  --negative: #ff8080;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Inter", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  --font-mono: "Cascadia Code", "Fira Code", "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --body-text: #d4d0da;
+  --h1-color: #f0e8ff;
+  --h2-color: #fff2bf;
+  --h3-color: #64e0b3;
+  --h4-color: #ff7fa2;
+  --h5-color: #c8a8ff;
+  --h6-color: #b8a3bd;
+  --heading-border-strong: rgba(176, 128, 255, 0.5);
+  --heading-border: rgba(176, 128, 255, 0.38);
+  --strong-color: #b080ff;
+  --em-color: #c4b4ee;
+  --link-cyan: #80f4ff;
+  --link-underline: rgba(141, 200, 251, 0.32);
+  --link-hover-bg: rgba(128, 244, 255, 0.1);
+  --link-hover-line: rgba(128, 244, 255, 0.78);
+  --inline-code-bg: #28242e;
+  --inline-code-color: #ffcf99;
+  --inline-code-border: #2e2935;
+  --blockquote-border: #7138cc;
+  --blockquote-bg: rgba(113, 56, 204, 0.08);
+  --blockquote-text: #b3a3dd;
+  --table-head-bg: #2c2634;
+  --table-head-text: #e2d3fe;
+  --table-cell-text: #c8c4d0;
+  --table-border: #3a3344;
+  --table-stripe: rgba(40, 36, 46, 0.62);
+  --table-hover: rgba(176, 128, 255, 0.1);
+  --hr-primary: rgba(176, 128, 255, 0.55);
+  --hr-cyan: rgba(128, 244, 255, 0.38);
+  --mark-bg: rgba(128, 255, 181, 0.18);
+  --mark-text: #c8ffd9;
+  --mark-border: rgba(128, 255, 181, 0.34);
+  --list-marker: #7138cc;
+  --image-border: #2e2935;
+}
+
+/* nocturne-bright 主题：浅紫纸面、蓝色链接和紫色标记。 */
+[data-theme="nocturne-bright"] {
+  color-scheme: light;
+  --bg: #fbf8ff;
+  --surface: #ffffff;
+  --surface-2: #f0eaf7;
+  --text: #2d2834;
+  --text-2: #4f4859;
+  --text-3: #817789;
+  --hairline: rgba(45, 40, 52, 0.12);
+  --ring: rgba(45, 40, 52, 0.16);
+  --accent: #276fa9;
+  --accent-ink: #fbf8ff;
+  --ink: #2d2834;
+  --ink-muted: #817789;
+  --sigil: #7542bd;
+  --positive: #168452;
+  --negative: #c33c3c;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Inter", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  --font-mono: "Cascadia Code", "Fira Code", "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --body-text: #4f4859;
+  --h1-color: #2d2834;
+  --h2-color: #5b2f91;
+  --h3-color: #008494;
+  --h4-color: #b3316d;
+  --h5-color: #7542bd;
+  --h6-color: #817789;
+  --heading-border-strong: rgba(117, 66, 189, 0.42);
+  --heading-border: rgba(117, 66, 189, 0.38);
+  --strong-color: #7542bd;
+  --em-color: #6d4ea3;
+  --link-cyan: #008494;
+  --link-underline: rgba(39, 111, 169, 0.26);
+  --link-hover-bg: rgba(0, 132, 148, 0.08);
+  --link-hover-line: rgba(0, 132, 148, 0.56);
+  --inline-code-bg: #ffffff;
+  --inline-code-color: #9a5a16;
+  --inline-code-border: #e6ddeb;
+  --blockquote-border: #7542bd;
+  --blockquote-bg: rgba(88, 45, 150, 0.08);
+  --blockquote-text: #6d5d87;
+  --table-head-bg: #f5effa;
+  --table-head-text: #5b2f91;
+  --table-cell-text: #4f4859;
+  --table-border: #d3c7e0;
+  --table-stripe: rgba(255, 255, 255, 0.62);
+  --table-hover: rgba(117, 66, 189, 0.1);
+  --hr-primary: rgba(117, 66, 189, 0.55);
+  --hr-cyan: rgba(0, 132, 148, 0.38);
+  --mark-bg: rgba(22, 132, 82, 0.18);
+  --mark-text: #0f633d;
+  --mark-border: rgba(22, 132, 82, 0.34);
+  --list-marker: #7542bd;
+  --image-border: #e6ddeb;
 }
 
 * {
@@ -233,7 +347,11 @@ hr {
   background-color: var(--surface-2);
 }
 
-/* 主题切换：night 显示切换到 paper 的太阳，paper 显示切换到 night 的月亮。 */
+/* 主题选择：暗色主题显示太阳，浅色主题显示月亮，菜单提供四套色板。 */
+.theme-picker {
+  position: relative;
+}
+
 .theme-toggle {
   display: inline-grid;
   place-items: center;
@@ -243,7 +361,12 @@ hr {
   border-radius: 10px;
   color: var(--text-2);
   cursor: pointer;
+  list-style: none;
   transition: color 140ms var(--ease), background-color 140ms var(--ease), border-color 140ms var(--ease);
+}
+
+.theme-toggle::-webkit-details-marker {
+  display: none;
 }
 
 .theme-toggle:hover,
@@ -261,12 +384,79 @@ hr {
   line-height: 1;
 }
 
-[data-theme="night"] .theme-toggle .icon-sun {
+html:is([data-theme="night"], [data-theme="nocturne"]) .theme-toggle .icon-sun {
   display: block;
 }
 
-[data-theme="paper"] .theme-toggle .icon-moon {
+html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .icon-moon {
   display: block;
+}
+
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: min(220px, calc(100dvw - 32px));
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background-color: var(--surface);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--text-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.theme-option:hover,
+.theme-option:focus-visible,
+.theme-option.is-active {
+  color: var(--text);
+  background-color: var(--surface-2);
+}
+
+.theme-option.is-active::after {
+  content: "✓";
+  margin-left: auto;
+  color: var(--accent);
+}
+
+.theme-swatch {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+}
+
+[data-theme-option="night"] .theme-swatch {
+  background-color: #0b0d14;
+}
+
+[data-theme-option="paper"] .theme-swatch {
+  background-color: #f7f4ee;
+}
+
+[data-theme-option="nocturne"] .theme-swatch {
+  background-color: #211d25;
+}
+
+[data-theme-option="nocturne-bright"] .theme-swatch {
+  background-color: #fbf8ff;
 }
 
 /* 移动导航用 details 原生折叠，避免第三方菜单依赖。 */
@@ -493,6 +683,30 @@ hr {
 
 [data-theme="paper"] .works-rail-item[data-accent="blue"] {
   --work-accent: #4f7e99;
+}
+
+[data-theme="nocturne"] .works-rail-item[data-accent="night"] {
+  --work-accent: #b080ff;
+}
+
+[data-theme="nocturne"] .works-rail-item[data-accent="gold"] {
+  --work-accent: #ffcf99;
+}
+
+[data-theme="nocturne"] .works-rail-item[data-accent="blue"] {
+  --work-accent: #80f4ff;
+}
+
+[data-theme="nocturne-bright"] .works-rail-item[data-accent="night"] {
+  --work-accent: #7542bd;
+}
+
+[data-theme="nocturne-bright"] .works-rail-item[data-accent="gold"] {
+  --work-accent: #9a5a16;
+}
+
+[data-theme="nocturne-bright"] .works-rail-item[data-accent="blue"] {
+  --work-accent: #008494;
 }
 
 .works-rail-mark {
@@ -1115,7 +1329,7 @@ hr {
   line-height: 1.6;
 }
 
-/* Shiki 高亮：构建期输出 token，night 使用 dark CSS 变量，paper 保留 light 默认色。 */
+/* Shiki 高亮：构建期输出 token，深色主题使用 dark CSS 变量，浅色主题保留 light 默认色。 */
 .post-body pre.shiki {
   margin: 24px 0;
   padding: 20px;
@@ -1128,16 +1342,19 @@ hr {
   line-height: 1.6;
 }
 
-html[data-theme="night"] .post-body pre.shiki,
-html[data-theme="night"] .post-body pre.shiki span {
+html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki {
   color: var(--shiki-dark) !important;
-  background-color: var(--shiki-dark-bg) !important;
+  background-color: var(--surface-2) !important;
+}
+
+html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki span {
+  color: var(--shiki-dark) !important;
   font-style: var(--shiki-dark-font-style, inherit) !important;
   font-weight: var(--shiki-dark-font-weight, inherit) !important;
   text-decoration: var(--shiki-dark-text-decoration, inherit) !important;
 }
 
-html[data-theme="paper"] .post-body pre.shiki {
+html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .post-body pre.shiki {
   background-color: var(--surface-2) !important;
 }
 
@@ -1150,7 +1367,7 @@ html[data-theme="paper"] .post-body pre.shiki {
   user-select: none;
 }
 
-html[data-theme="night"] .post-body pre.shiki .line-number {
+html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .line-number {
   color: var(--text-3) !important;
   background-color: transparent !important;
 }
@@ -1421,4 +1638,196 @@ html[data-theme="night"] .post-body pre.shiki .line-number {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* Nocturne 两套主题的正文排版和组件细节；night/paper 不受这些规则影响。 */
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body {
+  color: var(--body-text);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h1,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h2,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h3,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h4,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h5,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h1 {
+  margin: 2.4rem 0 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--heading-border-strong);
+  color: var(--h1-color);
+  font-size: 2rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h2 {
+  margin: 0.6rem 0 1rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--heading-border);
+  color: var(--h2-color);
+  font-size: 1.6rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h3 {
+  margin: 0.6rem 0 1rem;
+  color: var(--h3-color);
+  font-size: 1.3rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h4 {
+  margin: 0.6rem 0 1rem;
+  color: var(--h4-color);
+  font-size: 1.1rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h5 {
+  margin: 0.6rem 0 1rem;
+  color: var(--h5-color);
+  font-size: 1rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h6 {
+  margin: 0.6rem 0 1rem;
+  color: var(--h6-color);
+  font-size: 0.92rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-page .post-title,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .simple-page > .post-title {
+  color: var(--h1-color);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-page .post-title,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .simple-page > .post-title {
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--heading-border-strong);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .hero-title {
+  color: var(--h1-color);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .section-title {
+  color: var(--h2-color);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--link-underline);
+  border-radius: 3px;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body a:hover,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body a:focus-visible {
+  color: var(--link-cyan);
+  background-color: var(--link-hover-bg);
+  border-bottom-color: var(--link-hover-line);
+  text-decoration: none;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body strong {
+  color: var(--strong-color);
+  font-weight: 600;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body em {
+  color: var(--em-color);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body :not(pre) > code {
+  padding: 0.15em 0.45em;
+  border: 1px solid var(--inline-code-border);
+  border-radius: 4px;
+  background-color: var(--inline-code-bg);
+  color: var(--inline-code-color);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body blockquote {
+  margin: 1.2rem 0;
+  padding: 0.8rem 1.2rem;
+  border-left: 3px solid var(--blockquote-border);
+  border-radius: 0 6px 6px 0;
+  background-color: var(--blockquote-bg);
+  color: var(--blockquote-text);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body blockquote p {
+  color: var(--blockquote-text);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body table {
+  border: 1px solid var(--table-border);
+  font-size: 0.93rem;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body th {
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--table-border);
+  background-color: var(--table-head-bg);
+  color: var(--table-head-text);
+  font-size: 0.88rem;
+  letter-spacing: 0.01em;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body td {
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--table-border);
+  color: var(--table-cell-text);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body tr:nth-child(2n) td {
+  background-color: var(--table-stripe);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body tr:hover td {
+  background-color: var(--table-hover);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body ul li::marker,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body ol li::marker {
+  color: var(--list-marker);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body ol li::marker {
+  font-weight: 600;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body hr {
+  height: 2px;
+  margin: 2.4rem 0;
+  background: linear-gradient(90deg, transparent, var(--hr-primary), var(--hr-cyan), transparent);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body mark {
+  padding: 0.1em 0.3em;
+  border: 1px solid var(--mark-border);
+  border-radius: 3px;
+  background-color: var(--mark-bg);
+  color: var(--mark-text);
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body img {
+  border: 1px solid var(--image-border);
+  border-radius: 6px;
+}
+
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body sup,
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body sub {
+  color: var(--link-cyan);
 }

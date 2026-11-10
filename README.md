@@ -81,9 +81,9 @@ npm run build
 
 ## 界面主题
 
-站点使用两套可切换主题：`night` 是夜航深色，`paper` 是纸墨浅色。`base.njk` 在首帧前恢复用户选择，没有保存值时跟随系统配色；`assets/js/theme.js` 负责按钮切换、持久化和无障碍标签更新。
+站点使用四套可切换主题：`night` 是夜航深色、`paper` 是纸墨浅色、`nocturne` 是 Nocturne 深色、`nocturne-bright` 是 Nocturne Bright 浅色。Nocturne 两套主题使用各自的标题/正文字体栈和完整的正文组件规则，`night` / `paper` 保持原色板和原字体。`base.njk` 在首帧前恢复用户选择，没有保存值时跟随系统配色；`assets/js/theme.js` 负责菜单选择、持久化和无障碍标签更新。
 
-页面样式集中在 `assets/css/main.css`，基础站点不再加载 Bootstrap、jQuery 和 hc-mobile-nav。移动导航使用原生 `details`，主题按钮和移动菜单都支持键盘操作。
+页面样式集中在 `assets/css/main.css`，基础站点不再加载 Bootstrap、jQuery 和 hc-mobile-nav。移动导航使用原生 `details`，主题菜单和移动菜单都支持键盘操作。
 
 文章页目录由正文标题自动生成，不要求手写目录数据。桌面端显示在正文左侧并随页面滚动吸附，收起后正文从 880px 扩展到 1000px；移动端折叠在正文上方。Markdown 标题和文章型 HTML 里的标题都会参与生成。
 

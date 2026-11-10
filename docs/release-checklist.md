@@ -99,7 +99,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | 未使用依赖清理 | 部分完成 | `package.json` 只保留 `@11ty/eleventy` 和 `playwright`；`assets/vendor/` 仍有 Bootstrap、hc-mobile-nav 和 jQuery 文件，基础模板未加载，是否删除待确认 |
 | 代码块高亮方案确认 | √ | 选择 Shiki 4.6.0 直接接管 markdown-it，避免 `@shikijs/markdown-it@4.6.0` 的 markdown-it 15 依赖；详见 [markdown代码块渲染分析.md](markdown代码块渲染分析.md) |
 | 代码块高亮实现 | √ | Shiki 4.6.0 直接接管 markdown-it，使用 `github-light` / `github-dark` 双主题、`bundledLanguages` 全语言集和行号；旧 `highlight-github.css` 已删除；`npm run build` 和 `npm run validate:output` 通过 |
-| 代码块视觉验收 | 部分完成 | Playwright 已检查 C 自查表和 MySQL 自查表：`night` / `paper` 的 token、背景、行号正常，390px 下代码块内部横向滚动正常；MySQL 文章长 URL 造成的 46px 页面横向溢出属既有正文问题，待单独处理 |
+| 代码块视觉验收 | 部分完成 | Playwright 已检查 C 自查表和 MySQL 自查表在 `night` / `paper` / `nocturne` / `nocturne-bright` 四套主题下的字体、标题分级色、正文、链接、行内代码、引用、表格、token、背景和行号，390px 下代码块内部横向滚动正常；MySQL 文章长 URL 造成的 46px 页面横向溢出属既有正文问题，待单独处理 |
 | Node.js 最低版本 >=20 | √ | `package.json` 和 `package-lock.json` 根包声明 `engines.node >=20`；README、AGENTS.md 和迁移文档已同步 |
 | `.nojekyll` 存在于发布根 | √ | `gh-pages` 根目录包含 `.nojekyll`，避免非必要 Jekyll 处理 |
 | GitHub Pages 发布源为 `gh-pages` 根目录 | √（建议人工复核设置页） | 线上已输出新站，`main` 根目录没有 `index.html`，说明当前不是 `main` 根目录发布；仓库内无法直接读取 Pages Source 配置 |
@@ -109,7 +109,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | CLAUDE.md 引用 AGENTS.md | √ | `@AGENTS.md` |
 | 本地完整构建通过 | √ | 内容校验 10 个文件、输出校验 55 个 HTML 页面，构建产物与当前 `site/` 一致 |
 | 发布检查脚本通过 | √ | `npm run publish:pages:check` 确认 `main`、`site/` 提交状态、必需产物和远端配置 |
-| 人工抽查通过 | 部分完成 | 已做只读 HTTP 抽查；首页、文章、自定义页、旧 URL 正常；视觉、双主题、移动端和每篇文章仍需人工浏览器验收 |
+| 人工抽查通过 | 部分完成 | 已做只读 HTTP 抽查；首页、文章、自定义页、旧 URL 正常；视觉、四套主题、移动端和每篇文章仍需人工浏览器验收 |
 | 拟提交信息已生成 | √ | 本次 Shiki 高亮接入的拟提交文案已生成，未执行 commit |
 | 项目所有者明确要求执行提交 | 待确认 | 只有明确要求后才运行 `git commit` |
 | 合并迁移分支到 main | √ | `origin/main` 已包含迁移合并提交 |

@@ -18,10 +18,17 @@
         stored = null;
       }
       const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
-      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      const themeNames = ["night", "paper", "nocturne", "nocturne-bright"];
+      const themeColors = {
+        night: "#0b0d14",
+        paper: "#f7f4ee",
+        nocturne: "#211d25",
+        "nocturne-bright": "#fbf8ff"
+      };
+      const theme = themeNames.includes(stored) ? stored : systemTheme;
       document.documentElement.dataset.theme = theme;
       const themeColor = document.querySelector('meta[name="theme-color"]');
-      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+      if (themeColor) themeColor.content = themeColors[theme];
     })();
   </script>
 

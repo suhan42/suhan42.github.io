@@ -19,11 +19,11 @@
 
 当前剩余收尾项：
 
-1. 人工浏览器验收首页、9 篇 published 文章、3 个自定义页、双主题和移动端。
+1. 人工浏览器验收首页、9 篇 published 文章、3 个自定义页、四套主题和移动端。
 2. 确认 `views/fireworks2.html` 的退役或保留结论；该文件已随 `views/` 删除，当前没有跳转目标。
 3. 补齐日期、受控分类和受控标签的确认记录；当前 front matter 值已在站点使用，但不能把旧数据或 `mtime` 当作确认证据。
 4. 复核 `assets/vendor/` 中尚未被基础模板加载的 Bootstrap、hc-mobile-nav 和 jQuery 文件是否删除。
-5. 按 [markdown代码块渲染分析.md](markdown代码块渲染分析.md) 完成 Shiki 的人工视觉确认：C、C++、SQL、Shell、双主题、移动端和行号；Playwright 初步检查已通过。
+5. 按 [markdown代码块渲染分析.md](markdown代码块渲染分析.md) 完成 Shiki 的人工视觉确认：C、C++、SQL、Shell、四套主题、移动端和行号；Playwright 初步检查已通过。
 6. 生成拟提交文案；只有项目所有者明确要求时才执行 `git commit`。
 
 关键决策记录：

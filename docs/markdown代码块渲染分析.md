@@ -2,7 +2,7 @@
 
 更新时间：2026-11-10
 
-本文分析当前博客的 Markdown 代码块高亮方案，重点是 Eleventy 3.1.8、markdown-it 14.3.3、构建期静态输出和 `night` / `paper` 双主题下的兼容性。文中的 npm 版本查询时间为 2026-11-10；GitHub API 当时被限流，版本以 npm 官方 registry 和官方文档为准。
+本文分析当前博客的 Markdown 代码块高亮方案，重点是 Eleventy 3.1.8、markdown-it 14.3.3、构建期静态输出和 `night` / `paper` / `nocturne` / `nocturne-bright` 四套站点主题下的兼容性。文中的 npm 版本查询时间为 2026-11-10；GitHub API 当时被限流，版本以 npm 官方 registry 和官方文档为准。
 
 ## 结论
 
@@ -157,15 +157,18 @@ export default function (eleventyConfig) {
 5. 行号由 `transformerRenderLineNumber()` 生成；如果暂时不需要，先移除这个 transformer。
 6. 主题先选 `github-light` / `github-dark`，视觉稳定后再考虑 `vitesse-light` / `vitesse-dark`。
 
-## CSS 与双主题
+## CSS 与站点主题
 
-Shiki 的双主题输出使用 CSS 变量，例如 token 上会同时出现 light 颜色和 `--shiki-dark` 变量。页面需要根据站点主题切换变量：
+Shiki 的双主题输出使用 CSS 变量，例如 token 上会同时出现 light 颜色和 `--shiki-dark` 变量；站点四套主题按明暗映射到这两组变量。页面需要根据站点主题切换变量：
 
 ```css
-html[data-theme="night"] .post-body pre.shiki,
-html[data-theme="night"] .post-body pre.shiki span {
+html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki {
   color: var(--shiki-dark) !important;
-  background-color: var(--shiki-dark-bg) !important;
+  background-color: var(--surface-2) !important;
+}
+
+html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki span {
+  color: var(--shiki-dark) !important;
 }
 ```
 
@@ -174,7 +177,7 @@ html[data-theme="night"] .post-body pre.shiki span {
 - 把代码块边框、圆角、外间距交给站点的 `.post-body pre`。
 - 把 token 颜色、代码块背景交给 Shiki 主题变量。
 - 旧 `assets/vendor/highlight-github.css` 已删除，不要重新复制回 `assets/vendor/`。
-- 在 `paper` 主题下检查 `github-light` 的纯白背景是否和纸墨底色冲突；如果冲突，改用 `vitesse-light` 或覆盖 `--shiki-light-bg`。
+- 在 `paper` 和 `nocturne-bright` 主题下检查 `github-light` 的纯白背景是否和纸面底色冲突；如果冲突，改用 `vitesse-light` 或覆盖 `--shiki-light-bg`。
 
 ## Typora 参考
 
@@ -198,11 +201,11 @@ Typora 官方文档说明，代码围栏使用 CodeMirror 做语法高亮，代�
 2. 已安装精确版本依赖，更新 `package-lock.json`，未安装 `@shikijs/markdown-it`；语言集合加载 `bundledLanguages` 全集，不写死文章当前用到的语言。
 3. 已在 `eleventy.config.js` 接入 `highlight`，启用 `github-light` / `github-dark` 和行号。
 4. 用 `C 自查表`、`MySQL 自查表`、`关于 Git 使用`、`Linux 命令行` 四篇文章验收 C、C++、SQL、Shell 代码块；这一步仍需人工浏览器确认。
-5. 检查双主题：`night` 下 token 是否可读，`paper` 下背景是否过白，行号和复制按钮是否溢出。
+5. 检查四套主题：暗色主题下 token 是否可读，浅色主题下背景是否过白，行号和复制按钮是否溢出。
 6. 已运行 `npm run build` 和 `npm run validate:output`，确认没有引入 `node_modules` 引用、反斜杠路径或死链。
 7. 旧 `highlight-github.css` 已删除；接入 Shiki 后只保留一套 token 配色，避免两套规则并存。
 
-当前状态：Node.js >=20、旧样式清理和 Shiki 接入已完成，构建通过；Playwright 已检查 C 自查表和 MySQL 自查表的 `night` / `paper` 双主题、行号和 390px 代码块内部滚动，人工最终确认仍待完成。MySQL 文章长 URL 造成的页面横向溢出属于既有正文问题，不在本次高亮接入范围内。
+当前状态：Node.js >=20、旧样式清理和 Shiki 接入已完成，构建通过；Playwright 已检查 C 自查表和 MySQL 自查表的 `night` / `paper` / `nocturne` / `nocturne-bright` 四套主题、行号和 390px 代码块内部滚动，人工最终确认仍待完成。MySQL 文章长 URL 造成的页面横向溢出属于既有正文问题，不在本次高亮接入范围内。
 
 ## 参考资料
 
