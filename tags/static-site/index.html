@@ -18,10 +18,17 @@
         stored = null;
       }
       const systemTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "paper" : "night";
-      const theme = stored === "night" || stored === "paper" ? stored : systemTheme;
+      const themeNames = ["night", "paper", "nocturne", "nocturne-bright"];
+      const themeColors = {
+        night: "#0b0d14",
+        paper: "#f7f4ee",
+        nocturne: "#211d25",
+        "nocturne-bright": "#fbf8ff"
+      };
+      const theme = themeNames.includes(stored) ? stored : systemTheme;
       document.documentElement.dataset.theme = theme;
       const themeColor = document.querySelector('meta[name="theme-color"]');
-      if (themeColor) themeColor.content = theme === "paper" ? "#f7f4ee" : "#0b0d14";
+      if (themeColor) themeColor.content = themeColors[theme];
     })();
   </script>
 
@@ -53,10 +60,18 @@
         <span class="bi bi-github" aria-hidden="true"></span>
       </a>
 
-      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
-        <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
-        <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
-      </button>
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
 
       <details class="mobile-nav">
         <summary class="icon-link" aria-label="打开导航菜单">
