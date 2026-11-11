@@ -8,8 +8,8 @@ eleventyExcludeFromCollections: true
   <url><loc>{{ site.url }}/</loc></url>
   <url><loc>{{ site.url }}/about/</loc></url>
   <url><loc>{{ site.url }}/archive/</loc></url>
-  {% for category in collections.categories %}
-  <url><loc>{{ site.url }}/categories/{{ category }}/</loc></url>
+  {% for categoryPage in collections.categoryPages %}
+  <url><loc>{{ site.url }}{{ categoryPage.url }}</loc></url>
   {% endfor %}
   {% for tag in collections.allTags %}
   <url><loc>{{ site.url }}/tags/{{ tag }}/</loc></url>

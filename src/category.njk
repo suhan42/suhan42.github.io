@@ -1,23 +1,67 @@
 ---
 pagination:
-  data: collections.categories
+  data: collections.categoryPages
   size: 1
-  alias: category
-permalink: /categories/{{ category }}/
+  alias: categoryPage
+permalink: /categories/{{ categoryPage.parent }}/{% if categoryPage.kind == "subcategory" %}{{ categoryPage.slug }}/{% endif %}
 layout: layouts/base.njk
 title: Category
 eleventyComputed:
-  title: "Category: {{ category }}"
+  title: "Category: {{ categoryPage.label }}"
 ---
 
-<section class="simple-page">
-  <h1 class="post-title">{{ category }}</h1>
-  <p class="post-summary">Category archive</p>
-  <div class="post-list">
-    {% for post in collections.publishedPosts %}
-    {% if post.data.category == category %}
-      {% include "partials/post-card.njk" %}
-    {% endif %}
-    {% endfor %}
+<section class="simple-page category-page">
+  <div class="category-page-layout">
+    <nav class="category-tree" aria-labelledby="category-tree-title">
+      <h2 class="rail-title" id="category-tree-title">Categories</h2>
+      <ul class="category-tree-root">
+        {% for category in collections.categoryTree %}
+        {% set parentActive = categoryPage.parent == category.slug %}
+        <li class="category-tree-item{% if parentActive %} is-open{% endif %}">
+          <a href="/categories/{{ category.slug }}/" class="category-tree-link category-tree-parent{% if parentActive and categoryPage.kind == 'parent' %} is-active{% endif %}"{% if parentActive and categoryPage.kind == 'parent' %} aria-current="page"{% endif %}>
+            <span class="bi {% if parentActive %}bi-folder2-open{% else %}bi-folder2{% endif %}" aria-hidden="true"></span>
+            <span>{{ category.label }}</span>
+            {% if category.postCount %}
+            <span class="category-tree-count">{{ category.postCount }}</span>
+            {% endif %}
+          </a>
+          {% if category.subcategories.length %}
+          <ul class="category-tree-children">
+            {% for child in category.subcategories %}
+            <li>
+              <a href="/categories/{{ category.slug }}/{{ child.slug }}/" class="category-tree-link category-tree-child{% if parentActive and categoryPage.kind == 'subcategory' and categoryPage.slug == child.slug %} is-active{% endif %}"{% if parentActive and categoryPage.kind == 'subcategory' and categoryPage.slug == child.slug %} aria-current="page"{% endif %}>
+                <span class="bi bi-file-earmark-text" aria-hidden="true"></span>
+                <span>{{ child.label }}</span>
+                <span class="category-tree-count">{{ child.postCount }}</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <div class="category-page-main">
+      <div class="category-heading">
+        <span class="bi {% if categoryPage.kind == 'subcategory' %}bi-file-earmark-text{% else %}bi-folder2-open{% endif %}" aria-hidden="true"></span>
+        <h1 class="post-title">{{ categoryPage.label }}</h1>
+      </div>
+      {% if categoryPage.kind == "subcategory" %}
+      <p class="post-summary">{{ categoryPage.parentLabel }} / {{ categoryPage.label }}</p>
+      {% else %}
+      <p class="post-summary">Category archive</p>
+      {% endif %}
+      <div class="post-list">
+        {% for post in collections.publishedPosts %}
+        {% if post.data.category == categoryPage.parent %}
+        {% if categoryPage.kind == "parent" or (post.inputPath | postSubcategory) == categoryPage.slug %}
+          {% include "partials/post-card.njk" %}
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
   </div>
 </section>

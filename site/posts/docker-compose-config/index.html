@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>docker-compose.yml 和 docker-compose.override.yml - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/main.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#docker-composeyml-%E5%92%8C-docker-composeoverrideyml">docker-compose.yml 和 docker-compose.override.yml</a></li>
+<li class="toc-item toc-level-2"><a href="#docker-compose-f-xxxyml-%E5%91%BD%E4%BB%A4">docker-compose -f xxx.yml 命令</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/docker/" class="post-category">
+        it / docker      </a>
+      <time datetime="2026-11-11">2026-11-11</time>
+    </div>
+
+    <h1 id="post-title" class="post-title">docker-compose.yml 和 docker-compose.override.yml</h1>
+
+    <div class="post-body">
+<h1 id="docker-composeyml-和-docker-composeoverrideyml">docker-compose.yml 和 docker-compose.override.yml</h1>
+<p>官方文档：https://docs.docker.com/compose/reference/overview/</p>
+<h2 id="docker-compose-f-xxxyml-命令"><code>docker-compose -f xxx.yml</code> 命令</h2>
+<p>docker-compose的命令构成：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>docker-compose [-f …] [--profile …] [options] [COMMAND] [ARGS…]</span></span></code></pre>
+<p>其中<code>-f</code>部分可以指定使用哪一个<code>yml</code>文件，来执行后续的<code>COMMAND</code>（比如build,up,down等）。</p>
+<ol>
+<li>如果有多个<code>yml</code>，可以同时指定多个：</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker-compose</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -f</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> docker-compose1.yml</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -f</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> docker-compose2.yml</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> xxxx（省略）</span></span></code></pre>
+<p><code>docker-compose</code>会合并两个文件中的设定，如果存在设定重复，<code>docker-compose2.yml</code>会覆盖掉前面的设定。</p>
+<ol start="2">
+<li>如果没有用<code>-f</code>指定文件的话，那么会用当前文件夹下面的两个文件<code>docker-compose.yml</code>和<code>docker-compose.override.yml</code>等价于：</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker-compose</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -f</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> docker-compose.yml</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -f</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> docker-compose.override.yml</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> xxxx（省略）</span></span></code></pre>
+<ol start="3">
+<li>具体使用</li>
+</ol>
+<p>一般可以考虑把共同的设定比如build，images之类的放在<code>docker-compose.override.yml</code>中，运行时候的 ports 之类的设定放在<code>docker-compose.yml</code>中。</p>
+<p>即共同的在<code>compose.override.yml</code>，各个单独的放在<code>docker-compose.yml</code>。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

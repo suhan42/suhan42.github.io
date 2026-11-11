@@ -11,6 +11,64 @@ import markdownItSubSup from "./scripts/markdown-it-subsup.mjs";
 import markdownItGithubAlerts from "./scripts/markdown-it-github-alerts.mjs";
 
 const customPages = JSON.parse(readFileSync(new URL("./src/_data/custom-pages.json", import.meta.url), "utf8"));
+const POST_GLOBS = ["./src/content/posts/**/*.md", "./src/content/posts/**/*.html"];
+const POST_ROOT = "src/content/posts/";
+
+// 从文章输入路径读取第一层目录名作为子分类；根目录文章没有子分类。
+function getPostSubcategory(inputPath) {
+  const normalized = String(inputPath || "").replace(/\\/g, "/").replace(/^\.\//, "");
+  const rootIndex = normalized.indexOf(POST_ROOT);
+  if (rootIndex === -1) return "";
+  const segments = normalized.slice(rootIndex + POST_ROOT.length).split("/").filter(Boolean);
+  return segments.length > 1 ? segments[0] : "";
+}
+
+function getPublishedPosts(collectionApi) {
+  return POST_GLOBS
+    .flatMap((glob) => collectionApi.getFilteredByGlob(glob))
+    .filter((post) => post.data.status === "published")
+    .sort((a, b) => new Date(b.data.date) - new Date(a.data.date));
+}
+
+// 分类树只从已发布文章的 category 和所在目录派生，目录名就是子分类 slug。
+function buildCategoryTree(posts) {
+  const tree = new Map();
+  for (const post of posts) {
+    const parent = post.data.category;
+    if (!parent) continue;
+    if (!tree.has(parent)) tree.set(parent, { slug: parent, label: parent, subcategories: new Map(), postCount: 0 });
+    const node = tree.get(parent);
+    node.postCount += 1;
+    const subcategory = getPostSubcategory(post.inputPath);
+    if (subcategory) {
+      const child = node.subcategories.get(subcategory) || { slug: subcategory, label: subcategory, postCount: 0 };
+      child.postCount += 1;
+      node.subcategories.set(subcategory, child);
+    }
+  }
+
+  return Array.from(tree.values())
+    .sort((a, b) => a.slug.localeCompare(b.slug))
+    .map((node) => ({
+      ...node,
+      subcategories: Array.from(node.subcategories.values()).sort((a, b) => a.slug.localeCompare(b.slug))
+    }));
+}
+
+function buildCategoryPages(posts) {
+  return buildCategoryTree(posts).flatMap((node) => [
+    { kind: "parent", parent: node.slug, slug: node.slug, label: node.label, url: `/categories/${node.slug}/`, postCount: node.postCount },
+    ...node.subcategories.map((child) => ({
+      kind: "subcategory",
+      parent: node.slug,
+      parentLabel: node.label,
+      slug: child.slug,
+      label: child.label,
+      url: `/categories/${node.slug}/${child.slug}/`,
+      postCount: child.postCount
+    }))
+  ]);
+}
 
 // 用三份站点 CSS 的内容哈希生成缓存版本，样式一改 URL 就变化，不需要手工维护版本号。
 const cssVersion = createHash("sha256")
@@ -66,6 +124,12 @@ function headingText(value) {
     return Object.prototype.hasOwnProperty.call(entities, key) ? entities[key] : match;
   });
   return decoded.replace(/\s+/g, " ").trim();
+}
+
+// 比较两个标题是否相同，忽略空白、全半角和大小写差异，用于避免目录里出现同名首项。
+function sameHeadingText(left, right) {
+  const normalize = (value) => String(value || "").normalize("NFKC").replace(/\s+/g, "").toLowerCase();
+  return normalize(left) === normalize(right);
 }
 
 // 生成适合作为 HTML id 的稳定 slug，保留中文并处理重复标题。
@@ -138,32 +202,41 @@ export default function (eleventyConfig) {
     return currentUrl.startsWith(itemUrl);
   });
 
+  // 文章所属子分类直接取自目录；文章链接优先指向父分类下的子分类页。
+  eleventyConfig.addFilter("postSubcategory", (inputPath) => getPostSubcategory(inputPath));
+  eleventyConfig.addFilter("postCategoryUrl", (inputPath, category) => {
+    const subcategory = getPostSubcategory(inputPath);
+    return subcategory ? `/categories/${category}/${subcategory}/` : `/categories/${category}/`;
+  });
+
   // 只保留 status 为 published 的文章，draft 不进入首页、归档和聚合页。
   eleventyConfig.addCollection("publishedPosts", (collectionApi) => {
-    return collectionApi.getFilteredByGlob("./src/content/posts/*.md")
-      .concat(collectionApi.getFilteredByGlob("./src/content/posts/*.html"))
-      .filter((post) => post.data.status === "published")
-      .sort((a, b) => new Date(b.data.date) - new Date(a.data.date));
+    return getPublishedPosts(collectionApi);
   });
 
   // 从 published 文章集合派生分类列表，用于侧栏和页脚，不再硬编码。
   eleventyConfig.addCollection("categories", (collectionApi) => {
     const set = new Set();
-    const posts = collectionApi.getFilteredByGlob("./src/content/posts/*.md")
-      .concat(collectionApi.getFilteredByGlob("./src/content/posts/*.html"))
-      .filter((post) => post.data.status === "published");
+    const posts = getPublishedPosts(collectionApi);
     for (const post of posts) {
       if (post.data.category) set.add(post.data.category);
     }
     return Array.from(set).sort();
   });
 
+  // 分类页分页集合：父分类与目录派生的子分类都会生成页面，父分类页聚合全部下级文章。
+  eleventyConfig.addCollection("categoryTree", (collectionApi) => {
+    return buildCategoryTree(getPublishedPosts(collectionApi));
+  });
+
+  eleventyConfig.addCollection("categoryPages", (collectionApi) => {
+    return buildCategoryPages(getPublishedPosts(collectionApi));
+  });
+
   // 从 published 文章集合派生标签列表，用于侧栏。
   eleventyConfig.addCollection("allTags", (collectionApi) => {
     const set = new Set();
-    const posts = collectionApi.getFilteredByGlob("./src/content/posts/*.md")
-      .concat(collectionApi.getFilteredByGlob("./src/content/posts/*.html"))
-      .filter((post) => post.data.status === "published");
+    const posts = getPublishedPosts(collectionApi);
     for (const post of posts) {
       if (Array.isArray(post.data.tags)) {
         for (const tag of post.data.tags) set.add(tag);
@@ -198,9 +271,10 @@ export default function (eleventyConfig) {
   // 从已渲染正文提取第一张真实图片作为首页卡片封面；代码块里的图片语法会被转义，不会误命中。
   eleventyConfig.addFilter("firstImage", firstImage);
 
-  // 为文章正文标题补齐 id，并同步生成目录；没有标题的文章返回空目录，由模板保持单栏布局。
-  eleventyConfig.addFilter("withToc", (content) => {
-    if (!content) return { content: "", toc: "", hasToc: false };
+  // 为文章正文标题补齐 id，并同步生成目录；页面标题始终由布局使用 front matter 的 title 渲染。
+  // 正文 H1/H2 都只是内容标题，允许重复使用 H1，模板不强制降级，也不把它们提升为页面标题。
+  eleventyConfig.addFilter("withToc", (content, pageTitle = "") => {
+    if (!content) return { content: "", toc: "", hasToc: false, layoutTitleId: "post-title" };
 
     const headings = [];
     const usedIds = new Set();
@@ -208,19 +282,35 @@ export default function (eleventyConfig) {
       const text = headingText(inner);
       if (!text) return match;
 
+      const levelNumber = Number(level);
       const idMatch = attrs.match(/\bid\s*=\s*(?:"([^"]*)"|'([^']*)')/i);
       const existingId = idMatch ? idMatch[1] ?? idMatch[2] : "";
       const id = existingId || headingSlug(text, usedIds);
       const nextAttrs = existingId ? attrs : ` id="${escapeHtml(id)}"${attrs}`;
       usedIds.add(id);
-      headings.push({ level: Number(level), id, text });
-      return `<h${level}${nextAttrs}>${inner}</h${level}>`;
+      headings.push({ level: levelNumber, id, text });
+      return `<h${levelNumber}${nextAttrs}>${inner}</h${levelNumber}>`;
     });
+
+    // 页面标题默认作为目录首项，点击后回到文章顶部；正文第一项已经是同名 H1 时不重复插入。
+    let layoutTitleId = "post-title";
+    if (headings.length > 0) {
+      let suffix = 2;
+      while (usedIds.has(layoutTitleId)) {
+        layoutTitleId = `post-title-${suffix}`;
+        suffix += 1;
+      }
+      const duplicatedByBody = headings[0].level === 1 && sameHeadingText(headings[0].text, pageTitle);
+      if (pageTitle && !duplicatedByBody) {
+        headings.unshift({ level: 1, id: layoutTitleId, text: String(pageTitle) });
+      }
+    }
 
     return {
       content: html,
       toc: headings.length > 0 ? renderTableOfContents(headings) : "",
-      hasToc: headings.length > 0
+      hasToc: headings.length > 0,
+      layoutTitleId
     };
   });
 

@@ -2,6 +2,46 @@
 
 最新内容放前面；同一天合并写，聚焦具体内容，不记录过多 git 操作。
 
+## 2026-11-11
+
+### 文章图片迁移脚本
+
+- 新增 `scripts/migrate-post-assets.mjs` 和 `npm run assets:migrate`，用于把旧文章旁边的相对图片迁移到 `assets/images/<子分类>/<文件名>` 并改写为站点绝对路径。
+- 脚本默认 dry-run，`--write` 时先复制图片、改写文章并校验，最后才删除源文件；跳过代码块、行内代码、外链、data URL 和已经是 `/assets/images/...` 的引用，目标文件内容不同时 fail-fast，不覆盖用户资源；复制或改写失败会自动回滚，成功后清理系统临时目录里的迁移日志。
+- 同时处理 Markdown 图片、HTML `<img src>` 和 front matter `cover`；目标图片直接放在 `assets/images/<子分类>/` 下，不再保留源目录层级，根目录文章使用 front matter `slug` 作为命名空间。
+- 图片语法解析抽到 `scripts/image-references.mjs`，Markdown 代码块和行内代码边界由 markdown-it token 计算，迁移脚本和内容校验复用同一套 HTML 注释及 `pre/code/script/style` 保护规则。
+- `validate:content` 增加正文图片路径检查：Markdown 图片和 HTML `<img src>` 必须是 `/assets/images/...` 或显式外链，相对路径、反斜杠和包含 `..` 的路径会报错。
+- 迁移脚本拒绝“相对路径直接指向 assets/images”的写法，要求改用 `/assets/images/...`；内容校验先放行外链，再只对本地路径检查 `..`，避免误杀带 `..` 的远程 URL。
+- 迁移脚本遇到冲突时只输出冲突来源、目标和可选处理方式，不自动改名、移动或覆盖；覆盖两个源图撞同一目标、同一源图被规划到两个目标、目标文件已存在且内容不同三种情况。
+- 图片地址协议收紧为 HTTP/HTTPS、`data:`、`blob:` 和协议相对地址；`cover` 同步检查 `..` 与反斜杠；引用式图片和相对 `srcset` 改为 fail-closed，校验和迁移都会直接报“暂不支持”，不再静默放过。
+- `docker` 目录的两张安装截图已迁移到 `assets/images/docker/`，`Docker自定义安装.md` 的引用同步改为 `/assets/images/docker/...`；迁移脚本默认扁平存放，不再保留 `imgs-*` 子目录。
+- README 快速开始的 Node.js 版本要求从 `>=18` 修正为 `>=20`，与 `package.json` 和 AGENTS.md 对齐。
+
+### Docker 文章接入
+
+- `docker` 目录三篇文章补齐 front matter，使用 `2026-11-11` 作为发布日期、父分类 `it` 和 published 状态；slug 分别为 `docker-usage`、`docker-custom-install`、`docker-compose-config`。
+- `Docker.md` 的 `docker ps --format "{{...}}"` 代码块用 `{% raw %}` 包裹，避免 Nunjucks 在 Markdown 渲染前解析模板变量。
+- 当前 `npm run validate:content` 通过 14 个文件；`npm run build` 生成 53 个文件并生成 14 个旧 URL 跳转页，`validate:output` 通过 64 个 HTML 页面、13 篇 published，docker 文章页和 `/categories/it/docker/` 均存在。
+
+### 目录型子分类与分类文件夹树
+
+- `src/content/posts/` 的第一层目录名成为子分类 slug，front matter 的 `category` 继续表示父分类；例如 `git/关于Git使用.md` 输出 `/categories/it/git/`。
+- 文章、分类和标签集合改为递归扫描 `src/content/posts/**/*.md` 与 `**/*.html`，根目录文章仍可正常使用。
+- 分类页左侧新增文件夹树，当前父分类自动展开目录派生的子分类并高亮当前项，其他父分类保持收起；窄屏时树移动到正文上方。
+- 文章卡片和文章页的分类链接优先指向所属子分类页；sitemap 同步父分类和子分类 URL。
+- 内容校验增加目录 slug、单层目录、子分类目录与父分类一致性检查，同一目录混用不同父分类会 fail-fast。
+- 视觉沿用站点既有 beUI 式低噪音层级、细边框和留白，不引入第三方组件或前端依赖；beUI 在线页面本次网络不可达，未新增外部素材。
+
+### 审查修正
+
+- 图片保护改为由 markdown-it token 计算代码块和行内代码范围，覆盖缩进代码块、嵌套围栏和双反引号行内代码，避免内容校验误报和迁移脚本改到示例。
+- 修复 `rewriteImageReferences` 复用旧保护范围的问题：Markdown 图片改写会改变正文长度，HTML `<img src>` 改写改为基于上一轮结果重新计算代码块边界，避免代码示例被误改。
+- 分类文件夹树的父分类计数改用文章数，不再显示子分类数；当前父分类和子分类链接补 `aria-current="page"`。
+- 三篇 Docker 文章修正安装示例占位、复制残留、CVE 严重级别、截图 alt 和 `--profile` 拼写；日期统一按 front matter 的 `2026-11-11` 生效，不再单独标注待确认。
+- 文章页标题规则确定为：页面标题始终取 front matter 的 `title`，由布局统一渲染；正文 H1/H2 都只是内容标题，允许重复使用 H1，不接管页面标题；正文首个 H1 与 `title` 同名时目录不再重复插入标题项。Docker 三篇保留正文 H1。
+- 迁移脚本改为复制—改写—校验—删除四阶段；失败自动恢复文章并删除本次新建的图片，源文件清理失败时保留日志并返回非零。
+- 发布清单的 HTML 页面快照改回 57，归档年份统计改为 2023 年 9 篇、2026 年 4 篇。
+
 ## 2026-11-10
 
 ### 首页首图封面与卡片改版
@@ -27,7 +67,7 @@
 - 重写 `docs/content-inventory.md`：改为当前 `src/content/posts/` 和 `src/content/custom/` 的实际清单，历史 P0 快照只保留在 git 历史和 `pre-eleventy-migration` 标签。
 - 修正 `docs/target-architecture.md`：按实际目录更新文件树、`.nojekyll` 位置、集合名称和依赖说明，移除不存在的 `.eleventyignore`、`.editorconfig` 和根目录 `.nojekyll` 描述。
 - 当前验证：`validate:content` 通过 10 个文件，`validate:output` 通过 55 个 HTML 页面；`site/` 177 个跟踪文件，`gh-pages` 与 `main` 中 `site/` 子树一致。
-- 当前待确认：日期和受控分类/标签的确认记录、`views/fireworks2.html` 的退役结论、vendor 未使用资源清理、代码高亮视觉验收。
+- 当前待确认：父分类/标签的确认记录、`views/fireworks2.html` 的退役结论、vendor 未使用资源清理、代码高亮视觉验收。
 - `validate:output` 改为从 `src/content/posts/` 的 front matter 动态读取 published/draft，移除写死的 10 篇和 `photo-test` 文件名；新增共享 `scripts/front-matter.mjs`。
 - 新增 `src/_data/themes.json` 作为主题名称、标签、theme-color 和系统默认主题的唯一来源；菜单、首帧脚本和 `theme.js` 都从该文件读取。
 - 新增 `scripts/test-markdown.mjs` 和 `npm run test:markdown`，覆盖自定义 Markdown 规则及代码保护边界，共 12 项 fixture。

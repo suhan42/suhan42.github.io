@@ -3,7 +3,7 @@
 > 本文件是项目级固定开发准则，面向后续所有 AI 协作会话；全局指南的通用规则依然适用，冲突时以更严格者为准。
 
 创建日期：2026-11-06
-修改日期：2026-11-10
+修改日期：2026-11-11
 
 ## 0. 核心信条
 
@@ -58,7 +58,7 @@
 title: 非空
 date: YYYY-MM-DD
 slug: 只允许小写英文、数字和连字符，全站唯一
-category: 受控分类
+category: 父分类，小写英文 slug
 summary: 可选；需要精确控制列表、RSS 和搜索摘要时填写，缺省时取正文第一段
 status: published 或 draft
 ```
@@ -66,6 +66,10 @@ status: published 或 draft
 `tags` 可选；`cover` 可选，格式为 `/assets/images/...`。
 
 文章型 HTML（如《白色相簿2》攻略）与 Markdown 文章同等对待，都放 `src/content/posts/`，都要求完整 front matter；正文保持 HTML 不转 Markdown。独立特殊页（divergence、fireworks、box）放 `src/content/custom/`，不进文章集合，首页展示通过 `src/_data/custom-pages.json` 管理。
+
+子分类由 `src/content/posts/` 下的第一层目录名派生，例如 `git/关于Git使用.md` 对应 `it/git`；目录名必须是小写英文、数字或连字符，同一目录只能使用一个父分类，当前只支持一层子分类目录。
+
+页面标题始终取 front matter 的 `title`，由布局统一渲染为 `post-title`。正文 H1/H2 都只是内容标题，允许重复使用 H1，不接管页面标题，模板不强制降级。目录会自动补齐 id 并把页面标题放在首项，正文第一个 H1 与 `title` 同名时不重复插入。
 
 站内图片引用统一写作 `/assets/images/...`；禁止 `./`、`../` 和 Windows 反斜杠路径。
 
@@ -75,6 +79,7 @@ status: published 或 draft
 |---|---|
 | 文章页 | `/posts/{slug}/` |
 | 分类页 | `/categories/{category}/` |
+| 子分类页 | `/categories/{category}/{subcategory}/` |
 | 标签页 | `/tags/{tag}/` |
 | 特殊页 | `/custom/{slug}/` |
 | 归档页 | `/archive/` |

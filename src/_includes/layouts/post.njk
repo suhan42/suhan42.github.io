@@ -2,7 +2,8 @@
 layout: layouts/base.njk
 ---
 {# 文章页 layout：自动目录、标题、meta 和正文阅读线；post 正文由 Markdown 或受控 HTML 生成。 #}
-{% set article = content | withToc %}
+{% set article = content | withToc(title) %}
+{% set postSubcategory = page.inputPath | postSubcategory %}
 <div class="post-layout{% if not article.hasToc %} no-toc{% endif %}">
   {% if article.hasToc %}
   <details class="post-toc" open>
@@ -18,7 +19,9 @@ layout: layouts/base.njk
 
   <article class="post-page">
     <div class="post-meta">
-      <a href="/categories/{{ category }}/" class="post-category">{{ category }}</a>
+      <a href="{{ page.inputPath | postCategoryUrl(category) }}" class="post-category">
+        {{ category }}{% if postSubcategory %} / {{ postSubcategory }}{% endif %}
+      </a>
       <time datetime="{{ date | dateToIso }}">{{ date | dateDisplay }}</time>
       {% if tags and tags.length %}
       <span aria-hidden="true">/</span>
@@ -28,7 +31,7 @@ layout: layouts/base.njk
       {% endif %}
     </div>
 
-    <h1 class="post-title">{{ title }}</h1>
+    <h1 id="{{ article.layoutTitleId }}" class="post-title">{{ title }}</h1>
 
     <div class="post-body">
 {{ article.content | trim | safe }}

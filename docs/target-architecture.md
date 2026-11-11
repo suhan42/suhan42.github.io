@@ -192,13 +192,17 @@ status: published
 | `title` | 是 | 非空字符串 | 页面和列表展示标题，允许中文、书名号和空格 |
 | `date` | 是 | ISO 日期或日期时间 | 发布或写作时间，是唯一排序依据 |
 | `slug` | 是 | `/^[a-z0-9]+(?:-[a-z0-9]+)*$/` | URL 标识，全站唯一 |
-| `category` | 是 | 小写英文或受控映射键 | 一个文章只属于一个主分类 |
+| `category` | 是 | 小写英文 slug | 文章所属父分类；子分类由文章所在的第一层目录名派生，不写进 front matter |
 | `tags` | 否 | 字符串数组 | 小写标签，用于跨主题聚合 |
 | `summary` | 否 | 非空字符串 | 首页、RSS 和搜索摘要；缺省时由正文第一段生成展示摘要 |
 | `cover` | 否 | 站点绝对路径 | 显式覆盖首页卡片封面；缺省时自动取正文第一张真实 `<img>`，仍无图时只渲染纯文字卡 |
 | `status` | 是 | `published` 或 `draft` | 非 published 文章不进入首页、集合、RSS 和搜索索引 |
 
 站点内图片引用统一写作 `/assets/images/...`。不能在 Markdown 中使用 `./`、`../` 或 Windows 反斜杠路径。外部图片应显式使用完整 HTTPS URL；迁移时优先把本站文章使用的图片收入 `assets/images/`。首页卡片从构建后的正文 HTML 中读取第一张真实 `<img>`，代码块中的图片语法不会参与提取；front matter `cover` 始终优先，用于需要单独裁切或更换卡面时。
+
+子分类使用目录表达：`src/content/posts/git/example.md` 中，`git` 是子分类，front matter 的 `category: it` 是父分类，最终父分类页为 `/categories/it/`，子分类页为 `/categories/it/git/`。根目录文章没有子分类；当前只支持一层子分类目录，目录名必须可直接作为 URL slug，并且同一目录内的文章必须使用同一个父分类。
+
+页面标题始终取 front matter 的 `title`，由布局统一渲染 `post-title`。正文 H1/H2 都只是内容标题，允许重复使用 H1，不接管页面标题，模板不强制降级。目录会自动补齐 id 并把页面标题放在首项，正文第一个 H1 与 `title` 同名时不重复插入。
 
 ### 文章型 HTML 与独立型 HTML 的边界
 
@@ -274,6 +278,7 @@ base.njk
 | 首页第 2 页及以后 | `/page/2/` |
 | 文章页 | `/posts/{slug}/` |
 | 分类页 | `/categories/{category}/` |
+| 子分类页 | `/categories/{category}/{subcategory}/` |
 | 标签页 | `/tags/{tag}/` |
 | 归档页 | `/archive/` |
 | 关于页 | `/about/` |

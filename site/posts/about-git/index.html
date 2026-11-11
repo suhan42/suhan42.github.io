@@ -31,9 +31,9 @@
 
   <link href="/assets/images/suhan.png" rel="icon">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/css/themes.css?v=a7e715de44" rel="stylesheet">
-  <link href="/assets/css/main.css?v=a7e715de44" rel="stylesheet">
-  <link href="/assets/css/markdown.css?v=a7e715de44" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/main.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=e944d0c3b1" rel="stylesheet">
   <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
 </head>
 <body>
@@ -49,6 +49,7 @@
     <nav class="desktop-nav" aria-label="主导航">
       <ul class="nav-links">
         <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
         <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
         <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
         <li><a href="/about/" class="nav-link">About</a></li>
@@ -79,6 +80,7 @@
         </summary>
         <nav class="mobile-menu" aria-label="移动导航">
           <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
           <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
           <a href="/categories/acgn/">ACGN</a>
           <a href="/about/">About</a>
@@ -98,31 +100,33 @@
     </summary>
     <nav aria-label="文章目录">
       <ol class="toc-list">
-<li class="toc-item toc-level-1"><a href="#%E4%BB%80%E4%B9%88%E6%98%AFgit">什么是Git</a></li>
-<li class="toc-item toc-level-1"><a href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86">工作原理</a></li>
-<li class="toc-item toc-level-1"><a href="#%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C">常用操作</a></li>
-<li class="toc-item toc-level-1"><a href="#git%E4%BD%BF%E7%94%A8">Git使用</a></li>
-<li class="toc-item toc-level-2"><a href="#%E7%99%BB%E5%BD%95">登录</a></li>
-<li class="toc-item toc-level-2"><a href="#%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93">远程仓库</a></li>
-<li class="toc-item toc-level-2"><a href="#%E4%B8%8A%E4%BC%A0%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93">上传本地仓库</a></li>
-<li class="toc-item toc-level-2"><a href="#%E4%B8%8A%E4%BC%A0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93">上传远程仓库</a></li>
-<li class="toc-item toc-level-2"><a href="#%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86">分支管理</a></li>
-<li class="toc-item toc-level-2"><a href="#%E6%9F%A5%E7%9C%8B%E4%BF%AE%E6%94%B9">查看修改</a></li>
-<li class="toc-item toc-level-2"><a href="#%E6%A0%87%E7%AD%BE">标签</a></li>
+<li class="toc-item toc-level-1"><a href="#post-title">关于 Git 使用</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BB%80%E4%B9%88%E6%98%AFgit">什么是Git</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86">工作原理</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C">常用操作</a></li>
+<li class="toc-item toc-level-2"><a href="#git%E4%BD%BF%E7%94%A8">Git使用</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%99%BB%E5%BD%95">登录</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93">远程仓库</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%8A%E4%BC%A0%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93">上传本地仓库</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%8A%E4%BC%A0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93">上传远程仓库</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86">分支管理</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9F%A5%E7%9C%8B%E4%BF%AE%E6%94%B9">查看修改</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%A0%87%E7%AD%BE">标签</a></li>
 </ol>
     </nav>
   </details>
 
   <article class="post-page">
     <div class="post-meta">
-      <a href="/categories/it/" class="post-category">it</a>
+      <a href="/categories/it/git/" class="post-category">
+        it / git      </a>
       <time datetime="2023-01-23">2023-01-23</time>
       <span aria-hidden="true">/</span>
       <a href="/tags/git/">#git</a>
       <a href="/tags/workflow/">#workflow</a>
     </div>
 
-    <h1 class="post-title">关于 Git 使用</h1>
+    <h1 id="post-title" class="post-title">关于 Git 使用</h1>
 
     <div class="post-body">
 <h2 id="什么是git">什么是Git</h2>
