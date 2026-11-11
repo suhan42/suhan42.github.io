@@ -1,6 +1,27 @@
 
 [
   {
+    "title": "Docker 使用",
+    "url": "/posts/docker-usage/",
+    "date": "2026-11-11",
+    "category": "it",
+    "tags": [],
+    "summary": "常用的 Docker 客户端命令："
+  },  {
+    "title": "Docker 自定义安装",
+    "url": "/posts/docker-custom-install/",
+    "date": "2026-11-11",
+    "category": "it",
+    "tags": [],
+    "summary": "8分钟安装 Docker Desktop-哔哩哔哩视频"
+  },  {
+    "title": "docker-compose.yml 和 docker-compose.override.yml",
+    "url": "/posts/docker-compose-config/",
+    "date": "2026-11-11",
+    "category": "it",
+    "tags": [],
+    "summary": "官方文档：https://docs.docker.com/compose/reference/overview/"
+  },  {
     "title": "typora 手册",
     "url": "/posts/typora-index/",
     "date": "2026-10-22",
@@ -15,19 +36,19 @@
     "tags": ["essay","english"],
     "summary": "这篇随笔用英文整理了从失恋中获得的思考：失去不是终点，这些经历会塑造更成熟的心智和更长久的关系。"
   },  {
-    "title": "marked 造轮子",
-    "url": "/posts/marked-blog-generator/",
-    "date": "2023-01-23",
-    "category": "it",
-    "tags": ["marked","markdown","static-site"],
-    "summary": "这篇笔记记录如何用 marked 和 highlight.js 手写一个轻量博客生成器，覆盖 marked 的基本用法、自定义渲染器、代码高亮和常见问题排查。"
-  },  {
     "title": "关于 Git 使用",
     "url": "/posts/about-git/",
     "date": "2023-01-23",
     "category": "it",
     "tags": ["git","workflow"],
     "summary": "这篇笔记介绍 Git 的分布式版本控制思想和工作原理，整理常用操作命令，适合作为个人协作与版本管理的参考。"
+  },  {
+    "title": "marked 造轮子",
+    "url": "/posts/marked-blog-generator/",
+    "date": "2023-01-23",
+    "category": "it",
+    "tags": ["marked","markdown","static-site"],
+    "summary": "这篇笔记记录如何用 marked 和 highlight.js 手写一个轻量博客生成器，覆盖 marked 的基本用法、自定义渲染器、代码高亮和常见问题排查。"
   },  {
     "title": "Linux 命令行",
     "url": "/posts/linux-command/",

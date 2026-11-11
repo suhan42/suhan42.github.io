@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/main.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link is-active" aria-current="page">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/" class="is-active" aria-current="page">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout" tabindex="-1">
+    <div class="content-rail">
+      <div class="content-main">
+<section class="hero">
+  <p class="hero-eyebrow">Technical notes · essays · interactive works</p>
+  <h1 class="hero-title">夜里读书，纸上写笔记，偶尔做一点小作品。</h1>
+  <p class="hero-copy">这里是 suhan 的个人博客：技术自查表、读书随笔和 3 个手作交互页，全部由 Markdown 或 HTML 在构建期生成。</p>
+</section>
+
+<section class="posts-section">
+  <div class="section-heading">
+    <h2 class="section-title">Latest</h2>
+    <p class="section-note">3 notes · newest first</p>
+  </div>
+
+  <div class="post-list">
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">
+        it      </a>
+      <time datetime="2023-01-22">2023-01-22</time>
+    </div>
+
+    <a href="/posts/vi-and-vim/" class="card-link">
+      <h3 class="post-title">vi 与 vim</h3>
+    </a>
+
+    <p class="post-summary">这篇笔记对比 vi 和 vim 的差异，整理三种编辑模式和常用命令，适合作为 Linux 文本编辑的快速参考。</p>
+  </div>
+</article>
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">
+        it      </a>
+      <time datetime="2023-01-22">2023-01-22</time>
+    </div>
+
+    <a href="/posts/hexo-and-jekyll/" class="card-link">
+      <h3 class="post-title">静态博客框架之 Hexo 与 Jekyll</h3>
+    </a>
+
+    <p class="post-summary">这篇笔记对比 Hexo 和 Jekyll 两个静态博客框架，分析各自的生态、部署方式和适用场景，并说明选择 Hexo 的原因。</p>
+  </div>
+</article>
+
+<article class="post-card" data-category="acgn">
+  <div class="post-media" data-category="acgn" aria-hidden="true">
+    <img src="/assets/images/冬馬かずさ.jpg" alt="" class="post-cover" loading="lazy" decoding="async">
+  </div>
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/acgn/" class="post-category">
+        acgn      </a>
+      <time datetime="2023-01-22">2023-01-22</time>
+    </div>
+
+    <a href="/posts/wa2-playthrough-guide/" class="card-link">
+      <h3 class="post-title">《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理]</h3>
+    </a>
+
+    <p class="post-summary">这篇攻略整理了《白色相簿2》各版本的通关推荐顺序、名词解释和注意事项，帮助不透剧的玩家获得更好的游戏体验。</p>
+  </div>
+</article>
+  </div>
+
+
+<nav class="pagination" aria-label="文章分页">
+  <a href="/page/2/" class="page-prev">Previous</a>
+
+  <a href="/">1</a>
+  <a href="/page/2/">2</a>
+  <a aria-current="page" class="is-active">3</a>
+
+</nav>
+</section>
+      </div>
+
+<aside class="rail" aria-label="站点索引">
+  <section class="rail-card works-rail" aria-labelledby="works-title">
+    <div class="rail-heading">
+      <h2 class="rail-title" id="works-title">Works</h2>
+      <span class="works-count">3</span>
+    </div>
+    <div class="works-rail-list">
+      <a href="/custom/divergence-meter/" class="works-rail-item" data-accent="night">
+        <span class="works-rail-mark" aria-hidden="true">DM</span>
+        <span class="works-rail-copy">
+          <span class="works-rail-name">Divergence Meter</span>
+          <span class="works-rail-meta">交互页 · acgn</span>
+        </span>
+        <span class="works-rail-arrow bi bi-arrow-up-right" aria-hidden="true"></span>
+      </a>
+      <a href="/custom/happy-new-year/" class="works-rail-item" data-accent="gold">
+        <span class="works-rail-mark" aria-hidden="true">NY</span>
+        <span class="works-rail-copy">
+          <span class="works-rail-name">Happy New Year</span>
+          <span class="works-rail-meta">节令页 · acgn</span>
+        </span>
+        <span class="works-rail-arrow bi bi-arrow-up-right" aria-hidden="true"></span>
+      </a>
+      <a href="/custom/css-box/" class="works-rail-item" data-accent="blue">
+        <span class="works-rail-mark" aria-hidden="true">BX</span>
+        <span class="works-rail-copy">
+          <span class="works-rail-name">CSS Box 手册</span>
+          <span class="works-rail-meta">教学页 · it</span>
+        </span>
+        <span class="works-rail-arrow bi bi-arrow-up-right" aria-hidden="true"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="rail-card">
+    <h2 class="rail-title">Categories</h2>
+    <ul class="rail-links">
+      <li><a href="/categories/acgn/">acgn</a></li>
+      <li><a href="/categories/essay/">essay</a></li>
+      <li><a href="/categories/it/">it</a></li>
+    </ul>
+  </section>
+
+  <section class="rail-card">
+    <h2 class="rail-title">Tags</h2>
+    <div class="rail-tags">
+      <a href="/tags/c/" class="rail-tag">#c</a>
+      <a href="/tags/cpp/" class="rail-tag">#cpp</a>
+      <a href="/tags/database/" class="rail-tag">#database</a>
+      <a href="/tags/english/" class="rail-tag">#english</a>
+      <a href="/tags/essay/" class="rail-tag">#essay</a>
+      <a href="/tags/game/" class="rail-tag">#game</a>
+      <a href="/tags/git/" class="rail-tag">#git</a>
+      <a href="/tags/guide/" class="rail-tag">#guide</a>
+      <a href="/tags/hexo/" class="rail-tag">#hexo</a>
+      <a href="/tags/jekyll/" class="rail-tag">#jekyll</a>
+      <a href="/tags/linux/" class="rail-tag">#linux</a>
+      <a href="/tags/markdown/" class="rail-tag">#markdown</a>
+      <a href="/tags/marked/" class="rail-tag">#marked</a>
+      <a href="/tags/mysql/" class="rail-tag">#mysql</a>
+      <a href="/tags/note/" class="rail-tag">#note</a>
+      <a href="/tags/shell/" class="rail-tag">#shell</a>
+      <a href="/tags/static-site/" class="rail-tag">#static-site</a>
+      <a href="/tags/typora/" class="rail-tag">#typora</a>
+      <a href="/tags/vim/" class="rail-tag">#vim</a>
+      <a href="/tags/white-album-2/" class="rail-tag">#white-album-2</a>
+      <a href="/tags/workflow/" class="rail-tag">#workflow</a>
+    </div>
+  </section>
+
+  <section class="rail-card">
+    <h2 class="rail-title">Elsewhere</h2>
+    <ul class="rail-links">
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/feed.xml">RSS</a></li>
+      <li><a href="/sitemap.xml">Sitemap</a></li>
+    </ul>
+  </section>
+</aside>
+    </div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

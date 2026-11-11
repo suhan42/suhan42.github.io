@@ -31,9 +31,9 @@
 
   <link href="/assets/images/suhan.png" rel="icon">
   <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/css/themes.css?v=a7e715de44" rel="stylesheet">
-  <link href="/assets/css/main.css?v=a7e715de44" rel="stylesheet">
-  <link href="/assets/css/markdown.css?v=a7e715de44" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/main.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=e944d0c3b1" rel="stylesheet">
   <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
 </head>
 <body>
@@ -49,6 +49,7 @@
     <nav class="desktop-nav" aria-label="主导航">
       <ul class="nav-links">
         <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link is-active" aria-current="page">Essay</a></li>
         <li><a href="/categories/it/" class="nav-link">IT</a></li>
         <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
         <li><a href="/about/" class="nav-link">About</a></li>
@@ -79,6 +80,7 @@
         </summary>
         <nav class="mobile-menu" aria-label="移动导航">
           <a href="/">Home</a>
+          <a href="/categories/essay/" class="is-active" aria-current="page">Essay</a>
           <a href="/categories/it/">IT</a>
           <a href="/categories/acgn/">ACGN</a>
           <a href="/about/">About</a>
@@ -90,16 +92,72 @@
 </header>
 
   <main id="main" class="layout" tabindex="-1">
-<section class="simple-page">
-  <h1 class="post-title">essay</h1>
-  <p class="post-summary">Category archive</p>
-  <div class="post-list">
+<section class="simple-page category-page">
+  <div class="category-page-layout">
+    <nav class="category-tree" aria-labelledby="category-tree-title">
+      <h2 class="rail-title" id="category-tree-title">Categories</h2>
+      <ul class="category-tree-root">
+        <li class="category-tree-item">
+          <a href="/categories/acgn/" class="category-tree-link category-tree-parent">
+            <span class="bi bi-folder2" aria-hidden="true"></span>
+            <span>acgn</span>
+            <span class="category-tree-count">1</span>
+          </a>
+        </li>
+        <li class="category-tree-item is-open">
+          <a href="/categories/essay/" class="category-tree-link category-tree-parent is-active" aria-current="page">
+            <span class="bi bi-folder2-open" aria-hidden="true"></span>
+            <span>essay</span>
+            <span class="category-tree-count">1</span>
+          </a>
+        </li>
+        <li class="category-tree-item">
+          <a href="/categories/it/" class="category-tree-link category-tree-parent">
+            <span class="bi bi-folder2" aria-hidden="true"></span>
+            <span>it</span>
+            <span class="category-tree-count">11</span>
+          </a>
+          <ul class="category-tree-children">
+            <li>
+              <a href="/categories/it/docker/" class="category-tree-link category-tree-child">
+                <span class="bi bi-file-earmark-text" aria-hidden="true"></span>
+                <span>docker</span>
+                <span class="category-tree-count">3</span>
+              </a>
+            </li>
+            <li>
+              <a href="/categories/it/git/" class="category-tree-link category-tree-child">
+                <span class="bi bi-file-earmark-text" aria-hidden="true"></span>
+                <span>git</span>
+                <span class="category-tree-count">1</span>
+              </a>
+            </li>
+            <li>
+              <a href="/categories/it/markdown/" class="category-tree-link category-tree-child">
+                <span class="bi bi-file-earmark-text" aria-hidden="true"></span>
+                <span>markdown</span>
+                <span class="category-tree-count">1</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="category-page-main">
+      <div class="category-heading">
+        <span class="bi bi-folder2-open" aria-hidden="true"></span>
+        <h1 class="post-title">essay</h1>
+      </div>
+      <p class="post-summary">Category archive</p>
+      <div class="post-list">
 
 <article class="post-card no-cover" data-category="essay">
 
   <div class="post-body-area">
     <div class="post-meta">
-      <a href="/categories/essay/" class="post-category">essay</a>
+      <a href="/categories/essay/" class="post-category">
+        essay      </a>
       <time datetime="2023-09-26">2023-09-26</time>
     </div>
 
@@ -110,6 +168,8 @@
     <p class="post-summary">这篇随笔用英文整理了从失恋中获得的思考：失去不是终点，这些经历会塑造更成熟的心智和更长久的关系。</p>
   </div>
 </article>
+      </div>
+    </div>
   </div>
 </section>
   </main>

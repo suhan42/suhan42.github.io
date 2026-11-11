@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Docker 自定义安装 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/main.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#docker-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%AE%89%E8%A3%85">Docker 自定义安装</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%80%E4%BD%BF%E7%94%A8%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%AE%89%E8%A3%85docker%E6%8C%87%E5%AE%9Adocker%E5%AE%89%E8%A3%85%E7%9B%AE%E5%BD%95">一、使用命令行安装Docker，指定docker安装目录</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%83%85%E5%86%B5%E4%B8%80%E4%BB%A5%E7%AE%A1%E7%90%86%E5%91%98%E8%BA%AB%E4%BB%BD%E8%BF%90%E8%A1%8C-powershell">情况一、以管理员身份运行 PowerShell</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B">安装过程</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%83%85%E5%86%B5%E4%BA%8C%E6%B8%85%E7%90%86%E6%97%A7%E7%9A%84-docker-%E6%95%B0%E6%8D%AE%E5%A6%82%E6%9E%9C%E4%B9%8B%E5%89%8D%E5%AE%89%E8%A3%85%E8%BF%87">情况二、清理旧的 Docker 数据（如果之前安装过）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BA%8C%E6%9B%B4%E6%94%B9%E9%95%9C%E5%83%8F%E9%BB%98%E8%AE%A4%E4%BF%9D%E5%AD%98%E8%B7%AF%E5%BE%84">二、更改镜像默认保存路径</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%AA%8C%E8%AF%81%E5%AE%89%E8%A3%85">验证安装</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%97%AE%E9%A2%98">问题</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95">解决方法</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-1%E5%88%A0%E9%99%A4%E6%9C%89%E9%97%AE%E9%A2%98%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B9">步骤 1：删除有问题的文件夹</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-2%E4%BB%A5%E7%AE%A1%E7%90%86%E5%91%98%E8%BA%AB%E4%BB%BD%E9%87%8D%E6%96%B0%E5%AE%89%E8%A3%85">步骤 2：以管理员身份重新安装</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%90%AF%E7%94%A8-wsl2%E5%AE%B6%E5%BA%AD%E7%89%88%E5%BF%85%E7%9C%8B">启用 WSL2（家庭版必看）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%AE%89%E8%A3%85-wsl2">安装 WSL2</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/docker/" class="post-category">
+        it / docker      </a>
+      <time datetime="2026-11-11">2026-11-11</time>
+    </div>
+
+    <h1 id="post-title" class="post-title">Docker 自定义安装</h1>
+
+    <div class="post-body">
+<h1 id="docker-自定义安装">Docker 自定义安装</h1>
+<p><a href="https://www.bilibili.com/list/watchlater/?bvid=BV15rduYAEV7">8分钟安装 Docker Desktop-哔哩哔哩视频</a></p>
+<p>前置条件：</p>
+<ol>
+<li>Docker Desktop 已经下载</li>
+<li>确认虚拟化已开启
+<ol>
+<li>打开任务管理器</li>
+<li>切换到 <strong>性能</strong> 选项卡</li>
+<li>查看右下角 <strong>虚拟化</strong> 是否为 <strong>已启用</strong></li>
+</ol>
+</li>
+</ol>
+<hr>
+<h2 id="一使用命令行安装docker指定docker安装目录">一、使用命令行安装Docker，指定docker安装目录</h2>
+<h3 id="情况一以管理员身份运行-powershell">情况一、以管理员身份运行 PowerShell</h3>
+<p>右键点击 PowerShell 图标 → 选择 <strong>“以管理员身份运行”</strong></p>
+<p>切换到安装目录并运行：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">cd C:\Users\</span><span style="color:#005CC5;--shiki-dark:#79B8FF">01</span><span style="color:#24292E;--shiki-dark:#E1E4E8">\Downloads</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Start-Process</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Wait </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">FilePath </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Docker Desktop Installer.exe"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ArgumentList </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'install'</span><span style="color:#D73A49;--shiki-dark:#F97583">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '-accept-license'</span><span style="color:#D73A49;--shiki-dark:#F97583">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '--installation-dir="D:\Program\Docker"'</span></span></code></pre>
+<p>其中<code>D:\Program\Docker</code>是自定义文件夹的路径。</p>
+<h4 id="安装过程">安装过程</h4>
+<ol>
+<li>勾选：
+<ul>
+<li><code>Install required Windows components for WSL 2</code></li>
+<li><code>Add shortcut to desktop</code></li>
+</ul>
+</li>
+<li>点击 <strong>OK</strong> 开始安装</li>
+<li>安装完成后会提示 <strong>重启电脑</strong></li>
+</ol>
+<h3 id="情况二清理旧的-docker-数据如果之前安装过">情况二、清理旧的 Docker 数据（如果之前安装过）</h3>
+<p>如果之前安装过 Docker，可以先清理。清理前请确认没有需要保留的镜像、容器或配置，以下命令会递归删除目录：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 以管理员身份运行</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 停止相关服务</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Stop-Service</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> com.docker.service </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ErrorAction SilentlyContinue</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 删除旧的配置目录</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Remove-Item</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "C:\ProgramData\DockerDesktop"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Recurse </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Force </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ErrorAction SilentlyContinue</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Remove-Item</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "C:\ProgramData\Docker"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Recurse </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Force </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ErrorAction SilentlyContinue</span></span>
+<span class="line"><span class="line-number">8</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 然后重新安装</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">cd C:\Users\</span><span style="color:#005CC5;--shiki-dark:#79B8FF">01</span><span style="color:#24292E;--shiki-dark:#E1E4E8">\Downloads</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Start-Process</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Wait </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">FilePath </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Docker Desktop Installer.exe"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ArgumentList </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'install'</span><span style="color:#D73A49;--shiki-dark:#F97583">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '-accept-license'</span><span style="color:#D73A49;--shiki-dark:#F97583">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '--installation-dir="D:\Program\Docker"'</span></span></code></pre>
+<h2 id="二更改镜像默认保存路径">二、更改镜像默认保存路径</h2>
+<p><a href="https://www.bilibili.com/video/BV15rduYAEV7/">8分钟安装 Docker Desktop，让你开发效率起飞_哔哩哔哩_bilibili</a></p>
+<p>重启之后双击桌面 Docker Desktop 图标</p>
+<p>第一次启动可能会要求登录 Docker Hub，没有账号可以免费注册，启动成功后右下角任务栏会出现 🐳 小鲸鱼图标。</p>
+<p>进入软件之后可能会提示你<code>WSL needs updating</code>，就是需要更新，在powershell输入：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">wsl </span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#24292E;--shiki-dark:#E1E4E8">update</span></span></code></pre>
+<p>1、运行docker，进入设置页，点击Resources选项，发现镜像默认安装在%UserProfile%\AppData\Local\Docker\wsl目录下。</p>
+<p>2、点击Browse按钮，选择自定义的其他盘路径，例如：D:\Program\</p>
+<p>如下图所示：</p>
+<p><img src="/assets/images/docker/2900655-20231201134518986-2004247954.png" alt="Docker Desktop 的 Resources 页面，显示 Disk image location"></p>
+<p>3、最后点击Apply &amp; restart按钮重启Docker即可生效。</p>
+<p><img src="/assets/images/docker/2900655-20231201134614499-797892774.png" alt="Docker Desktop 修改镜像存储路径后的确认界面"></p>
+<p>4、docker会自动在选定的目录下增加子目录DockerDesktopWSL。</p>
+<h3 id="验证安装">验证安装</h3>
+<p>打开 PowerShell 或 CMD，输入：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">docker </span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#24292E;--shiki-dark:#E1E4E8">version</span></span></code></pre>
+<p>如果显示 <code>Docker version ...</code> 形式的版本号，说明 Docker 安装成功。</p>
+<p>再运行：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>docker run hello-world</span></span></code></pre>
+<p>如果出现 Hello from Docker! 说明 Docker 已能正常拉取和运行镜像。</p>
+<h2 id="问题">问题</h2>
+<p>如果报错<code>For security reasons C:\ProgramData\DockerDesktop must be owned by an elevated account</code>。</p>
+<p>这个错误信息是 Docker Desktop 为了修复近期被发现的中危安全漏洞（CVE-2025-14740）而新增的安全检查机制，官方修复版本为 4.57.0 或更高版本。</p>
+<p>简单来说,这个漏洞允许一个低权限用户在安装 Docker 之前,预先创建 <code>C:\ProgramData\DockerDesktop</code> 文件夹并获取其所有权。之后,他就可以利用这个漏洞来篡改配置文件,最终在你（一个高权限用户）运行 Docker 时,以你的权限执行恶意代码。你看到的这个提示,正是 Docker 安装程序在阻止这种潜在的攻击。</p>
+<h3 id="解决方法">解决方法</h3>
+<p>你需要清理掉这个被“错误账户”所拥有的文件夹,然后重新以管理员身份运行安装程序。</p>
+<h4 id="步骤-1删除有问题的文件夹">步骤 1：删除有问题的文件夹</h4>
+<p>这个文件夹通常无法直接通过资源管理器删除,我们需要使用命令行。</p>
+<ol>
+<li>
+<p>按下 <code>Win</code> + <code>S</code> 键,输入 <code>powershell</code>,然后右键点击 <strong>“Windows PowerShell”</strong>,选择 <strong>“以管理员身份运行”</strong>。</p>
+</li>
+<li>
+<p>在弹出的 UAC（用户账户控制）窗口中点击 <strong>“是”</strong>。</p>
+</li>
+<li>
+<p>在 PowerShell 窗口中,输入以下命令来强制删除问题文件夹：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Remove-Item</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Path </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"C:\ProgramData\DockerDesktop"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Force </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Recurse</span></span></code></pre>
+<blockquote>
+<p><code>-Force</code> 参数会强制删除任何属性的文件夹,<code>-Recurse</code> 则会删除其内部的所有子项和文件。</p>
+</blockquote>
+</li>
+</ol>
+<h4 id="步骤-2以管理员身份重新安装">步骤 2：以管理员身份重新安装</h4>
+<p>删除成功后,就可以开始安装了。</p>
+<ol>
+<li>
+<p><strong>确保 PowerShell 仍在管理员模式下运行。</strong></p>
+</li>
+<li>
+<p>在 PowerShell 中,切换到安装程序所在的目录：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">cd C:\Users\</span><span style="color:#005CC5;--shiki-dark:#79B8FF">01</span><span style="color:#24292E;--shiki-dark:#E1E4E8">\Downloads</span></span></code></pre>
+</li>
+<li>
+<p>运行你的安装命令：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Start-Process</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Wait </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">FilePath </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Docker Desktop Installer.exe"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ArgumentList </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'install'</span><span style="color:#D73A49;--shiki-dark:#F97583">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '-accept-license'</span><span style="color:#D73A49;--shiki-dark:#F97583">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '--installation-dir="D:\Program\Docker"'</span></span></code></pre>
+</li>
+</ol>
+<p>安装程序会再次请求权限,请允许。如果一切顺利,它应该会开始安装而不再报错。</p>
+<hr>
+<blockquote>
+<p>💡 <strong>补充说明</strong>
+在极少数情况下,如果你之前安装过 Docker 并且卸载不干净,可能还会遇到其他残留文件的问题。如果上面的方法没有解决,可以再尝试重启电脑,或者在管理员模式下运行以下命令,进行更彻底的清理后再重试：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 清理其他可能的相关目录</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Remove-Item</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "C:\ProgramData\Docker"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Force </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Recurse </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ErrorAction SilentlyContinue</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Remove-Item</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "C:\Program Files\Docker"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Force </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Recurse </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ErrorAction SilentlyContinue</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Remove-Item</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$</span><span style="color:#005CC5;--shiki-dark:#79B8FF">env:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">USERPROFILE</span><span style="color:#032F62;--shiki-dark:#9ECBFF">\.docker"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Force </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Recurse </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ErrorAction SilentlyContinue</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Remove-Item</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$</span><span style="color:#005CC5;--shiki-dark:#79B8FF">env:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">LOCALAPPDATA</span><span style="color:#032F62;--shiki-dark:#9ECBFF">\Docker"</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Force </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Recurse </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ErrorAction SilentlyContinue</span></span></code></pre>
+</blockquote>
+<hr>
+<h2 id="启用-wsl2家庭版必看">启用 WSL2（家庭版必看）</h2>
+<p>如果你是 Windows 10/11 家庭版 或者第一次安装 Docker Desktop，需要启用 WSL2。</p>
+<h3 id="安装-wsl2">安装 WSL2</h3>
+<p><strong>方法一</strong>：在 PowerShell（管理员模式）中输入：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --install</span></span></code></pre>
+<p>等待系统自动安装 Linux 子系统和 WSL2 内核。</p>
+<p><strong>方法二</strong>：直接打开 Docker Desktop，会提示 <code>WSL needs updating</code>。点击 Restart，然后按任意键退出 PowerShell（管理员模式），再按任意键安装（推荐）。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

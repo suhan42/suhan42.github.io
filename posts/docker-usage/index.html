@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Docker 使用 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/main.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=e944d0c3b1" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#docker-%E4%BD%BF%E7%94%A8">Docker 使用</a></li>
+<li class="toc-item toc-level-2"><a href="#%E7%BB%B4%E6%8A%A4">维护</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%BF%90%E8%A1%8C%E4%B8%80%E4%B8%AA-web-%E5%BA%94%E7%94%A8">运行一个 web 应用</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%87%8D%E5%90%AF%E6%8C%87%E4%BB%A4">重启指令</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%87%8D%E5%90%AF">重启</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%87%8D%E5%BB%BA%E5%AE%B9%E5%99%A8">重建容器</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/docker/" class="post-category">
+        it / docker      </a>
+      <time datetime="2026-11-11">2026-11-11</time>
+    </div>
+
+    <h1 id="post-title" class="post-title">Docker 使用</h1>
+
+    <div class="post-body">
+<h1 id="docker-使用">Docker 使用</h1>
+<p>常用的 Docker 客户端命令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><strong>命令</strong></th>
+<th style="text-align:left"><strong>功能</strong></th>
+<th style="text-align:left"><strong>示例</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>docker run</code></td>
+<td style="text-align:left">启动一个新的容器并运行命令</td>
+<td style="text-align:left"><code>docker run -d ubuntu</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker ps</code></td>
+<td style="text-align:left">列出当前正在运行的容器</td>
+<td style="text-align:left"><code>docker ps</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker ps -a</code></td>
+<td style="text-align:left">列出所有容器（包括已停止的容器）</td>
+<td style="text-align:left"><code>docker ps -a</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker build</code></td>
+<td style="text-align:left">使用 Dockerfile 构建镜像</td>
+<td style="text-align:left"><code>docker build -t my-image .</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker images</code></td>
+<td style="text-align:left">列出本地存储的所有镜像</td>
+<td style="text-align:left"><code>docker images</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker pull</code></td>
+<td style="text-align:left">从 Docker 仓库拉取镜像</td>
+<td style="text-align:left"><code>docker pull ubuntu</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker push</code></td>
+<td style="text-align:left">将镜像推送到 Docker 仓库</td>
+<td style="text-align:left"><code>docker push my-image</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker exec</code></td>
+<td style="text-align:left">在运行的容器中执行命令</td>
+<td style="text-align:left"><code>docker exec -it container_name bash</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker stop</code></td>
+<td style="text-align:left">停止一个或多个容器</td>
+<td style="text-align:left"><code>docker stop container_name</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker start</code></td>
+<td style="text-align:left">启动已停止的容器</td>
+<td style="text-align:left"><code>docker start container_name</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker restart</code></td>
+<td style="text-align:left">重启一个容器</td>
+<td style="text-align:left"><code>docker restart container_name</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker rm</code></td>
+<td style="text-align:left">删除一个或多个容器</td>
+<td style="text-align:left"><code>docker rm container_name</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker rmi</code></td>
+<td style="text-align:left">删除一个或多个镜像</td>
+<td style="text-align:left"><code>docker rmi my-image</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker logs</code></td>
+<td style="text-align:left">查看容器的日志</td>
+<td style="text-align:left"><code>docker logs container_name</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker inspect</code></td>
+<td style="text-align:left">获取容器或镜像的详细信息</td>
+<td style="text-align:left"><code>docker inspect container_name</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker exec -it</code></td>
+<td style="text-align:left">进入容器的交互式终端</td>
+<td style="text-align:left"><code>docker exec -it container_name /bin/bash</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker network ls</code></td>
+<td style="text-align:left">列出所有 Docker 网络</td>
+<td style="text-align:left"><code>docker network ls</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker volume ls</code></td>
+<td style="text-align:left">列出所有 Docker 卷</td>
+<td style="text-align:left"><code>docker volume ls</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker-compose up</code></td>
+<td style="text-align:left">启动多容器应用（从 <code>docker-compose.yml</code> 文件）</td>
+<td style="text-align:left"><code>docker-compose up</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker-compose down</code></td>
+<td style="text-align:left">停止并删除由 <code>docker-compose</code> 启动的容器、网络等</td>
+<td style="text-align:left"><code>docker-compose down</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker info</code></td>
+<td style="text-align:left">显示 Docker 系统的详细信息</td>
+<td style="text-align:left"><code>docker info</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker version</code></td>
+<td style="text-align:left">显示 Docker 客户端和守护进程的版本信息</td>
+<td style="text-align:left"><code>docker version</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker stats</code></td>
+<td style="text-align:left">显示容器的实时资源使用情况</td>
+<td style="text-align:left"><code>docker stats</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker login</code></td>
+<td style="text-align:left">登录 Docker 仓库</td>
+<td style="text-align:left"><code>docker login</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docker logout</code></td>
+<td style="text-align:left">登出 Docker 仓库</td>
+<td style="text-align:left"><code>docker logout</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>常用选项说明:</strong></p>
+<ul>
+<li><strong><code>-d</code></strong>：后台运行容器，例如 <code>docker run -d ubuntu</code>。</li>
+<li><strong><code>-it</code></strong>：以交互式终端运行容器，例如 <code>docker exec -it container_name bash</code>。</li>
+<li><strong><code>-t</code></strong>：为镜像指定标签，例如 <code>docker build -t my-image .</code>。</li>
+</ul>
+<hr>
+<h2 id="维护">维护</h2>
+<p>用 <code>--format</code> 指定要显示的列。比如默认输出包含 PORTS，你想去掉它：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ps</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --format</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.CreatedAt}}\t{{.Status}}\t{{.Names}}"</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ps</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --format</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "table {{.ID}}\t{{.Image}}\t{{.Ports}}\t{{.Names}}"</span></span></code></pre>
+<p>常用字段：</p>
+<ul>
+<li><code>.ID</code> / <code>.Names</code> / <code>.Image</code> / <code>.Command</code> / <code>.Status</code> / <code>.CreatedAt</code> / <code>.RunningFor</code> / <code>.Size</code> / <code>.Labels</code> / <code>.Mounts</code> / <code>.Networks</code> / <code>.Ports</code></li>
+</ul>
+<h2 id="运行一个-web-应用">运行一个 web 应用</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> pull</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> training/webapp</span><span style="color:#6A737D;--shiki-dark:#6A737D">  # 载入镜像</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> run</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -d</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -P</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> training/webapp</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> python</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> app.py</span></span></code></pre>
+<ul>
+<li>**-d:**让容器在后台运行。</li>
+<li>**-P:**将容器内部使用的网络端口随机映射到我们使用的主机上。</li>
+</ul>
+<h2 id="重启指令">重启指令</h2>
+<h3 id="重启">重启</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> compose</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> restart</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> api</span></span></code></pre>
+<p>只重启已经存在的 api 容器
+不重新读取 docker-compose.yml 里的新增 volumes
+不重新创建容器
+适合只改了容器内已经生效的环境、服务卡住、临时重启</p>
+<h3 id="重建容器">重建容器</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 改了代码/Dockerfile，要重新构建镜像并启动</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> compose</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> up</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -d</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --build</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> api</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> worker</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 既重新构建镜像，又强制重建容器（最彻底的重启）</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> compose</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> up</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -d</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --build</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --force-recreate</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> api</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> worker</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 全部重建</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">docker</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> compose</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> up</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -d</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --build</span></span></code></pre>
+<p><code>--build</code>：重新执行 Dockerfile 构建，生成新的镜像，然后再用新镜像创建容器</p>
+<p>按当前 docker-compose.yml 重新创建 api 和 worker 容器
+会应用新增 volumes
+会应用 compose 里的 environment 变化
+不会动没有点名的其他服务
+重建容器让 .env 重新注入</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

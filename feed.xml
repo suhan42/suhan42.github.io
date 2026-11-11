@@ -7,6 +7,30 @@
     <description>Suhan 的个人博客</description>
     <language>zh-CN</language>
     <item>
+      <title>Docker 使用</title>
+      <link>https://suhan42.github.io/posts/docker-usage/</link>
+      <guid>https://suhan42.github.io/posts/docker-usage/</guid>
+      <pubDate>Wed, 11 Nov 2026 00:00:00 GMT</pubDate>
+      <description>常用的 Docker 客户端命令：</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Docker 自定义安装</title>
+      <link>https://suhan42.github.io/posts/docker-custom-install/</link>
+      <guid>https://suhan42.github.io/posts/docker-custom-install/</guid>
+      <pubDate>Wed, 11 Nov 2026 00:00:00 GMT</pubDate>
+      <description>8分钟安装 Docker Desktop-哔哩哔哩视频</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>docker-compose.yml 和 docker-compose.override.yml</title>
+      <link>https://suhan42.github.io/posts/docker-compose-config/</link>
+      <guid>https://suhan42.github.io/posts/docker-compose-config/</guid>
+      <pubDate>Wed, 11 Nov 2026 00:00:00 GMT</pubDate>
+      <description>官方文档：https://docs.docker.com/compose/reference/overview/</description>
+      <category>it</category>
+    </item>
+    <item>
       <title>typora 手册</title>
       <link>https://suhan42.github.io/posts/typora-index/</link>
       <guid>https://suhan42.github.io/posts/typora-index/</guid>
@@ -23,19 +47,19 @@
       <category>essay</category>
     </item>
     <item>
-      <title>marked 造轮子</title>
-      <link>https://suhan42.github.io/posts/marked-blog-generator/</link>
-      <guid>https://suhan42.github.io/posts/marked-blog-generator/</guid>
-      <pubDate>Mon, 23 Jan 2023 00:00:00 GMT</pubDate>
-      <description>这篇笔记记录如何用 marked 和 highlight.js 手写一个轻量博客生成器，覆盖 marked 的基本用法、自定义渲染器、代码高亮和常见问题排查。</description>
-      <category>it</category>
-    </item>
-    <item>
       <title>关于 Git 使用</title>
       <link>https://suhan42.github.io/posts/about-git/</link>
       <guid>https://suhan42.github.io/posts/about-git/</guid>
       <pubDate>Mon, 23 Jan 2023 00:00:00 GMT</pubDate>
       <description>这篇笔记介绍 Git 的分布式版本控制思想和工作原理，整理常用操作命令，适合作为个人协作与版本管理的参考。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>marked 造轮子</title>
+      <link>https://suhan42.github.io/posts/marked-blog-generator/</link>
+      <guid>https://suhan42.github.io/posts/marked-blog-generator/</guid>
+      <pubDate>Mon, 23 Jan 2023 00:00:00 GMT</pubDate>
+      <description>这篇笔记记录如何用 marked 和 highlight.js 手写一个轻量博客生成器，覆盖 marked 的基本用法、自定义渲染器、代码高亮和常见问题排查。</description>
       <category>it</category>
     </item>
     <item>
