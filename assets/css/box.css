@@ -78,7 +78,7 @@ header, footer {
 }
 .im {
 	height: 100px;
-	background-image: url(../images/gd.jpg); /*当color和image同时存在时，背景图案优先显示*/
+	background-image: url(../images/box/gd.jpg); /*当color和image同时存在时，背景图案优先显示*/
 	background-repeat: no-repeat;/*重复显示方式：repeat-x在x方向重复, repeat-y, no-repeat*/
 	background-attachment: scroll;/*背景图案是否跟随内容一起滚动：scroll默认, fixed不跟随滚动*/
 	background-position: 10px;/*起始显示：top, left, center。或者background-position: 30px 50px;*/
