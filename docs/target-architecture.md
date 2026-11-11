@@ -180,7 +180,7 @@ tags:
   - marked
   - markdown
 summary: 用 marked 写一个小型静态博客生成器。
-cover: /assets/images/gd.jpg
+cover: /assets/images/box/gd.jpg
 status: published
 ---
 
@@ -195,10 +195,10 @@ status: published
 | `category` | 是 | 小写英文或受控映射键 | 一个文章只属于一个主分类 |
 | `tags` | 否 | 字符串数组 | 小写标签，用于跨主题聚合 |
 | `summary` | 否 | 非空字符串 | 首页、RSS 和搜索摘要；缺省时由正文第一段生成展示摘要 |
-| `cover` | 否 | 站点绝对路径 | 首页封面；无封面时模板渲染文字卡 |
+| `cover` | 否 | 站点绝对路径 | 显式覆盖首页卡片封面；缺省时自动取正文第一张真实 `<img>`，仍无图时只渲染纯文字卡 |
 | `status` | 是 | `published` 或 `draft` | 非 published 文章不进入首页、集合、RSS 和搜索索引 |
 
-站点内图片引用统一写作 `/assets/images/...`。不能在 Markdown 中使用 `./`、`../` 或 Windows 反斜杠路径。外部图片应显式使用完整 HTTPS URL；迁移时优先把本站文章使用的图片收入 `assets/images/`。
+站点内图片引用统一写作 `/assets/images/...`。不能在 Markdown 中使用 `./`、`../` 或 Windows 反斜杠路径。外部图片应显式使用完整 HTTPS URL；迁移时优先把本站文章使用的图片收入 `assets/images/`。首页卡片从构建后的正文 HTML 中读取第一张真实 `<img>`，代码块中的图片语法不会参与提取；front matter `cover` 始终优先，用于需要单独裁切或更换卡面时。
 
 ### 文章型 HTML 与独立型 HTML 的边界
 
@@ -312,6 +312,7 @@ GitHub Pages 的 Branch source 只允许根目录或 `/docs`，不能直接选�
 ```bash
 npm ci
 npm run validate:content
+npm run test:first-image
 npm run test:markdown
 npm run test:theme
 npm run build
@@ -320,7 +321,7 @@ npm run publish:pages:check
 npm run publish:pages
 ```
 
-`validate:content` 校验 front matter、必填字段、slug 唯一性、日期格式、图片路径和状态枚举。`test:markdown` 校验自定义 Markdown 规则和代码保护边界。`test:theme` 校验 `themes.json` 的 theme-color 与 `themes.css` 的主题背景一致。`build` 先清理 `site/`，再执行 Eleventy 构建。`validate:output` 检查输出文件、失效链接、反斜杠路径、对 `node_modules` 的引用和 published 文章数量。
+`validate:content` 校验 front matter、必填字段、slug 唯一性、日期格式、图片路径和状态枚举。`test:first-image` 校验首页首图提取规则。`test:markdown` 校验自定义 Markdown 规则和代码保护边界。`test:theme` 校验 `themes.json` 的 theme-color 与 `themes.css` 的主题背景一致。`build` 先清理 `site/`，再执行 Eleventy 构建。`validate:output` 检查输出文件、失效链接、反斜杠路径、对 `node_modules` 的引用和 published 文章数量。
 
 `publish:pages:check` 校验当前分支为 `main`、`site/` 没有未提交改动、发布根目录包含 `index.html` 和 `.nojekyll`，但不会推送。`publish:pages` 只发布已经提交到当前 HEAD 的 `site/` 内容；必须先由项目所有者确认提交并推送 `main`，未提交的本地构建不会自动进入发布分支。
 

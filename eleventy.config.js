@@ -1,14 +1,24 @@
 // Eleventy 构建配置：输入目录 src/，输出目录 site/。
 // 仅注册构建规则和目录结构，不承载业务内容；配置按 ES Module 执行。
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { bundledLanguages, createHighlighter } from "shiki";
 import { transformerRenderLineNumber } from "@shikijs/transformers";
+import { firstImage } from "./scripts/first-image.mjs";
 import markPlugin from "./scripts/markdown-it-mark.mjs";
 import markdownItKatex from "./scripts/markdown-it-katex.mjs";
 import markdownItSubSup from "./scripts/markdown-it-subsup.mjs";
 import markdownItGithubAlerts from "./scripts/markdown-it-github-alerts.mjs";
 
 const customPages = JSON.parse(readFileSync(new URL("./src/_data/custom-pages.json", import.meta.url), "utf8"));
+
+// 用三份站点 CSS 的内容哈希生成缓存版本，样式一改 URL 就变化，不需要手工维护版本号。
+const cssVersion = createHash("sha256")
+  .update(readFileSync(new URL("./assets/css/themes.css", import.meta.url)))
+  .update(readFileSync(new URL("./assets/css/main.css", import.meta.url)))
+  .update(readFileSync(new URL("./assets/css/markdown.css", import.meta.url)))
+  .digest("hex")
+  .slice(0, 10);
 
 // 构建期只创建一次高亮器，加载 Shiki 内置语言全集，后续文章新增语言不需要改配置。
 const highlighter = await createHighlighter({
@@ -185,6 +195,9 @@ export default function (eleventyConfig) {
     return `${text.slice(0, limit).trimEnd()}…`;
   });
 
+  // 从已渲染正文提取第一张真实图片作为首页卡片封面；代码块里的图片语法会被转义，不会误命中。
+  eleventyConfig.addFilter("firstImage", firstImage);
+
   // 为文章正文标题补齐 id，并同步生成目录；没有标题的文章返回空目录，由模板保持单栏布局。
   eleventyConfig.addFilter("withToc", (content) => {
     if (!content) return { content: "", toc: "", hasToc: false };
@@ -222,6 +235,7 @@ export default function (eleventyConfig) {
   // 全局数据：特殊页受控元数据给首页 Works 区使用；当前年份给页脚版权行使用。
   eleventyConfig.addGlobalData("customPages", customPages);
   eleventyConfig.addGlobalData("currentYear", () => new Date().getFullYear());
+  eleventyConfig.addGlobalData("cssVersion", cssVersion);
 
   return {
     dir: {

@@ -329,6 +329,7 @@ P5 是唯一的大规模清理阶段。所有删除、移动退役和旧 URL 兼
 ```bash
 npm ci
 npm run validate:content
+npm run test:first-image
 npm run test:markdown
 npm run test:theme
 npm run build

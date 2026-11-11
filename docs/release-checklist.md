@@ -55,6 +55,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | draft 不进入公开集合 | √ | `test.md` 仍生成独立页，但不进入首页、RSS、sitemap 和搜索索引 |
 | 内容校验脚本可用 | √ | `npm run validate:content` 通过 11 个文件 |
 | Markdown 规则回归测试可用 | √ | `npm run test:markdown` 覆盖高亮、数学、上下标、Callouts、删除线和代码保护，共 12 项 |
+| 首图提取测试可用 | √ | `npm run test:first-image` 覆盖正常首图、注释、代码文本、data/blob 和属性边界 |
 | 主题配置测试可用 | √ | `npm run test:theme` 校验 `themes.json` 与 `themes.css` 的四套主题背景色一致 |
 | 站点资源不引用 `node_modules` | √ | 旧 highlight 样式已删除；当前构建不引用 `node_modules` |
 | 构建产物只在迁移分支本地验证 | √ | `npm run build` 生成 10 个文章页和静态资源 |
@@ -124,6 +125,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 git status --short
 npm ci
 npm run validate:content
+npm run test:first-image
 npm run test:markdown
 npm run test:theme
 npm run build

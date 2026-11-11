@@ -14,6 +14,7 @@
   "scripts": {
     "validate:content": "node scripts/validate-content.mjs",
     "validate:output": "node scripts/validate-output.mjs",
+    "test:first-image": "node scripts/test-first-image.mjs",
     "test:markdown": "node scripts/test-markdown.mjs",
     "test:theme": "node scripts/test-theme-config.mjs",
     "fonts:prune": "node scripts/prune-katex-fonts.mjs",

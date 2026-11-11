@@ -15,6 +15,7 @@
 ```bash
 npm ci                 # 安装依赖
 npm run validate:content  # 校验文章 front matter、slug 唯一性和路径规范
+npm run test:first-image  # 校验首图提取规则和边界
 npm run test:markdown  # 校验自定义 Markdown 规则和代码保护边界
 npm run test:theme     # 校验 themes.json 与 themes.css 的主题颜色一致
 npm run build          # 清理 site/ 并执行 Eleventy 构建
@@ -51,7 +52,7 @@ category: it
 tags:
   - example
 summary: 一句话摘要，用于首页卡片、RSS 和搜索。 # 可选
-cover: /assets/images/example.jpg   # 可选
+cover: /assets/images/example.jpg   # 可选，覆盖正文首图
 status: published                     # 或 draft，draft 不进首页和公开索引
 ---
 ```
@@ -61,7 +62,7 @@ status: published                     # 或 draft，draft 不进首页和公开�
 1. `slug` 只允许小写英文、数字和连字符，全站唯一，决定文章 URL `/posts/{slug}/`。
 2. `date` 是唯一排序依据，禁止依赖文件修改时间。
 3. `summary` 可选；缺省时列表、RSS 和搜索索引统一取正文第一段生成展示摘要，需要精确控制时再显式填写。
-4. 站内图片引用统一写作 `/assets/images/...`，禁止 `./`、`../` 和反斜杠路径。
+4. 站内图片引用统一写作 `/assets/images/...`，禁止 `./`、`../` 和反斜杠路径；首页卡片自动取正文第一张真实图片，`cover` 可显式覆盖，没有图片时只显示纯文字卡。
 5. 文章型 HTML（如《白色相簿2》攻略）与 Markdown 同等对待，都放 `src/content/posts/` 且要求完整 front matter；独立交互页放 `src/content/custom/`，不进文章集合。
 6. Markdown 行内高亮使用 `==文字==`，构建后会渲染为 `<mark>文字</mark>`；普通比较表达式请放进代码块或行内代码。
 7. 数学公式使用 `$...$` 行内写法或 `$$...$$` 块级写法，构建期由 KaTeX 渲染；公式不要放在代码块里。
@@ -104,6 +105,7 @@ npm run build
 ```bash
 npm ci						# 安装依赖
 npm run validate:content	# 校验文章 front matter、slug 唯一性和路径规范
+npm run test:first-image	# 校验首图提取规则和边界
 npm run test:markdown		# 校验自定义 Markdown 规则和代码保护边界
 npm run test:theme		# 校验 themes.json 与 themes.css 的主题颜色一致
 

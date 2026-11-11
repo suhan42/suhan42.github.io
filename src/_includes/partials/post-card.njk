@@ -1,7 +1,11 @@
-{# 文章卡片：摘要优先取 front matter，没有时用 excerpt 过滤器取正文第一段，因此不需要逐篇维护简介。 #}
-<article class="post-card{% if not post.cover %} no-cover{% endif %}">
-  {% if post.cover %}
-  <img src="{{ post.cover }}" alt="" class="post-cover" loading="lazy">
+{# 文章卡片：cover 可显式覆盖封面，否则自动取正文第一张真实图片；没有图片时只渲染纯文字卡。 #}
+{% set bodyImage = post.templateContent | firstImage %}
+{% set cardImage = post.data.cover or bodyImage %}
+<article class="post-card{% if not cardImage %} no-cover{% endif %}" data-category="{{ post.data.category }}">
+  {% if cardImage %}
+  <div class="post-media" data-category="{{ post.data.category }}" aria-hidden="true">
+    <img src="{{ cardImage }}" alt="" class="post-cover" loading="lazy" decoding="async">
+  </div>
   {% endif %}
 
   <div class="post-body-area">

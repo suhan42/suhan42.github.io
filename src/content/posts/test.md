@@ -9,6 +9,6 @@ status: draft
 
 photo test
 
-![gd](/assets/images/gd.jpg)
+![gd](/assets/images/box/gd.jpg)
 
 写点什么你
