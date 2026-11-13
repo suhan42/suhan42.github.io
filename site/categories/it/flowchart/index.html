@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Category: 程序流程图 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/css/main.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout" tabindex="-1">
+<section class="simple-page category-page">
+  <div class="category-page-layout">
+    <nav class="category-tree" aria-labelledby="category-tree-title">
+      <h2 class="rail-title" id="category-tree-title">Categories</h2>
+      <ul class="category-tree-root">
+        <li class="category-tree-item">
+          <a href="/categories/acgn/" class="category-tree-link category-tree-parent">
+            <span class="bi bi-folder2" aria-hidden="true"></span>
+            <span>acgn</span>
+            <span class="category-tree-count">1</span>
+          </a>
+        </li>
+        <li class="category-tree-item">
+          <a href="/categories/essay/" class="category-tree-link category-tree-parent">
+            <span class="bi bi-folder2" aria-hidden="true"></span>
+            <span>essay</span>
+            <span class="category-tree-count">1</span>
+          </a>
+        </li>
+        <li class="category-tree-item is-open">
+          <a href="/categories/it/" class="category-tree-link category-tree-parent">
+            <span class="bi bi-folder2-open" aria-hidden="true"></span>
+            <span>it</span>
+            <span class="category-tree-count">12</span>
+          </a>
+          <ul class="category-tree-children">
+            <li>
+              <a href="/categories/it/docker/" class="category-tree-link category-tree-child">
+                <span class="bi bi-file-earmark-text" aria-hidden="true"></span>
+                <span>docker</span>
+                <span class="category-tree-count">3</span>
+              </a>
+            </li>
+            <li>
+              <a href="/categories/it/flowchart/" class="category-tree-link category-tree-child is-active" aria-current="page">
+                <span class="bi bi-file-earmark-text" aria-hidden="true"></span>
+                <span>程序流程图</span>
+                <span class="category-tree-count">1</span>
+              </a>
+            </li>
+            <li>
+              <a href="/categories/it/git/" class="category-tree-link category-tree-child">
+                <span class="bi bi-file-earmark-text" aria-hidden="true"></span>
+                <span>git</span>
+                <span class="category-tree-count">1</span>
+              </a>
+            </li>
+            <li>
+              <a href="/categories/it/markdown/" class="category-tree-link category-tree-child">
+                <span class="bi bi-file-earmark-text" aria-hidden="true"></span>
+                <span>markdown</span>
+                <span class="category-tree-count">1</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="category-page-main">
+      <div class="category-heading">
+        <span class="bi bi-file-earmark-text" aria-hidden="true"></span>
+        <h1 class="post-title">程序流程图</h1>
+      </div>
+      <p class="post-summary">it / 程序流程图</p>
+      <div class="post-list">
+
+<article class="post-card" data-category="it">
+  <div class="post-media" data-category="it" aria-hidden="true">
+    <img src="/assets/images/lct/%E7%AC%A6%E5%8F%B7.png" alt="" class="post-cover" loading="lazy" decoding="async">
+  </div>
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/flowchart/" class="post-category">
+        it / 程序流程图      </a>
+      <time datetime="2023-01-22">2023-01-22</time>
+    </div>
+
+    <a href="/posts/lct/" class="card-link">
+      <h3 class="post-title">程序流程图</h3>
+    </a>
+
+    <p class="post-summary">我们可以用一条公式来表示程序流程图，即：</p>
+  </div>
+</article>
+      </div>
+    </div>
+  </div>
+</section>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

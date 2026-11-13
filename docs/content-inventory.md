@@ -1,6 +1,6 @@
 # 内容清点表
 
-更新时间：2026-11-11
+更新时间：2026-11-13
 
 本文记录当前 Eleventy 内容源的实际状态。迁移前 P0 清点快照可从 `pre-eleventy-migration` 标签和 git 历史查看，不再把已删除的 `posts/`、`views/` 路径当作当前文件。
 
@@ -8,11 +8,11 @@
 
 | 项目 | 数量或状态 |
 |---|---:|
-| 文章源 | 14 |
-| published 文章 | 13 |
+| 文章源 | 15 |
+| published 文章 | 14 |
 | draft 文章 | 1（`test.md`，slug `photo-test`） |
 | 父分类（当前使用） | 3（`acgn`、`essay`、`it`） |
-| 子分类（目录派生） | 3（`it/docker`、`it/git`、`it/markdown`） |
+| 子分类（目录派生） | 4（`it/docker`、`it/flowchart`、`it/git`、`it/markdown`） |
 | 标签页 | 21 |
 | 独立特殊页 | 3 |
 
@@ -36,6 +36,7 @@
 | `src/content/posts/git/关于Git使用.md` | 关于 Git 使用 | 2023-01-23 | `about-git` | `it` | `git`, `workflow` | published |
 | `src/content/posts/静态博客框架之Hexo & Jekyll.md` | 静态博客框架之 Hexo 与 Jekyll | 2023-01-22 | `hexo-and-jekyll` | `it` | `static-site`, `hexo`, `jekyll` | published |
 | `src/content/posts/markdown/typora手册.md` | typora 手册 | 2026-10-22 | `typora-index` | `it` | `markdown`, `typora` | published |
+| `src/content/posts/flowchart/程序流程图.md` | 程序流程图 | 2023-01-22 | `lct` | `it` | 无 | published |
 
 ## 独立特殊页
 

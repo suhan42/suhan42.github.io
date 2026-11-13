@@ -1,5 +1,5 @@
 // 文章图片迁移脚本：把文章里的相对图片引用搬到 assets/images/ 下，并改写为站点绝对路径。
-// 默认只打印迁移计划，传 --write 才复制图片、改写文章并删除源文件；构建流程不会自动调用，避免构建时修改源码。
+// 默认只打印迁移计划，传 --write 才复制图片、改写文章并删除源文件；--all 扫描全部文章，供 build / serve 前同步。
 
 import { createHash } from "node:crypto";
 import {
@@ -25,6 +25,7 @@ import {
   parseImageReference,
   rewriteImageReferences
 } from "./image-references.mjs";
+import { getPostSubcategory } from "./post-assets.mjs";
 
 const POSTS_DIR = resolve("src/content/posts");
 const IMAGES_DIR = resolve("assets/images");
@@ -32,6 +33,7 @@ const POST_FILE_PATTERN = /\.(?:md|html)$/i;
 
 const args = process.argv.slice(2);
 const write = args.includes("--write");
+const syncAll = args.includes("--all");
 const toIndex = args.indexOf("--to");
 const customNamespace = toIndex === -1 ? "" : args[toIndex + 1] || "";
 const inputs = args.filter((arg, index) => {
@@ -40,17 +42,23 @@ const inputs = args.filter((arg, index) => {
   return true;
 });
 
-// 只允许 --write 和 --to 两个参数，避免拼写错误时静默按 dry-run 执行。
+// 只允许 --write、--all 和 --to 三个参数，避免拼写错误时静默按 dry-run 执行。
 for (const arg of args) {
-  if (arg.startsWith("--") && arg !== "--write" && arg !== "--to") {
+  if (arg.startsWith("--") && arg !== "--write" && arg !== "--all" && arg !== "--to") {
     fail(`未知参数：${arg}`);
   }
 }
 if (toIndex !== -1 && (!customNamespace || customNamespace.startsWith("--"))) {
   fail("--to 需要一个 assets/images 下的相对子目录。");
 }
-if (inputs.length === 0) {
-  fail("用法：npm run assets:migrate -- <文章或目录> [--to <子目录>] [--write]");
+if (syncAll && toIndex !== -1) {
+  fail("--all 不能与 --to 同时使用。");
+}
+if (syncAll && inputs.length > 0) {
+  fail("--all 不能同时指定文章或目录。");
+}
+if (!syncAll && inputs.length === 0) {
+  fail("用法：npm run assets:migrate -- <文章或目录> [--to <子目录>] [--write]，或 npm run assets:sync [-- --write]");
 }
 
 function fail(message) {
@@ -141,12 +149,11 @@ function slugifyStem(value) {
     .replace(/^-+|-+$/g, "");
 }
 
-// 子分类文章使用目录名作为图片命名空间，根目录文章优先使用 front matter slug。
+// 合法子分类目录使用目录名作为图片命名空间；资源包目录和根目录文章使用 front matter slug。
 function getNamespace(postFile) {
   if (normalizedCustomNamespace) return normalizedCustomNamespace;
-  const relativePath = relative(POSTS_DIR, postFile);
-  const segments = relativePath.split(sep);
-  if (segments.length > 1) return segments[0];
+  const subcategory = getPostSubcategory(postFile, POSTS_DIR);
+  if (subcategory) return subcategory;
   const content = readFileSync(postFile, "utf8");
   const { data } = parseFrontMatter(content);
   if (data && data.slug) return data.slug;
@@ -174,8 +181,10 @@ function planReference(postFile, namespace, rawTarget) {
     throw new Error(`相对图片不能直接指向 assets/images，请改写成 /assets/images/...：${rawTarget}`);
   }
 
-  if (!isInside(POSTS_DIR, sourcePath)) {
-    throw new Error(`相对图片指向文章目录之外：${rawTarget}`);
+  if (!isInside(dirname(postFile), sourcePath)) {
+    throw new Error(
+      `相对图片必须在当前文章目录内：${rawTarget}；跨文章目录引用不会自动迁移，共享图片请放到 assets/images 并使用 /assets/images/...`
+    );
   }
 
   const destinationRelative = join(namespace, basename(sourcePath));
@@ -361,7 +370,7 @@ function rollbackMigration(createdDestinations, writtenPlans, journalPath) {
 }
 
 const normalizedCustomNamespace = customNamespace ? normalizeCustomNamespace(customNamespace) : "";
-const postFiles = collectPostFiles(inputs);
+const postFiles = collectPostFiles(syncAll ? [POSTS_DIR] : inputs);
 if (postFiles.length === 0) {
   fail("没有找到可处理的 Markdown 或 HTML 文章。");
 }

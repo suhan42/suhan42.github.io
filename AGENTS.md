@@ -3,7 +3,7 @@
 > 本文件是项目级固定开发准则，面向后续所有 AI 协作会话；全局指南的通用规则依然适用，冲突时以更严格者为准。
 
 创建日期：2026-11-06
-修改日期：2026-11-11
+修改日期：2026-11-13
 
 ## 0. 核心信条
 
@@ -45,7 +45,7 @@
 | `src/content/pages/` | About 等固定页面 | 否 |
 | `src/_includes/layouts/` | 布局模板 | 否 |
 | `src/_includes/partials/` | 可复用组件模板 | 否 |
-| `src/_data/` | 站点配置和特殊页元数据 | 否 |
+| `src/_data/` | 站点配置、分类展示名和特殊页元数据 | 否 |
 | `assets/` | 站点静态资源 | 否 |
 | `site/` | 构建产物，唯一发布目录 | 否 |
 | `docs/` | 项目文档 | 否 |
@@ -63,15 +63,15 @@ summary: 可选；需要精确控制列表、RSS 和搜索摘要时填写，缺�
 status: published 或 draft
 ```
 
-`tags` 可选；`cover` 可选，格式为 `/assets/images/...`。
+`tags` 可选；`cover` 可选，可以写 `/assets/images/...`，也可以写文章目录内的相对图片路径。
 
 文章型 HTML（如《白色相簿2》攻略）与 Markdown 文章同等对待，都放 `src/content/posts/`，都要求完整 front matter；正文保持 HTML 不转 Markdown。独立特殊页（divergence、fireworks、box）放 `src/content/custom/`，不进文章集合，首页展示通过 `src/_data/custom-pages.json` 管理。
 
-子分类由 `src/content/posts/` 下的第一层目录名派生，例如 `git/关于Git使用.md` 对应 `it/git`；目录名必须是小写英文、数字或连字符，同一目录只能使用一个父分类，当前只支持一层子分类目录。
+子分类由 `src/content/posts/` 下的第一层合法 slug 目录派生，例如 `git/关于Git使用.md` 对应 `it/git`；中文等非 slug 目录视为文章资源包，不生成子分类页，同一目录只能使用一个父分类，当前只支持一层子分类目录。子分类页面和文章卡片的中文展示名由 `src/_data/category-labels.json` 按父分类和子分类 slug 配置，未配置时回退显示 slug。
 
 页面标题始终取 front matter 的 `title`，由布局统一渲染为 `post-title`。正文 H1/H2 都只是内容标题，允许重复使用 H1，不接管页面标题，模板不强制降级。目录会自动补齐 id 并把页面标题放在首项，正文第一个 H1 与 `title` 同名时不重复插入。
 
-站内图片引用统一写作 `/assets/images/...`；禁止 `./`、`../` 和 Windows 反斜杠路径。
+文章源可以直接写 `/assets/images/...`，也可以在文章目录内使用 `./` 或 `.\` 相对图片。`build` / `serve` 启动前会执行 `assets:sync` 全量同步：先复制图片到 `assets/images/<命名空间>/<文件名>`，再改写正文和 `cover`，校验写入后删除文章目录中的源图；构建期还保留虚拟兜底，确保直接运行 Eleventy 时相对图片能输出到 `site/assets/images/`。相对图片必须真实存在且只能位于当前文章目录内；出现 `../` 或跨文章目录引用时必须明确报错，不自动猜测共享图片，直接相对指向 `assets/images` 仍会被拒绝。
 
 ### 3.3 路由规则
 
@@ -106,7 +106,8 @@ status: published 或 draft
 ## 4. 构建与发布
 
 - 构建产物 `site/` 提交到仓库；GitHub Pages 发布源固定为 `gh-pages` 分支根目录（由 `site/` 子树生成），不得把 `main` 根目录设为 Pages 源，也不得把 `gh-pages` 合并回 `main`；构建、验收和发布由人工执行，不使用 CI/CD。
-- 发布命令固定为：`npm ci` → `npm run validate:content` → `npm run test:first-image` → `npm run test:markdown` → `npm run test:theme` → `npm run build` → `npm run validate:output` → 人工验收 → 用户明确要求提交时才 `git commit` → 推送 `main` → `npm run publish:pages:check` → `npm run publish:pages`。
+- 发布命令固定为：`npm ci` → `npm run validate:content` → `npm run test:first-image` → `npm run test:post-assets` → `npm run test:markdown` → `npm run test:theme` → `npm run assets:sync` → `npm run build` → `npm run validate:output` → 人工验收 → 用户明确要求提交时才 `git commit` → 推送 `main` → `npm run publish:pages:check` → `npm run publish:pages`。
+- 发布前确认新增文章的相对图片已完成源文件归档：图片位于 `assets/images/<命名空间>/`，Markdown/HTML 已改写为 `/assets/images/...`，文章目录中的原图已删除；`npm run build` 的 `prebuild` 会自动执行，仍应人工检查迁移输出和 `git status`。
 - 发布产物必须在本地构建和验收通过，合并到 `main` 并经用户确认推送后，再同步到 `gh-pages` 发布分支。
 
 ## 5. 已知坑与边界

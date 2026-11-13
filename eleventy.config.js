@@ -2,26 +2,25 @@
 // 仅注册构建规则和目录结构，不承载业务内容；配置按 ES Module 执行。
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { bundledLanguages, createHighlighter } from "shiki";
 import { transformerRenderLineNumber } from "@shikijs/transformers";
 import { firstImage } from "./scripts/first-image.mjs";
+import {
+  buildPostAssetPlans,
+  getPostSubcategory,
+  rewritePostImageReferences
+} from "./scripts/post-assets.mjs";
 import markPlugin from "./scripts/markdown-it-mark.mjs";
 import markdownItKatex from "./scripts/markdown-it-katex.mjs";
 import markdownItSubSup from "./scripts/markdown-it-subsup.mjs";
 import markdownItGithubAlerts from "./scripts/markdown-it-github-alerts.mjs";
 
 const customPages = JSON.parse(readFileSync(new URL("./src/_data/custom-pages.json", import.meta.url), "utf8"));
+const categoryLabels = JSON.parse(readFileSync(new URL("./src/_data/category-labels.json", import.meta.url), "utf8"));
 const POST_GLOBS = ["./src/content/posts/**/*.md", "./src/content/posts/**/*.html"];
-const POST_ROOT = "src/content/posts/";
-
-// 从文章输入路径读取第一层目录名作为子分类；根目录文章没有子分类。
-function getPostSubcategory(inputPath) {
-  const normalized = String(inputPath || "").replace(/\\/g, "/").replace(/^\.\//, "");
-  const rootIndex = normalized.indexOf(POST_ROOT);
-  if (rootIndex === -1) return "";
-  const segments = normalized.slice(rootIndex + POST_ROOT.length).split("/").filter(Boolean);
-  return segments.length > 1 ? segments[0] : "";
-}
+// 构建开始时先规划所有文章图片；源文件保持不变，图片通过透传复制输出。
+const postAssetPlan = buildPostAssetPlans();
 
 function getPublishedPosts(collectionApi) {
   return POST_GLOBS
@@ -30,7 +29,12 @@ function getPublishedPosts(collectionApi) {
     .sort((a, b) => new Date(b.data.date) - new Date(a.data.date));
 }
 
-// 分类树只从已发布文章的 category 和所在目录派生，目录名就是子分类 slug。
+// 子分类 URL 使用目录 slug，展示名由 category-labels.json 覆盖；没有配置时回退到 slug。
+function getSubcategoryLabel(parent, subcategory) {
+  return categoryLabels[parent]?.[subcategory] || subcategory;
+}
+
+// 分类树只从已发布文章的 category 和合法 slug 目录派生。
 function buildCategoryTree(posts) {
   const tree = new Map();
   for (const post of posts) {
@@ -41,7 +45,12 @@ function buildCategoryTree(posts) {
     node.postCount += 1;
     const subcategory = getPostSubcategory(post.inputPath);
     if (subcategory) {
-      const child = node.subcategories.get(subcategory) || { slug: subcategory, label: subcategory, postCount: 0 };
+      const child =
+        node.subcategories.get(subcategory) || {
+          slug: subcategory,
+          label: getSubcategoryLabel(parent, subcategory),
+          postCount: 0
+        };
       child.postCount += 1;
       node.subcategories.set(subcategory, child);
     }
@@ -178,8 +187,20 @@ export default function (eleventyConfig) {
     md.options.highlight = highlightCode;
   });
 
+  // 相对图片只在渲染内存中改写为 /assets/images/...，不修改作者保存的 Markdown 或 HTML。
+  eleventyConfig.addPreprocessor("post-relative-images", ["md", "html"], function (data, content) {
+    const plan = postAssetPlan.plans.get(resolve(this.inputPath));
+    if (!plan || plan.replacements.size === 0) return content;
+    return rewritePostImageReferences(content, plan.replacements);
+  });
+
   // 把根目录 assets/ 原样复制到输出目录的 assets/ 下；src/static/ 的内容（.nojekyll）复制到输出根目录。
   eleventyConfig.addPassthroughCopy({ "assets": "assets", "src/static": "." });
+  for (const copy of postAssetPlan.copies.values()) {
+    eleventyConfig.addPassthroughCopy({
+      [copy.sourcePath]: copy.destinationOutput
+    });
+  }
 
   // 日期显示过滤器：把 JS Date 或 ISO 字符串格式化为 YYYY-MM-DD，用于列表和文章页。
   eleventyConfig.addFilter("dateDisplay", (value) => {
@@ -204,9 +225,23 @@ export default function (eleventyConfig) {
 
   // 文章所属子分类直接取自目录；文章链接优先指向父分类下的子分类页。
   eleventyConfig.addFilter("postSubcategory", (inputPath) => getPostSubcategory(inputPath));
+  eleventyConfig.addFilter("postSubcategoryLabel", (inputPath, category) => {
+    const subcategory = getPostSubcategory(inputPath);
+    return subcategory ? getSubcategoryLabel(category, subcategory) : "";
+  });
   eleventyConfig.addFilter("postCategoryUrl", (inputPath, category) => {
     const subcategory = getPostSubcategory(inputPath);
     return subcategory ? `/categories/${category}/${subcategory}/` : `/categories/${category}/`;
+  });
+
+  // front matter 的相对 cover 也要走同一套规划；正文首图已经由预处理器改写。
+  eleventyConfig.addFilter("postCoverUrl", (cover, inputPath) => {
+    const value = String(cover || "")
+      .trim()
+      .replace(/^(["'])([\s\S]*)\1$/, "$2");
+    if (!value) return "";
+    const plan = postAssetPlan.plans.get(resolve(inputPath || ""));
+    return plan?.replacements.get(value) || value;
   });
 
   // 只保留 status 为 published 的文章，draft 不进入首页、归档和聚合页。

@@ -4,10 +4,35 @@
 
 ## 2026-11-13
 
+### 文章图片归档与自动同步
+
+- 明确源图片的规范归档位置是 `assets/images/<命名空间>/<文件名>`，迁移顺序为复制、改写正文与 `cover`、校验写入、删除源图。
+- 明确相对图片只能位于当前文章目录内；`../` 或跨文章目录引用必须明文报错，不自动猜测共享图片。
+- 新增 `npm run assets:sync` 全量幂等同步入口，默认预览，传 `--write` 执行源文件迁移；`prebuild` 和 `preserve` 已接入，`build` / `serve` 启动前自动执行。
+- 迁移脚本的图片边界从整个 `src/content/posts` 收紧到当前文章目录，跨文章目录的 `../` 引用会明确报错并保持源文件不变。
+- 迁移脚本同时支持 `--all` 全量扫描，单篇文章仍可用 `assets:migrate -- <文章或目录>` 处理。
+- 《程序流程图》的 9 张源图片已实际迁移到 `assets/images/lct/`，Markdown 改写为 `/assets/images/lct/...`，文章目录中的源图已删除。
+- README、AGENTS、目标架构和发布清单同步更新，避免把虚拟输出误写成源文件已完成迁移。
+
+### 构建期文章图片自动处理
+
+- 新增 `scripts/post-assets.mjs`，构建时扫描文章内的相对图片，按命名空间规划到 `site/assets/images/<命名空间>/<文件名>`，并在渲染内存中改写为 `/assets/images/...`，不修改源 Markdown 或文章型 HTML。
+- Eleventy 配置接入图片透传复制和正文预处理器，覆盖正文图片与 front matter `cover`；首页卡片通过 `postCoverUrl` 同步解析相对封面。
+- 图片命名空间优先使用合法子分类目录名；中文等非 slug 目录作为文章资源包，回退到 front matter `slug`，不再误生成中文子分类页。
+- `validate:content` 允许文章目录内真实存在的 `./` 和 `.\` 相对图片，同时继续拦截 `../`、相对指向 `assets/images`、缺失文件、未知扩展名、引用式图片和相对 `srcset`。
+- 新增 `npm run test:post-assets`，覆盖根目录文章、子分类、资源包目录、反斜杠路径、相对 cover、命名空间回退、目标冲突、缺失文件、CLI 全量迁移幂等和跨目录拒绝。
+- 手动迁移脚本改为复用同一套子分类判断，避免与构建期命名空间规则分叉；`assets:migrate` 继续保留用于指定单篇文章或目录的场景。
+
 ### 首页文章卡封面
 
 - 移除首页文章卡封面的左侧帘幕裁切，封面默认按媒体框比例展示；悬停和键盘聚焦仍会让媒体框轻微加宽，但不再增加横向裁切或放大图片。
 - 同步清理窄屏和减少动态效果模式中已失效的 `clip-path`、`transform` 覆盖，避免同一封面在不同输入方式下显示不一致。
+
+### 程序流程图
+
+- `程序流程图.md` 移入合法 slug 目录 `src/content/posts/flowchart/`，生成子分类页 `/categories/it/flowchart/`，文章仍使用 slug `lct`、父分类 `it`。
+- 新增 `src/_data/category-labels.json`，把 `it.flowchart` 映射为“程序流程图”；子分类页标题、分类树、文章卡片和文章页分类链接显示中文名，URL 保持英文 slug。
+- 9 张本地图片已归档到 `assets/images/lct/`，正文和首页卡片使用 `/assets/images/lct/...`。
 
 ## 2026-11-11
 

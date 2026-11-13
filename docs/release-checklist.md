@@ -1,6 +1,6 @@
 # 发布验收清单
 
-更新时间：2026-11-11
+更新时间：2026-11-13
 
 本清单服务于人工发布流程，不使用 CI/CD。P0 只建立迁移前的基线检查；P2 到 P5 的具体命令在对应阶段实现后逐步启用。每个检查项必须由人确认，不允许因为脚本通过就跳过人工验收。
 
@@ -18,6 +18,8 @@
 - 当前剩余：人工视觉/移动端验收、日期与父分类/标签确认、`views/fireworks2.html` 退役结论、vendor 未使用文件清理、代码高亮视觉验收和提交文案。
 
 2026-11-11 本地内容更新：新增 3 篇 Docker 文章，`validate:content` 通过 14 个文件，`build` 生成 53 个文件，`validate:output` 通过 64 个 HTML 页面、13 篇 published；线上抽查和 `gh-pages` 同步待发布时重新执行。
+
+2026-11-13 本地内容更新：新增《程序流程图》，9 张源图片已归档到 `assets/images/lct/`，正文和卡片封面改写为 `/assets/images/lct/...`，文章目录中的源图已删除；文章移入 `flowchart/` 子分类目录，子分类页 `/categories/it/flowchart/` 显示中文名“程序流程图”。`validate:content` 通过 15 个文件，`build` 生成 55 个模板文件，`validate:output` 通过 66 个 HTML 页面、14 篇 published。
 
 ## P0：迁移前基线
 
@@ -42,7 +44,10 @@
 | 摘要兜底策略确认 | √ | `summary` 可选，缺省时列表、RSS 和搜索索引取正文第一段 |
 | 父分类集确认 | 待确认 | 实际使用 `acgn`、`essay`、`it`，是否作为最终集合需项目所有者确认；子分类由目录派生 |
 | 受控标签集确认 | 待确认 | 当前生成 21 个标签页，是否作为最终受控集需项目所有者确认 |
-| 封面路径统一为 `/assets/images/...` | √ | 内容校验和输出校验均通过，无 Windows 反斜杠 |
+| 输出封面路径统一为 `/assets/images/...` | √ | 源文件可使用文章目录内相对路径，构建期自动改写；输出校验确认无反斜杠和死链 |
+| 源图片归档到 `assets/images/<命名空间>/` | √ | `prebuild` / `preserve` 在构建和预览前执行全量同步，提交前检查迁移输出和 `git status` |
+| 跨文章目录的 `../` 图片引用明确报错 | √ | 内容校验、虚拟管线和迁移脚本统一限制在当前文章目录内，并提示共享图片改用 `/assets/images/...` |
+| 新增文章自动 materialize | √ | `build` / `serve` 启动前执行幂等 `assets:sync --write`，无相对图片时不产生改动 |
 
 P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求在 P1 阶段验证。
 
@@ -56,6 +61,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | published posts collection 数量正确 | √ | 输出校验从内容源动态读取 status，并核对全部 published 页面，不再写死数量或 draft 文件名 |
 | draft 不进入公开集合 | √ | `test.md` 仍生成独立页，但不进入首页、RSS、sitemap 和搜索索引 |
 | 内容校验脚本可用 | √ | `npm run validate:content` 通过 11 个文件 |
+| 文章图片规划测试可用 | √ | `npm run test:post-assets` 覆盖相对路径、命名空间回退、cover 改写、冲突检测、CLI 迁移幂等和跨目录拒绝 |
 | Markdown 规则回归测试可用 | √ | `npm run test:markdown` 覆盖高亮、数学、上下标、Callouts、删除线和代码保护，共 12 项 |
 | 首图提取测试可用 | √ | `npm run test:first-image` 覆盖正常首图、注释、代码文本、data/blob 和属性边界 |
 | 主题配置测试可用 | √ | `npm run test:theme` 校验 `themes.json` 与 `themes.css` 的四套主题背景色一致 |
@@ -86,7 +92,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 |---|---|---|
 | 归档页生成 | √ | `/archive/` 按年份分组，2023 年 9 篇、2026 年 4 篇 |
 | 分类页生成 | √ | `/categories/{acgn,essay,it}/` 三个父分类页，文章列表正确 |
-| 子分类页生成 | √ | 目录派生的 `/categories/it/docker/`、`/categories/it/git/`、`/categories/it/markdown/` 页面，左侧文件夹树和当前项高亮正常 |
+| 子分类页生成 | √ | 目录派生的 `/categories/it/docker/`、`/categories/it/flowchart/`、`/categories/it/git/`、`/categories/it/markdown/` 页面，左侧文件夹树和当前项高亮正常 |
 | 标签页生成 | √ | `/tags/{tag}/` 21 个页面，由 collection 派生 |
 | 搜索索引生成 | √ | `/data/search-index.json` 13 篇 published，draft 排除，JSON 格式有效 |
 | RSS 生成 | √ | `/feed.xml` 13 条 item，RFC 822 日期 |
@@ -129,8 +135,10 @@ git status --short
 npm ci
 npm run validate:content
 npm run test:first-image
+npm run test:post-assets
 npm run test:markdown
 npm run test:theme
+npm run assets:sync
 npm run build
 npm run validate:output
 # 用户确认提交并推送 main 后，同步发布分支：

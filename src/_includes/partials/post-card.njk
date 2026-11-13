@@ -1,7 +1,8 @@
 {# 文章卡片：cover 可显式覆盖封面，否则自动取正文第一张真实图片；没有图片时只渲染纯文字卡。 #}
 {% set bodyImage = post.templateContent | firstImage %}
-{% set cardImage = post.data.cover or bodyImage %}
+{% set cardImage = post.data.cover | postCoverUrl(post.inputPath) or bodyImage %}
 {% set postSubcategory = post.inputPath | postSubcategory %}
+{% set postSubcategoryName = post.inputPath | postSubcategoryLabel(post.data.category) %}
 <article class="post-card{% if not cardImage %} no-cover{% endif %}" data-category="{{ post.data.category }}">
   {% if cardImage %}
   <div class="post-media" data-category="{{ post.data.category }}" aria-hidden="true">
@@ -12,7 +13,7 @@
   <div class="post-body-area">
     <div class="post-meta">
       <a href="{{ post.inputPath | postCategoryUrl(post.data.category) }}" class="post-category">
-        {{ post.data.category }}{% if postSubcategory %} / {{ postSubcategory }}{% endif %}
+        {{ post.data.category }}{% if postSubcategory %} / {{ postSubcategoryName }}{% endif %}
       </a>
       <time datetime="{{ post.data.date | dateToIso }}">{{ post.data.date | dateDisplay }}</time>
     </div>

@@ -16,11 +16,15 @@
 npm ci                 # 安装依赖
 npm run validate:content  # 校验文章 front matter、slug 唯一性和路径规范
 npm run test:first-image  # 校验首图提取规则和边界
+npm run test:post-assets  # 校验相对图片规划、命名空间和冲突检测
+npm run assets:sync       # 预览全部文章的源图片归档计划
 npm run test:markdown  # 校验自定义 Markdown 规则和代码保护边界
 npm run test:theme     # 校验 themes.json 与 themes.css 的主题颜色一致
 npm run build          # 清理 site/ 并执行 Eleventy 构建
 npm run serve          # 本地预览，默认 http://localhost:8080
 ```
+
+`npm run build` 和 `npm run serve` 启动前会先执行全量图片同步，可能改写 Markdown 并移动源图片；预览期间新增带相对图片的整篇文章后，重启一次预览服务，让同步和图片规划重新执行。
 
 ## 项目结构
 
@@ -31,7 +35,7 @@ npm run serve          # 本地预览，默认 http://localhost:8080
 | `src/content/pages/` | About 等固定页面 |
 | `src/_includes/layouts/` | 布局模板：`base.njk`、`post.njk` |
 | `src/_includes/partials/` | 可复用组件：header、footer、sidebar、文章卡、分页 |
-| `src/_data/` | 站点配置、主题清单 `themes.json` 和特殊页元数据 `custom-pages.json` |
+| `src/_data/` | 站点配置、主题清单 `themes.json`、分类展示名 `category-labels.json` 和特殊页元数据 `custom-pages.json` |
 | `assets/` | 站点静态资源：主题 CSS、主题脚本、图片和 vendor 库 |
 | `site/` | Eleventy 构建产物，提交到仓库；通过 `gh-pages` 分支根目录发布 |
 | `docs/` | 项目文档：现状分析、目标架构、迁移计划、发布清单 |
@@ -62,15 +66,24 @@ status: published                     # 或 draft，draft 不进首页和公开�
 1. `slug` 只允许小写英文、数字和连字符，全站唯一，决定文章 URL `/posts/{slug}/`。
 2. `date` 是唯一排序依据，禁止依赖文件修改时间。
 3. `summary` 可选；缺省时列表、RSS 和搜索索引统一取正文第一段生成展示摘要，需要精确控制时再显式填写。
-4. 站内图片引用统一写作 `/assets/images/...`，禁止 `./`、`../` 和反斜杠路径；`validate:content` 会拦截正文中的相对图片引用，引用式图片和相对 `srcset` 暂不支持，会直接报错，请改成内联 `![](/assets/images/...)`；首页卡片自动取正文第一张真实图片，`cover` 可显式覆盖，没有图片时只显示纯文字卡。
+4. 站内图片可以直接写 `/assets/images/...`，也可以在文章目录内使用 `./图片.png` 或 `.\图片.png`。`build` / `serve` 启动前会自动执行全量同步：把源图片归档到 `assets/images/<命名空间>/<文件名>`、改写 Markdown/HTML 与 `cover`，然后删除文章目录中的源图片。构建期还保留虚拟兜底，确保直接运行 Eleventy 时相对图片也能输出到 `site/assets/images/`。
 5. 文章型 HTML（如《白色相簿2》攻略）与 Markdown 同等对待，都放 `src/content/posts/` 且要求完整 front matter；独立交互页放 `src/content/custom/`，不进文章集合。
-6. 子分类由文章目录决定：`src/content/posts/git/example.md` 的目录名 `git` 是子分类，front matter 的 `category` 是父分类；目录名只允许小写英文、数字和连字符，当前只支持一层子分类目录。
+6. 子分类由文章目录决定：`src/content/posts/git/example.md` 的目录名 `git` 是子分类，front matter 的 `category` 是父分类；只有小写英文、数字和连字符目录会派生子分类。中文等非 slug 目录视为文章资源包，不生成子分类页，图片命名空间回退到 front matter `slug`。子分类展示名可在 `src/_data/category-labels.json` 中按父分类和 slug 配置，未配置时回退显示 slug。
 7. Markdown 行内高亮使用 `==文字==`，构建后会渲染为 `<mark>文字</mark>`；普通比较表达式请放进代码块或行内代码。
 8. 数学公式使用 `$...$` 行内写法或 `$$...$$` 块级写法，构建期由 KaTeX 渲染；公式不要放在代码块里。
 9. 上下标使用 `H~2~O` 和 `y^2^=4`；公式内部的上下标请放在 `$...$` 或 `$$...$$` 中。
 10. Callouts 使用 `> [!NOTE]`、`> [!TIP]`、`> [!IMPORTANT]`、`> [!WARNING]`、`> [!CAUTION]`，后接引用正文。
-11. 从旧站导入带本地图片的文章时，先运行 `npm run assets:migrate -- <文章或目录>` 预览，确认后加 `--write`；脚本会先复制图片到 `assets/images/<子分类>/<文件名>`、改写正文和 front matter `cover`，校验通过后才删除源文件，任一步失败会自动回滚并保留系统临时目录里的迁移日志；相对路径只能指向文章目录内的图片，直接指向 `assets/images` 会被拒绝，应该写成站点绝对路径；代码块、行内代码、外链和已迁移的绝对路径不会被动，构建时也不会自动执行。
+11. `assets:sync` 按“复制到 `assets/images/<命名空间>/` → 改写正文和 front matter `cover` → 校验写入 → 删除源图”的顺序执行，任一步失败会自动回滚并保留系统临时目录里的迁移日志。日常写作直接运行 `npm run build` 即可；需要单独预览时运行 `npm run assets:sync`，确认后执行 `npm run assets:sync -- --write`。相对图片必须位于当前文章目录内；出现 `../` 或跨文章目录引用时会明确报错，不自动猜测共享图片。
 12. 页面标题始终取 front matter 的 `title`，由布局统一渲染；正文 H1/H2 都只是内容标题，允许重复使用 H1，不接管页面标题，模板不强制降级。目录会把页面标题放在首项，正文第一个 H1 与 `title` 同名时不重复插入。
+
+### 文章图片归档口径
+
+- 规范源位置：`assets/images/<命名空间>/<文件名>`；构建产物对应 `site/assets/images/<命名空间>/<文件名>`。
+- 命名空间：合法 slug 子分类目录使用目录名，例如 `git/`；根目录文章和中文等非 slug 资源包目录使用 front matter `slug`，例如 `lct`。
+- 迁移顺序：先复制到规范位置，再改写 Markdown 或文章型 HTML 中的图片 URL 和 `cover`，校验写入成功后，最后删除文章目录中的源图片。
+- 相对图片边界：只允许引用当前文章目录内的真实图片；`../`、跨文章目录引用、缺失文件、未知扩展名和相对指向 `assets/images` 都必须报错。
+- 图片输出采用文件名扁平化：例如 `./imgs/符号.png` 会变为 `assets/images/lct/符号.png`；同一命名空间内同名但内容不同的图片必须 fail-fast。
+- 当前状态：`prebuild` / `preserve` 已接入全量同步；`npm run build` 和 `npm run serve` 启动前会自动 materialize 源图片。全量同步是幂等的，没有相对图片时不会产生任何改动。
 
 写完后执行：
 
@@ -110,9 +123,11 @@ npm run build
 npm ci						# 安装依赖
 npm run validate:content	# 校验文章 front matter、slug 唯一性和路径规范
 npm run test:first-image	# 校验首图提取规则和边界
+npm run test:post-assets	# 校验相对图片规划、命名空间和冲突检测
 npm run test:markdown		# 校验自定义 Markdown 规则和代码保护边界
 npm run test:theme		# 校验 themes.json 与 themes.css 的主题颜色一致
 
+npm run assets:sync		# 预览源图片归档计划；build 的 prebuild 会自动执行写入
 npm run build				# 清理 site/ 并执行 Eleventy 构建
 npm run validate:output		# 校验构建后的 site/
 

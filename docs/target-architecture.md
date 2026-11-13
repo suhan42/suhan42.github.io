@@ -1,6 +1,6 @@
 # Eleventy 目标架构
 
-更新时间：2026-11-10
+更新时间：2026-11-13
 
 本文定义迁移完成后的规范文件树、目录职责、内容数据模型、模板体系、构建输出、路由规则和 GitHub Pages 发布边界。它描述目标状态；阶段任务、删除顺序和回滚边界见 [migration-plan.md](migration-plan.md)。
 
@@ -54,8 +54,10 @@ suhan42.github.io/
 │
 ├─ scripts/
 │  ├─ front-matter.mjs
+│  ├─ post-assets.mjs
 │  ├─ validate-content.mjs
 │  ├─ validate-output.mjs
+│  ├─ test-post-assets.mjs
 │  ├─ test-markdown.mjs
 │  ├─ test-theme-config.mjs
 │  ├─ prune-katex-fonts.mjs
@@ -71,6 +73,7 @@ suhan42.github.io/
 │  ├─ _data/
 │  │  ├─ site.json
 │  │  ├─ themes.json
+│  │  ├─ category-labels.json
 │  │  └─ custom-pages.json
 │  │
 │  ├─ _includes/
@@ -195,12 +198,16 @@ status: published
 | `category` | 是 | 小写英文 slug | 文章所属父分类；子分类由文章所在的第一层目录名派生，不写进 front matter |
 | `tags` | 否 | 字符串数组 | 小写标签，用于跨主题聚合 |
 | `summary` | 否 | 非空字符串 | 首页、RSS 和搜索摘要；缺省时由正文第一段生成展示摘要 |
-| `cover` | 否 | 站点绝对路径 | 显式覆盖首页卡片封面；缺省时自动取正文第一张真实 `<img>`，仍无图时只渲染纯文字卡 |
+| `cover` | 否 | 站点绝对路径或文章目录内相对路径 | 显式覆盖首页卡片封面；缺省时自动取正文第一张真实 `<img>`，仍无图时只渲染纯文字卡 |
 | `status` | 是 | `published` 或 `draft` | 非 published 文章不进入首页、集合、RSS 和搜索索引 |
 
-站点内图片引用统一写作 `/assets/images/...`。不能在 Markdown 中使用 `./`、`../` 或 Windows 反斜杠路径。外部图片应显式使用完整 HTTPS URL；迁移时优先把本站文章使用的图片收入 `assets/images/`。首页卡片从构建后的正文 HTML 中读取第一张真实 `<img>`，代码块中的图片语法不会参与提取；front matter `cover` 始终优先，用于需要单独裁切或更换卡面时。
+文章源图片的规范归档位置是 `assets/images/<命名空间>/<文件名>`。新增或导入文章后，应执行 materialize：复制图片到规范位置，改写 Markdown 或文章型 HTML 中的图片 URL 与 front matter `cover`，校验写入成功后删除文章目录中的源图片。命名空间优先使用合法子分类目录名，目录名不是 slug 时回退到 front matter `slug`；相对路径只在当前文章目录内有效，`../` 或跨文章目录引用必须明文报错，不自动猜测共享图片。图片按文件名扁平化到命名空间，同一目标文件名内容不一致时必须 fail-fast。
 
-子分类使用目录表达：`src/content/posts/git/example.md` 中，`git` 是子分类，front matter 的 `category: it` 是父分类，最终父分类页为 `/categories/it/`，子分类页为 `/categories/it/git/`。根目录文章没有子分类；当前只支持一层子分类目录，目录名必须可直接作为 URL slug，并且同一目录内的文章必须使用同一个父分类。
+`npm run build` 的 `prebuild` 和 `npm run serve` 的 `preserve` 会执行 `assets:sync --write`，扫描全部文章并完成源图片 materialize；同步是幂等的，没有相对图片时不产生改动。`scripts/post-assets.mjs` 仍提供构建期虚拟兜底：如果直接运行 Eleventy 或仍有未同步的相对图片，图片会通过 passthrough copy 输出到 `site/assets/images/<命名空间>/<文件名>`，并在渲染结果中改写为 `/assets/images/...`。外部图片应显式使用完整 HTTPS URL。首页卡片从构建后的正文 HTML 中读取第一张真实 `<img>`，代码块中的图片语法不会参与提取；front matter `cover` 始终优先，用于需要单独裁切或更换卡面时。
+
+子分类使用目录表达：`src/content/posts/git/example.md` 中，`git` 是子分类，front matter 的 `category: it` 是父分类，最终父分类页为 `/categories/it/`，子分类页为 `/categories/it/git/`。根目录文章没有子分类；当前只支持一层子分类目录，只有可直接作为 URL slug 的目录名才会派生子分类。中文等非 slug 目录作为文章资源包使用，不生成分类页，并且同一目录内的文章必须使用同一个父分类。
+
+子分类 URL 始终使用目录 slug，页面标题、分类树、文章卡片和文章页中的展示名由 `src/_data/category-labels.json` 覆盖。配置按父分类分组，例如 `it.flowchart = "程序流程图"` 会让 `/categories/it/flowchart/` 显示中文名，未配置的 slug 继续显示 slug 本身。
 
 页面标题始终取 front matter 的 `title`，由布局统一渲染 `post-title`。正文 H1/H2 都只是内容标题，允许重复使用 H1，不接管页面标题，模板不强制降级。目录会自动补齐 id 并把页面标题放在首项，正文第一个 H1 与 `title` 同名时不重复插入。
 

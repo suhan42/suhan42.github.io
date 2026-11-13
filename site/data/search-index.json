@@ -71,6 +71,13 @@
     "tags": ["c","cpp","note"],
     "summary": "这是一份 C 和 C++ 常见问题的自查笔记，覆盖编译器行为、头文件宏、字符编码、main 函数签名等容易踩坑的知识点。"
   },  {
+    "title": "程序流程图",
+    "url": "/posts/lct/",
+    "date": "2023-01-22",
+    "category": "it",
+    "tags": [],
+    "summary": "我们可以用一条公式来表示程序流程图，即："
+  },  {
     "title": "vi 与 vim",
     "url": "/posts/vi-and-vim/",
     "date": "2023-01-22",
