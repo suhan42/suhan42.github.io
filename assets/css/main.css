@@ -610,7 +610,7 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
   transform: translate(0, 0);
 }
 
-/* 首页文章卡：沿用紧凑横向排版；有正文图片时在可变宽媒体框内做左侧揭示，没有图片时只保留文字。 */
+/* 首页文章卡：沿用紧凑横向排版；有正文图片时取消帘幕裁切，没有图片时只保留文字。 */
 .post-list {
   display: grid;
   grid-auto-rows: 1fr;
@@ -789,15 +789,9 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
   -webkit-line-clamp: 2;
 }
 
-/* hover 规则不绑定主指针类型，避免触摸屏笔记本把鼠标误判成无 hover；触屏再单独显示完整图片。 */
+/* 封面不再做额外帘幕裁切；hover 只扩展媒体框，不放大图片。 */
 .post-media .post-cover {
-  clip-path: inset(0 36% 0 0 round 10px);
-  transform: scale(1);
-  transform-origin: center;
-  transition:
-    clip-path 480ms var(--ease),
-    transform 360ms var(--ease),
-    box-shadow 360ms var(--ease);
+  transition: box-shadow 360ms var(--ease);
 }
 
 .post-card:hover .post-media,
@@ -807,15 +801,7 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
 
 .post-card:hover .post-media .post-cover,
 .post-card:focus-within .post-media .post-cover {
-  clip-path: inset(0 0 0 0 round 10px);
-  transform: scale(1.18);
   box-shadow: 0 12px 26px -14px rgba(0, 0, 0, 0.55);
-}
-
-@media (hover: none) {
-  .post-media .post-cover {
-    clip-path: inset(0 0 0 0 round 10px);
-  }
 }
 
 .post-card a.card-link::after {
@@ -1566,7 +1552,6 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
     width: 100%;
     height: 100%;
     aspect-ratio: auto;
-    clip-path: inset(0 0 0 0 round 10px);
   }
 
   .post-body-area {
@@ -1586,16 +1571,6 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-  }
-
-  .post-media .post-cover {
-    clip-path: inset(0 0 0 0 round 10px);
-    transform: none;
-  }
-
-  .post-card:hover .post-media .post-cover,
-  .post-card:focus-within .post-media .post-cover {
-    transform: scale(1.18);
   }
 
   .post-card:hover .post-media,
