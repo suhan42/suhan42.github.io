@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>PostgreSQL 与 MySQL 对比 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/css/main.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#postgresql-%E4%B8%8E-mysql-%E5%AF%B9%E6%AF%94">PostgreSQL 与 MySQL 对比</a></li>
+<li class="toc-item toc-level-2"><a href="#1-%E5%9F%BA%E6%9C%AC%E5%AE%9A%E4%BD%8D%E4%B8%8E%E9%80%82%E7%94%A8%E8%BE%B9%E7%95%8C">1. 基本定位与适用边界</a></li>
+<li class="toc-item toc-level-2"><a href="#2-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%BB%BA%E6%A8%A1%E8%83%BD%E5%8A%9B">2. 数据类型与建模能力</a></li>
+<li class="toc-item toc-level-2"><a href="#3-json-%E4%B8%8E%E5%8D%8A%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE">3. JSON 与半结构化数据</a></li>
+<li class="toc-item toc-level-2"><a href="#4-sql%E6%9F%A5%E8%AF%A2%E4%B8%8E%E5%88%86%E6%9E%90%E8%83%BD%E5%8A%9B">4. SQL、查询与分析能力</a></li>
+<li class="toc-item toc-level-2"><a href="#5-%E4%BA%8B%E5%8A%A1%E5%B9%B6%E5%8F%91%E4%B8%8E%E9%94%81">5. 事务、并发与锁</a></li>
+<li class="toc-item toc-level-2"><a href="#6-%E6%80%A7%E8%83%BD%E5%BF%85%E9%A1%BB%E6%8C%89%E8%B4%9F%E8%BD%BD%E6%8B%86%E5%BC%80%E7%9C%8B">6. 性能：必须按负载拆开看</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%80%A7%E8%83%BD%E9%AA%8C%E8%AF%81%E6%9C%80%E4%BD%8E%E6%B8%85%E5%8D%95">性能验证最低清单</a></li>
+<li class="toc-item toc-level-2"><a href="#7-%E5%85%A8%E6%96%87%E6%90%9C%E7%B4%A2gis-%E4%B8%8E%E5%90%91%E9%87%8F%E6%90%9C%E7%B4%A2">7. 全文搜索、GIS 与向量搜索</a></li>
+<li class="toc-item toc-level-2"><a href="#8-%E9%AB%98%E5%8F%AF%E7%94%A8%E5%A4%8D%E5%88%B6%E4%B8%8E%E6%89%A9%E5%B1%95%E6%9E%B6%E6%9E%84">8. 高可用、复制与扩展架构</a></li>
+<li class="toc-item toc-level-2"><a href="#9-%E7%94%9F%E6%80%81%E8%BF%90%E7%BB%B4%E4%B8%8E%E6%88%90%E6%9C%AC">9. 生态、运维与成本</a></li>
+<li class="toc-item toc-level-2"><a href="#10-%E5%85%B8%E5%9E%8B%E5%9C%BA%E6%99%AF%E5%BB%BA%E8%AE%AE">10. 典型场景建议</a></li>
+<li class="toc-item toc-level-2"><a href="#11-%E8%BF%81%E7%A7%BB%E4%B8%8E%E5%85%BC%E5%AE%B9%E9%A3%8E%E9%99%A9">11. 迁移与兼容风险</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%81%E7%A7%BB%E6%B5%81%E7%A8%8B%E5%BB%BA%E8%AE%AE">迁移流程建议</a></li>
+<li class="toc-item toc-level-2"><a href="#12-%E9%80%89%E5%9E%8B%E5%86%B3%E7%AD%96%E6%B8%85%E5%8D%95">12. 选型决策清单</a></li>
+<li class="toc-item toc-level-2"><a href="#13-%E5%8F%AF%E6%89%A7%E8%A1%8C%E7%9A%84%E9%80%89%E5%9E%8B%E8%A7%84%E5%88%99">13. 可执行的选型规则</a></li>
+<li class="toc-item toc-level-2"><a href="#14-%E5%B8%B8%E8%A7%81%E8%AF%AF%E5%8C%BA%E4%BF%AE%E6%AD%A3">14. 常见误区修正</a></li>
+<li class="toc-item toc-level-2"><a href="#15-%E6%9C%80%E5%90%8E%E9%80%89%E5%9E%8B%E5%BB%BA%E8%AE%AE">15. 最后选型建议</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">
+        it      </a>
+      <time datetime="2026-09-17">2026-09-17</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/database/">#database</a>
+      <a href="/tags/postgresql/">#postgresql</a>
+      <a href="/tags/mysql/">#mysql</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">PostgreSQL 与 MySQL 对比</h1>
+
+    <div class="post-body">
+<h1 id="postgresql-与-mysql-对比">PostgreSQL 与 MySQL 对比</h1>
+<h2 id="1-基本定位与适用边界">1. 基本定位与适用边界</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>PostgreSQL 16/17</th>
+<th>MySQL 8.x</th>
+<th>较稳的判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据库类型</td>
+<td>对象关系型数据库（ORDBMS），扩展类型能力突出</td>
+<td>以关系型数据库为主，InnoDB 是默认事务存储引擎</td>
+<td>PG 类型系统和扩展机制更强</td>
+</tr>
+<tr>
+<td>标准契合度</td>
+<td>SQL 标准契合度和高级 SQL 特性通常更好</td>
+<td>8.x 已支持 CTE、窗口函数、表达式索引等，但高级 SQL 生态仍常弱于 PG</td>
+<td>复杂 SQL 场景 PG 更顺</td>
+</tr>
+<tr>
+<td>设计取向</td>
+<td>功能完备、类型丰富、可定制、约束表达强</td>
+<td>简单、直接、部署广泛、Web OLTP 成熟</td>
+<td>“强弱”应转译为业务适配度</td>
+</tr>
+<tr>
+<td>版本现状</td>
+<td>PG 16/17 功能和并行能力继续增强</td>
+<td>MySQL 8.x 是当前主流，8.4/LTS 和 9.x 生态在演进</td>
+<td>新项目应以各自当前稳定版本为准</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-数据类型与建模能力">2. 数据类型与建模能力</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>PostgreSQL</th>
+<th>MySQL/InnoDB</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基础类型</td>
+<td>数值、文本、时间、布尔、网络地址、UUID、几何、数组、范围、枚举等很丰富</td>
+<td>数值、字符串、日期时间、JSON、空间类型等足够覆盖常见 Web 业务</td>
+<td>PG 建模表达力更强</td>
+</tr>
+<tr>
+<td>数组/范围/复合类型</td>
+<td>原生支持，适合标签、区间、权限范围、复杂值对象</td>
+<td>常用关联表、JSON 或应用层拆解替代</td>
+<td>PG 可减少某些反范式和折衷建模</td>
+</tr>
+<tr>
+<td>自定义类型/操作符</td>
+<td>支持自定义类型、操作符、函数、索引方法</td>
+<td>能力边界主要不是“用户自定义核心类型”</td>
+<td>PG 明显更强</td>
+</tr>
+<tr>
+<td>严格约束</td>
+<td><code>CHECK</code>、外键、唯一约束、排他约束、部分唯一索引能力强</td>
+<td>支持外键、唯一键、<code>CHECK</code> 等；触发器和 SQL 表达能力可覆盖大部分需求</td>
+<td>对数据完整性要求越高，PG 越有优势</td>
+</tr>
+<tr>
+<td><code>SERIAL</code> / 自增与标识列</td>
+<td>支持 <code>IDENTITY</code> 和 sequence</td>
+<td><code>AUTO_INCREMENT</code> 成熟</td>
+<td>均可用；迁移时注意主键生成语义</td>
+</tr>
+<tr>
+<td>时间类型</td>
+<td><code>TIMESTAMP</code>、<code>TIMESTAMPTZ</code>、<code>INTERVAL</code>、<code>DATE</code> 等语义清晰</td>
+<td><code>DATETIME</code>、<code>TIMESTAMP</code> 行为受时区、范围和默认值影响，需仔细设计</td>
+<td>跨时区系统 PG 更省心</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-json-与半结构化数据">3. JSON 与半结构化数据</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>PostgreSQL</th>
+<th>MySQL 8.x</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>类型</td>
+<td><code>json</code> 保存原始文本；<code>jsonb</code> 使用二进制表示，支持去重、索引和丰富操作符</td>
+<td><code>JSON</code> 是带校验和优化存储格式的二进制类型</td>
+<td>两者都不是“纯文本”；PG 的操作符/索引生态通常更完整</td>
+</tr>
+<tr>
+<td>索引</td>
+<td><code>GIN</code>、表达式索引、部分索引可组合，适合路径/存在性/包含查询</td>
+<td>可使用生成列 + 普通/函数索引；MySQL 也支持 <code>JSON_VALUE</code> 等函数路径，但灵活性弱于 PG</td>
+<td>PG 更强，MySQL 可以用“JSON + 生成列”补齐高频路径</td>
+</tr>
+<tr>
+<td>语义</td>
+<td><code>JSONB</code> 适合读多、复杂过滤和索引；<code>json</code> 适合保留原文和键序</td>
+<td>JSON 原地更新和部分更新有实现边界，需要看具体语句和版本行为</td>
+<td>PG 更适合把 JSON 当一等建模工具</td>
+</tr>
+<tr>
+<td>风险</td>
+<td><code>JSONB</code> 索引和旧版本清理也有成本；不要把所有字段都塞进 JSON</td>
+<td>生成列设计不好会带来存储/写放大；复杂 JSON 查询仍易失控</td>
+<td>半结构化数据也要建模，不是“扔 JSON”就结束</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-sql查询与分析能力">4. SQL、查询与分析能力</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>PostgreSQL</th>
+<th>MySQL 8.x</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CTE</td>
+<td>支持 <code>WITH</code>、递归 CTE、物化提示（不同版本行为有差异）</td>
+<td>8.0 起支持 CTE 和递归 CTE</td>
+<td>均可用，PG 高级用法更丰富</td>
+</tr>
+<tr>
+<td>窗口函数</td>
+<td>支持完整，帧、聚合、排名和复杂分析表达好</td>
+<td>8.0 起支持窗口函数</td>
+<td>均可用；PG 高级组合更强</td>
+</tr>
+<tr>
+<td><code>LATERAL</code></td>
+<td>支持成熟</td>
+<td>8.0.14 起支持 <code>LATERAL</code> 派生表</td>
+<td>均可用，PG 更常见</td>
+</tr>
+<tr>
+<td>并行查询</td>
+<td>支持顺序扫描、索引扫描、join、聚合等并行路径</td>
+<td>8.x 有并行读、并行聚合等能力</td>
+<td>双方都可调优；不要只看营销指标</td>
+</tr>
+<tr>
+<td>物化视图</td>
+<td>原生物质化视图，可手动/调度刷新</td>
+<td>无原生物化视图，常用表 + 任务、生成表或外部层模拟</td>
+<td>分析场景 PG 更直接</td>
+</tr>
+<tr>
+<td>查询规划器</td>
+<td>统计信息和高级 join/扫描路径能力强</td>
+<td>8.x 优化器比旧版进步明显，但复杂 SQL 的表达和优化空间通常仍小于 PG</td>
+<td>复杂报表/分析 PG 更合适</td>
+</tr>
+<tr>
+<td>外部数据/联邦能力</td>
+<td>FDW 生态较丰富</td>
+<td>原生联邦能力有限，通常靠应用层、中间件或复制</td>
+<td>跨源分析 PG 生态更好</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-事务并发与锁">5. 事务、并发与锁</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>PostgreSQL</th>
+<th>MySQL/InnoDB</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACID</td>
+<td>单机事务和约束保障成熟</td>
+<td>InnoDB 提供 ACID；MyISAM 不支持事务，生产核心表不建议使用</td>
+<td>两者核心路径都能支撑关键业务</td>
+</tr>
+<tr>
+<td>MVCC</td>
+<td>旧版本由表内历史版本 + <code>VACUUM</code> 清理；长事务会阻碍清理</td>
+<td>undo log/回滚段维护历史版本；长查询会带来 undo 增长和读视图代价</td>
+<td>都有长事务风险，只是表现形式不同</td>
+</tr>
+<tr>
+<td>读阻塞</td>
+<td>普通 SELECT 与写入不互相阻塞</td>
+<td>普通 SELECT 与写入也不互相阻塞</td>
+<td>“写不阻塞读”不是 PG 独有优势</td>
+</tr>
+<tr>
+<td>隔离级别</td>
+<td><code>READ COMMITTED</code>、<code>REPEATABLE READ</code>、<code>SERIALIZABLE</code>；默认 <code>READ COMMITTED</code></td>
+<td><code>READ UNCOMMITTED</code>、<code>READ COMMITTED</code>、<code>REPEATABLE READ</code>、<code>SERIALIZABLE</code>；默认 <code>REPEATABLE READ</code></td>
+<td>不要靠默认隔离级别判断业务正确性，必须显式设计</td>
+</tr>
+<tr>
+<td>锁与热点</td>
+<td>行锁、咨询锁、并发索引创建等成熟；热点行更新需重点设计</td>
+<td>行锁成熟；热点行、间隙锁和死锁要结合隔离级别与索引设计处理</td>
+<td>热点行为取决于事务形状，不取决于品牌</td>
+</tr>
+<tr>
+<td>长事务风险</td>
+<td>阻碍 <code>VACUUM</code>，可能导致表/索引膨胀和事务 ID 回卷压力</td>
+<td>undo 增长、历史链变长、查询退化，复制和恢复也要注意</td>
+<td>监控和治理长事务是两边共同要求</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-性能必须按负载拆开看">6. 性能：必须按负载拆开看</h2>
+<table>
+<thead>
+<tr>
+<th>负载形状</th>
+<th>PostgreSQL 的表现条件</th>
+<th>MySQL/InnoDB 的表现条件</th>
+<th>可用判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>简单点查/简单 CRUD</td>
+<td>PG 16/17 已很强；连接模型、连接池、索引和缓存决定结果</td>
+<td>常见 Web 场景成熟，8.x 优化明显</td>
+<td>不能默认 MySQL 更快，应实测</td>
+</tr>
+<tr>
+<td>读多写少 Web 业务</td>
+<td>索引设计好时表现稳定</td>
+<td>生态成熟，托管服务和工具链完善</td>
+<td>MySQL 是合理默认之一</td>
+</tr>
+<tr>
+<td>写密集批量导入</td>
+<td><code>COPY</code>、<code>UNLOGGED</code> 表、批量事务、合理索引策略可达高吞吐</td>
+<td><code>LOAD DATA</code>、批量 <code>INSERT</code>、<code>innodb_autoinc_lock_mode</code> 等有成熟路径</td>
+<td>都能做，重点在批量大小、索引延迟创建、提交策略</td>
+</tr>
+<tr>
+<td>高并发热点更新</td>
+<td>避免单行热点、缩短事务、合理重试；索引膨胀要监控</td>
+<td>行锁成熟，热点行、间隙锁、死锁需按索引和隔离级别调优</td>
+<td>热点更新两边都要拆分竞争</td>
+</tr>
+<tr>
+<td>复杂查询/报表</td>
+<td>优化器、窗口函数、CTE、物化视图、并行能力组合更强</td>
+<td>复杂 SQL 可用，但高级分析和物化视图生态弱一些</td>
+<td>PG 通常更顺</td>
+</tr>
+<tr>
+<td>全内存点查</td>
+<td>连接/进程模型和池化方案影响显著</td>
+<td>简单查询路径成熟，托管场景表现稳定</td>
+<td>应按真实 QPS、CPU、连接数实测</td>
+</tr>
+</tbody>
+</table>
+<h3 id="性能验证最低清单">性能验证最低清单</h3>
+<ol>
+<li>用真实或脱敏后的生产形数据测，不要只测单表百万行均匀随机数据。</li>
+<li>同时记录 P50/P95/P99、TPS/QPS、CPU、I/O、锁等待、上下文切换和连接队列。</li>
+<li>测“正常路径”和“故障/边界路径”：长事务、大批量导入、索引创建、备份、主从切换。</li>
+<li>控制变量：连接池、事务大小、隔离级别、索引、<code>EXPLAIN ANALYZE</code>、缓冲池/shared buffers、WAL/binlog 配置。</li>
+<li>给出运行边界：目标数据量增长、并发连接、备份窗口、可接受主从延迟、恢复时间目标。</li>
+</ol>
+<h2 id="7-全文搜索gis-与向量搜索">7. 全文搜索、GIS 与向量搜索</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>PostgreSQL</th>
+<th>MySQL 8.x</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全文搜索</td>
+<td>内置全文检索，支持配置词典、rank、索引，复杂中文方案可结合扩展/外部搜索</td>
+<td>内置全文索引可用于基础场景，中文分词和高级检索能力有限</td>
+<td>重搜索选 PG 或专业搜索引擎</td>
+</tr>
+<tr>
+<td>GIS</td>
+<td>PostGIS 是行业级开源空间扩展，函数、投影、地理类型和空间索引生态强</td>
+<td>原生空间类型和函数覆盖基础场景，复杂 GIS 能力远不如 PostGIS</td>
+<td>专业 GIS 明确优先 PG/PostGIS</td>
+</tr>
+<tr>
+<td>向量搜索</td>
+<td>需要 <code>pgvector</code> 等扩展；可支持向量类型、距离运算和索引，生态活跃</td>
+<td>需看具体版本、发行版或云扩展；传统 MySQL 社区版原生向量能力不是同等成熟选项</td>
+<td>原句应为“PG + 合适扩展”，不要说 PG 原生就带向量</td>
+</tr>
+<tr>
+<td>专业搜索替代</td>
+<td>PG 能处理中小规模应用内搜索</td>
+<td>MySQL 也能处理基础场景</td>
+<td>大规模、复杂相关性、分词和实时索引应考虑 OpenSearch/Elasticsearch/专用引擎</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-高可用复制与扩展架构">8. 高可用、复制与扩展架构</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>PostgreSQL</th>
+<th>MySQL/InnoDB</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>复制基础</td>
+<td>物理流复制、逻辑复制；WAL 是核心机制</td>
+<td>binlog 主从复制、GTID、半同步等成熟</td>
+<td>两者都能支撑高可用，方案成熟度不同</td>
+</tr>
+<tr>
+<td>同步语义</td>
+<td>同步/异步流复制可配置</td>
+<td>异步复制是常见默认；半同步可提升持久性但影响写延迟</td>
+<td>RPO/RTO 必须显式设计</td>
+</tr>
+<tr>
+<td>多主</td>
+<td>原生不推荐做多主；BDR 等属第三方方案</td>
+<td>InnoDB Cluster/Group Replication、NDB、第三方拓扑有不同取舍</td>
+<td>不要把“多主”当默认优势</td>
+</tr>
+<tr>
+<td>故障切换</td>
+<td>Patroni、repmgr、云托管自动切换等生态成熟</td>
+<td>Orchestrator、InnoDB Cluster、云托管切换等方案成熟</td>
+<td>团队熟悉度和演练频率比组件列表更重要</td>
+</tr>
+<tr>
+<td>读写分离</td>
+<td>逻辑复制/流复制 + 应用层或代理</td>
+<td>binlog 复制 + 代理/应用层方案广泛</td>
+<td>复制延迟和一致性语义要进接口设计</td>
+</tr>
+<tr>
+<td>分库分表</td>
+<td>Citus、分区表、FDW、外部中间件等路线</td>
+<td>InnoDB 分区、MySQL 生态分库分表组件多</td>
+<td>超大规模分布式是架构问题，不是单一数据库开关</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-生态运维与成本">9. 生态、运维与成本</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>PostgreSQL</th>
+<th>MySQL/InnoDB</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>部署</td>
+<td>单二进制/服务概念清晰，云托管和容器生态成熟</td>
+<td>安装、托管、容器和云产品普及度高</td>
+<td>两边都不难；难点在参数、备份、监控和演练</td>
+</tr>
+<tr>
+<td>监控重点</td>
+<td>锁等待、长事务、连接、缓存命中率、<code>VACUUM</code>、事务 ID 年龄、复制延迟、表/索引膨胀</td>
+<td>锁等待、死锁、长事务、undo/历史链、连接、缓冲池、复制延迟、binlog 和慢查询</td>
+<td>监控项不同，不等于某一边成本必然更低</td>
+</tr>
+<tr>
+<td>PostgreSQL 特有风险</td>
+<td>长事务阻碍清理；<code>VACUUM</code> 不足导致膨胀；事务 ID 回卷；参数和索引膨胀治理</td>
+<td>存储引擎差异；主从延迟和故障切换一致性；热点页/热点行；binlog 与备份恢复链条</td>
+<td>“PG 一定更难运维”太绝对</td>
+</tr>
+<tr>
+<td>MySQL 特有风险</td>
+<td>不适用</td>
+<td>现代版继续收敛，但老资料常把 MyISAM、查询缓存等旧行为混入当前架构</td>
+<td>生产核心表应锁定 InnoDB 和当前稳定版本</td>
+</tr>
+<tr>
+<td>备份恢复</td>
+<td><code>pg_basebackup</code>、WAL 归档、逻辑备份、快照、云托管 PITR</td>
+<td><code>mysqldump</code>、MySQL Enterprise Backup、XtraBackup、binlog PITR、快照、云托管 PITR</td>
+<td>按恢复目标设计，不只备份文件</td>
+</tr>
+<tr>
+<td>商业支持</td>
+<td>社区 + 云厂商 + EDB/专业服务</td>
+<td>Oracle、Percona、云厂商、托管服务广泛</td>
+<td>两边商业支持都比老文章描述的更成熟</td>
+</tr>
+<tr>
+<td>人才与工具</td>
+<td>后端/DBA 人才增多，云原生项目占比上升</td>
+<td>Web 后端、托管服务、存量工具链极大</td>
+<td>团队经验优先级很高</td>
+</tr>
+<tr>
+<td>许可证</td>
+<td>PostgreSQL License，商业集成边界宽松</td>
+<td>GPL/商业双许可，发行版和服务边界要理解清楚</td>
+<td>商业产品集成时必须做法务确认</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-典型场景建议">10. 典型场景建议</h2>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>更合适的默认</th>
+<th>理由</th>
+<th>仍需确认</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>经典 Web/CRUD、内容站、电商订单主库</td>
+<td>MySQL 8.x</td>
+<td>团队熟悉度、托管生态、简单 OLTP 成熟</td>
+<td>热点 SKU、库存扣减、隔离级别、死锁和重试</td>
+</tr>
+<tr>
+<td>SaaS 中后台、复杂业务建模、强约束业务</td>
+<td>PostgreSQL</td>
+<td>复杂类型、约束、高级 SQL、扩展机制有利</td>
+<td>多租户隔离模型、索引规模、连接池</td>
+</tr>
+<tr>
+<td>报表/BI/复杂分析</td>
+<td>PostgreSQL 或专业分析库</td>
+<td>CTE/窗口函数/物化视图/复杂 join 更顺</td>
+<td>数据增长后应评估列存、数仓或湖仓</td>
+</tr>
+<tr>
+<td>GIS</td>
+<td>PostgreSQL + PostGIS</td>
+<td>空间函数、投影、索引和行业生态最强</td>
+<td>数据量、瓦片/轨迹负载、是否叠加专业 GIS 服务</td>
+</tr>
+<tr>
+<td>全文搜索</td>
+<td>PostgreSQL 或专用搜索引擎</td>
+<td>PG 可覆盖中小场景，大搜索规模需要专用引擎</td>
+<td>分词、相关性、更新频率、QPS</td>
+</tr>
+<tr>
+<td>向量搜索</td>
+<td>PostgreSQL + pgvector 或专用向量库</td>
+<td>pgvector 生态活跃，PG 便于混合检索</td>
+<td>维度、召回、QPS、索引内存、是否需要专用 ANN 系统</td>
+</tr>
+<tr>
+<td>金融核心/强一致交易系统</td>
+<td>都可能，但必须专项设计</td>
+<td>一致性来自事务、隔离级别、复制语义、审计和恢复设计</td>
+<td>RPO/RTO、审计、对账、跨服务事务边界</td>
+</tr>
+<tr>
+<td>高并发写入/日志/事件流</td>
+<td>先评估专用写入/队列/时序系统</td>
+<td>通用库不应默认吞下无边界写入流</td>
+<td>分区、保留策略、压缩、消费链路</td>
+</tr>
+<tr>
+<td>多租户 SaaS</td>
+<td>PostgreSQL 或 MySQL 都可行</td>
+<td>关键在租户隔离、迁移、容量和合规</td>
+<td>schema 隔离、行级隔离、资源隔离、 noisy neighbor</td>
+</tr>
+<tr>
+<td>存量 MySQL 系统</td>
+<td>不因“PG 更先进”贸然替换</td>
+<td>迁移成本、SQL 方言、ORM、存储过程、运维链路都会放大风险</td>
+<td>先做 SQL/依赖审计和灰度迁移方案</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-迁移与兼容风险">11. 迁移与兼容风险</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>MySQL → PostgreSQL</th>
+<th>PostgreSQL → MySQL</th>
+<th>通用风险</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SQL 方言</td>
+<td>引号、类型、日期函数、<code>UPSERT</code>、分页、分组严格性差异大</td>
+<td>序列/数组/JSONB/高级 SQL 难替代</td>
+<td>ORM 生成的 SQL 也会绑定方言</td>
+</tr>
+<tr>
+<td>默认行为</td>
+<td>大小写折叠、空串/null、类型隐转、时间时区行为不同</td>
+<td>大小写、排序规则、时区、默认值语义不同</td>
+<td>必须做行为对齐测试，不只看语法通过</td>
+</tr>
+<tr>
+<td>主键/序列</td>
+<td><code>AUTO_INCREMENT</code> 到 sequence/identity 的迁移要注意间隙和缓存</td>
+<td>sequence 到 <code>AUTO_INCREMENT</code> 要处理起始值和并发</td>
+<td>迁移期间要冻结写入或做双向核对</td>
+</tr>
+<tr>
+<td>JSON</td>
+<td><code>JSON</code>/生成列到 <code>jsonb</code> 时要重新评估路径、索引和更新</td>
+<td><code>JSONB</code> 操作符/索引到 MySQL 要重写</td>
+<td>JSON 不能当成透明迁移</td>
+</tr>
+<tr>
+<td>存储过程/触发器</td>
+<td>PL/pgSQL 与 MySQL 存储过程差异大</td>
+<td>反向迁移也需重写</td>
+<td>尽量减少数据库内复杂业务逻辑</td>
+</tr>
+<tr>
+<td>工具</td>
+<td>pgloader、ETL、云迁移服务</td>
+<td>ETL、云迁移服务</td>
+<td>迁移工具不能替代语义验证</td>
+</tr>
+</tbody>
+</table>
+<h3 id="迁移流程建议">迁移流程建议</h3>
+<ol>
+<li><strong>先审计</strong>：列出对象、数据量、依赖、存储过程、触发器、ORM 方言、慢 SQL、报表、备份和高可用链路。</li>
+<li><strong>行为验证</strong>：为边界数据、并发事务、错误路径、空值、时区、排序、大小写、JSON、主键生成写对齐测试。</li>
+<li><strong>性能基线</strong>：保留源库 P95/P99、慢 SQL、硬件和参数，迁移后在同负载下对比。</li>
+<li><strong>双轨方案</strong>：只读灰度、影子库、双写/对账、按模块迁移或按只读服务迁移，避免一次性大切换。</li>
+<li><strong>回退设计</strong>：明确回滚点、数据补偿、DNS/连接切换、复制方向、停写窗口和验证人。</li>
+<li><strong>上线后观察</strong>：监控锁、长事务、膨胀/undo、复制延迟、慢 SQL、错误率和业务对账结果。</li>
+</ol>
+<h2 id="12-选型决策清单">12. 选型决策清单</h2>
+<p>先回答下面的问题，再决定默认库：</p>
+<ol>
+<li>新项目还是已有系统？已有系统的迁移成本必须计入。</li>
+<li>最关键的 20 条 SQL 是什么？事务、索引和并发形状是什么？</li>
+<li>是否有复杂类型、数组、范围、GIS、JSON、向量、全文搜索需求？</li>
+<li>期望一致性语义是什么？可接受复制延迟和故障丢失窗口是多少？</li>
+<li>P95/P99、TPS/QPS、数据量三年增长、备份窗口和恢复目标是什么？</li>
+<li>团队当前最熟悉哪一个？有没有 24 小时值班和故障演练能力？</li>
+<li>是否使用云托管？托管服务是否覆盖自动备份、监控、参数调优、切换、审计和合规？</li>
+<li>未来 5 年是更可能扩大 OLTP、增加报表、引入搜索/向量，还是先保交付？</li>
+<li>是否存在合规、数据驻留、审计、许可证或商业支持要求？</li>
+<li>如果数据库不可用 30 分钟，业务损失和恢复路径是什么？</li>
+</ol>
+<h2 id="13-可执行的选型规则">13. 可执行的选型规则</h2>
+<ul>
+<li><strong>默认 MySQL</strong>：新团队、经典 CRUD、读多写少、急需上线、已有 MySQL 托管和运维体系、无复杂 SQL/类型需求。</li>
+<li><strong>默认 PostgreSQL</strong>：复杂领域建模、强约束、丰富类型、JSONB、GIS、pgvector、复杂报表、SaaS/ToB 中后台、愿意学习 PG 运维模型。</li>
+<li><strong>不要只因“性能”切换</strong>：除非有真实负载基线，且新库在关键路径上稳定超过阈值。</li>
+<li><strong>不要只因“功能多”切换</strong>：功能只在团队能正确使用、运维能监控其代价时才是收益。</li>
+<li><strong>数据库不是孤岛</strong>：连接池、缓存、队列、搜索引擎、数仓、备份、故障演练和应用架构共同决定成败。</li>
+<li><strong>保留演进路径</strong>：优先把业务逻辑放在可迁移层，避免大量私有 SQL、触发器和存储过程把系统焊死在单一数据库上。</li>
+</ul>
+<h2 id="14-常见误区修正">14. 常见误区修正</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>更准确的表述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL 有 MVCC，MySQL 没有</td>
+<td>两者都用 MVCC。InnoDB 依赖 MVCC；PG 和 InnoDB 的版本存储与清理机制不同</td>
+</tr>
+<tr>
+<td>MySQL JSON 只是文本</td>
+<td>MySQL <code>JSON</code> 有校验和优化二进制存储；PG <code>JSONB</code> 的索引和操作符生态通常更强，但两者定位不同</td>
+</tr>
+<tr>
+<td>MySQL 8 仍有查询缓存</td>
+<td>MySQL 8.0 已移除查询缓存，不应继续作为当前架构核心层</td>
+</tr>
+<tr>
+<td>PG 天然适合高并发写</td>
+<td>PG 能支撑写密集负载，但热点行、长事务和膨胀必须治理；MySQL 也有成熟写路径</td>
+</tr>
+<tr>
+<td>MySQL 天然只适合简单读</td>
+<td>MySQL 8.x 支持窗口函数、CTE、JSON、表达式索引等；能否支撑复杂业务要看设计和版本边界</td>
+</tr>
+<tr>
+<td>PG 所有云投入都超过 MySQL</td>
+<td>云厂商对两者都有重点投入；具体能力要看托管版本、参数开放度、备份/恢复、监控和切换 SLA</td>
+</tr>
+<tr>
+<td>学习成本 PG 一定更高</td>
+<td>初学 CRUD 时 MySQL 常更容易；掌握生产级调优、备份、恢复和高可用时，两边都需要专业能力</td>
+</tr>
+<tr>
+<td>“不换数据库”等于选 PG</td>
+<td>长期可控来自数据模型、约束、监控、备份、迁移策略和团队认知，不是单次选型</td>
+</tr>
+</tbody>
+</table>
+<h2 id="15-最后选型建议">15. 最后选型建议</h2>
+<ul>
+<li>经典 Web/CRUD、读多写少、已有 MySQL 生态、团队经验集中：MySQL 8.x 仍然合理。</li>
+<li>复杂关系建模、复杂 SQL、约束校验、GIS、丰富 JSON/半结构化数据、扩展类型、搜索与向量扩展生态：PostgreSQL 通常更合适。</li>
+<li>性能不能靠品牌判断。简单 OLTP 不等于 MySQL 必胜；复杂查询也不等于 PostgreSQL 必胜。必须看表结构、索引、事务模式、连接池、数据量、并发形状和硬件。</li>
+<li>运维难点不同：PostgreSQL 重点在 <code>VACUUM</code>、事务 ID 回卷、长事务和膨胀控制；MySQL/InnoDB 重点在存储引擎边界、复制拓扑、主从延迟、故障切换和参数调优。</li>
+</ul>
+<p>不要问“PostgreSQL 和 MySQL 谁更强”，改成问：</p>
+<ol>
+<li>这套业务的关键事务长什么样？</li>
+<li>哪些数据必须强约束，哪些适合 JSON/半结构化？</li>
+<li>P95/P99、并发、增长和故障恢复目标是什么？</li>
+<li>团队能长期运维哪个数据库？</li>
+<li>迁移、备份、监控、审计和扩展路径是否已经设计？</li>
+</ol>
+<p>如果答案清楚，PostgreSQL 和 MySQL 都是优秀选择；如果答案不清楚，换数据库本身救不了设计问题。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

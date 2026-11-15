@@ -195,11 +195,13 @@ export default function (eleventyConfig) {
   });
 
   // 把根目录 assets/ 原样复制到输出目录的 assets/ 下；src/static/ 的内容（.nojekyll）复制到输出根目录。
-  eleventyConfig.addPassthroughCopy({ "assets": "assets", "src/static": "." });
+  // Windows 下递归复制默认并发过高时会在并发 mkdir 上随机抛 EPERM，限制为串行复制以保证构建稳定。
+  const passthroughCopyOptions = { concurrency: 1 };
+  eleventyConfig.addPassthroughCopy({ "assets": "assets", "src/static": "." }, passthroughCopyOptions);
   for (const copy of postAssetPlan.copies.values()) {
     eleventyConfig.addPassthroughCopy({
       [copy.sourcePath]: copy.destinationOutput
-    });
+    }, passthroughCopyOptions);
   }
 
   // 日期显示过滤器：把 JS Date 或 ISO 字符串格式化为 YYYY-MM-DD，用于列表和文章页。

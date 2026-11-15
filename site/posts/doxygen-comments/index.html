@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Doxygen 注释 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/css/main.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Doxygen 注释</a></li>
+<li class="toc-item toc-level-1"><a href="#doxygen">Doxygen</a></li>
+<li class="toc-item toc-level-2"><a href="#1%E7%89%B9%E6%AE%8A%E5%91%BD%E4%BB%A4%E7%AE%80%E4%BB%8B">1.特殊命令简介</a></li>
+<li class="toc-item toc-level-2"><a href="#2%E6%96%87%E4%BB%B6%E6%B3%A8%E9%87%8A">2.文件注释</a></li>
+<li class="toc-item toc-level-2"><a href="#3%E7%BB%93%E6%9E%84%E4%BD%93%E6%B3%A8%E9%87%8A">3.结构体注释</a></li>
+<li class="toc-item toc-level-2"><a href="#4%E5%87%BD%E6%95%B0%E6%B3%A8%E9%87%8A">4.函数注释</a></li>
+<li class="toc-item toc-level-2"><a href="#5%E5%B8%B8%E9%87%8F%E5%8F%98%E9%87%8F%E6%B3%A8%E9%87%8A">5.常量/变量注释</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">
+        it      </a>
+      <time datetime="2024-04-22">2024-04-22</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/doxygen/">#doxygen</a>
+      <a href="/tags/documentation/">#documentation</a>
+      <a href="/tags/c/">#c</a>
+      <a href="/tags/cpp/">#cpp</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Doxygen 注释</h1>
+
+    <div class="post-body">
+<h1 id="doxygen">Doxygen</h1>
+<p><code>Doxygen</code> 是一个程序的文件产生工具，可将程序中的特定批注转换成为说明文件。通常我们在写程序时，或多或少都会写上批注，但是对于其它人而言，要直接探索程序里的批注，与打捞铁达尼号同样的辛苦。大部分有用的批注都是属于针对函式，类别等等的说明。所以，如果能依据程序本身的结构，将批注经过处理重新整理成为一个纯粹的参考手册，对于后面利用您的程序代码的人而言将会减少许多的负担。不过，反过来说，整理文件的工作对于您来说，就是沉重的负担。</p>
+<p>Doxygen 就是在您写批注时，稍微按照一些它所制订的规则。接着，他就可以帮您产生出漂亮的文档了。</p>
+<p>因此，Doxygen 的使用可分为两大部分。首先是特定格式的批注撰写，第二便是利用Doxygen的工具来产生文档。</p>
+<p>所谓<code>Doxygen</code>语法就是在写程序注视时候按照<code>Doxygen</code>语法规则来写注释。只有按照标准的注释规则来写注释，生成的文档才会非常偏亮，否则乱七八糟的。</p>
+<h2 id="1特殊命令简介">1.特殊命令简介</h2>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>字段名</th>
+<th>语法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>@file</td>
+<td>文件名</td>
+<td>file [&lt; name &gt;]</td>
+</tr>
+<tr>
+<td>@brief</td>
+<td>简介</td>
+<td>brief { brief description }</td>
+</tr>
+<tr>
+<td>@author</td>
+<td>作者</td>
+<td>author { list of authors }</td>
+</tr>
+<tr>
+<td>@mainpage</td>
+<td>主页信息</td>
+<td>mainpage [(title)]</td>
+</tr>
+<tr>
+<td>@date</td>
+<td>年-月-日</td>
+<td>date { date description }</td>
+</tr>
+<tr>
+<td>@author</td>
+<td>版本号</td>
+<td>version { version number }</td>
+</tr>
+<tr>
+<td>@copyright</td>
+<td>版权</td>
+<td>copyright { copyright description }</td>
+</tr>
+<tr>
+<td>@param</td>
+<td>参数</td>
+<td>param [(dir)] &lt; parameter-name&gt; { parameter description }</td>
+</tr>
+<tr>
+<td>@return</td>
+<td>返回</td>
+<td>return { description of the return value }</td>
+</tr>
+<tr>
+<td>@retval</td>
+<td>返回值</td>
+<td>retval { description }</td>
+</tr>
+<tr>
+<td>@bug</td>
+<td>漏洞</td>
+<td>bug { bug description }</td>
+</tr>
+<tr>
+<td>@details</td>
+<td>细节</td>
+<td>details { detailed description }</td>
+</tr>
+<tr>
+<td>@pre</td>
+<td>前提条件</td>
+<td>pre { description of the precondition }</td>
+</tr>
+<tr>
+<td>@see</td>
+<td>参考</td>
+<td>see { references }</td>
+</tr>
+<tr>
+<td>@link</td>
+<td>连接(与@see类库，{@link <a href="https://link.zhihu.com/?target=http%3A//www.google.com">http://www.google.com</a>})</td>
+<td>link &lt; link-object&gt;</td>
+</tr>
+<tr>
+<td>@throw</td>
+<td>异常描述</td>
+<td>throw &lt; exception-object&gt; { exception description }</td>
+</tr>
+<tr>
+<td>@todo</td>
+<td>待处理</td>
+<td>todo { paragraph describing what is to be done }</td>
+</tr>
+<tr>
+<td>@warning</td>
+<td>警告信息</td>
+<td>warning { warning message }</td>
+</tr>
+<tr>
+<td>@deprecated</td>
+<td>弃用说明。可用于描述替代方案，预期寿命等</td>
+<td>deprecated { description }</td>
+</tr>
+<tr>
+<td>@example</td>
+<td>弃用说明。可用于描述替代方案，预期寿命等</td>
+<td>deprecated { description }</td>
+</tr>
+</tbody>
+</table>
+<p>以上是写注释是可以加上的，但是实际操作中，并不需要这么多参数。</p>
+<h2 id="2文件注释">2.文件注释</h2>
+<p>一般放在文件开头</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>/**</span></span>
+<span class="line"><span class="line-number">2</span><span> * @file 文件名</span></span>
+<span class="line"><span class="line-number">3</span><span> * @brief 简介</span></span>
+<span class="line"><span class="line-number">4</span><span> * @details 细节</span></span>
+<span class="line"><span class="line-number">5</span><span> * @author 作者</span></span>
+<span class="line"><span class="line-number">6</span><span> * @version 版本号</span></span>
+<span class="line"><span class="line-number">7</span><span> * @date 年-月-日</span></span>
+<span class="line"><span class="line-number">8</span><span> * @copyright 版权</span></span>
+<span class="line"><span class="line-number">9</span><span> */</span></span></code></pre>
+<h2 id="3结构体注释">3.结构体注释</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>/**</span></span>
+<span class="line"><span class="line-number">2</span><span> * @brief 类的详细描述</span></span>
+<span class="line"><span class="line-number">3</span><span> */</span></span></code></pre>
+<h2 id="4函数注释">4.函数注释</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>/**</span></span>
+<span class="line"><span class="line-number">2</span><span>  * @brief 函数描述</span></span>
+<span class="line"><span class="line-number">3</span><span>  * @param 参数描述</span></span>
+<span class="line"><span class="line-number">4</span><span>  * @return 返回描述</span></span>
+<span class="line"><span class="line-number">5</span><span>  * @retval 返回值描述</span></span>
+<span class="line"><span class="line-number">6</span><span>  */</span></span></code></pre>
+<h2 id="5常量变量注释">5.常量/变量注释</h2>
+<p>一般常量/变量可以有两种形式：</p>
+<ul>
+<li><strong>常量/变量上一行注释</strong></li>
+<li><strong>常量/变量后注释</strong></li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>//定义一个整型变量a</span></span>
+<span class="line"><span class="line-number">2</span><span>int a;</span></span>
+<span class="line"><span class="line-number">3</span><span></span></span>
+<span class="line"><span class="line-number">4</span><span>/**</span></span>
+<span class="line"><span class="line-number">5</span><span> * @brief 定义一个整型变量a</span></span>
+<span class="line"><span class="line-number">6</span><span>*/</span></span>
+<span class="line"><span class="line-number">7</span><span>int a;</span></span>
+<span class="line"><span class="line-number">8</span><span></span></span>
+<span class="line"><span class="line-number">9</span><span>int a; /*!&#x3C; 定义一个整型变量a */</span></span>
+<span class="line"><span class="line-number">10</span><span>int a; /**&#x3C; 定义一个整型变量a */</span></span>
+<span class="line"><span class="line-number">11</span><span>int a; //!&#x3C; 定义一个整型变量a</span></span>
+<span class="line"><span class="line-number">12</span><span>int a; ///&#x3C; 定义一个整型变量a</span></span></code></pre>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

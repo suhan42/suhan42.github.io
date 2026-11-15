@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>搜索的技巧 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/css/main.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=552ef116f9" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#%E6%90%9C%E7%B4%A2%E7%9A%84%E6%8A%80%E5%B7%A7">搜索的技巧</a></li>
+<li class="toc-item toc-level-2"><a href="#01%E5%85%B3%E9%94%AE%E5%AD%97%E6%90%9C%E7%B4%A2">01.关键字搜索</a></li>
+<li class="toc-item toc-level-2"><a href="#02%E5%87%8F%E5%8F%B7">02.减号：-</a></li>
+<li class="toc-item toc-level-2"><a href="#03%E5%8F%8C%E5%BC%95%E5%8F%B7">03.双引号：&quot;&quot;</a></li>
+<li class="toc-item toc-level-2"><a href="#04%E6%A8%A1%E7%B3%8A%E6%90%9C%E7%B4%A2%E9%80%9A%E9%85%8D%E7%AC%A6">04.模糊搜索：通配符 *</a></li>
+<li class="toc-item toc-level-2"><a href="#05%E6%96%87%E6%A1%A3%E6%90%9C%E7%B4%A2filetype">05.文档搜索：filetype</a></li>
+<li class="toc-item toc-level-2"><a href="#06%E7%AB%99%E5%86%85%E6%90%9C%E7%B4%A2site">06.站内搜索：site</a></li>
+<li class="toc-item toc-level-2"><a href="#07%E9%99%90%E5%AE%9A%E6%97%B6%E9%97%B4">07.限定时间</a></li>
+<li class="toc-item toc-level-2"><a href="#08%E9%A1%B5%E9%9D%A2%E6%A0%87%E9%A2%98intitle">08.页面标题：intitle</a></li>
+<li class="toc-item toc-level-2"><a href="#09%E5%85%B3%E9%94%AE%E8%AF%8Dallintitle">09.关键词：allintitle</a></li>
+<li class="toc-item toc-level-2"><a href="#10inurl">10.inurl</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">
+        it      </a>
+      <time datetime="2025-06-25">2025-06-25</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/search/">#search</a>
+      <a href="/tags/tips/">#tips</a>
+      <a href="/tags/workflow/">#workflow</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">搜索的技巧</h1>
+
+    <div class="post-body">
+<h1 id="搜索的技巧">搜索的技巧</h1>
+<h2 id="01关键字搜索">01.关键字搜索</h2>
+<p>关键字搜索是最基础的搜索，这个旨在提取关键字。</p>
+<p>比如你的电脑蓝屏了，不是搜“我的电脑为什么蓝屏了？”而是可以直接搜索“电脑蓝屏”。</p>
+<p>还有一个要点是用中文和英文搜索的信息有所区别，大伙可以尝试下。</p>
+<h2 id="02减号">02.减号：-</h2>
+<p>减号搜索，是想搜索的信息减去不想搜索的信息。</p>
+<p><strong>格式：A -B（A和减号之间有空格）</strong></p>
+<h2 id="03双引号">03.双引号：&quot;&quot;</h2>
+<p>双引号搜索，搜索结果必须出现连续的文本AAA</p>
+<p><strong>格式：&quot;AAA&quot;（双引号为英文状态）</strong></p>
+<p><img src="https://segmentfault.com/img/remote/1460000038432202" alt="img"></p>
+<h2 id="04模糊搜索通配符">04.模糊搜索：通配符 *</h2>
+<p><strong>通配符</strong>——可代替任何文字，用在模糊印象的地方比较多。</p>
+<p>一般可以用来搜只记得一部分的成语、诗句，或者是一些描述广泛的东西。</p>
+<h2 id="05文档搜索filetype">05.文档搜索：filetype</h2>
+<p>文档搜索命令 <code>filetype</code>，多数情况下用以查找我们所需要的资料，返回的页面是你搜索的文档相应格式。</p>
+<p><strong>格式：A filetype:pdf（A后有空格，符号为英文状态）</strong></p>
+<p>如搜 JavaScript权威指南（第四版）的 pdf，就是: filetype:pdf JavaScript权威指南（第四版）</p>
+<p><img src="https://segmentfault.com/img/remote/1460000038432195" alt="img"></p>
+<h2 id="06站内搜索site">06.站内搜索：site</h2>
+<p>搜索某网页中的内容</p>
+<p><strong>格式：A site:http://XXX.com</strong></p>
+<p>http://XXX.com就是要搜索的网站。</p>
+<p>一般程序猿解决问题，用 <code>site:stackoverflow.com</code>，大部分解决不了的问题，都会有答案了。</p>
+<p>比如在 segmentfault.com 里面搜索：&quot;react打包npm run build生成的文件好大，怎样关掉生成 sourceMap&quot; site:segmentfault.com</p>
+<p><img src="https://segmentfault.com/img/remote/1460000038432198" alt="img"></p>
+<h2 id="07限定时间">07.限定时间</h2>
+<p>搜索特定时间段的资料</p>
+<p><strong>格式：A filetype:pdf 2017..2018（时间段间的符号同为英文状态下）</strong></p>
+<h2 id="08页面标题intitle">08.页面标题：intitle</h2>
+<p>结果页面标题包含关键词</p>
+<p><strong>格式：A intitle B （注意有2个空格）</strong></p>
+<h2 id="09关键词allintitle">09.关键词：allintitle</h2>
+<p>结果页面标题包含多组关键词</p>
+<p><strong>格式：A allintitle B（注意有2个空格）</strong></p>
+<h2 id="10inurl">10.inurl</h2>
+<p>查询词出现在url的界面</p>
+<p><strong>格式：A inurl XXX（注意有2个空格）</strong></p>
+<p>**url：**统一资源定位符（Uniform Resource Locator）是对可以从互联网上得到的资源的位置和访问方法的一种简洁的表示，是互联网上标准资源的地址。说人话就是网址。</p>
+<p>例如：前端教程 inurl:video
+查询词 “前端教程” 是可以出现在网页的任何位置，而 “video” 则必须出现在网页 <code>url</code> 中。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000038432210" alt="img"></p>
+<p><strong>常用的URL：</strong></p>
+<ul>
+<li>书籍：book；ebook；shuji；shu</li>
+<li>论坛：bbs；forum</li>
+<li>音乐：music；mp3；midi；yinyue</li>
+<li>软件：soft；software；ruanjian</li>
+<li>新闻：news；xinwen；gov</li>
+<li>体育：sports；tiyu</li>
+</ul>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>
