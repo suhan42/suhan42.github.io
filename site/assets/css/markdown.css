@@ -197,7 +197,7 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
   margin-top: 0;
 }
 
-/* Nocturne 两套主题的正文排版和组件细节；night/paper 不受这些规则影响。 */
+/* Nocturne 两套主题的正文颜色和组件细节；字号、字重和行高沿用基础排版，保证四主题一致。 */
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body {
   color: var(--body-text);
   font-family: var(--font-ui);
@@ -206,73 +206,59 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
   line-height: 1.75;
 }
 
-:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h1,
-:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h2,
-:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h3,
-:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h4,
-:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h5,
-:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h6 {
-  font-family: var(--font-display);
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: 0;
-}
-
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h1 {
-  margin: 2.4rem 0 1.2rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--heading-border-strong);
   color: var(--h1-color);
-  font-size: 2rem;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h2 {
-  margin: 0.6rem 0 1rem;
   padding-bottom: 0.35rem;
   border-bottom: 1px solid var(--heading-border);
   color: var(--h2-color);
-  font-size: 1.6rem;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h3 {
-  margin: 0.6rem 0 1rem;
   color: var(--h3-color);
-  font-size: 1.3rem;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h4 {
-  margin: 0.6rem 0 1rem;
   color: var(--h4-color);
-  font-size: 1.1rem;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h5 {
-  margin: 0.6rem 0 1rem;
   color: var(--h5-color);
-  font-size: 1rem;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body h6 {
-  margin: 0.6rem 0 1rem;
   color: var(--h6-color);
-  font-size: 0.92rem;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-page .post-title,
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .simple-page > .post-title {
   color: var(--h1-color);
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: 0;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-page .post-title,
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .simple-page > .post-title {
-  margin-bottom: 1.2rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--heading-border-strong);
+}
+
+/* SimSun 没有 500 字重，500 会回退到 400；Nocturne 用 600 触发粗体面，视觉上接近基础主题的 500。 */
+:is([data-theme="nocturne"], [data-theme="nocturne-bright"]) :is(
+  .brand-name,
+  .hero-title,
+  .section-title,
+  .post-title,
+  .post-body h1,
+  .post-body h2,
+  .post-body h3,
+  .post-body h4,
+  .post-body h5,
+  .post-body h6
+) {
+  font-weight: 600;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .hero-title {
@@ -330,7 +316,6 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body table {
   border: 1px solid var(--table-border);
-  font-size: 0.93rem;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body th {
@@ -338,8 +323,6 @@ html:is([data-theme="night"], [data-theme="nocturne"]) .post-body pre.shiki .lin
   border: 1px solid var(--table-border);
   background-color: var(--table-head-bg);
   color: var(--table-head-text);
-  font-size: 0.88rem;
-  letter-spacing: 0.01em;
 }
 
 :is([data-theme="nocturne"], [data-theme="nocturne-bright"]) .post-body td {
