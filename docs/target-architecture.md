@@ -38,8 +38,7 @@ suhan42.github.io/
 │  │  ├─ markdown.css
 │  │  ├─ variables.css
 │  │  ├─ me.css
-│  │  ├─ change_colour.css
-│  │  └─ box.css
+│  │  └─ change_colour.css
 │  ├─ js/
 │  │  ├─ site.js
 │  │  ├─ theme.js
@@ -96,7 +95,6 @@ suhan42.github.io/
 │  │  │  └─ about.html
 │  │  └─ custom/
 │  │     ├─ divergence.html
-│  │     ├─ box.html
 │  │     └─ fireworks.html
 │  │
 │  ├─ index.njk
@@ -183,7 +181,7 @@ tags:
   - marked
   - markdown
 summary: 用 marked 写一个小型静态博客生成器。
-cover: /assets/images/box/gd.jpg
+cover: /assets/images/suhan.png
 status: published
 ---
 
@@ -217,7 +215,7 @@ status: published
 
 `src/content/posts/` 存放文章型内容，扩展名可以是 `.md` 或 `.html`。文章型 HTML 必须包含与 Markdown 文章相同的完整 front matter，正文部分保持原始 HTML 不转 Markdown；它进入 posts collection、按 date 参与排序，并出现在首页、归档、搜索索引和 RSS 中。典型例子是《白色相簿2》攻略整理，它本质是一篇文章，只是正文是 HTML。
 
-`src/content/custom/` 存放独立型 HTML 页面，这些页面有完整的文档结构、独立脚本或独立交互逻辑，不套用文章 layout，不进入 posts collection。典型例子是 divergence 倒计时、fireworks 和 box 教学页。这类页面如果需要在首页展示，由 `src/_data/custom-pages.json` 维护受控元数据，由首页模板统一渲染，不允许在客户端硬编码文章列表。
+`src/content/custom/` 存放独立型 HTML 页面，这些页面有完整的文档结构、独立脚本或独立交互逻辑，不套用文章 layout，不进入 posts collection。典型例子是 divergence 倒计时和 fireworks 烟花页。这类页面如果需要在首页展示，由 `src/_data/custom-pages.json` 维护受控元数据，由首页模板统一渲染，不允许在客户端硬编码文章列表。
 
 这个边界解决了两类内容的职责冲突：文章型 HTML 需要博客的聚合能力，独立型 HTML 需要脱离博客模板的自由度。两者混在一个集合里会互相约束。
 
@@ -247,7 +245,7 @@ base.njk
 │ Suhan                          Home IT ACGN About  ◐ │
 ├───────────────────────────────────────────┬──────────┤
 │ 夜里读书，纸上写笔记，偶尔做一点小作品。       │ Works    │
-│ 这里是 suhan 的个人博客……                     │ DM/NY/BX │
+│ 这里是 suhan 的个人博客……                     │ DM/NY    │
 │                                           │          │
 │ Latest                                    │ Categories│
 │ ┌───────────────────────────────────────┐ │          │

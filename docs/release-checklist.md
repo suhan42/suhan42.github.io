@@ -59,7 +59,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | `src/` 输入目录与 `site/` 输出目录建立 | √ | 目录职责见目标架构文档 |
 | 内容迁入 `src/content/posts/` | √ | 10 个文件使用 git 移动保留历史 |
 | published posts collection 数量正确 | √ | 输出校验从内容源动态读取 status，并核对全部 published 页面，不再写死数量或 draft 文件名 |
-| draft 不进入公开集合 | √ | `test.md` 仍生成独立页，但不进入首页、RSS、sitemap 和搜索索引 |
+| draft 不进入公开集合 | √ | 当前无 draft 文章；draft 过滤逻辑仍保留，草稿不会进入首页、RSS、sitemap 和搜索索引 |
 | 内容校验脚本可用 | √ | `npm run validate:content` 通过 11 个文件 |
 | 文章图片规划测试可用 | √ | `npm run test:post-assets` 覆盖相对路径、命名空间回退、cover 改写、冲突检测、CLI 迁移幂等和跨目录拒绝 |
 | Markdown 规则回归测试可用 | √ | `npm run test:markdown` 覆盖高亮、数学、上下标、Callouts、删除线和代码保护，共 12 项 |
@@ -78,11 +78,11 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | base layout 统一 HTML 骨架 | √ | head、header、footer、主题初始化和基础脚本只维护一份 |
 | 首页分页正确 | √ | 第 1 页为 `/`，后续页为 `/page/N/` |
 | 文章卡视觉不回退 | √ | 1440px 双主题和 390px 移动端截图验收通过 |
-| Works 展示 | √ | 右侧栏三行毛玻璃索引，约 192px 高；桌面 hover 和移动端堆叠验证通过 |
+| Works 展示 | √ | 右侧栏两行毛玻璃索引，约 148px 高；桌面 hover 和移动端堆叠验证通过 |
 | 文章页正文样式正确 | √ | 中文、代码块、表格、图片和链接在双主题下正常 |
 | 文章目录自动生成 | √ | 正文标题自动补 id，重复标题追加后缀；桌面侧栏可整列收起并扩展正文到 1000px，4px 悬浮滚动条、当前章节高亮、移动端折叠和锚点跳转验证通过 |
 | 移动端导航可用 | √ | 原生 details 菜单、主题按钮、外部点击和 Esc 关闭均验证通过 |
-| 自定义页面资源完整 | √ | Divergence 无 404 且手机端两行显示；烟花页无外部依赖和脚本错误；CSS Box 使用独立浅色骨架 |
+| 自定义页面资源完整 | √ | Divergence 无 404 且手机端两行显示；烟花页无外部依赖和脚本错误 |
 | 关于页迁移完成 | √ | 新阅读线和主题变量下版式正常 |
 | 站内链接抽查无 404 | √ | `npm run validate:output` 通过 64 个 HTML 页面 |
 
@@ -105,7 +105,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 
 | 检查项 | 状态 | 说明 |
 |---|---|---|
-| 旧 URL 跳转策略确认 | 部分完成 | 16 个旧路径已生成跳转页，包含 `/page/3/`、`/page/4/` 回退到 `/page/2/`；`views/fireworks2.html` 已随 `views/` 删除，当前没有目标路由，退役或保留待确认 |
+| 旧 URL 跳转策略确认 | 部分完成 | 15 个旧路径已生成跳转页，包含 `/page/3/`、`/page/4/` 回退到 `/page/2/`；`views/box.html` 已退役；`views/fireworks2.html` 已随 `views/` 删除，当前没有目标路由，退役或保留待确认 |
 | 删除旧脚本、旧数据和旧产物 | √ | `16f781b` 已删除根目录生成脚本、`tools/`、`home_data.json` 和 `htmls/`；确认记录见 git 历史 |
 | `node_modules` 退出 git 跟踪 | √ | `git ls-files node_modules` 当前为 0 |
 | 未使用依赖清理 | 部分完成 | `package.json` 只保留 `@11ty/eleventy` 和 `playwright`；`assets/vendor/` 仍有 Bootstrap、hc-mobile-nav 和 jQuery 文件，基础模板未加载，是否删除待确认 |

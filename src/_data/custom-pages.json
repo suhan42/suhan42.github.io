@@ -18,15 +18,5 @@
     "accent": "gold",
     "mark": "NY",
     "url": "/custom/happy-new-year/"
-  },
-  {
-    "slug": "css-box",
-    "title": "CSS Box 手册",
-    "category": "it",
-    "kind": "教学页",
-    "note": "盒模型、浮动与定位的可视化笔记。",
-    "accent": "blue",
-    "mark": "BX",
-    "url": "/custom/css-box/"
   }
 ]

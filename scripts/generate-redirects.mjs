@@ -10,7 +10,7 @@ const REDIRECT_MAP = {
   'htmls/Linux命令行.html': '/posts/linux-command/',
   'htmls/marked造轮子.html': '/posts/marked-blog-generator/',
   'htmls/MySQL自查表.html': '/posts/mysql-reference/',
-  // test.md 已标记为 draft，旧地址指向首页而不是新文章页。
+  // 测试页已删除，旧地址保留回首页的兼容跳转。
   'htmls/test.html': '/',
   'htmls/vi、vim.html': '/posts/vi-and-vim/',
   'htmls/what did you learn from your heartbreak.html': '/posts/learn-from-heartbreak/',
@@ -18,7 +18,6 @@ const REDIRECT_MAP = {
   'htmls/关于Git使用.html': '/posts/about-git/',
   'htmls/静态博客框架之Hexo & Jekyll.html': '/posts/hexo-and-jekyll/',
   'views/divergence/divergence.html': '/custom/divergence-meter/',
-  'views/box.html': '/custom/css-box/',
   'views/fireworks.html': '/custom/happy-new-year/',
   'plugins/about.html': '/about/',
   // 首页改为每页 10 篇后，旧的后续分页回退到当前末页；未来页数恢复时下面的存在性检查会跳过真实页面。

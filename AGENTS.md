@@ -65,7 +65,7 @@ status: published 或 draft
 
 `tags` 可选；`cover` 可选，可以写 `/assets/images/...`，也可以写文章目录内的相对图片路径。
 
-文章型 HTML（如《白色相簿2》攻略）与 Markdown 文章同等对待，都放 `src/content/posts/`，都要求完整 front matter；正文保持 HTML 不转 Markdown。独立特殊页（divergence、fireworks、box）放 `src/content/custom/`，不进文章集合，首页展示通过 `src/_data/custom-pages.json` 管理。
+文章型 HTML（如《白色相簿2》攻略）与 Markdown 文章同等对待，都放 `src/content/posts/`，都要求完整 front matter；正文保持 HTML 不转 Markdown。独立特殊页（divergence、fireworks）放 `src/content/custom/`，不进文章集合，首页展示通过 `src/_data/custom-pages.json` 管理。
 
 子分类由 `src/content/posts/` 下的第一层合法 slug 目录派生，例如 `git/关于Git使用.md` 对应 `it/git`；中文等非 slug 目录视为文章资源包，不生成子分类页，同一目录只能使用一个父分类，当前只支持一层子分类目录。子分类页面和文章卡片的中文展示名由 `src/_data/category-labels.json` 按父分类和子分类 slug 配置，未配置时回退显示 slug。
 

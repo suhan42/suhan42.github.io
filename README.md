@@ -31,7 +31,7 @@ npm run serve          # 本地预览，默认 http://localhost:8080
 | 目录 | 职责 |
 |---|---|
 | `src/content/posts/` | 文章源，`.md` 和文章型 `.html`，进入文章集合 |
-| `src/content/custom/` | 独立特殊页（divergence、box、fireworks），完整 HTML，不进文章集合 |
+| `src/content/custom/` | 独立特殊页（divergence、fireworks），完整 HTML，不进文章集合 |
 | `src/content/pages/` | About 等固定页面 |
 | `src/_includes/layouts/` | 布局模板：`base.njk`、`post.njk` |
 | `src/_includes/partials/` | 可复用组件：header、footer、sidebar、文章卡、分页 |

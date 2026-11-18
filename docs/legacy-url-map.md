@@ -25,14 +25,14 @@
 | `./htmls/关于Git使用.html` | 关于 Git 使用 | 静态跳转页 | `/posts/about-git/` | √ | 目标与 front matter slug 一致 |
 | `./htmls/静态博客框架之Hexo & Jekyll.html` | 静态博客框架之 Hexo 与 Jekyll | 静态跳转页 | `/posts/hexo-and-jekyll/` | √ | 目标与 front matter slug 一致 |
 | `./views/divergence/divergence.html` | 倒计时 | 静态跳转页 | `/custom/divergence-meter/` | √ | 交互页已迁移，资源位于 `/assets/custom/divergence-meter/` |
-| `./views/box.html` | 关于 css 中 box 的使用 | 静态跳转页 | `/custom/css-box/` | √ | 已迁移为独立 HTML 教学页 |
+| `./views/box.html` | 关于 css 中 box 的使用 | 已退役 | 无 | √ | 特殊页及其 Works 卡片按所有者要求删除 |
 | `./views/fireworks.html` | 新年快乐！！！ | 静态跳转页 | `/custom/happy-new-year/` | √ | 已迁移为独立 HTML 烟花页 |
 | `./plugins/about.html` | 关于页 | 静态跳转页 | `/about/` | √ | 已迁移为 `src/content/pages/about.html` |
 | `./views/fireworks2.html` | 备用或实验 fireworks 页面 | 未建立跳转 | 无 | 待确认 | 文件已随 `views/` 删除；是否保留或退役需项目所有者明确结论 |
 
 ## 生成结果
 
-- `scripts/generate-redirects.mjs` 当前生成 16 个跳转页，输出在 `site/htmls/`、`site/views/`、`site/plugins/` 和 `site/page/`。
+- `scripts/generate-redirects.mjs` 当前生成 15 个跳转页，输出在 `site/htmls/`、`site/views/`、`site/plugins/` 和 `site/page/`。
 - 所有已发布文章的旧 URL 都有跳转页；`test` 旧 URL 指向首页。
 - `views/fireworks2.html` 不在跳转映射中，当前只有“已删除、未建跳转”的仓库事实，没有正式退役结论。
 
@@ -59,5 +59,5 @@
 1. 每个已发布旧内容 URL 都有跳转页或“明确退役”记录。
 2. 每个跳转页目标都与正式 permalink 一致。
 3. 不再生成指向 `node_modules` 或不存在资源的跳转页。
-4. `test.md` 保持 draft，旧 URL 不进入公开文章集合。
+4. 测试页已删除，旧 `htmls/test.html` 仍回首页，不进入公开文章集合。
 5. `views/fireworks2.html` 有保留、删除或迁移结论。

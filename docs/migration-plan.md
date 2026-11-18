@@ -1,6 +1,6 @@
 # Eleventy 迁移开发计划
 
-更新时间：2026-11-10
+更新时间：2026-11-18
 
 本计划定义从当前自研静态博客生成器迁移到 Eleventy 的阶段、任务、验收标准、回滚边界和主要风险。原则是不推翻现有视觉，不引入 CI/CD，分阶段交付，每阶段都能本地验证；破坏性删除、依赖变更和 URL 退役必须先获得确认。
 
@@ -11,7 +11,7 @@
 | 阶段 | 状态 | 说明 |
 |---|---|---|
 | P0 基线 | √ | 备份标签 `pre-eleventy-migration`、迁移分支和清点文档已完成 |
-| P1 内容正式化 | 部分完成 | 9 篇 Markdown + 1 篇文章型 HTML 全部有完整 front matter；`test.md` 为 draft；日期、分类和标签的来源确认未形成完整记录 |
+| P1 内容正式化 | 部分完成 | 当前文章源全部有完整 front matter，已无 draft 文章；日期、分类和标签的来源确认未形成完整记录 |
 | P2 Eleventy 骨架 | √ | Eleventy 3.1.8 安装、目录结构、最小模板、内容校验和首次构建通过 |
 | P3 页面模板与视觉 | √ | 首页、header/footer/sidebar、分页、文章页和双主题视觉重做完成 |
 | P4 站点能力 | √ | 归档、分类页、标签页、RSS、sitemap、搜索索引和输出校验完成 |
@@ -29,7 +29,7 @@
 关键决策记录：
 
 1. 文章型 HTML 与独立型 HTML 按"是否需要进入文章集合"分类，不按扩展名。
-2. 三个自定义页面（divergence、box、fireworks）全部保留首页展示资格。
+2. 两个自定义页面（divergence、fireworks）保留首页展示资格；box 特殊页已按所有者要求退役。
 3. WA2 文章保留 HTML 正文格式，迁入 `src/content/posts/`。
 4. `node_modules` 移出 git 追踪比原计划提前到 P2，因为安装后不处理会导致后续提交包含全部依赖。
 5. `site/` 作为唯一发布目录提交到仓库，并由 `gh-pages` 分支根目录承载 GitHub Pages 发布；构建、验收和推送仍由人工执行。
@@ -363,7 +363,7 @@ git status --short
 | 旧文章日期无法确认 | 排序、归档、RSS 和 SEO 错误 | P1 停下确认，不用当前时间兜底 |
 | slug 冲突 | 文章互相覆盖或 permalink 不稳定 | 内容校验强制唯一 |
 | 旧链接失效 | 外部访问、搜索索引和收藏夹失效 | 生成静态跳转页并维护映射 |
-| 自定义页面迁移失败 | divergence、fireworks、box 功能丢失 | 单独归类为 custom，不强行 Markdown 化 |
+| 自定义页面迁移失败 | divergence、fireworks 功能丢失 | 单独归类为 custom，不强行 Markdown 化 |
 | 依赖升级导致 Markdown 行为变化 | 文章渲染异常 | 新链路不迁移 marked API；用 Eleventy 默认 Markdown 体系并逐篇验收 |
 | jQuery 与新模板耦合 | 新页面加载旧库或移动导航失效 | 基础骨架优先原生 JS；确需 jQuery 的 custom 页面单独声明 |
 | 发布产物提交造成 diff 很大 | 审查困难 | 按阶段构建和验收，P5 清理后再合并发布 |

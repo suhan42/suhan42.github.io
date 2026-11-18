@@ -4,6 +4,19 @@
 
 ## 2026-11-18
 
+### CSS Box 特殊页退役
+
+- 删除 `src/content/custom/box.html`、`assets/css/box.css` 和仅供该页使用的 `assets/images/box/` 图片资源。
+- 从 `custom-pages.json` 删除 CSS Box 的 Works 卡片，右侧 Works 当前保留 Divergence Meter 和 Happy New Year 两项。
+- 移除 `views/box.html` 的旧跳转映射，旧地址按退役记录处理。
+- README、AGENTS、目标架构、内容清点表、发布清单和旧 URL 清单同步更新。
+
+### 测试草稿退役
+
+- 删除 `src/content/posts/test.md` 及构建产物 `site/posts/photo-test/`，旧 `htmls/test.html` 保留回首页的兼容跳转。
+- 内容清点表移除测试草稿并更新为当前 16 篇 published、0 篇 draft、5 个目录子分类和 26 个标签页。
+- 发布清单和迁移计划中的 draft/test 描述同步更新。
+
 ### 首页分页数量
 
 - 首页每页文章数量从 5 调整为 10，当前首页展示 10 篇、`/page/2/` 展示剩余 6 篇。
