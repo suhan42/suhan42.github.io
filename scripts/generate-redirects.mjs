@@ -1,7 +1,7 @@
 // 旧 URL 跳转页生成脚本：为每个旧地址生成静态跳转页，包含 meta refresh、canonical 和可见链接。
 // GitHub Pages 不支持 HTTP 301，这是静态站点的标准替代方案。
 
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 
 // 旧相对路径 → 新绝对路径 映射表，与 docs/legacy-url-map.md 保持一致。
@@ -20,7 +20,10 @@ const REDIRECT_MAP = {
   'views/divergence/divergence.html': '/custom/divergence-meter/',
   'views/box.html': '/custom/css-box/',
   'views/fireworks.html': '/custom/happy-new-year/',
-  'plugins/about.html': '/about/'
+  'plugins/about.html': '/about/',
+  // 首页改为每页 10 篇后，旧的后续分页回退到当前末页；未来页数恢复时下面的存在性检查会跳过真实页面。
+  'page/3/index.html': '/page/2/',
+  'page/4/index.html': '/page/2/'
 };
 
 function buildRedirectHtml(oldPath, newPath) {
@@ -44,6 +47,10 @@ let count = 0;
 for (const [oldPath, newPath] of Object.entries(REDIRECT_MAP)) {
   const outputDir = join('site', dirname(oldPath));
   const outputFile = join('site', oldPath);
+  if (existsSync(outputFile)) {
+    console.log(`跳过已有页面：${oldPath}`);
+    continue;
+  }
   mkdirSync(outputDir, { recursive: true });
   writeFileSync(outputFile, buildRedirectHtml(oldPath, newPath), 'utf8');
   count++;

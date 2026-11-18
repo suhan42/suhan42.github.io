@@ -32,9 +32,18 @@
 
 ## 生成结果
 
-- `scripts/generate-redirects.mjs` 当前生成 14 个跳转页，输出在 `site/htmls/`、`site/views/` 和 `site/plugins/`。
+- `scripts/generate-redirects.mjs` 当前生成 16 个跳转页，输出在 `site/htmls/`、`site/views/`、`site/plugins/` 和 `site/page/`。
 - 所有已发布文章的旧 URL 都有跳转页；`test` 旧 URL 指向首页。
 - `views/fireworks2.html` 不在跳转映射中，当前只有“已删除、未建跳转”的仓库事实，没有正式退役结论。
+
+## 分页 URL
+
+| 旧 URL | 迁移策略 | 目标路由 | 状态 | 备注 |
+|---|---|---|---|---|
+| `/page/3/` | 静态跳转页 | `/page/2/` | √ | 首页改为每页 10 篇后不再生成，回退到当前末页 |
+| `/page/4/` | 静态跳转页 | `/page/2/` | √ | 首页改为每页 10 篇后不再生成，回退到当前末页 |
+
+分页跳转只会在目标页面不存在时生成；未来文章数增加、`/page/3/` 或 `/page/4/` 恢复为真实分页时，生成脚本会跳过对应文件，不会覆盖真实页面。
 
 ## 目标路由约束
 

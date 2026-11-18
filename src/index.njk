@@ -4,7 +4,7 @@ title: Suhan
 showRail: true
 pagination:
   data: collections.publishedPosts
-  size: 5
+  size: 10
   alias: pagePosts
 eleventyComputed:
   permalink: "{% if pagination.pageNumber == 0 %}/{% else %}/page/{{ pagination.pageNumber + 1 }}/{% endif %}"

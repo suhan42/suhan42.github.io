@@ -238,7 +238,7 @@ base.njk
 └─ partials/site-footer.njk
 ```
 
-`index.njk` 使用 Eleventy pagination，每页显示五篇 published 文章。第 1 页输出 `/`，后续页输出 `/page/2/`、`/page/3/`。`post.njk` 通过 `posts.11tydata.json` 应用，输出标题、日期、分类、标签、可收起的自动目录和正文阅读线；桌面端收起目录后正文从 880px 扩展到 1000px。`category.njk` 与 `tag.njk` 分别生成分类页和标签页，`archive.njk` 按年份归档，`404.njk` 输出站点骨架下的错误页。
+`index.njk` 使用 Eleventy pagination，每页显示十篇 published 文章。第 1 页输出 `/`，后续页输出 `/page/2/`、`/page/3/`。`post.njk` 通过 `posts.11tydata.json` 应用，输出标题、日期、分类、标签、可收起的自动目录和正文阅读线；桌面端收起目录后正文从 880px 扩展到 1000px。`category.njk` 与 `tag.njk` 分别生成分类页和标签页，`archive.njk` 按年份归档，`404.njk` 输出站点骨架下的错误页。
 
 首页主内容以 hero 和 Latest 两个分区组织，Works 移入右侧栏做紧凑索引。特殊页数据来自 `custom-pages.json`，文章数据来自 `collections.publishedPosts`，home 与侧栏不硬编码内容：
 

@@ -105,7 +105,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 
 | 检查项 | 状态 | 说明 |
 |---|---|---|
-| 旧 URL 跳转策略确认 | 部分完成 | 14 个旧路径已生成跳转页；`views/fireworks2.html` 已随 `views/` 删除，当前没有目标路由，退役或保留待确认 |
+| 旧 URL 跳转策略确认 | 部分完成 | 16 个旧路径已生成跳转页，包含 `/page/3/`、`/page/4/` 回退到 `/page/2/`；`views/fireworks2.html` 已随 `views/` 删除，当前没有目标路由，退役或保留待确认 |
 | 删除旧脚本、旧数据和旧产物 | √ | `16f781b` 已删除根目录生成脚本、`tools/`、`home_data.json` 和 `htmls/`；确认记录见 git 历史 |
 | `node_modules` 退出 git 跟踪 | √ | `git ls-files node_modules` 当前为 0 |
 | 未使用依赖清理 | 部分完成 | `package.json` 只保留 `@11ty/eleventy` 和 `playwright`；`assets/vendor/` 仍有 Bootstrap、hc-mobile-nav 和 jQuery 文件，基础模板未加载，是否删除待确认 |
