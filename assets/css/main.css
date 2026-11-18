@@ -613,15 +613,15 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
 /* 首页文章卡：沿用紧凑横向排版；有正文图片时取消帘幕裁切，没有图片时只保留文字。 */
 .post-list {
   display: grid;
-  grid-auto-rows: 1fr;
+  grid-auto-rows: auto;
   gap: 16px;
 }
 
 .post-card {
   --card-accent: var(--accent);
-  --media-width: 96px;
-  --media-hover-width: 124px;
-  --media-height: 120px;
+  --media-width: 160px;
+  --media-hover-width: 192px;
+  --media-height: 160px;
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -1486,9 +1486,9 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
   }
 
   .post-card {
-    --media-width: 88px;
-    --media-hover-width: 114px;
-    --media-height: 110px;
+    --media-width: 136px;
+    --media-hover-width: 168px;
+    --media-height: 140px;
   }
 
   .category-page-layout {
@@ -1529,9 +1529,9 @@ html:is([data-theme="paper"], [data-theme="nocturne-bright"]) .theme-toggle .ico
   }
 
   .post-card {
-    --media-width: 80px;
-    --media-hover-width: 104px;
-    --media-height: 100px;
+    --media-width: 112px;
+    --media-hover-width: 140px;
+    --media-height: 120px;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 18px;
     align-items: start;
