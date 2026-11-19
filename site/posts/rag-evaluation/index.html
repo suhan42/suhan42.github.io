@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>RAG 评估与回测 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">RAG 评估与回测</a></li>
+<li class="toc-item toc-level-1"><a href="#rag%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5">RAG基础概念</a></li>
+<li class="toc-item toc-level-1"><a href="#rag%E8%AF%84%E4%BC%B0%E6%8C%87%E6%A0%87">RAG评估指标</a></li>
+<li class="toc-item toc-level-1"><a href="#rag%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95">RAG评估方法</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%85%B7%E4%BD%93%E6%96%B9%E5%BC%8F">具体方式</a></li>
+<li class="toc-item toc-level-1"><a href="#%E6%8C%87%E6%A0%87%E8%AE%A1%E7%AE%97">指标计算</a></li>
+<li class="toc-item toc-level-1"><a href="#rag-%E6%80%A7%E8%83%BD%E8%AF%84%E4%BC%B0%E7%B2%BE%E5%BA%A6%E7%99%BE%E5%88%86%E6%AF%94%E6%B5%8B%E8%AF%95%E6%8C%87%E5%8D%97">RAG 性能评估：精度百分比测试指南</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%80%E6%98%8E%E7%A1%AE%E4%BD%A0%E8%A6%81%E6%B5%8B%E7%9A%84%E7%B2%BE%E5%BA%A6%E6%98%AF%E4%BB%80%E4%B9%88">一、明确你要测的&quot;精度&quot;是什么</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BA%8C%E6%9E%84%E5%BB%BA%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE%E9%9B%86">二、构建测试数据集</a></li>
+<li class="toc-item toc-level-3"><a href="#1-%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8Fq-a-%E5%AF%B9-%E9%BB%84%E9%87%91%E6%96%87%E6%A1%A3">1. 数据格式（Q-A 对 + 黄金文档）</a></li>
+<li class="toc-item toc-level-3"><a href="#2-%E6%95%B0%E6%8D%AE%E9%9B%86%E5%88%92%E5%88%86">2. 数据集划分</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%89-%E6%A3%80%E7%B4%A2%E7%AB%AF-%E7%B2%BE%E5%BA%A6%E6%B5%8B%E8%AF%95%E6%90%9C%E7%B4%A2%E6%8E%A8%E8%8D%90%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87">三、 检索端 精度测试（搜索推荐评价指标）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%A0%B8%E5%BF%83%E6%8C%87%E6%A0%87%E8%AE%A1%E7%AE%97">核心指标计算</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%8E%A8%E8%8D%90%E6%8C%87%E6%A0%87%E5%9C%A8-rag-%E4%B8%AD%E7%9A%84%E9%80%82%E7%94%A8%E6%80%A7%E5%AF%B9%E7%85%A7">推荐指标在 RAG 中的适用性对照</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%85%B3%E9%94%AE%E5%B7%AE%E5%BC%82%E5%A5%97%E7%94%A8%E6%97%B6%E7%9A%84-4-%E4%B8%AA%E6%B3%A8%E6%84%8F%E7%82%B9">关键差异：套用时的 4 个注意点</a></li>
+<li class="toc-item toc-level-5"><a href="#1-%E7%9B%B8%E5%85%B3%E6%80%A7%E5%AE%9A%E4%B9%89%E4%B8%8D%E5%90%8C">1. 相关性定义不同</a></li>
+<li class="toc-item toc-level-5"><a href="#2-%E5%A4%9A%E7%AD%94%E6%A1%88-vs-%E5%8D%95%E7%AD%94%E6%A1%88">2. 多答案 vs 单答案</a></li>
+<li class="toc-item toc-level-5"><a href="#3-%E4%BD%8D%E7%BD%AE%E6%95%8F%E6%84%9F%E6%80%A7">3. 位置敏感性</a></li>
+<li class="toc-item toc-level-5"><a href="#4-%E8%B4%9F%E4%BE%8B%E6%B5%8B%E8%AF%95">4. 负例测试</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8Bpython">测试代码示例（Python）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%9B%9B-%E7%94%9F%E6%88%90%E7%AB%AF-%E7%B2%BE%E5%BA%A6%E6%B5%8B%E8%AF%95">四、 生成端 精度测试</a></li>
+<li class="toc-item toc-level-3"><a href="#1-%E8%87%AA%E5%8A%A8%E8%AF%84%E4%BC%B0%E6%8C%87%E6%A0%87">1. 自动评估指标</a></li>
+<li class="toc-item toc-level-3"><a href="#2-llm-as-judge%E6%8E%A8%E8%8D%90%E7%94%A8%E4%BA%8E%E5%A4%8D%E6%9D%82%E5%9C%BA%E6%99%AF">2. LLM-as-Judge（推荐用于复杂场景）</a></li>
+<li class="toc-item toc-level-3"><a href="#3-%E7%94%9F%E6%88%90%E7%AB%AF%E8%AF%84%E4%BC%B0%E4%BB%A3%E7%A0%81">3. 生成端评估代码</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BA%94-%E7%AB%AF%E5%88%B0%E7%AB%AF-%E7%BB%BC%E5%90%88%E7%B2%BE%E5%BA%A6">五、 端到端 综合精度</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%85%AD%E6%8E%A8%E8%8D%90%E5%B7%A5%E5%85%B7%E5%BA%93">六、推荐工具库</a></li>
+<li class="toc-item toc-level-3"><a href="#ragas-%E5%BF%AB%E9%80%9F%E7%A4%BA%E4%BE%8B">RAGAS 快速示例</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%83%E6%B5%8B%E8%AF%95%E6%8A%A5%E5%91%8A%E6%A8%A1%E6%9D%BF">七、测试报告模板</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/rag/" class="post-category">
+        it / RAG      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/rag/">#rag</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">RAG 评估与回测</h1>
+
+    <div class="post-body">
+<h1 id="rag基础概念">RAG基础概念</h1>
+<p>Retrieval Augmented Generation，检索增强生成。 RAG = 检索技术（Search）+ LLM 提示。其主要目的是通过从外部检索与输入问题相关的相关信息，然后利用这些信息来引导生成过程，从而提高生成文本的相关性、准确性和多样性。具体可以参照下图：</p>
+<p><img src="/assets/images/rag-evaluation/RAG%E5%9B%9E%E6%B5%8B-RAG.png" alt="RAG回测-RAG"></p>
+<p>RAG技术包括三个核心部分：索引（Indexing）、检索（Retrieval）和生成（Generation）。</p>
+<ul>
+<li>
+<p>首先，系统会对原始知识先进行分割切片，然后利用向量模型（Embedding Model）进行编码并存储在向量数据库中。</p>
+</li>
+<li>
+<p>其次，当用户提出问题时，会使用检索算法（如BM25、DPR、ColBERT等）从向量数据库中找到最相关的信息。</p>
+</li>
+<li>
+<p>最后，这些检索到的信息被整合到原始问题（提示词Prompt）中作为上下文输入到一个生成模型，最终生成更准确且符合上下文的答案。</p>
+</li>
+</ul>
+<h1 id="rag评估指标">RAG评估指标</h1>
+<p>在评估的过程中，我们会特别关注几个关键的方面，首先是对最终结果准确性的考量，其次是聚焦于大模型的能力，最后是如何评估检索阶段的效果。</p>
+<ul>
+<li><strong>准确率</strong>：简单解释就是站在用户的角度，评判答案是否符合实际的需求。因为无论中间过程多复杂，对用户来说是不关心的，只关心最终的结果是否符合他们的希望，这是最直观，也是我认为最重要的一个评估指标。</li>
+<li><strong>忠实度</strong>：这个主要指大模型层面，看生成的内容是否忠实于所提供的上下文信息。简单理解，我们精准找到了相关的参考文档，并把这些文档内容和原始问题一起给到大模型之后，模型的回答是不是基于所提供的这个参考文档来给出的。如果回答能够准确反映文档中的信息，那我们就说它的忠实度高，反之就说明忠实度不足。如果发现忠实度不达标，可能就需要考虑一下换一个模型了。因为在这种情况下，问题不在于检索到的信息，而是在于大模型不能有效利用这些信息来给出满意的答复。</li>
+</ul>
+<p>下面这三个指标主要是用于评估检索阶段的有效性：</p>
+<ul>
+<li><strong>召回率</strong>（Recall）：关注的是信息找的全不全，确保没有遗漏相关的信息。</li>
+<li><strong>精确度</strong>（Precision）是你的信息找的准不准，确保找的信息都是有用的。</li>
+<li><strong>F值</strong>：是召回率和精确率的平衡点，是一个综合指标。</li>
+</ul>
+<p>具体详细解释下，这其中蕴含着计算公式，参照下图：</p>
+<p><img src="/assets/images/rag-evaluation/rag%E5%9B%9E%E6%B5%8B%E8%AE%A1%E7%AE%97%E5%85%AC%E5%BC%8F.jpeg" alt="rag回测计算公式"></p>
+<blockquote>
+<p>例如我现在想从知识库中查询有关药的书籍，正确的应该有10本。但我查询后，查询出了15本，其中有9本是正确的跟药有关的书籍，另外6本不是。那此时：</p>
+<p>召回率：9 / 10 = 90%（检索到了15本，9本相关的有，有1本是相关的但是在15本中未检索到）</p>
+<p>精确度：9 / 15 = 60%（检索到了15本，9本是相关的，6本是不相关的）</p>
+<p>F值：（2 * 60% * 90%） / （60% + 90%） = 72%</p>
+</blockquote>
+<p>那么在实际的应用中，我们应该更关注哪一个指标呢？我个人认为，倾向于更加重视<strong>召回率</strong>。因为现在大模型对于噪声数据有着比较高的容忍度，即使包含了一些错误或者噪声数据。一般情况下。大模型也能够过滤掉没用的部分，提炼出准确的答案。所以在条件允许的情况下，比如说GPU资源充足，系统性能足够强大，我会建议尽可能的优化召回率。这样做不仅能确保我们不会错过任何重要的信息，也能够让我们的模型啊，在面对复杂问题的时候，更加的稳健。</p>
+<h1 id="rag评估方法">RAG评估方法</h1>
+<p>现在RAG的评估方法，一般分为两大类，<strong>人工评估</strong>和模型<strong>自动评估</strong>。</p>
+<ul>
+<li><strong>人工评估</strong></li>
+</ul>
+<p>首先，我们需要准备一些样本数据，这些样本就包含了问题及其对应的标准答案，还有针对每个回答设定的评分标准。其次，我们就可以把这些问题输入到你的RAG系统中，去获取最后运行后的结果。最后，也就是最关键的一步，需要评估人员对RAG系统的回答进行交叉检查并评分来确保每个回答是否准确或给予相应的分数。</p>
+<p>通过这种方式。我们就可以直接衡量RAG系统回答的准确性，或者得到一个综合的评分来反映整体的表现。</p>
+<ul>
+<li><strong>自动评估</strong></li>
+</ul>
+<p>自动评估同样也需要预先准备包含问题和标准答案的测试样本集，然后把这些问题交给RAG系统来获得作答结果。在自动评估的过程中，介绍两种主要的技术路径：</p>
+<p>第一种方法是把问题和系统的作答结果输入到Cross-Encoder模型，得到它们之间的相关性作为得分。</p>
+<p>第二种方法是计算标准答案和系统输出之间的文本相似度，以此作为评分的基础。</p>
+<p>理论上，如果两者的相似度越高，那么模型回答的准确性也就越高。</p>
+<p>值得我们注意的是，在第一种方法中，即使没有标准答案，也可以通过对问题和系统回答的相关性分析来进行初步的评分，这对于早期阶段的快速迭代特别有用。</p>
+<p>最后，我们还要充分利用工具的力量。人工评估虽然比较精准，但确实非常耗时耗力，我们不妨用一些三方平台提供的强大评估工具和服务（例如LangSmith平台和Langfuse平台），当我们运行RAG服务时，这些平台不仅能够帮助我们追踪整个过程，从找到什么样的上下文，到最终的检索和生成的效果，还能够提供一站式的全面评估服务，这样一来，我们就可以轻松的掌握各个环节的表现，确保评估结果的准确性和可靠性。</p>
+<hr>
+<h1 id="具体方式">具体方式</h1>
+<ol>
+<li>从文件a中，让ai给你推导出 10～20 个关键词/问题句子，并且确定答案分块；</li>
+<li>找一个文件数大于等于20个文件的知识库（存在文件A的）。使用这10～20个关键词/问题句子，分别测试以下rag接口（不用看ai分析结果）。</li>
+</ol>
+<p>使用ai或者自己根据步骤1/2 的答案分块，确定检索范围是否</p>
+<p>考评如下：</p>
+<ol>
+<li>单文件rag检索场景下，这三类，这些关键词/问题句子的命中切片率</li>
+<li>知识库多文件rag检索场景下，这三类，这些关键词/问题句子，命中/文件/切片率。</li>
+</ol>
+<h1 id="指标计算">指标计算</h1>
+<h1 id="rag-性能评估精度百分比测试指南">RAG 性能评估：精度百分比测试指南</h1>
+<p>RAG 系统的评估分为 <strong>检索端</strong> 和 <strong>生成端</strong> 两个层面，最终精度百分比取决于你关注的指标。以下是完整的测试方案：</p>
+<h2 id="一明确你要测的精度是什么">一、明确你要测的&quot;精度&quot;是什么</h2>
+<table>
+<thead>
+<tr>
+<th>评估层面</th>
+<th>核心指标</th>
+<th>含义</th>
+<th>输出形式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>检索质量</strong></td>
+<td>Precision@K / Recall@K</td>
+<td>检索到的文档是否包含答案</td>
+<td>百分比</td>
+</tr>
+<tr>
+<td><strong>检索质量</strong></td>
+<td>MRR / NDCG</td>
+<td>正确答案的排名位置</td>
+<td>0~1 分数</td>
+</tr>
+<tr>
+<td><strong>生成质量</strong></td>
+<td>答案准确率</td>
+<td>生成答案是否正确</td>
+<td>百分比</td>
+</tr>
+<tr>
+<td><strong>生成质量</strong></td>
+<td>忠实度 (Faithfulness)</td>
+<td>答案是否忠于检索内容</td>
+<td>百分比</td>
+</tr>
+<tr>
+<td><strong>端到端</strong></td>
+<td>综合评分</td>
+<td>检索+生成的整体表现</td>
+<td>百分比</td>
+</tr>
+</tbody>
+</table>
+<h2 id="二构建测试数据集">二、构建测试数据集</h2>
+<h3 id="1-数据格式q-a-对-黄金文档">1. 数据格式（Q-A 对 + 黄金文档）</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "question"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"公司2025年的营收是多少？"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "ground_truth_answer"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"120亿元"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "ground_truth_doc_ids"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"doc_2025_annual_report.pdf#page=15"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "category"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"财务数据"</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<ul>
+<li>建议至少 <strong>50-100 条</strong> 测试用例，覆盖不同难度</li>
+<li>包含：直接检索型、推理型、多文档综合型、负例（无答案）</li>
+</ul>
+<h3 id="2-数据集划分">2. 数据集划分</h3>
+<ul>
+<li><strong>简单题</strong>（答案在单文档中直接出现）: 30%</li>
+<li><strong>中等题</strong>（需要跨段落/多文档整合）: 50%</li>
+<li><strong>困难题</strong>（需要推理或负例）: 20%</li>
+</ul>
+<h2 id="三-检索端-精度测试搜索推荐评价指标">三、<mark>检索端</mark>精度测试（搜索推荐评价指标）</h2>
+<h3 id="核心指标计算">核心指标计算</h3>
+<p><strong>Precision@K</strong>（前K个检索结果的<strong>精确率</strong>）</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>Precision@K = (前K个结果中相关文档数) / K</span></span></code></pre>
+<p><strong>Recall@K</strong>（前K个检索结果的<strong>召回率</strong>）</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>Recall@K = (前K个结果中相关文档数) / (所有相关文档总数)</span></span></code></pre>
+<p><strong>MRR</strong>（平均倒数排名，关注第一个正确答案的位置）</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>MRR = (1/N) * Σ(1/rank_i)   // rank_i 是第i个查询的第一个正确答案排名</span></span></code></pre>
+<h4 id="推荐指标在-rag-中的适用性对照">推荐指标在 RAG 中的适用性对照</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">推荐指标</th>
+<th style="text-align:left">RAG 适用性</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Precision@K</strong></td>
+<td style="text-align:left">✅ 直接用</td>
+<td style="text-align:left">前 K 个检索块中有多少包含答案</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Recall@K</strong></td>
+<td style="text-align:left">✅ 直接用</td>
+<td style="text-align:left">前 K 个检索块覆盖了多少答案来源</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>MRR</strong></td>
+<td style="text-align:left">✅ 直接用</td>
+<td style="text-align:left">第一个包含答案的文档块排第几</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>MAP</strong></td>
+<td style="text-align:left">✅ 直接用</td>
+<td style="text-align:left">多个查询的平均精确率，RAG 回测标准指标</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>NDCG</strong></td>
+<td style="text-align:left">⚠️ 需调整</td>
+<td style="text-align:left">推荐常用 1-5 级评分；RAG 通常是二元（相关/不相关），此时 NDCG 退化为类似 MAP 的效果，但仍可用</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Hit Ratio@K</strong></td>
+<td style="text-align:left">✅ 直接用</td>
+<td style="text-align:left">等价于 Recall@K 在单相关项时的特例</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Coverage</strong></td>
+<td style="text-align:left">❌ 不适用</td>
+<td style="text-align:left">推荐关心长尾覆盖；RAG 只关心 query 是否被回答</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Diversity</strong></td>
+<td style="text-align:left">⚠️ 慎用</td>
+<td style="text-align:left">推荐需要多样性避免信息茧房；RAG 中如果问题需要多角度答案， diversity 有参考价值，但多数情况下<strong>精确性优先于多样性</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Novelty / Serendipity</strong></td>
+<td style="text-align:left">❌ 不适用</td>
+<td style="text-align:left">RAG 不需要&quot;惊喜感&quot;，只需要准确</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>AUC / ROC</strong></td>
+<td style="text-align:left">⚠️ 不推荐</td>
+<td style="text-align:left">推荐中常用，但 RAG 更关注 top-k 排序质量而非全局分类能力；MAP/NDCG 更敏感</td>
+</tr>
+</tbody>
+</table>
+<h4 id="关键差异套用时的-4-个注意点">关键差异：套用时的 4 个注意点</h4>
+<h5 id="1-相关性定义不同">1. 相关性定义不同</h5>
+<ul>
+<li><strong>推荐</strong>：隐式反馈（用户是否点击、停留时长），相关性是概率性的</li>
+<li><strong>RAG</strong>：通常是显式标注（文档块是否包含答案），相关性是确定性的</li>
+</ul>
+<p><strong>实践建议</strong>：RAG 中相关性标注更严格，建议采用二元标注（1=包含答案，0=不包含），必要时可加入「部分相关」（0.5=包含部分信息）。</p>
+<h5 id="2-多答案-vs-单答案">2. 多答案 vs 单答案</h5>
+<ul>
+<li><strong>推荐</strong>：用户可能喜欢多个商品， relevant items 数量通常不固定</li>
+<li><strong>RAG</strong>：一个问题可能对应<strong>多个</strong>包含答案的文档块（尤其是长文档被切分后）</li>
+</ul>
+<p><strong>实践建议</strong>：RAG 的 Recall@K 分母是「所有包含答案的文档块总数」，而不是 1。如果只用 Hit@1，会低估多文档场景。</p>
+<h5 id="3-位置敏感性">3. 位置敏感性</h5>
+<ul>
+<li><strong>推荐</strong>：第 1 位和第 3 位差异巨大（用户很少往下翻）</li>
+<li><strong>RAG</strong>：LLM 的 context window 通常能容纳 top-5~top-10 个文档块，<strong>位置敏感性比推荐弱</strong></li>
+</ul>
+<p><strong>实践建议</strong>：RAG 中 Recall@5/10 往往比 Precision@1 更有参考价值，因为 LLM 可以从多个文档块中综合答案。</p>
+<h5 id="4-负例测试">4. 负例测试</h5>
+<ul>
+<li><strong>推荐</strong>：很少测试&quot;用户什么都不喜欢&quot;的场景</li>
+<li><strong>RAG</strong>：必须测试<strong>知识库中无答案</strong>的情况（拒答能力）</li>
+</ul>
+<p><strong>实践建议</strong>：RAG 回测数据集应包含 10-20% 的负例（unanswerable），此时 Precision@K 应该接近 0，如果检索出了&quot;看似相关&quot;的文档块，说明存在假阳性风险。</p>
+<h3 id="测试代码示例python">测试代码示例（Python）</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> typing </span><span style="color:#D73A49;--shiki-dark:#F97583">import</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> List, Dict</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">import</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> numpy </span><span style="color:#D73A49;--shiki-dark:#F97583">as</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> np</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">def</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> evaluate_retrieval</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    queries: List[Dict],</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    retriever_func,</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    k_values</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">):</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    """</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    queries: [{"question": "...", "ground_truth_doc_ids": ["doc1", "doc2"]}]</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    retriever_func: 你的检索函数，返回 (doc_ids, scores)</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    """</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    results </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {k: {</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"precision"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [], </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"recall"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [], </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"hit"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: []} </span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> k </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> k_values}</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    mrr_scores </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> []</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> q </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> queries:</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        retrieved_ids, _ </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> retriever_func(q[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"question"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">], </span><span style="color:#E36209;--shiki-dark:#FFAB70">top_k</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">max</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(k_values))</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        gt_ids </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> set</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(q[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ground_truth_doc_ids"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">])</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#6A737D;--shiki-dark:#6A737D">        # MRR</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        first_relevant_rank </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> None</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> idx, doc_id </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> enumerate</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(retrieved_ids, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">):</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> doc_id </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> gt_ids:</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                first_relevant_rank </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> idx</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#D73A49;--shiki-dark:#F97583">                break</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        mrr_scores.append(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#24292E;--shiki-dark:#E1E4E8">first_relevant_rank </span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> first_relevant_rank </span><span style="color:#D73A49;--shiki-dark:#F97583">else</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#6A737D;--shiki-dark:#6A737D">        # Precision@K / Recall@K / Hit@K</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> k </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> k_values:</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            retrieved_k </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> set</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(retrieved_ids[:k])</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            relevant_in_k </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> len</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(retrieved_k </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> gt_ids)</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            </span></span>
+<span class="line"><span class="line-number">33</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            precision </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> relevant_in_k </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> k</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            recall </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> relevant_in_k </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> len</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(gt_ids) </span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> gt_ids </span><span style="color:#D73A49;--shiki-dark:#F97583">else</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span></span>
+<span class="line"><span class="line-number">35</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            hit </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> relevant_in_k </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#D73A49;--shiki-dark:#F97583"> else</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span></span>
+<span class="line"><span class="line-number">36</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            </span></span>
+<span class="line"><span class="line-number">37</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            results[k][</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"precision"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">].append(precision)</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            results[k][</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"recall"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">].append(recall)</span></span>
+<span class="line"><span class="line-number">39</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            results[k][</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"hit"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">].append(hit)</span></span>
+<span class="line"><span class="line-number">40</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">41</span><span style="color:#6A737D;--shiki-dark:#6A737D">    # 输出百分比</span></span>
+<span class="line"><span class="line-number">42</span><span style="color:#005CC5;--shiki-dark:#79B8FF">    print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"="</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 50</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">43</span><span style="color:#005CC5;--shiki-dark:#79B8FF">    print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"检索性能评估结果"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">44</span><span style="color:#005CC5;--shiki-dark:#79B8FF">    print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"="</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 50</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">45</span><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> k </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> k_values:</span></span>
+<span class="line"><span class="line-number">46</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        p </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> np.mean(results[k][</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"precision"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]) </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 100</span></span>
+<span class="line"><span class="line-number">47</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        r </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> np.mean(results[k][</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"recall"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]) </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 100</span></span>
+<span class="line"><span class="line-number">48</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        h </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> np.mean(results[k][</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"hit"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]) </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 100</span></span>
+<span class="line"><span class="line-number">49</span><span style="color:#005CC5;--shiki-dark:#79B8FF">        print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">f</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Precision@</span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">k</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">p</span><span style="color:#D73A49;--shiki-dark:#F97583">:.1f</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">%"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">50</span><span style="color:#005CC5;--shiki-dark:#79B8FF">        print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">f</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Recall@</span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">k</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">:    </span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">r</span><span style="color:#D73A49;--shiki-dark:#F97583">:.1f</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">%"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">51</span><span style="color:#005CC5;--shiki-dark:#79B8FF">        print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">f</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Hit@</span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">k</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">:       </span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">h</span><span style="color:#D73A49;--shiki-dark:#F97583">:.1f</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">%"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">52</span><span style="color:#005CC5;--shiki-dark:#79B8FF">        print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"-"</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 50</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">53</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">54</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    mrr </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> np.mean(mrr_scores) </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 100</span></span>
+<span class="line"><span class="line-number">55</span><span style="color:#005CC5;--shiki-dark:#79B8FF">    print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">f</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"MRR: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mrr</span><span style="color:#D73A49;--shiki-dark:#F97583">:.1f</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">%"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">56</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">57</span><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> results</span></span></code></pre>
+<h2 id="四-生成端-精度测试">四、<mark>生成端</mark>精度测试</h2>
+<h3 id="1-自动评估指标">1. 自动评估指标</h3>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>适用场景</th>
+<th>计算方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Exact Match</strong></td>
+<td>短答案、事实型</td>
+<td>生成答案与标准答案完全匹配的比例</td>
+</tr>
+<tr>
+<td><strong>F1 Score</strong></td>
+<td>短答案</td>
+<td>基于词级别的精确率和召回率的调和平均</td>
+</tr>
+<tr>
+<td><strong>BLEU/ROUGE</strong></td>
+<td>长文本生成</td>
+<td>N-gram 重叠度</td>
+</tr>
+<tr>
+<td><strong>BERTScore</strong></td>
+<td>语义相似度</td>
+<td>基于预训练模型的语义匹配</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-llm-as-judge推荐用于复杂场景">2. LLM-as-Judge（推荐用于复杂场景）</h3>
+<p>用更强的模型（如 GPT-4）作为裁判，输出 <strong>0-100 分</strong> 或 <strong>是/否</strong>：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#005CC5;--shiki-dark:#79B8FF">JUDGE_PROMPT</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> """</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#032F62;--shiki-dark:#9ECBFF">你是一个严格的评估专家。请判断以下生成答案是否准确回答了问题。</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#032F62;--shiki-dark:#9ECBFF">问题：</span><span style="color:#005CC5;--shiki-dark:#79B8FF">{question}</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#032F62;--shiki-dark:#9ECBFF">标准答案：</span><span style="color:#005CC5;--shiki-dark:#79B8FF">{ground_truth}</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#032F62;--shiki-dark:#9ECBFF">生成答案：</span><span style="color:#005CC5;--shiki-dark:#79B8FF">{generated_answer}</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#032F62;--shiki-dark:#9ECBFF">请按以下维度评分（0-100）：</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1. 准确性：答案内容是否正确</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#032F62;--shiki-dark:#9ECBFF">2. 完整性：是否覆盖标准答案的所有要点</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#032F62;--shiki-dark:#9ECBFF">3. 忠实度：是否严格基于检索内容，没有幻觉</span></span>
+<span class="line"><span class="line-number">12</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#032F62;--shiki-dark:#9ECBFF">只输出JSON格式：</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#032F62;--shiki-dark:#9ECBFF">{</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#032F62;--shiki-dark:#9ECBFF">  "accuracy": 85,</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#032F62;--shiki-dark:#9ECBFF">  "completeness": 70,</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#032F62;--shiki-dark:#9ECBFF">  "faithfulness": 90,</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#032F62;--shiki-dark:#9ECBFF">  "overall": 82,</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#032F62;--shiki-dark:#9ECBFF">  "reasoning": "..."</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"""</span></span></code></pre>
+<h3 id="3-生成端评估代码">3. 生成端评估代码</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">import</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> json</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> openai </span><span style="color:#D73A49;--shiki-dark:#F97583">import</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> OpenAI</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">def</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> evaluate_generation</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    queries: List[Dict],</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    rag_pipeline_func,  </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 你的完整RAG流程</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    judge_model</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"gpt-4"</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">):</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    client </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> OpenAI()</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    scores </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"accuracy"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [], </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"completeness"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [], </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"faithfulness"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [], </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"overall"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: []}</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> q </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> queries:</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6A737D;--shiki-dark:#6A737D">        # 运行RAG</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        generated </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> rag_pipeline_func(q[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"question"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">])</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#6A737D;--shiki-dark:#6A737D">        # LLM评估</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        prompt </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> JUDGE_PROMPT</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.format(</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">            question</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">q[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"question"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">            ground_truth</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">q[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ground_truth_answer"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">            generated_answer</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">generated</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        )</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        response </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> client.chat.completions.create(</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">            model</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">judge_model,</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#E36209;--shiki-dark:#FFAB70">            messages</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[{</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"role"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"user"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"content"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: prompt}],</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#E36209;--shiki-dark:#FFAB70">            response_format</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"json_object"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        )</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        result </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> json.loads(response.choices[</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">].message.content)</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> key </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> scores:</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            scores[key].append(result.get(key, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">))</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">33</span><span style="color:#005CC5;--shiki-dark:#79B8FF">    print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"="</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 50</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#005CC5;--shiki-dark:#79B8FF">    print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"生成质量评估结果"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">35</span><span style="color:#005CC5;--shiki-dark:#79B8FF">    print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"="</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 50</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">36</span><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> key, vals </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> scores.items():</span></span>
+<span class="line"><span class="line-number">37</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        avg </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> np.mean(vals)</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#005CC5;--shiki-dark:#79B8FF">        print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">f</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">key.capitalize()</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">avg</span><span style="color:#D73A49;--shiki-dark:#F97583">:.1f</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">%"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">39</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">40</span><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> scores</span></span></code></pre>
+<h2 id="五-端到端-综合精度">五、<mark>端到端</mark>综合精度</h2>
+<p>如果你需要一个 <strong>总体的精度百分比</strong>，可以设计加权公式：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">def</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> overall_accuracy</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(retrieval_scores, generation_scores, weights</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">None</span><span style="color:#24292E;--shiki-dark:#E1E4E8">):</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    """</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    综合精度 = 检索权重 * 检索分 + 生成权重 * 生成分</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    """</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> weights </span><span style="color:#D73A49;--shiki-dark:#F97583">is</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> None</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        weights </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"retrieval"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">0.4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"generation"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">0.6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    retrieval_avg </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> np.mean([</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        retrieval_scores[</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">][</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"precision"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],  </span><span style="color:#6A737D;--shiki-dark:#6A737D"># Precision@5</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        retrieval_scores[</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">][</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"recall"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    ]) </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 100</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    generation_avg </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> generation_scores[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"overall"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    total </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        weights[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"retrieval"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">] </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> retrieval_avg </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        weights[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"generation"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">] </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> generation_avg</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    )</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> total</span></span>
+<span class="line"><span class="line-number">21</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 示例输出</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 综合RAG精度: 78.5%</span></span></code></pre>
+<h2 id="六推荐工具库">六、推荐工具库</h2>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>用途</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RAGAS</strong></td>
+<td>端到端RAG评估</td>
+<td>内置忠实度、答案相关性、上下文精确率等指标</td>
+</tr>
+<tr>
+<td><strong>DeepEval</strong></td>
+<td>LLM评估框架</td>
+<td>支持多种指标，集成方便</td>
+</tr>
+<tr>
+<td><strong>Arize Phoenix</strong></td>
+<td>可观测性+评估</td>
+<td>可视化追踪检索和生成过程</td>
+</tr>
+<tr>
+<td><strong>LangSmith</strong></td>
+<td>调试与评估</td>
+<td>LangChain生态，适合迭代优化</td>
+</tr>
+<tr>
+<td><strong>LlamaIndex Evaluation</strong></td>
+<td>检索+生成评估</td>
+<td>与LlamaIndex深度集成</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ragas-快速示例">RAGAS 快速示例</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ragas </span><span style="color:#D73A49;--shiki-dark:#F97583">import</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> evaluate</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ragas.metrics </span><span style="color:#D73A49;--shiki-dark:#F97583">import</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> faithfulness, answer_relevancy, context_precision</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">result </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> evaluate(</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">    dataset</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">your_test_dataset,</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">    metrics</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[faithfulness, answer_relevancy, context_precision]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 直接输出 0-1 的分数，乘以100即百分比</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(result)</span></span></code></pre>
+<h2 id="七测试报告模板">七、测试报告模板</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>RAG 性能测试报告</span></span>
+<span class="line"><span class="line-number">2</span><span>==================</span></span>
+<span class="line"><span class="line-number">3</span><span>测试时间: 2026-07-30</span></span>
+<span class="line"><span class="line-number">4</span><span>测试样本: 100条Q-A对</span></span>
+<span class="line"><span class="line-number">5</span><span></span></span>
+<span class="line"><span class="line-number">6</span><span>【检索性能】</span></span>
+<span class="line"><span class="line-number">7</span><span>Precision@1:  65.0%</span></span>
+<span class="line"><span class="line-number">8</span><span>Precision@5:  82.0%</span></span>
+<span class="line"><span class="line-number">9</span><span>Recall@5:     75.0%</span></span>
+<span class="line"><span class="line-number">10</span><span>MRR:          72.0%</span></span>
+<span class="line"><span class="line-number">11</span><span></span></span>
+<span class="line"><span class="line-number">12</span><span>【生成性能】</span></span>
+<span class="line"><span class="line-number">13</span><span>Exact Match:  45.0%</span></span>
+<span class="line"><span class="line-number">14</span><span>F1 Score:     68.0%</span></span>
+<span class="line"><span class="line-number">15</span><span>LLM评分-准确性: 78.0%</span></span>
+<span class="line"><span class="line-number">16</span><span>LLM评分-忠实度: 85.0%</span></span>
+<span class="line"><span class="line-number">17</span><span></span></span>
+<span class="line"><span class="line-number">18</span><span>【端到端综合】</span></span>
+<span class="line"><span class="line-number">19</span><span>综合精度: 76.5%</span></span></code></pre>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

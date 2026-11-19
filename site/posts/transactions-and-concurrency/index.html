@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>事务与并发控制 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">事务与并发控制</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%85%AD%E4%BA%8B%E5%8A%A1%E4%B8%8E%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6">六、事务与并发控制</a></li>
+<li class="toc-item toc-level-2"><a href="#1%E4%BA%8B%E5%8A%A1">1.事务</a></li>
+<li class="toc-item toc-level-3"><a href="#11%E4%BA%8B%E5%8A%A1%E7%9A%84acid%E7%89%B9%E6%80%A7">1.1事务的ACID特性</a></li>
+<li class="toc-item toc-level-3"><a href="#12mysql%E4%BA%8B%E5%8A%A1%E6%8E%A7%E5%88%B6%E8%AF%AD%E5%8F%A5">1.2MySQL事务控制语句</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%BC%80%E5%90%AF%E4%BA%8B%E5%8A%A1">开启事务</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%8F%90%E4%BA%A4%E4%BA%8B%E5%8A%A1">提交事务</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%9B%9E%E6%BB%9A%E4%BA%8B%E5%8A%A1">回滚事务</a></li>
+<li class="toc-item toc-level-2"><a href="#2%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6">2.并发控制</a></li>
+<li class="toc-item toc-level-3"><a href="#21%E5%B9%B6%E5%8F%91%E6%89%A7%E8%A1%8C%E5%8F%AF%E8%83%BD%E5%BC%95%E8%B5%B7%E7%9A%84%E9%97%AE%E9%A2%98">2.1并发执行可能引起的问题</a></li>
+<li class="toc-item toc-level-4"><a href="#211%E4%B8%A2%E5%A4%B1%E6%9B%B4%E6%96%B0">2.1.1丢失更新</a></li>
+<li class="toc-item toc-level-4"><a href="#212%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB">2.1.2不可重复读</a></li>
+<li class="toc-item toc-level-4"><a href="#213%E8%AF%BB%E8%84%8F%E6%95%B0%E6%8D%AE">2.1.3读脏数据</a></li>
+<li class="toc-item toc-level-3"><a href="#22%E5%B9%B6%E5%8F%91%E8%B0%83%E5%BA%A6%E7%9A%84%E5%8F%AF%E4%B8%B2%E8%A1%8C%E6%80%A7">2.2并发调度的可串行性</a></li>
+<li class="toc-item toc-level-3"><a href="#23%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%B9%B6%E8%A1%8C%E7%9A%84%E5%8C%BA%E5%88%86">2.3并发与并行的区分</a></li>
+<li class="toc-item toc-level-3"><a href="#24%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB">2.4事务的隔离级别</a></li>
+<li class="toc-item toc-level-2"><a href="#3%E5%B0%81%E9%94%81">3.封锁</a></li>
+<li class="toc-item toc-level-3"><a href="#31%E5%9F%BA%E6%9C%AC%E9%94%81">3.1基本锁</a></li>
+<li class="toc-item toc-level-3"><a href="#32%E5%9F%BA%E6%9C%AC%E9%94%81%E7%9A%84%E7%9B%B8%E5%AE%B9%E7%9F%A9%E9%98%B5">3.2基本锁的相容矩阵</a></li>
+<li class="toc-item toc-level-3"><a href="#33%E9%94%81%E7%9A%84%E7%B2%92%E5%BA%A6">3.3锁的粒度</a></li>
+<li class="toc-item toc-level-3"><a href="#34%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE">3.4封锁协议</a></li>
+<li class="toc-item toc-level-4"><a href="#341%E4%B8%80%E7%BA%A7%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE">3.4.1一级封锁协议</a></li>
+<li class="toc-item toc-level-4"><a href="#342%E4%BA%8C%E7%BA%A7%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE">3.4.2二级封锁协议</a></li>
+<li class="toc-item toc-level-4"><a href="#343%E4%B8%89%E7%BA%A7%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE">3.4.3三级封锁协议</a></li>
+<li class="toc-item toc-level-4"><a href="#344%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE%E6%80%BB%E7%BB%93">3.4.4封锁协议总结</a></li>
+<li class="toc-item toc-level-3"><a href="#35%E5%B0%81%E9%94%81%E5%B8%A6%E6%9D%A5%E7%9A%84%E9%97%AE%E9%A2%98">3.5封锁带来的问题</a></li>
+<li class="toc-item toc-level-4"><a href="#351%E9%A5%BF%E6%AD%BB%E9%97%AE%E9%A2%98">3.5.1“饿死”问题</a></li>
+<li class="toc-item toc-level-4"><a href="#352%E6%B4%BB%E9%94%81%E9%97%AE%E9%A2%98">3.5.2“活锁”问题</a></li>
+<li class="toc-item toc-level-4"><a href="#353%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98">3.5.3“死锁”问题</a></li>
+<li class="toc-item toc-level-3"><a href="#36%E4%B8%A4%E6%AE%B5%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE2pl">3.6两段封锁协议2PL</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/database/" class="post-category">
+        it / 数据库      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/database/">#database</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">事务与并发控制</h1>
+
+    <div class="post-body">
+<h1 id="六事务与并发控制">六、事务与并发控制</h1>
+<p>[toc]</p>
+<p>数据库是一个共享资源，可以供多个用户使用。</p>
+<p>允许多个用户同时使得的数据库系统称为<strong>多用户数据库系统</strong>，例如航空订票系统、银行系统等都是多用户数据库系统。在这样的系统中，在<strong>同一时刻并发运行的事务数可达数百甚至数千个</strong>。</p>
+<p>对于多用户数据库系统而言，当多个用户并发操作时，会产生<strong>多个事务同时操作同一数据的情况</strong>。若对并发操作不加以控制，就可能发生读取和写入不正确数据的情况，从而破坏了数据库的<strong>一致性</strong>，所以数据库管理系统必须提供<strong>并发控制</strong>机制。</p>
+<h2 id="1事务">1.事务</h2>
+<p>所谓的<strong>事务</strong>是指由用户定义的一系列数据库<strong>更新</strong>操作，这些操作，<strong>要么都执行，要么都不执行</strong>，是一个不可分割的逻辑工作单元。这里的更新操作主要指对数据库内容产生修改作用的操作，比如：insert、delete、update等操作。</p>
+<ul>
+<li>如果事务<strong>成功</strong>执行，那么该事务中所有的更新操作都会成功执行，并将执行结果提交到数据库文件中，成为数据库永久的组成部分。</li>
+<li>如果事务中某个更新操作执行<strong>失败</strong>，那么事务中的所有更新操作均被撤消。简言之：事务中的更新操作要么都执行，要么都不执行。</li>
+</ul>
+<h3 id="11事务的acid特性">1.1事务的ACID特性</h3>
+<p>为了保证事务对数据操作的完整性，对事务需要加以要求和限制，只有满足这些要求或限制才能使数据库在任何情况下都是正确有效的，这是DBMS的责任。</p>
+<p>DBMS为了保证在并发访问时对数据库的保护，要求事务具有4个特性，即，简称<strong>ACID特性</strong>。</p>
+<ul>
+<li>
+<p><strong>原子性(Atomicity)</strong></p>
+<p>原子性体现事务所有操作是否被全部完成。事务处理的操作<strong>要么全都完成，要么全都不做</strong>，如果有操作失败，整个事务将要回滚，从而保证事务所有操作成功必将完成所有的数据库修改任务，如果有操作失败数据库将恢复到事务开始之前的状态。</p>
+</li>
+<li>
+<p><strong>一致性(Consistency)</strong></p>
+<p>一致性是指事务<strong>必须在执行前后都要处于一致性状态</strong>。事务操作全部正确执行，数据库的变化将生效，从而处于有效状态；如果事务处理失败，系统将会回滚，从而恢复到执行前的状态，由于执行前系统处于一致性状态，所以回滚后系统仍然处于一致性状态。</p>
+</li>
+<li>
+<p><strong>隔离性(Isolation)</strong></p>
+<p>隔离性是面对多用户并发对数据库访问时，<strong>要保证所有并发事务认为只有自己在使用系统，而不为其他事务的操作所干扰</strong>。</p>
+</li>
+<li>
+<p><strong>持久性(Durability)</strong></p>
+<p>持久性是指<strong>一旦一个事务被完成，那么系统中的数据的改变将会是永久的</strong>，即使系统遭遇了故障的情况下，也不会丢失提交事务的操作。</p>
+</li>
+</ul>
+<h3 id="12mysql事务控制语句">1.2MySQL事务控制语句</h3>
+<h4 id="开启事务">开启事务</h4>
+<p>事务处理首先要开启事务，使用的语句如下所示：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">START TRANSACTION</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<h4 id="提交事务">提交事务</h4>
+<p>开启事务之后，就开始执行事务内的SQL语句，当SQL语句执行完毕后，必须使用语句提交事务，使用的语句如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">COMMIT</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<h4 id="回滚事务">回滚事务</h4>
+<p>开启事务之后，事务中的SQL语句只有在提交事务之后才能运行生效。在提交事务之前，还可以使用语句取消当前事务，叫做回滚事务，具体如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">ROLLBACK</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p>例子：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例11-1】假设银行存在两个借记卡账户“李三”和“王五”，要求这两个借记卡账户不能用于透支，即两个账户的余额（balance）不能小于0。创建存储过程tran_proc，实现两个账户的转账业务。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">#建立account表</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> account</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  Account_no </span><span style="color:#D73A49;--shiki-dark:#F97583">INT</span><span style="color:#D73A49;--shiki-dark:#F97583"> PRIMARY KEY</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  Account_name </span><span style="color:#D73A49;--shiki-dark:#F97583">VARCHAR</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">NOT NULL</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  Balance </span><span style="color:#D73A49;--shiki-dark:#F97583">INT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> UNSIGNED );</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">#向account表插入记录</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">  INSERT INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> account </span><span style="color:#D73A49;--shiki-dark:#F97583">VALUES</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'李三'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">  INSERT INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> account </span><span style="color:#D73A49;--shiki-dark:#F97583">VALUES</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'王五'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例11-1】假设银行存在两个借记卡账户“李三”和“王五”，要求这两个借记卡账户不能用于透支，即两个账户的余额（balance）不能小于0。创建存储过程tran_proc，实现两个账户的转账业务。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">#建立account表</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> account</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  Account_no </span><span style="color:#D73A49;--shiki-dark:#F97583">INT</span><span style="color:#D73A49;--shiki-dark:#F97583"> PRIMARY KEY</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  Account_name </span><span style="color:#D73A49;--shiki-dark:#F97583">VARCHAR</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">NOT NULL</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  Balance </span><span style="color:#D73A49;--shiki-dark:#F97583">INT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> UNSIGNED );</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">#向account表插入记录</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">  INSERT INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> account </span><span style="color:#D73A49;--shiki-dark:#F97583">VALUES</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'李三'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">  INSERT INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> account </span><span style="color:#D73A49;--shiki-dark:#F97583">VALUES</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'王五'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
+<p>结果</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 第一次转账业务可以正确实现，结果如图11.1所示。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">CALL</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tran_proc(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">800</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> account;</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 第二次转账业务由于转账金额超过余额，因此未能正确实现，执行结果如图11.2所示。</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">CALL</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tran_proc(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">500</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> account;</span></span></code></pre>
+<h2 id="2并发控制">2.并发控制</h2>
+<p>事务的并发执行：</p>
+<p>DBMS同时执行多个事务对同一数据的操作，为此DBMS要<strong>对各事务中的操作顺序进行安排</strong>，以达到同时运行多个事务的目的。这里的并发是指<strong>在单处理器上利用分时方法实现</strong>多个事务<strong>同时操作</strong>。</p>
+<h3 id="21并发执行可能引起的问题">2.1并发执行可能引起的问题</h3>
+<p>事务中的操作归根结底就是读或写。</p>
+<p>两个事务之间的相互干扰就是其操作彼此冲突。因此，事务间的相互干扰问题可归纳为<strong>写-写</strong>、<strong>读-写</strong>和<strong>写-读</strong>3种冲突（读-读不冲突），分别称为“<strong>丢失更新</strong>”、“<strong>不可重复读</strong>”、“<strong>读脏数据</strong>”问题。</p>
+<h4 id="211丢失更新">2.1.1丢失更新</h4>
+<p>丢失更新又称为<strong>覆盖未提交的数据</strong>。也就是说，<strong>一个事务更新的数据尚未提交，另一事务又将该未提交的更新数据再次更新，使得前一个事务更新的数据丢失</strong>。</p>
+<p>原因：由于两个（或多个）事务对同一数据<strong>并发地写入</strong>引起，称为<strong>写-写</strong>冲突。</p>
+<p>结果：与串行地执行两个（或多个）事务的结果不一致。</p>
+<p>【例11-3】在表11-1中，数据库中A的初值是100，事务T1对A的值减30，事务T2对A的值增加一倍。
+如果执行顺序是先T1后T2，那么结果A的值是140；如果是先T2后T1，那么A的值是170。这两种情况都应该是正确的。但是按表11-1中的并发执行，结果A的值是200，这个值肯定是错误的，因为在时间t0丢失了事务T1对数据库的更新操作。所以这个并发操作是不正确的。</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事务T1</th>
+<th>A的值</th>
+<th>事务T2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t0</td>
+<td>R(A)</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>t1</td>
+<td></td>
+<td>100</td>
+<td>R(A)</td>
+</tr>
+<tr>
+<td>t2</td>
+<td>A:=A-30</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>t3</td>
+<td></td>
+<td></td>
+<td>A;=A*2</td>
+</tr>
+<tr>
+<td>t4</td>
+<td>W(A)</td>
+<td>70</td>
+<td></td>
+</tr>
+<tr>
+<td>t5</td>
+<td></td>
+<td>200</td>
+<td>W(A)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="212不可重复读">2.1.2不可重复读</h4>
+<p>不可重复读也称为<strong>读值不可复现</strong>。由于<strong>另一事务对同一数据的写入，一个事务对该数据两次读到的值不一样</strong>。</p>
+<p>原因：该问题因<strong>读-写</strong>冲突引起。</p>
+<p>结果：第二次读的值与前次读的值不同。</p>
+<p>【例11-4】表11-2表示T1需要两次读取同一数据项A，但是在两次读取操作的间隔中，另一事务T2改变了A的值。因此，T1在两次读同一数据项A时却读出不同的值。</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事务T1</th>
+<th>A的值</th>
+<th>事务T2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t0</td>
+<td>R(A)</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>t1</td>
+<td></td>
+<td>100</td>
+<td>R(A)</td>
+</tr>
+<tr>
+<td>t2</td>
+<td></td>
+<td></td>
+<td>A:=A*2</td>
+</tr>
+<tr>
+<td>t3</td>
+<td></td>
+<td>200</td>
+<td>W(A)</td>
+</tr>
+<tr>
+<td>t4</td>
+<td></td>
+<td></td>
+<td>COMMIT</td>
+</tr>
+<tr>
+<td>t5</td>
+<td>R(A)</td>
+<td>200</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="213读脏数据">2.1.3读脏数据</h4>
+<p>读脏数据也称为<strong>读未提交的数据</strong>。也就是说<strong>一个事务更新的数据尚未提交，被另一事务读到，如前一事务因故要回滚，则后一事务读到的数据已经是没有意义的数据了</strong>，即为<strong>脏数据</strong>。</p>
+<p>原因：由于后一事务读了前一事务写了但尚未提交的数据引起，称为<strong>写-读</strong>冲突。</p>
+<p>结果：读到有可能要回滚的更新数据。但如果前一事务不回滚，那么后一事务读到的数据仍然是有意义的。</p>
+<p>【例11-5】表11-3中事务T1把A的值修改为70，但尚未提交（即未做COMMIT操作），事务T2紧跟着读未提交的A值70。随后，事务T1做了ROLLBACK操作，把A的值恢复为100，而事务T2仍在使用被撤消了的A值70。</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事务T1</th>
+<th>A的值</th>
+<th>事务T2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t0</td>
+<td>R(A)</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>t1</td>
+<td>A:=A-30</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>t2</td>
+<td>W(A)</td>
+<td>70</td>
+<td></td>
+</tr>
+<tr>
+<td>t3</td>
+<td></td>
+<td>70</td>
+<td>R(A)</td>
+</tr>
+<tr>
+<td>t4</td>
+<td>ROLLBACK</td>
+<td>100</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>产生上述3类数据不一致性的主要原因是<strong>并发操作破坏了事务的隔离性</strong>。</p>
+<p><strong>并发控制</strong>就是要求DBMS提供并发控制功能，以正确的方式执行并发事务，避免并发事务之间相互干扰造成数据的不一致性，保证数据库的完整性和一致性。</p>
+<h3 id="22并发调度的可串行性">2.2并发调度的可串行性</h3>
+<ol>
+<li>多个事务的并发执行是正确的，当且仅当其结果与按某一次序串行地执行它们时的结果相同，称这种调度策略为可串行化的调度。</li>
+<li>可串行性是并发事务正确性的准则。按这个准则规定，一个给定的并发调度，当且仅当它是串行化的，才认为是正确调度。</li>
+</ol>
+<h3 id="23并发与并行的区分">2.3并发与并行的区分</h3>
+<ul>
+<li><strong>并发</strong>(Concurrent)**：**当有多个线程在操作时,如果系统只有一个CPU,则它不可能真正同时进行一个以上的线程，它只能把CPU运行时间划分成若干个时间段,再将时间段分配给各个线程执行，在一个时间段的线程代码运行时，其它线程处于挂起状。</li>
+<li><strong>并行</strong>(Parallel)：当系统有一个以上CPU时,则线程的操作有可能非并发。当一个CPU执行一个线程时，另一个CPU可以执行另一个线程，两个线程互不抢占CPU资源，可以同时进行。</li>
+</ul>
+<p>**区别：**并发和并行是即相似又有区别的两个概念，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。</p>
+<h3 id="24事务的隔离级别">2.4事务的隔离级别</h3>
+<p><strong>隔离性</strong>是事务最重要的基本特性之一，是解决事务并发执行时可能发生的相互干扰问题的基本技术。</p>
+<p><strong>隔离级别定义了一个事务与其他事务的隔离程度</strong>。</p>
+<p>为了更好地理解隔离级别，再来看并发事务对同一数据库进行访问可能发生的情况。在并发事务中，总的来说会发生以下3种异常情况。</p>
+<p>在并发事务中，总的来说会发生以下3种情况：</p>
+<p>（1）<strong>丢失更新</strong>
+丢失更新就是一个事务更新的数据尚未提交，另一事务又将该未提交的更新数据再次更新，使得前一个事务更新的数据丢失。</p>
+<p>（2）<strong>不可重复读</strong>
+不可重复读是指当一个事务读取数据库中的数据后，另一个事务更新了数据，当第一个事务再次读取该数据时，发现数据已经发生改变，导致一个事务前后两次读取的数据值不相同。</p>
+<p>（3）<strong>读脏数据</strong>
+读脏数据就是当一个事务修改数据时，另一个事务读取了修改的数据，并且第一个事务由于某种原因取消了对数据的修改，使数据库回到原来的状态，这时第二个事务中读取的数据与数据库中的数据已经不相符。</p>
+<p>隔离级别分为以下4级：</p>
+<p>（1）<strong>未提交读</strong>（READ UNCOMMITED）：
+在此隔离级别下，<strong>用户可以对数据执行未提交读</strong>；在事务结束前可以更改数据内的数值，行也可以出现在数据集中或从数据集消失。它是4个级别中限制最小的级别。</p>
+<p>（2）<strong>提交读</strong>（READ COMMITED）：
+此隔离级别<strong>不允许用户读一些未提交的数据</strong>，因此不会出现读脏数据的情况，<strong>但数据可以在事务结束前被修改</strong>，从而产生不可重复读。</p>
+<p>（3）<strong>可重复读</strong>（REPEATABLE READ）：
+此隔离级别<strong>保证在一个事务中重复读到的数据会保持同样的值</strong>，而不会出现读脏数据、不可重复读的问题。但允许其他用户将新的幻影行插入数据集，且幻影行包括在当前事务的后续读取中。</p>
+<p>（4）<strong>可串行读</strong>（SERIALIZABLE）：
+此隔离级别是4个隔离级别中限制最大的级别，<strong>不允许其他用户在事务完成之前更新数据集或将行插入到数据集内</strong>。</p>
+<p>4种隔离级别允许的不同类型的行为：</p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>丢失更新</th>
+<th>读脏数据</th>
+<th>不可重复度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>未提交读<br/>（READ UNCOMMITED）</td>
+<td>是</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>提交读<br/>（READ COMMITED）</td>
+<td>否</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>可重复读<br/>（REPEATABLE READ）</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td>可串行读<br/>（SERIALIZABLE）</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3封锁">3.封锁</h2>
+<p>封锁是实现并发控制的一个非常重要的技术。所谓封锁，就是<strong>事务T在对某个数据对象（例如表、记录等）操作之前先向系统发出请求，对其加锁</strong>。</p>
+<p>一个锁实质上就是<strong>允许（或阻止）一个事务对一个数据对象的存取特权</strong>。一个事务对一个对象加锁的结果是将别的事务封锁在该对象之外，特别是防止了其他事务对该对象的更改，而加锁的事务则可执行它所希望的处理，并维持该对象的正确状态。一个锁总是与某一事务的一个操作相联系的。</p>
+<h3 id="31基本锁">3.1基本锁</h3>
+<p>锁可以有多种不同的类型，最基本的有两种，即<strong>排他锁</strong>（Exclusive Locks）和<strong>共享锁</strong>（Share Locks）。</p>
+<ol>
+<li><strong>排他锁（X锁）</strong></li>
+</ol>
+<p><strong>排他锁</strong>又称为<strong>写锁</strong>。若一个事务T1在数据对象R上获得了排他锁，则T1既可对R进行读操作，也可进行写操作。其他任何事务不能对R加任何锁，因而不能进行任何操作，直到T1释放了它对R加的锁。所以排他锁就是<strong>独占锁</strong>。</p>
+<ol start="2">
+<li><strong>共享锁（S锁）</strong></li>
+</ol>
+<p><strong>共享锁</strong>又称为<strong>读锁</strong>。若一个事务T1在数据对象R上获得了共享锁，则它能对R进行读操作，但不能写R。其他事务可以也只能同时对R加共享锁。</p>
+<p>显然，排他锁比共享锁更“强”，因为共享锁只禁止其他事务的写操作，而排他锁既禁止其他事务的写又禁止读。</p>
+<p>常用XLOCK表示对A上加X锁，SLOCK表示对A加S锁，UNLOCK A表示释放A上的封锁。</p>
+<h3 id="32基本锁的相容矩阵">3.2基本锁的相容矩阵</h3>
+<p>根据X锁、S锁的定义，可以得出基本锁的相容矩阵，如表11-5所示。表中表明，当一个数据对象R已被事务持有一个锁，而另一事务又想在R上加一个锁时，只有两种锁同为共享型锁才有可能。如果要请求对R加一个排他锁，只有在R上无任何事务持有锁时才可以。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>请求锁</th>
+<th>请求锁</th>
+<th>请求锁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>持有锁</strong></td>
+<td>S</td>
+<td>X</td>
+<td>--</td>
+</tr>
+<tr>
+<td>S</td>
+<td>Y</td>
+<td>N</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>X</td>
+<td>N</td>
+<td>N</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>--</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+</tbody>
+</table>
+<h3 id="33锁的粒度">3.3锁的粒度</h3>
+<p><strong>封锁对象的大小称为封锁的粒度</strong>（Lock Granularity）。</p>
+<p>根据对数据的不同处理，封锁的对象可以是字段、记录、表、数据库等逻辑单元，也可以是页（数据页或索引页）、块等物理单元。</p>
+<p>封锁粒度与系统的并发度和并发控制的开销密切相关。</p>
+<p>封锁粒度越小，系统中能够被封锁的对象就越多，但封锁机构复杂，系统开销也就越大；相反，封锁粒度越大，系统中能够被封锁的对象就越少，并发度越小，封锁机构简单，相应系统开销也就越小。</p>
+<p>因此，在实际应用中选择封锁粒度应同时考虑封锁机构和并发度两个因素，<strong>对系统开销</strong>与<strong>并发度</strong>进行权衡，以求得最优的效果。一般来说，需要处理大量元组的用户事务可以以关系为封锁单元；而对于一个处理少量元组的用户事务，可以以元组为封锁单元，以提高并发度。</p>
+<h3 id="34封锁协议">3.4封锁协议</h3>
+<p>在运用封锁机制时还需要约定一些<strong>规则</strong>，例如何时开始封锁、封锁多长时间、何时释放等，这些封锁规则称为<strong>封锁协议</strong>（lock protocol）。</p>
+<p>前面讲过的并发操作所带来的丢失更新、读脏数据和不可重复读等数据不一致性问题，可以通过<strong>三级封锁协议</strong>在不同程度上给予解决。</p>
+<h4 id="341一级封锁协议">3.4.1一级封锁协议</h4>
+<p>一级封锁协议的内容：<strong>事务T在修改数据对象之前必须对其加X锁，直到事务结束</strong>。</p>
+<p>一级封锁协议规定事务在更新数据对象时必须获得X锁，使得两个同时要求更新R的并行事务之一必须在一个事务更新操作执行完成之后才能获得X锁，这样就避免了两个事务读到同一个R值而先后更新所发生的<strong>数据丢失更新</strong>问题。</p>
+<p>但一级封锁协议只有当<strong>修改数据</strong>时才进行加锁，如果只是读取数据，并不加锁，所以它不能防止读脏数据和不可重复读的情况。</p>
+<p><strong>解决数据丢失问题：</strong></p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事务T1</th>
+<th>A的值</th>
+<th>事务T2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t0</td>
+<td>XLOCK A</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>t1</td>
+<td>R(A)</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>t2</td>
+<td></td>
+<td></td>
+<td>XLOCK A</td>
+</tr>
+<tr>
+<td>t3</td>
+<td>A:=A-30</td>
+<td></td>
+<td>等待</td>
+</tr>
+<tr>
+<td>t4</td>
+<td>W(A)</td>
+<td>70</td>
+<td>等待</td>
+</tr>
+<tr>
+<td>t5</td>
+<td>COMMIT</td>
+<td></td>
+<td>等待</td>
+</tr>
+<tr>
+<td>t6</td>
+<td>UNLOCK X</td>
+<td></td>
+<td>等待</td>
+</tr>
+<tr>
+<td>t7</td>
+<td></td>
+<td></td>
+<td>XLOCK A</td>
+</tr>
+<tr>
+<td>t8</td>
+<td></td>
+<td>70</td>
+<td>R(A)</td>
+</tr>
+<tr>
+<td>t9</td>
+<td></td>
+<td></td>
+<td>A:=A*2</td>
+</tr>
+<tr>
+<td>t10</td>
+<td></td>
+<td>140</td>
+<td>W(A)</td>
+</tr>
+<tr>
+<td>t11</td>
+<td></td>
+<td></td>
+<td>COMMIT</td>
+</tr>
+<tr>
+<td>t12</td>
+<td></td>
+<td></td>
+<td>UNLOCK X</td>
+</tr>
+</tbody>
+</table>
+<h4 id="342二级封锁协议">3.4.2二级封锁协议</h4>
+<p>二级封锁协议的内容：<strong>在一级封锁协议的基础上加上“事务T在读取数据对象R之前必须先对其加S锁，读完后释放S锁”</strong>。</p>
+<p>二级封锁协议不但可以解决数据丢失更新问题，还可以<strong>进一步防止读脏数据</strong>。但二级封锁协议在读取数据之后立即释放S锁，所以它仍然不能解决不可重复读的问题。</p>
+<p><strong>解决读脏数据问题：</strong></p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事务T1</th>
+<th>A的值</th>
+<th>事务T2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t0</td>
+<td>XLOCK A</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>t1</td>
+<td>R(A)</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>t2</td>
+<td>A:=A-30</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>t3</td>
+<td>W(A)</td>
+<td>70</td>
+<td></td>
+</tr>
+<tr>
+<td>t4</td>
+<td></td>
+<td></td>
+<td>SLOCK A</td>
+</tr>
+<tr>
+<td>t5</td>
+<td>ROLLBACK</td>
+<td>100</td>
+<td>等待</td>
+</tr>
+<tr>
+<td>t6</td>
+<td>UNLOCK X</td>
+<td></td>
+<td>等待</td>
+</tr>
+<tr>
+<td>t7</td>
+<td></td>
+<td></td>
+<td>SLOCK A</td>
+</tr>
+<tr>
+<td>t8</td>
+<td></td>
+<td>100</td>
+<td>R(A)</td>
+</tr>
+<tr>
+<td>t9</td>
+<td></td>
+<td></td>
+<td>COMMIT</td>
+</tr>
+<tr>
+<td>t10</td>
+<td></td>
+<td></td>
+<td>UNLOCK S</td>
+</tr>
+</tbody>
+</table>
+<h4 id="343三级封锁协议">3.4.3三级封锁协议</h4>
+<p>三级封锁协议的内容：<strong>在一级封锁协议的基础上加上“事务T在读取数据R之前必须先对其加S锁，读完后并不释放S锁，直到事务T结束才释放”</strong>。</p>
+<p>所以三级封锁协议除了可以防止丢失更新和读脏数据外，还可以<strong>进一步防止不可重复读</strong>，彻底解决了并发操作带来的三种不一致性问题。</p>
+<p><strong>解决不可重复读问题：</strong></p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事务T1</th>
+<th>A的值</th>
+<th>事务T2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t0</td>
+<td>SLOCK A</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>t1</td>
+<td>R(A)</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>t2</td>
+<td></td>
+<td></td>
+<td>XLOCK A</td>
+</tr>
+<tr>
+<td>t3</td>
+<td>R(A)</td>
+<td>100</td>
+<td>等待</td>
+</tr>
+<tr>
+<td>t4</td>
+<td>COMMIT</td>
+<td></td>
+<td>等待</td>
+</tr>
+<tr>
+<td>t5</td>
+<td>UNLOCK S</td>
+<td></td>
+<td>等待</td>
+</tr>
+<tr>
+<td>t6</td>
+<td></td>
+<td></td>
+<td>XLOCK A</td>
+</tr>
+<tr>
+<td>t7</td>
+<td></td>
+<td>100</td>
+<td>R(A)</td>
+</tr>
+<tr>
+<td>t8</td>
+<td></td>
+<td></td>
+<td>A:=A*2</td>
+</tr>
+<tr>
+<td>t9</td>
+<td></td>
+<td>200</td>
+<td>W(A)</td>
+</tr>
+<tr>
+<td>t10</td>
+<td></td>
+<td></td>
+<td>COMMIT</td>
+</tr>
+<tr>
+<td>t11</td>
+<td></td>
+<td></td>
+<td>UNLOCK X</td>
+</tr>
+</tbody>
+</table>
+<h4 id="344封锁协议总结">3.4.4封锁协议总结</h4>
+<p><img src="/assets/images/transactions-and-concurrency/%E5%B0%81%E9%94%81.png" alt="封锁"></p>
+<h3 id="35封锁带来的问题">3.5封锁带来的问题</h3>
+<p>利用封锁技术可以避免并发操作引起的各种错误，但有可能产生新的问题，即<strong>活锁</strong>、<strong>饿死</strong>和<strong>死锁</strong>。</p>
+<h4 id="351饿死问题">3.5.1“饿死”问题</h4>
+<p>有可能存在一个事务序列，其中的每个事务都申请对某数据项加S锁，且每个事务在授权加锁后一小段时间内释放封锁，此时若另一事务T2要在该数据项上加X锁，则将永远轮不上封锁的机会。这种现象称为“饿死”（Starvation）。</p>
+<p>可以用下列授权方式来避免事务被“饿死”。</p>
+<p>当事务T中请求对数据R加S锁时，授权加锁的条件如下：</p>
+<p>（1）不存在数据R上持有X锁的其他事务。
+（2）不存在等待对数据R加锁且先于T申请加锁的事务。</p>
+<h4 id="352活锁问题">3.5.2“活锁”问题</h4>
+<p>系统可能使某个事务永远处于等待状态，得不到封锁的机会，这种现象为“活锁”（live lock）。</p>
+<p>例如，事务T1在对数据R封锁后，事务T2又请求封锁R，于是T2等待；T3也请求封锁R，当T1释放R上的封锁后，系统首先批准了T3的请求，T2继续等待；然后又有T4请求封锁R，T3释放了R上的封锁后，系统又批准了T4的请示；依此类推，T2可能永远处于等待状态，从而发生“活锁”。</p>
+<p>解决“活锁”问题的一种简单方法是采用“<strong>先来先服务</strong>”的策略。</p>
+<h4 id="353死锁问题">3.5.3“死锁”问题</h4>
+<p>系统中两个或两个以上的事务都处于等待状态，并且每个事务都在等待其中另一个事务解除封锁，才能继续执行下去，结果造成任何一个事务都无法继续执行，这种现象称系统进入“死锁”（dead lock）状态。</p>
+<p>例如，事务T1等待事务T2释放它对数据对象持有的锁，事务T2等待事务T3释放它的锁，依此类推，最后事务Tn又等待T1释放它持有的某个锁，从而形成了一个锁的等待圈，产生“死锁”。</p>
+<hr>
+<ol>
+<li><strong>“死锁”的预防</strong></li>
+</ol>
+<p>预防死锁有两种方法，即一次加锁法和顺序加锁法。</p>
+<p>（1）<strong>一次加锁法</strong>：
+一次加锁法是每个事务必须将所有要使用的数据对象全部依次加锁，并要求加锁成功，只要一个加锁不成功，则表示本次加锁失败，应该立即释放所有已加锁成功的数据对象，然后重新开始从头加锁。</p>
+<p>（2）<strong>顺序加锁法</strong>：
+顺序加锁法是预先对所有可加锁的数据对象强加一个封锁的顺序，同时要求所有事务都只能按此顺序封锁数据对象。</p>
+<ol start="2">
+<li><strong>“死锁”的检测与解除</strong></li>
+</ol>
+<p>预防死锁的代价太高，还可能发生许多不必要的回退操作。因此，现在大多数DBMS采用的方法是允许死锁发生，然后设法发现它、解除它。</p>
+<p>死锁的检测：利用事务等待图测试系统中是否存在死锁。</p>
+<p>死锁的解除：死锁测试程序</p>
+<h3 id="36两段封锁协议2pl">3.6两段封锁协议2PL</h3>
+<p>DBMS对并发事务不同的调度（即事务的执行次序）可能会产生不同的结果，那么什么样的调度是正确的呢？</p>
+<p>显然，串行调度是正确的，执行结果等价于串行调度的调度也是正确的，这样的调度称为<strong>可串行化调度</strong>。</p>
+<p>前面说明了封锁是一种最常用的并发控制技术，<strong>可串行性是并发调度的一种正确性准则</strong>。</p>
+<p>接下来的问题是怎么封锁其调度才是可串行化的？最简单而有效的方法是采用<strong>两段封锁协议</strong>（Two-Phase Locking protocol，2PL协议）。</p>
+<p>两段封锁协议规定所有的事务应遵守下面两条规则：</p>
+<p>（1）在对任何一个数据进行读/写操作之前，首先要申请并获得对该数据的封锁。
+（2）在释放一个封锁后，事务不再申请和获得任何其他封锁。</p>
+<p>两段锁的含义是，事务分为两个阶段。</p>
+<p>第一阶段是<strong>获得封锁</strong>，也称为“扩展”阶段。在这个阶段，事务可以申请获得任何数据项上的任何类型的锁，但是不能释放任何锁；</p>
+<p>第二阶段是<strong>释放封锁</strong>，也称为“收缩”阶段，在这个阶段，事务可以释放任何数据项上的任何类型的锁，但是不能再申请任何锁。</p>
+<p>遗憾的是，两段封锁协议<strong>仍有可能导致死锁的发生</strong>，而且可能会增多，这是因为每个事务都不能及时解除被它封锁的数据。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

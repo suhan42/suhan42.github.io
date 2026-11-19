@@ -98,7 +98,7 @@ function walkDirectory(dir) {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
       files.push(...walkDirectory(fullPath));
-    } else if (POST_FILE_PATTERN.test(entry.name) && !entry.name.startsWith(".")) {
+    } else if (POST_FILE_PATTERN.test(entry.name) && !entry.name.startsWith(".") && entry.name !== "AGENTS.md") {
       files.push(fullPath);
     }
   }
@@ -149,13 +149,13 @@ function slugifyStem(value) {
     .replace(/^-+|-+$/g, "");
 }
 
-// 合法子分类目录使用目录名作为图片命名空间；资源包目录和根目录文章使用 front matter slug。
+// 子分类优先使用 front matter 的 subcategory；资源包目录和根目录文章使用 front matter slug。
 function getNamespace(postFile) {
   if (normalizedCustomNamespace) return normalizedCustomNamespace;
-  const subcategory = getPostSubcategory(postFile, POSTS_DIR);
-  if (subcategory) return subcategory;
   const content = readFileSync(postFile, "utf8");
   const { data } = parseFrontMatter(content);
+  const subcategory = getPostSubcategory(postFile, data, POSTS_DIR);
+  if (subcategory) return subcategory;
   if (data && data.slug) return data.slug;
   const stem = basename(postFile, extname(postFile));
   const slug = slugifyStem(stem);

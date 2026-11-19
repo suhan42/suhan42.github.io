@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>数据库编程 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">数据库编程</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%9B%9B%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B">四、数据库编程</a></li>
+<li class="toc-item toc-level-2"><a href="#1sql%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80">1.SQL编程基础</a></li>
+<li class="toc-item toc-level-3"><a href="#11%E5%B8%B8%E9%87%8F">1.1常量</a></li>
+<li class="toc-item toc-level-3"><a href="#12%E5%8F%98%E9%87%8F">1.2变量</a></li>
+<li class="toc-item toc-level-4"><a href="#121%E7%B3%BB%E7%BB%9F%E5%8F%98%E9%87%8F">1.2.1系统变量</a></li>
+<li class="toc-item toc-level-4"><a href="#122%E7%94%A8%E6%88%B7%E5%8F%98%E9%87%8F%E7%94%A8%E6%88%B7%E4%BC%9A%E8%AF%9D%E5%8F%98%E9%87%8F">1.2.2用户变量（用户会话变量）</a></li>
+<li class="toc-item toc-level-4"><a href="#123%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F">1.2.3局部变量</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E4%B8%8E%E7%94%A8%E6%88%B7%E4%BC%9A%E8%AF%9D%E5%8F%98%E9%87%8F">局部变量与用户会话变量</a></li>
+<li class="toc-item toc-level-3"><a href="#13%E8%BF%90%E7%AE%97%E7%AC%A6%E4%B8%8E%E8%A1%A8%E8%BE%BE%E5%BC%8F">1.3运算符与表达式</a></li>
+<li class="toc-item toc-level-4"><a href="#131%E7%AE%97%E6%9C%AF%E8%BF%90%E7%AE%97%E7%AC%A6%E4%B8%8E%E7%AE%97%E6%9C%AF%E8%A1%A8%E8%BE%BE%E5%BC%8F">1.3.1算术运算符与算术表达式</a></li>
+<li class="toc-item toc-level-4"><a href="#132%E6%AF%94%E8%BE%83%E7%AE%97%E6%9C%AF%E8%BF%90%E7%AE%97%E7%AC%A6%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A1%A8%E8%BE%BE%E5%BC%8F">1.3.2比较算术运算符与比较表达式</a></li>
+<li class="toc-item toc-level-4"><a href="#133%E9%80%BB%E8%BE%91%E7%AE%97%E6%9C%AF%E8%BF%90%E7%AE%97%E7%AC%A6%E4%B8%8E%E9%80%BB%E8%BE%91%E8%A1%A8%E8%BE%BE%E5%BC%8F">1.3.3逻辑算术运算符与逻辑表达式</a></li>
+<li class="toc-item toc-level-4"><a href="#134%E8%BF%90%E7%AE%97%E7%AC%A6%E7%9A%84%E4%BC%98%E5%85%88%E7%BA%A7">1.3.4运算符的优先级</a></li>
+<li class="toc-item toc-level-3"><a href="#14-begin-end%E8%AF%AD%E5%8F%A5%E5%9D%97">1.4 begin-end语句块</a></li>
+<li class="toc-item toc-level-3"><a href="#15%E6%9D%A1%E4%BB%B6%E6%8E%A7%E5%88%B6%E8%AF%AD%E5%8F%A5">1.5条件控制语句</a></li>
+<li class="toc-item toc-level-4"><a href="#151-if%E8%AF%AD%E5%8F%A5">1.5.1 if语句</a></li>
+<li class="toc-item toc-level-4"><a href="#152-case%E8%AF%AD%E5%8F%A5">1.5.2 case语句</a></li>
+<li class="toc-item toc-level-3"><a href="#16%E5%BE%AA%E7%8E%AF%E8%AF%AD%E5%8F%A5">1.6循环语句</a></li>
+<li class="toc-item toc-level-4"><a href="#161-while%E8%AF%AD%E5%8F%A5">1.6.1 while语句</a></li>
+<li class="toc-item toc-level-4"><a href="#162-repeat%E8%AF%AD%E5%8F%A5">1.6.2 repeat语句</a></li>
+<li class="toc-item toc-level-4"><a href="#163-loop%E8%AF%AD%E5%8F%A5">1.6.3 loop语句</a></li>
+<li class="toc-item toc-level-3"><a href="#17%E9%87%8D%E7%BD%AE%E5%91%BD%E4%BB%A4%E7%BB%93%E6%9D%9F%E6%A0%87%E8%AE%B0">1.7重置命令结束标记</a></li>
+<li class="toc-item toc-level-3"><a href="#18%E6%B3%A8%E9%87%8A">1.8注释</a></li>
+<li class="toc-item toc-level-2"><a href="#2%E7%B3%BB%E7%BB%9F%E5%87%BD%E6%95%B0">2.系统函数</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/database/" class="post-category">
+        it / 数据库      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/database/">#database</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">数据库编程</h1>
+
+    <div class="post-body">
+<h1 id="四数据库编程">四、数据库编程</h1>
+<p>另一个大纲：</p>
+<p>5.1存储过程
+5.1.1存储过程基本概念
+5.1.2创建存储过程
+5.1.3存储过程体
+5.1.4调用存储过程
+5.1.5删除</p>
+<p>5.2存储函数
+5.2.1创建存储函数
+5.2.2调用存储函数
+5.2.3删除存储函数</p>
+<p>目录</p>
+<p>[toc]</p>
+<h2 id="1sql编程基础">1.SQL编程基础</h2>
+<p>MySQL也在常量、变量、运算符、表达式、流程控制以及函数等方面进行了扩展。</p>
+<p>主要介绍MySQL中使用的<strong>常量、变量的类型和用法，其中包含了常量、变量、运算符、表达式、begin-end语句块、条件控制语句、循环语句、重置命令结束标记</strong>等内容。</p>
+<p>MySQL中提供给用户的<strong>常用的系统函数</strong>，包括数学函数、字符串函数、数据类型转换函数、条件控制函数、系统信息函数、日期和时间函数还有一些其他的常用函数。</p>
+<h3 id="11常量">1.1常量</h3>
+<p>常量也称为文字值或标量值，是指程序运行中值始终不变的量。</p>
+<p>常量的格式取决于它所表示的的值的数据类型。</p>
+<ol>
+<li>
+<p><strong>字符串常量</strong>：是用单引号或者双引号引起来的字符序列。</p>
+<blockquote>
+<p>例如：“I love China”，'Hello,world'。</p>
+</blockquote>
+</li>
+<li>
+<p><strong>数值常量</strong></p>
+<p>数值常量分为整型和实型。整型常量即十进制整数，实型常量分为小数表示和科学计数法。</p>
+<blockquote>
+<p>例如：3.14、1.234E-5表示1.234*10<sup>-5</sup>。</p>
+</blockquote>
+</li>
+<li>
+<p><strong>日期时间常量</strong></p>
+<p>MySQL中，日期时间常量是符合规定格式的字符串。
+格式为：YYYY-MM-DD HH:MM:SS。</p>
+<blockquote>
+<p>例如：
+'17:45:20'表示时间常量
+'2020-05-09 17:47:00'表示日期时间常量。
+'2020-05-09'表示日期常量</p>
+</blockquote>
+<p>但要在合法范围内，如某年的2月31日，是非法的日期时间常量。</p>
+</li>
+<li>
+<p><strong>布尔值常量</strong></p>
+<p>布尔值是用来表示对错的。常量为：true和false。true的值为1，false的值为0。</p>
+</li>
+<li>
+<p><strong>NULL</strong>值</p>
+<p>当表达式运行结果不确定或没有值时，可以用NULL表示，它与任何类型都匹配。如果使用NULL作为运算量参与算术运算、逻辑运算时，运算结果依然是NULL。</p>
+</li>
+</ol>
+<h3 id="12变量">1.2变量</h3>
+<p>变量就是<strong>在程序执行过程中值可以改变的量</strong>。变量用于临时存放数据，变量中的数据随着程序的运行而变化。</p>
+<p>变量由<strong>变量名</strong>和<strong>变量值</strong>构成，变量名用于标识该变量，变量名不能与命令和函数名相同。变量的数据类型与常量一样，它确定了该变量存放值的格式及允许的运算。</p>
+<p>MySQL中的变量3种分类</p>
+<ol>
+<li>系统变量</li>
+<li>用户变量（用户会话变量）</li>
+<li>局部变量</li>
+</ol>
+<h4 id="121系统变量">1.2.1系统变量</h4>
+<p>系统变量用于一些系统参数的设置。</p>
+<p><strong>系统变量在MySQL服务器启动时就被引入并初始化为默认值。</strong></p>
+<p>MySQL有一些特定的设置，当MySQL数据库服务器启动的时候，这些设置被读取来决定下一步骤。</p>
+<blockquote>
+<p>例如，有些设置定义了数据如何被存储，有些设置则影响到处理速度，还有些与日期有关，这些设置就是系统变量。</p>
+</blockquote>
+<p>大多数系统变量应用于其它SQL语句时，必须在名称前加两个<code>@</code>符号，而为了与其它SQL产品保持一致，某些特定的系统变量要省略掉这两个@符号，如<code>CURRENT_DATE</code>（系统日期）、<code>CURRENT_TIME</code>（系统时间）、<code>CURRENT_USER</code>（SQL用户的名字）等。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 获得现在使用的MySQL版本。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @@</span><span style="color:#D73A49;--shiki-dark:#F97583">VERSION</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 获得系统当前时间。</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> CURRENT_TIME;</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 查看当前使用的MySQL的版本信息和当前的系统日期。</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @@</span><span style="color:#D73A49;--shiki-dark:#F97583">VERSION</span><span style="color:#D73A49;--shiki-dark:#F97583"> AS</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '当前MySQL版本'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,CURRENT_DATE;</span></span></code></pre>
+<h4 id="122用户变量用户会话变量">1.2.2用户变量（用户会话变量）</h4>
+<p>用户变量与连接有关。</p>
+<p>以<code>@</code>开始，形式为<code>@变量名</code>。用户会话变量<strong>对大小写不敏感</strong>，命名中不可以用特殊符号，一般情况下，变量不要用中文命名。</p>
+<p>特点：</p>
+<ol>
+<li>一个客户端定义的变量不能被其他客户端看到或使用。</li>
+<li>当客户端退出时，该客户端连接的所有用户变量将<strong>自动释放</strong>。当终端断开与服务器的连接，这些变量就会释放，不再占用服务器的内存。</li>
+<li>为了实现不同SQL语句中进行值的传递，可以把一些数值存储在自定义的用户变量中，不同的SQL语句都可以对它进行访问。</li>
+<li>在使用用户变量前必须先定义和初始化。如果变量没有初始化则它的值为NULL。</li>
+</ol>
+<p>定义方法：</p>
+<ol>
+<li>使用<code>set</code>命令为用户对话变量定义并赋值：</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {@用户会话变量</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">表达式|常量} [,…N];</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- eg.创建用户变量name并赋值为“王林”。</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'王林'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 还可以同时定义多个变量，中间用逗号隔开。</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- eg.创建用户变量user1并赋值为1，user2赋值为2，user3赋值为3。</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @user1</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, @user2</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, @user3</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 定义用户变量时变量值可以是一个表达式。</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- eg.创建用户变量user4，它的值为user3的值加1。</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @user4</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@user3</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">13</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 输出展示select</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @stu_name </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'Tom'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @stu_score</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">99</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @stu_name,@stu_score;</span></span></code></pre>
+<ol start="2">
+<li>使用select语句定义用户会话变量并赋值：</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 语法1</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {@用户会话变量 :</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表达式|常量} [,…N]</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 语法2</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {表达式|常量 </span><span style="color:#D73A49;--shiki-dark:#F97583">into</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @用户会话变量}[,…N]</span></span></code></pre>
+<p>【注意】在语法1中，使用的赋值符号是<code>:=</code>，因为在select语句中，<code>=</code>是关系运算符，表示比较。</p>
+<p>将前面的set语句改成select语法，分别为：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 语法1</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @stu_name:</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'Tom'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,@stu_score:</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">99</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @stu_name, @stu_score;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 语法2</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'Jerry'</span><span style="color:#D73A49;--shiki-dark:#F97583"> into</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @stu_nm;</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @stu_nm;</span></span></code></pre>
+<ol start="3">
+<li>用户会话变量在SQL语句中的应用</li>
+</ol>
+<p>在数据库使用过程中，经常遇到检索出的结果是单个值。有时需要对这些值进行进一步的操作，此时，可以<strong>使用用户会话变量临时保存这些值</strong>，以便下一步的操作。</p>
+<p>会话变量可以直接嵌入到select、insert、update、delete语句的表达式中。</p>
+<p>例如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'1902030102'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@stu_no;</span></span></code></pre>
+<p>在上述命令中，MySQL解析器通过用户会话变量前面的@来区别字段名与用户会话变量之间的区别。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 查询表student中姓名为“秦建兴”的Stu_no，并将该值保存在用户变量id_stu中。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @id_stu </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Stu_no </span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Stu_name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'秦建兴'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@id_stu;</span></span></code></pre>
+<h4 id="123局部变量">1.2.3局部变量</h4>
+<p>局部变量是指定义在存诸函数、触发器、存储过程及事件等存储程序中的变量，这些变量的<strong>作用域范围仅限于所定义的存储程序中，批处理结束后，存储在局部变量中的信息将丢失</strong>。</p>
+<p>说明：局部变量只能在<code>BEGIN…END</code>语句块中声明。</p>
+<p>局部变量必须在存储过程的开头就声明，声明完后，可以在声明它的BEGIN…END语句块中使用该变量，其他语句块中不可以使用它。</p>
+<ol>
+<li>定义方法</li>
+</ol>
+<p>局部变量必须用<code>DECLARE</code>命令定义后才可以使用，语法形式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {变量名列表 数据类型 [default 默认值]}</span></span></code></pre>
+<p>变量的定义必须在存储过程的开头。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">eg.:以下语句声明了两个整型变量和一个字符型变量：</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n1,n2 </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> default</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> s </span><span style="color:#D73A49;--shiki-dark:#F97583">varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
+<ol start="2">
+<li>赋值方法</li>
+</ol>
+<p>使用DECLARE命令声明并创建局部变量之后，如果想要设定局部变量的值，必须使用<code>set</code>命令或者<code>select...into...</code>语句。其语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {变量名</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">表达式}[,…N]</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 或者</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {字段名列表} </span><span style="color:#D73A49;--shiki-dark:#F97583">into</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {变量名列表} [from {表名} where {条件}]</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- declare语句专门用于定义局部变量，可以使用default来说明默认值</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">  declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> age </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> default</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 局部变量的赋值方式一</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">  declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> age </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">  set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> age</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 局部变量的赋值方式二</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">  declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> age </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">  select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> StuAge </span><span style="color:#D73A49;--shiki-dark:#F97583">into</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> age </span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> demo</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">student</span><span style="color:#D73A49;--shiki-dark:#F97583"> where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> StuNo</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'A001'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">13</span></span></code></pre>
+<p>这段语句定义了name和tel两个局部变量，并从student表中检索学号为'180101011'的数据，为name和tel赋值：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#D73A49;--shiki-dark:#F97583"> name</span><span style="color:#D73A49;--shiki-dark:#F97583"> varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tel </span><span style="color:#D73A49;--shiki-dark:#F97583">varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_name,stu_tel </span><span style="color:#D73A49;--shiki-dark:#F97583">into</span><span style="color:#D73A49;--shiki-dark:#F97583"> name</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,tel </span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'180101011'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<h4 id="局部变量与用户会话变量">局部变量与用户会话变量</h4>
+<p>在使用过程中，局部变量与用户会话变量要分清楚，以免犯错。</p>
+<p>二者区别主要有以下两点：</p>
+<p>（1）开头标志不同：用户会话变量是以@开头，而局部变量名不以@开头；
+（2）作用域不同：用户会话变量的作用域是在本次会话期间一直有效，而局部变量是在其定义的存储过程或函数块中有效。</p>
+<h3 id="13运算符与表达式">1.3运算符与表达式</h3>
+<p>运算符是操作数据的符号，能够用来执行算术运算、字符串连接、赋值以及在字段、常量和变量之间进行比较。</p>
+<p>表达式用来表示某个求值规则，它由运算符和配对的圆括号将常量、变量、函数等操作数以合理的形式组合而成。</p>
+<p>每个表达式都产生唯一的值。表达式的类型由运算符的类型决定。从功能角度划分，MySQL中的运算符分为：</p>
+<ol>
+<li>算术运算符</li>
+<li>比较运算符</li>
+<li>逻辑运算符</li>
+<li>位操作运算符。</li>
+</ol>
+<h4 id="131算术运算符与算术表达式">1.3.1算术运算符与算术表达式</h4>
+<p>算术运算符包括加(+)、减(–)、乘(*)、除(/)、求余(%)和求商(div)。</p>
+<p>如果在一个表达式中，出现多个算术运算符，则运算符的优先级顺序为：乘、除、取模运算为同一优先级，加、减运算符的优先级为次。</p>
+<p>如果参与的运算量中，有一个值为NULL，则运算结果也是NULL。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例9-6】算术运算符的使用。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">%</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">--运算结果为：1   1.250000   1</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 25</span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">), </span><span style="color:#005CC5;--shiki-dark:#79B8FF">25</span><span style="color:#24292E;--shiki-dark:#E1E4E8">%(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)	</span><span style="color:#6A737D;--shiki-dark:#6A737D">--运算结果为：1   7</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例9-7】日期类型数据的加与减。</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '2020-05-15'</span><span style="color:#D73A49;--shiki-dark:#F97583"> +</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> interval </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'22'</span><span style="color:#D73A49;--shiki-dark:#F97583"> day</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'2030-05-15'</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">interval </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'22'</span><span style="color:#D73A49;--shiki-dark:#F97583"> day</span></span></code></pre>
+<p>日期（时间）型数据本身是一个数值，可以进行简单的算术运算。<code>interval</code>是关键字，后面的数字表示时间间隔</p>
+<h4 id="132比较算术运算符与比较表达式">1.3.2比较算术运算符与比较表达式</h4>
+<table>
+<thead>
+<tr>
+<th><strong>运算符</strong></th>
+<th><strong>含义</strong></th>
+<th><strong>运算符</strong></th>
+<th><strong>含义</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>=</td>
+<td>等于</td>
+<td>&lt;=&gt;</td>
+<td>相等或者都等于空</td>
+</tr>
+<tr>
+<td>&gt;</td>
+<td>大于</td>
+<td>in</td>
+<td>是否是某个集合内的值</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>小于</td>
+<td>like</td>
+<td>匹配模式</td>
+</tr>
+<tr>
+<td>&gt;=</td>
+<td>大于或者等于</td>
+<td>between...and...</td>
+<td>是否在某个区间内</td>
+</tr>
+<tr>
+<td>&lt;=</td>
+<td>小于或者等于</td>
+<td>is  null</td>
+<td>是否都为空</td>
+</tr>
+<tr>
+<td>&lt;&gt;、!=</td>
+<td>不等于</td>
+<td>regexp</td>
+<td>正则表达式匹配模式</td>
+</tr>
+</tbody>
+</table>
+<p>比较表达式用于Where子句及流程控制语句中，过滤复合搜索条件的行。</p>
+<h4 id="133逻辑算术运算符与逻辑表达式">1.3.3逻辑算术运算符与逻辑表达式</h4>
+<table>
+<thead>
+<tr>
+<th><strong>运算符</strong></th>
+<th><strong>含义</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>and  或  &amp;&amp;</td>
+<td>逻辑与</td>
+</tr>
+<tr>
+<td>or 或  ||</td>
+<td>逻辑或</td>
+</tr>
+<tr>
+<td>not  或！</td>
+<td>逻辑非</td>
+</tr>
+<tr>
+<td>xor</td>
+<td>异或</td>
+</tr>
+</tbody>
+</table>
+<h4 id="134运算符的优先级">1.3.4运算符的优先级</h4>
+<p>当一个复杂的表达式中包含多种运算符时，运算符的优先顺序将决定表达式的计算和比较顺序。在MySQL中，运算符的优先等级<strong>从高到低</strong>的顺序如下。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>+(正)、–(负)、~(位求反)</span></span>
+<span class="line"><span class="line-number">2</span><span>*(乘)、/(除)、%(求余)</span></span>
+<span class="line"><span class="line-number">3</span><span>+(加)、–(减)</span></span>
+<span class="line"><span class="line-number">4</span><span>=、>、&#x3C;、>=、&#x3C;=、&#x3C;>、!=、!>、!&#x3C;比较运算符</span></span>
+<span class="line"><span class="line-number">5</span><span>^(位异或)、&#x26;(位与)、|(位或)</span></span>
+<span class="line"><span class="line-number">6</span><span>NOT</span></span>
+<span class="line"><span class="line-number">7</span><span>AND、BETWEEN…AND…、IN、LIKE、OR</span></span>
+<span class="line"><span class="line-number">8</span><span>=(赋值)</span></span></code></pre>
+<h3 id="14-begin-end语句块">1.4 begin-end语句块</h3>
+<p><code>BEGIN…END</code>可以定义SQL语句块，这些语句块作为一组语句执行，并且允许语句嵌套。</p>
+<p>其基本语法结构如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">   语句序列</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span></span></code></pre>
+<p><strong>局部变量的声明应该位于语句块开始的部分，在语句块内部声明的局部变量，作用域仅为语句块内部</strong>。</p>
+<p>其中，开始标签与结束标签必须相同。</p>
+<p>在MySQL中，单独使用begin-end语句没有意义，只有将begin-end放在存储过程、函数、触发器以及事件等内部才有意义。</p>
+<h3 id="15条件控制语句">1.5条件控制语句</h3>
+<p>条件控制语句分为两种，一种是<code>if</code>语句，另一种是<code>case</code>语句。</p>
+<h4 id="151-if语句">1.5.1 if语句</h4>
+<p><code>IF-THEN-ELSE</code>语句用于控制程序根据不同的条件执行不同的操作。其基本语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">IF</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 条件表达式1 </span><span style="color:#D73A49;--shiki-dark:#F97583">THEN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 语句序列1</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[ELSEIF 条件表达式2 THEN 语句序列2]…</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[ELSE 语句序列n]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#D73A49;--shiki-dark:#F97583"> IF</span></span></code></pre>
+<p><code>IF…else</code>语句可以嵌套使用，而且嵌套层数没有限制。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 判断输入的两个参数x和y的大小关系，并将结构放在变量result中。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">IF</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> x</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">y </span><span style="color:#D73A49;--shiki-dark:#F97583">THEN</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583"> 	SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> result</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">' x大于y '</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">ELSEIF x</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">y </span><span style="color:#D73A49;--shiki-dark:#F97583">THEN</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583"> 	SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> result</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ' x等于y '</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">ELSE</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">	      SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> result</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ' x小于y '</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#D73A49;--shiki-dark:#F97583"> IF</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p>下面这段代码定义了一个函数，函数用参数来表示要查询的课程代码，如果此门课程已经开设过，则返回这门课程的平均分，否则返回0。调用函数时，注意语法和参数格式。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter $$</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> find_course</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(cno </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)) </span><span style="color:#D73A49;--shiki-dark:#F97583">returns</span><span style="color:#D73A49;--shiki-dark:#F97583"> float</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">reads </span><span style="color:#D73A49;--shiki-dark:#F97583">sql</span><span style="color:#D73A49;--shiki-dark:#F97583"> data</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">begin</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">    declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">    declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> avg_score </span><span style="color:#D73A49;--shiki-dark:#F97583">float</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">    select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> count</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">into</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num </span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">cno;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(num</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">    then</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">       select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> avg</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(score) </span><span style="color:#D73A49;--shiki-dark:#F97583">into</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> avg_score </span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">cno;</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">    else</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">       set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> avg_score</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span><span style="color:#D73A49;--shiki-dark:#F97583"> if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> avg_score;</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$$</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter ;</span></span></code></pre>
+<h4 id="152-case语句">1.5.2 case语句</h4>
+<p>Case语句用于实现比if语句分支更为复杂的条件判断，其语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CASE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表达式</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    WHEN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 值1 </span><span style="color:#D73A49;--shiki-dark:#F97583">THEN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 语句块1</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">    WHEN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 值2 </span><span style="color:#D73A49;--shiki-dark:#F97583">THEN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 语句块2</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	    …</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    [ELSE 语句序列n]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#D73A49;--shiki-dark:#F97583"> CASE</span></span></code></pre>
+<p>其中，测试表达式的值必须与测试值的数据类型相同，<strong>测试表达式可以是局部变量，也可以是表中的字段变量名，还可以是用运算符连接起来的表达式</strong>。</p>
+<p>执行case表达式时，会按顺序将测试表达式的值与测试值逐个进行比较，只要发现一个相等，则执行相应的语句块，case语句执行结束。否则，将执行else中的语句，case表达式执行结束。</p>
+<p>在case表达式中，若同时有多个测试值与测试表达式的值相同，则只返回第一个与测试表达式值相同的when子句后的结果。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例9-13】显示“成绩”表中的数据，并使用case语句将课程号替换为课程名。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> get_course_name</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(c_no </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)) </span><span style="color:#D73A49;--shiki-dark:#F97583">returns</span><span style="color:#D73A49;--shiki-dark:#F97583"> varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">no</span><span style="color:#D73A49;--shiki-dark:#F97583"> sql</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">begin</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">    declare</span><span style="color:#D73A49;--shiki-dark:#F97583"> name</span><span style="color:#D73A49;--shiki-dark:#F97583"> varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">    case</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> c_no</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">     when</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '010001'</span><span style="color:#D73A49;--shiki-dark:#F97583"> then</span><span style="color:#D73A49;--shiki-dark:#F97583"> set</span><span style="color:#D73A49;--shiki-dark:#F97583"> name=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'大学计算机基础'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">     when</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '010002'</span><span style="color:#D73A49;--shiki-dark:#F97583"> then</span><span style="color:#D73A49;--shiki-dark:#F97583"> set</span><span style="color:#D73A49;--shiki-dark:#F97583"> name=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'数据结构'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">     when</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '010003'</span><span style="color:#D73A49;--shiki-dark:#F97583"> then</span><span style="color:#D73A49;--shiki-dark:#F97583"> set</span><span style="color:#D73A49;--shiki-dark:#F97583"> name=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'数据库原理'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">     when</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '010004'</span><span style="color:#D73A49;--shiki-dark:#F97583"> then</span><span style="color:#D73A49;--shiki-dark:#F97583"> set</span><span style="color:#D73A49;--shiki-dark:#F97583"> name=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'操作系统原理'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">   else</span><span style="color:#D73A49;--shiki-dark:#F97583"> set</span><span style="color:#D73A49;--shiki-dark:#F97583"> name=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'非计算机专业课'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">  end</span><span style="color:#D73A49;--shiki-dark:#F97583"> case</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">  return</span><span style="color:#D73A49;--shiki-dark:#F97583"> name</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$$</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter ;</span></span></code></pre>
+<h3 id="16循环语句">1.6循环语句</h3>
+<p>MySQL中提供了三种循环语句：</p>
+<ol>
+<li><strong>while</strong></li>
+<li><strong>repeat</strong></li>
+<li><strong>loop</strong></li>
+</ol>
+<p>用<code>iterate</code>语句及<code>leave</code>语句用来循环的内部控制。</p>
+<h4 id="161-while语句">1.6.1 while语句</h4>
+<p>利用循环语句while可以有条件地重复执行一个SQL语句或语句块。其语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[循环标签:]</span><span style="color:#D73A49;--shiki-dark:#F97583">while</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 条件表达式 do</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">   循环体;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#D73A49;--shiki-dark:#F97583"> while</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[循环标签];</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】使用WHILE语句创建一个执行5次的循环。</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a </span><span style="color:#D73A49;--shiki-dark:#F97583">INT</span><span style="color:#D73A49;--shiki-dark:#F97583"> DEFAULT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">WHILE</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  a </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> DO</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">	SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#D73A49;--shiki-dark:#F97583"> WHILE</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p>一些例子</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例9-14】用while语句计算2的n次方。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> pow_2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">returns</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">no</span><span style="color:#D73A49;--shiki-dark:#F97583"> sql</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">begin</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">   declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> default</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">   declare</span><span style="color:#D73A49;--shiki-dark:#F97583"> start</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span><span style="color:#D73A49;--shiki-dark:#F97583"> default</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">while</span><span style="color:#D73A49;--shiki-dark:#F97583"> start&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">n do</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">     set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">my_result</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">     set</span><span style="color:#D73A49;--shiki-dark:#F97583"> start=start+</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#D73A49;--shiki-dark:#F97583"> while</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">   return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result;</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$$</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter ;</span></span>
+<span class="line"><span class="line-number">15</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例9-15】改写例9-14，要求使用iterate和leave语句。</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter $$</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> pow1_2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">returns</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">no</span><span style="color:#D73A49;--shiki-dark:#F97583"> sql</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">begin</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#D73A49;--shiki-dark:#F97583">      declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> default</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      time_num:</span><span style="color:#D73A49;--shiki-dark:#F97583">while</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> true do</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#D73A49;--shiki-dark:#F97583">          set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">my_result</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#D73A49;--shiki-dark:#F97583">          set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">n</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#D73A49;--shiki-dark:#F97583">          if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#D73A49;--shiki-dark:#F97583"> then</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#24292E;--shiki-dark:#E1E4E8">              iterate time_num;</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#D73A49;--shiki-dark:#F97583">          end</span><span style="color:#D73A49;--shiki-dark:#F97583"> if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#24292E;--shiki-dark:#E1E4E8">          leave time_num;</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#D73A49;--shiki-dark:#F97583">      end</span><span style="color:#D73A49;--shiki-dark:#F97583"> while</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> time_num;</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#D73A49;--shiki-dark:#F97583">      return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result;</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$$</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimeter ;</span></span></code></pre>
+<h4 id="162-repeat语句">1.6.2 repeat语句</h4>
+<p>repeat语句与while语句正好相反，当条件当假时，反复执行循环体，直到条件为真，退出循环。语法如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[循环标签:]</span><span style="color:#D73A49;--shiki-dark:#F97583">repeat</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">     循环体</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">until 条件表达式</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#D73A49;--shiki-dark:#F97583"> repeat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[循环标签];</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】用REPEAT语句创建一个执行5次的循环。</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a </span><span style="color:#D73A49;--shiki-dark:#F97583">INT</span><span style="color:#D73A49;--shiki-dark:#F97583"> DEFAULT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">REPEAT</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	a </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">UNTIL a </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#D73A49;--shiki-dark:#F97583"> REPEAT</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">12</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例9-16】用repeat改写例9-13。</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter $$</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> pow2_2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">returns</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">no</span><span style="color:#D73A49;--shiki-dark:#F97583"> sql</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">begin</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> default</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#D73A49;--shiki-dark:#F97583"> start</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span><span style="color:#D73A49;--shiki-dark:#F97583"> default</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">repeat</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#D73A49;--shiki-dark:#F97583">     set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">my_result</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#D73A49;--shiki-dark:#F97583">     set</span><span style="color:#D73A49;--shiki-dark:#F97583"> start=</span><span style="color:#D73A49;--shiki-dark:#F97583"> start+</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#24292E;--shiki-dark:#E1E4E8">until </span><span style="color:#D73A49;--shiki-dark:#F97583">start=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">n</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#D73A49;--shiki-dark:#F97583"> repeat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result;</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$$</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter ;</span></span></code></pre>
+<h4 id="163-loop语句">1.6.3 loop语句</h4>
+<p>loop语句是一种特殊的循环，本身没有停止循环的语句，所以，loop语句必须借助leave语句跳出循环，语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[循环标签:]</span><span style="color:#D73A49;--shiki-dark:#F97583">loop</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">   循环体</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">   if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 条件表达式 </span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">      leave [循环标签];</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">   end</span><span style="color:#D73A49;--shiki-dark:#F97583"> if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#D73A49;--shiki-dark:#F97583"> loop</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】使用LOOP语句创建一个执行5次的循环。</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">label1: </span><span style="color:#D73A49;--shiki-dark:#F97583">LOOP</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">  SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">  IF</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#D73A49;--shiki-dark:#F97583"> THEN</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    LEAVE label1;</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">  END</span><span style="color:#D73A49;--shiki-dark:#F97583"> IF</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#D73A49;--shiki-dark:#F97583"> LOOP</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> label1;</span></span>
+<span class="line"><span class="line-number">16</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例9-17】使用loop语句实现2的n次方的功能。</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter $$</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> pow3_2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">returns</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">no</span><span style="color:#D73A49;--shiki-dark:#F97583"> sql</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#D73A49;--shiki-dark:#F97583">begin</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> default</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#D73A49;--shiki-dark:#F97583"> start</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span><span style="color:#D73A49;--shiki-dark:#F97583"> default</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#24292E;--shiki-dark:#E1E4E8">time_2:</span><span style="color:#D73A49;--shiki-dark:#F97583">loop</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#D73A49;--shiki-dark:#F97583">     set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">my_result</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#D73A49;--shiki-dark:#F97583">     set</span><span style="color:#D73A49;--shiki-dark:#F97583"> start=</span><span style="color:#D73A49;--shiki-dark:#F97583"> start+</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">start=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">n) </span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    leave time_2;</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#D73A49;--shiki-dark:#F97583"> if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#D73A49;--shiki-dark:#F97583"> loop</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> my_result;</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$$</span></span>
+<span class="line"><span class="line-number">33</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter ;</span></span></code></pre>
+<h3 id="17重置命令结束标记">1.7重置命令结束标记</h3>
+<p>在语句块中，通常存在多条语句，语法规定，有很多语句结束时需要结束标记，而这种结束标记与整个语句块结束标记如果相同，势必造成冲突，使得语句块被拆分。</p>
+<p>解决方法是设置一个不同的结束标记，在写语句块之前设置好，在语句块结束后，重新设置回来。语法记为：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>delimiter 命令结束标记</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>这里的命令结束标记被使得较多的是：$$、;;、//。</span></span></code></pre>
+<p>例如在窗口中输入：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter </span><span style="color:#D73A49;--shiki-dark:#F97583">//</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_name </span><span style="color:#D73A49;--shiki-dark:#F97583">like</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '张_'</span><span style="color:#D73A49;--shiki-dark:#F97583"> //</span></span></code></pre>
+<p>此时语句的结束标记变为<code>//</code>，而接下来的执行语句<code>delimiter </code>；可以将结束标志重新置为<code>;</code>。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">delimiter ;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span><span style="color:#D73A49;--shiki-dark:#F97583">where</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_name </span><span style="color:#D73A49;--shiki-dark:#F97583">like</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '张_'</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ;</span></span></code></pre>
+<h3 id="18注释">1.8注释</h3>
+<p>注释是程序代码中不被执行的文本字符串，用于对代码进行说明或进行整段的部分语句。</p>
+<p>MySQL支持以下3中注释方式：</p>
+<ol>
+<li><code>#</code>：从#到行尾都是注释内容。</li>
+<li><code>--</code>：从--到行尾都是注释内容，注意--后面必须有一个空格。</li>
+<li><code>/*  */</code>：/* 和 */之间的所有内容都是注释，通常用于多行注释。</li>
+</ol>
+<h2 id="2系统函数">2.系统函数</h2>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

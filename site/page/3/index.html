@@ -1,13 +1,397 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="night">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=/page/2/">
-  <link rel="canonical" href="/page/2/">
-  <title>页面已迁移</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
 </head>
 <body>
-  <p>该页面已迁移到 <a href="/page/2/">/page/2/</a>，正在自动跳转……</p>
-  <p>如果没有自动跳转，请点击上方链接。</p>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link is-active" aria-current="page">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/" class="is-active" aria-current="page">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout" tabindex="-1">
+    <div class="content-rail">
+      <div class="content-main">
+<section class="hero">
+  <p class="hero-eyebrow">Technical notes · essays · interactive works</p>
+  <h1 class="hero-title">夜里读书，纸上写笔记，偶尔做一点小作品。</h1>
+  <p class="hero-copy">这里是 suhan 的个人博客：技术自查表、读书随笔和 2 个手作交互页，全部由 Markdown 或 HTML 在构建期生成。</p>
+</section>
+
+<section class="posts-section">
+  <div class="section-heading">
+    <h2 class="section-title">Latest</h2>
+    <p class="section-note">10 notes · newest first</p>
+  </div>
+
+  <div class="post-list">
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/llm-api-tuning/" class="card-link">
+      <h3 class="post-title">LLM API 调参</h3>
+    </a>
+
+    <p class="post-summary">解释 temperature、top_p、top_k 等 LLM API 采样参数的作用和调参思路。</p>
+  </div>
+</article>
+
+<article class="post-card" data-category="it">
+  <div class="post-media" data-category="it" aria-hidden="true">
+    <img src="https://www.runoob.com/wp-content/uploads/2026/02/d689a96f-f89a-4a55-83d7-fe5aa789d836.png" alt="" class="post-cover" loading="lazy" decoding="async">
+  </div>
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/llm-basics/" class="card-link">
+      <h3 class="post-title">LLM 基础</h3>
+    </a>
+
+    <p class="post-summary">介绍大语言模型、Transformer、vLLM 推理引擎和 MoE 架构的基础概念。</p>
+  </div>
+</article>
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/prompt-engineering/" class="card-link">
+      <h3 class="post-title">Prompt Engineering</h3>
+    </a>
+
+    <p class="post-summary">整理 Prompt Engineering 中的 Token、上下文窗口、结构化提示和常用技巧。</p>
+  </div>
+</article>
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/moe-architecture/" class="card-link">
+      <h3 class="post-title">大模型 MoE 架构资料</h3>
+    </a>
+
+    <p class="post-summary">汇总大模型 MoE 架构与 DeepSeek MoE 的两篇外部解析文章。</p>
+  </div>
+</article>
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/model-compression/" class="card-link">
+      <h3 class="post-title">模型量化、蒸馏和剪枝</h3>
+    </a>
+
+    <p class="post-summary">汇总一篇关于模型量化、蒸馏和剪枝的外部文章。</p>
+  </div>
+</article>
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/markdown/" class="post-category">
+        it / Markdown      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/markdown-math/" class="card-link">
+      <h3 class="post-title">Markdown 中数学公式编辑</h3>
+    </a>
+
+    <p class="post-summary">整理 Markdown/LaTeX 数学公式的行内与块级写法、希腊字母、上下标和括号等语法。</p>
+  </div>
+</article>
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/markdown/" class="post-category">
+        it / Markdown      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/mermaid-diagrams/" class="card-link">
+      <h3 class="post-title">Mermaid 画图</h3>
+    </a>
+
+    <p class="post-summary">介绍 Mermaid 的节点、连线、子图和常见图表写法。</p>
+  </div>
+</article>
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/markdown/" class="post-category">
+        it / Markdown      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/typora-license-analysis/" class="card-link">
+      <h3 class="post-title">Typora 授权与激活机制分析</h3>
+    </a>
+
+    <p class="post-summary">分析 Typora 免费激活方案的凭证签发、机器绑定和校验机制。</p>
+  </div>
+</article>
+
+<article class="post-card" data-category="it">
+  <div class="post-media" data-category="it" aria-hidden="true">
+    <img src="/assets/images/break-even-analysis/10%E4%BA%A7%E5%93%81%E6%88%90%E6%9C%AC.jpg" alt="" class="post-cover" loading="lazy" decoding="async">
+  </div>
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/operations-research/" class="post-category">
+        it / 运筹学      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/break-even-analysis/" class="card-link">
+      <h3 class="post-title">盈亏分析模型</h3>
+    </a>
+
+    <p class="post-summary">介绍盈亏分析、盈亏平衡分析、产品成本结构和成品销售分析。</p>
+  </div>
+</article>
+
+<article class="post-card no-cover" data-category="it">
+
+  <div class="post-body-area">
+    <div class="post-meta">
+      <a href="/categories/it/operations-research/" class="post-category">
+        it / 运筹学      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+    </div>
+
+    <a href="/posts/simulation-basics/" class="card-link">
+      <h3 class="post-title">模拟的基本概念</h3>
+    </a>
+
+    <p class="post-summary">介绍模拟的概念、使用原因、系统模拟过程和模拟的不足。</p>
+  </div>
+</article>
+  </div>
+
+
+<nav class="pagination" aria-label="文章分页">
+  <a href="/page/2/" class="page-prev">Previous</a>
+
+  <a href="/">1</a>
+  <a href="/page/2/">2</a>
+  <a aria-current="page" class="is-active">3</a>
+  <a href="/page/4/">4</a>
+  <a href="/page/5/">5</a>
+  <a href="/page/6/">6</a>
+  <a href="/page/7/">7</a>
+
+  <a href="/page/4/" class="page-next">Next</a>
+</nav>
+</section>
+      </div>
+
+<aside class="rail" aria-label="站点索引">
+  <section class="rail-card works-rail" aria-labelledby="works-title">
+    <div class="rail-heading">
+      <h2 class="rail-title" id="works-title">Works</h2>
+      <span class="works-count">2</span>
+    </div>
+    <div class="works-rail-list">
+      <a href="/custom/divergence-meter/" class="works-rail-item" data-accent="night">
+        <span class="works-rail-mark" aria-hidden="true">DM</span>
+        <span class="works-rail-copy">
+          <span class="works-rail-name">Divergence Meter</span>
+          <span class="works-rail-meta">交互页 · acgn</span>
+        </span>
+        <span class="works-rail-arrow bi bi-arrow-up-right" aria-hidden="true"></span>
+      </a>
+      <a href="/custom/happy-new-year/" class="works-rail-item" data-accent="gold">
+        <span class="works-rail-mark" aria-hidden="true">NY</span>
+        <span class="works-rail-copy">
+          <span class="works-rail-name">Happy New Year</span>
+          <span class="works-rail-meta">节令页 · acgn</span>
+        </span>
+        <span class="works-rail-arrow bi bi-arrow-up-right" aria-hidden="true"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="rail-card">
+    <h2 class="rail-title">Categories</h2>
+    <ul class="rail-links">
+      <li><a href="/categories/acgn/">acgn</a></li>
+      <li><a href="/categories/essay/">essay</a></li>
+      <li><a href="/categories/it/">it</a></li>
+    </ul>
+  </section>
+
+  <section class="rail-card">
+    <h2 class="rail-title">Tags</h2>
+    <div class="rail-tags">
+      <a href="/tags/agent/" class="rail-tag">#agent</a>
+      <a href="/tags/c/" class="rail-tag">#c</a>
+      <a href="/tags/cpp/" class="rail-tag">#cpp</a>
+      <a href="/tags/database/" class="rail-tag">#database</a>
+      <a href="/tags/essay/" class="rail-tag">#essay</a>
+      <a href="/tags/game/" class="rail-tag">#game</a>
+      <a href="/tags/git/" class="rail-tag">#git</a>
+      <a href="/tags/linux/" class="rail-tag">#linux</a>
+      <a href="/tags/llm/" class="rail-tag">#llm</a>
+      <a href="/tags/markdown/" class="rail-tag">#markdown</a>
+      <a href="/tags/operations-research/" class="rail-tag">#operations-research</a>
+      <a href="/tags/prompt/" class="rail-tag">#prompt</a>
+      <a href="/tags/python/" class="rail-tag">#python</a>
+      <a href="/tags/rag/" class="rail-tag">#rag</a>
+      <a href="/tags/security/" class="rail-tag">#security</a>
+      <a href="/tags/static-site/" class="rail-tag">#static-site</a>
+      <a href="/tags/wechat/" class="rail-tag">#wechat</a>
+      <a href="/tags/workflow/" class="rail-tag">#workflow</a>
+    </div>
+  </section>
+
+  <section class="rail-card">
+    <h2 class="rail-title">Elsewhere</h2>
+    <ul class="rail-links">
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/feed.xml">RSS</a></li>
+      <li><a href="/sitemap.xml">Sitemap</a></li>
+    </ul>
+  </section>
+</aside>
+    </div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
 </body>
 </html>

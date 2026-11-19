@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>线性规划 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">线性规划</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%AC%AC%E4%BA%94%E7%AB%A0-%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%92">第五章 线性规划</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%80%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%99">一、线性规则</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%AE%9A%E4%B9%89">定义</a></li>
+<li class="toc-item toc-level-4"><a href="#%E7%9B%AE%E7%9A%84">目的</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%9F%BA%E6%9C%AC%E7%89%B9%E7%82%B9">基本特点</a></li>
+<li class="toc-item toc-level-4"><a href="#%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%92%E8%AF%8D%E8%AF%AD%E8%A7%A3%E9%87%8A">线性规划词语解释</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%8C%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%92%E7%9A%84%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84">二、线性规划的模型结构</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%89%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%92%E5%BB%BA%E6%A8%A1%E7%9A%84%E6%AD%A5%E9%AA%A4">三、线性规划建模的步骤</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9B%9B%E5%9B%BE%E8%A7%A3%E6%B3%95">四、图解法</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4">步骤</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%94%E5%8D%95%E7%BA%AF%E5%BD%A2%E6%B3%95p76">五、单纯形法P76</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-2">步骤</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8D%95%E7%BA%AF%E5%BD%A2%E8%A1%A8%E8%BF%9B%E8%A1%8C%E8%BF%AD%E4%BB%A3%E6%AD%A5%E9%AA%A4">单纯形表进行迭代步骤</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8D%95%E7%BA%AF%E5%BD%A2%E8%A1%A8%E5%87%A0%E4%B8%AA%E6%A6%82%E5%BF%B5">单纯形表几个概念</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/operations-research/" class="post-category">
+        it / 运筹学      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/operations-research/">#operations-research</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">线性规划</h1>
+
+    <div class="post-body">
+<h1 id="第五章-线性规划">第五章 线性规划</h1>
+<h3 id="一线性规则">一、线性规则</h3>
+<h4 id="定义">定义</h4>
+<p>线性规划是一种合理利用资源，合理调配资源的<strong>应用数学方法</strong>。</p>
+<h4 id="目的">目的</h4>
+<p>在现有人力、物力和财力等资源条件下，合理地加以利用和调配使我们在实现预期目标的过程中，耗费资源最少，获得收益最大。</p>
+<h4 id="基本特点">基本特点</h4>
+<p>基本特点是<strong>模型中的线性函数</strong></p>
+<h4 id="线性规划词语解释">线性规划词语解释</h4>
+<ul>
+<li><strong>线性</strong>：是用来描述两个或多个变量之间成正比例的。</li>
+<li><strong>规划</strong>：是指使用某种数学方法使有限资源的运用，达到最优化。</li>
+</ul>
+<p><strong>线性规划</strong>：是一种合理的利用资源、合理调配资源的应用数学方法</p>
+<h3 id="二线性规划的模型结构">二、线性规划的模型结构</h3>
+<ul>
+<li>变量：根据需求自己设出变量</li>
+<li>目标函数：把想要实现的目标公式化</li>
+<li>约束条件：实现目标的限制因素</li>
+<li>变量非负：变量的取值应大于等于0</li>
+</ul>
+<h3 id="三线性规划建模的步骤">三、线性规划建模的步骤</h3>
+<ol>
+<li>明确问题，确定目标，列出约束因素</li>
+<li>收集资料，确立模型</li>
+<li>模型求解与检验</li>
+<li>优化后分析</li>
+</ol>
+<p>其中较为困难的是<strong>建立模型</strong>；建模的关键是提出问题，明确问题，确定目标；花时间、精力最大的是收集资料和数据。</p>
+<h3 id="四图解法">四、图解法</h3>
+<p>又称为“几何解法”，一般只适用于2~3个变量的线性规划问题。</p>
+<ul>
+<li>可行解：满足约束条件的解</li>
+<li>可行解区：全部可行解所分布的区域</li>
+<li>等值线： 可过行解区的凸点交点并行于目标函数的直线，分为等成本线和等利润线</li>
+</ul>
+<h4 id="步骤">步骤</h4>
+<ol>
+<li>根据所给的约束条件，视为等于来画出图</li>
+<li>在可行解区中，求出变量x（x1, x2...）满足目标函数的最优解</li>
+<li>将x代入线性规划模型求出最优值</li>
+</ol>
+<h3 id="五单纯形法p76">五、单纯形法P76</h3>
+<p>它是一种解线性规划的常用方法，是通过一种数学的迭代过程，逐步求得最优解的方法。</p>
+<h4 id="步骤-2">步骤</h4>
+<ol>
+<li>引入剩余变量或松弛变量，把约束方程中的不等式变为等式，新变量在目标函数中系数为0</li>
+<li>观察有无基变量，若有则本步省略，如无则引入人工虚拟变量，凑出基变量，人工变量在目标函数中系数为M，是个极大的正数</li>
+</ol>
+<h3 id="单纯形表进行迭代步骤">单纯形表进行迭代步骤</h3>
+<ol>
+<li>
+<p>判断是否最优： 表中最后一行为辨别指数行，求最大值时，数值都小于等于0时最优，最小值时相反，若最优则停止，不是最优继续下一步</p>
+</li>
+<li>
+<p>确定入基变量和出基变量：最后一行数值正数中最大的（或）负数中最小的）所对应的列变量最为最大值问题（或最小值问题）的入基变量；最后一列数值与入基变量多对应系数比值最小的数值对应的行变量做为出基变量</p>
+</li>
+<li>
+<p>迭代：入基变量取代出基变量进行系数转换</p>
+</li>
+<li>
+<p>重复1，2，3 过程直至最优</p>
+</li>
+</ol>
+<h3 id="单纯形表几个概念">单纯形表几个概念</h3>
+<ul>
+<li>设约束方程的个数为m ， 变量的个数为n， m&lt;n时（变量个数多于方程个数），可把变量分为<strong>基变量</strong>和<strong>非基变量</strong>两部分，基变量个数=方程个数=m , 非基变量个数= n-m。</li>
+<li>所有的非基变量都等于0时求出的特解我们称为<strong>基解</strong>或<strong>基础解</strong>，基解非负要求时叫做<strong>非负基解</strong>，也叫<strong>可行解</strong>。</li>
+<li>一个线性规划问题若有最优解，那么此最优解必定是某个基变量组的可行基解，由于每个基变量组的基解，不一定是可行的，即使是可行的，也不一定是最优的，所以求最优解的任务就在于可行基解中，找到最优的可行基解。</li>
+<li>松弛变量（辅助变量）：例如约束条件2x1+4x2&lt;=80，进入引入松弛变量k，就得到2x1+4x2+k=80。这里的k就是松弛变量。</li>
+<li>一般来说，引入的松弛变量k就是基变量</li>
+</ul>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

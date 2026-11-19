@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>决策分析 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">决策分析</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-%E5%86%B3%E7%AD%96">第三章 决策</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%80%E5%86%B3%E7%AD%96">一、决策</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%8C%E5%86%B3%E7%AD%96%E7%9A%84%E5%88%86%E7%B1%BB">二、决策的分类</a></li>
+<li class="toc-item toc-level-4"><a href="#1%E5%86%B3%E7%AD%96%E6%96%B9%E6%B3%95%E5%88%86%E7%B1%BB">1决策方法分类</a></li>
+<li class="toc-item toc-level-4"><a href="#2%E8%AE%A1%E5%88%92%E5%92%8C%E6%8E%A7%E5%88%B6%E5%85%B3%E7%B3%BB%E5%88%86%E7%B1%BB">2计划和控制关系分类</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%89%E5%86%B3%E7%AD%96%E7%9A%84%E7%A8%8B%E5%BA%8F">三、决策的程序</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9B%9B%E5%9C%A8%E4%B8%8D%E5%90%8C%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%9A%84%E5%86%B3%E7%AD%96">四、在不同环境下的决策</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%94%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%9D%A1%E4%BB%B6%E4%B8%8B%E7%9A%84%E5%86%B3%E7%AD%96">五、不确定条件下的决策</a></li>
+<li class="toc-item toc-level-4"><a href="#51%E6%9C%80%E5%A4%A7%E6%9C%80%E5%A4%A7%E5%86%B3%E7%AD%96%E6%A0%87%E5%87%86">5.1、最大最大决策标准</a></li>
+<li class="toc-item toc-level-4"><a href="#52%E6%9C%80%E5%A4%A7%E6%9C%80%E5%B0%8F%E5%86%B3%E7%AD%96%E6%A0%87%E5%87%86">5.2、最大最小决策标准</a></li>
+<li class="toc-item toc-level-4"><a href="#53%E6%9C%80%E5%B0%8F%E6%9C%80%E5%A4%A7%E9%81%97%E6%86%BE%E5%80%BC%E5%86%B3%E7%AD%96%E6%A0%87%E5%87%86">5.3、最小最大遗憾值决策标准</a></li>
+<li class="toc-item toc-level-4"><a href="#54%E7%8E%B0%E5%AE%9E%E4%B8%BB%E4%B9%89%E5%86%B3%E7%AD%96%E6%A0%87%E5%87%86">5.4、现实主义决策标准</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%85%AD%E9%A3%8E%E9%99%A9%E6%9D%A1%E4%BB%B6%E4%B8%8B%E7%9A%84%E5%86%B3%E7%AD%96">六、风险条件下的决策</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%9C%9F%E6%9C%9B">期望</a></li>
+<li class="toc-item toc-level-4"><a href="#61%E6%9C%80%E5%A4%A7%E6%9C%9F%E6%9C%9B%E6%94%B6%E7%9B%8A%E5%80%BC%E6%A0%87%E5%87%86">6.1、最大期望收益值标准</a></li>
+<li class="toc-item toc-level-4"><a href="#62%E6%9C%80%E5%B0%8F%E6%9C%9F%E6%9C%9B%E6%8D%9F%E5%A4%B1%E5%80%BC%E6%A0%87%E5%87%86">6.2、最小期望损失值标准</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%83%E5%86%B3%E7%AD%96%E6%A0%91">七、决策树</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%86%B3%E7%AD%96%E6%A0%91%E7%9A%84%E4%BC%98%E7%82%B9">决策树的优点</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/operations-research/" class="post-category">
+        it / 运筹学      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/operations-research/">#operations-research</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">决策分析</h1>
+
+    <div class="post-body">
+<h1 id="第三章-决策">第三章 决策</h1>
+<h3 id="一决策">一、决策</h3>
+<p>狭义：决策是对一些可供选择的方案做出选择</p>
+<p>广义：包括明确决策项目的目的，寻求可行的方案，在诸可行方案中进行决策，对选定的方案经过实施后的结果进行总结评价</p>
+<p><strong>决策是行动的基础</strong>。</p>
+<p><strong>管理的关键在于决策</strong>。</p>
+<h3 id="二决策的分类">二、决策的分类</h3>
+<h4 id="1决策方法分类">1决策方法分类</h4>
+<ol>
+<li>
+<p><strong>常规性决策</strong>：常规性决策实例的重复性的决策。
+例如：家庭或食堂打算购买粮食；汽车司机在行驶途中决定超车。</p>
+</li>
+<li>
+<p><strong>特殊型决策</strong>：特殊型决策是对特殊性的，没有先例可循的新问题的决策。
+例如：一个快要高中毕业的学生需要报考高中毕业的学生需要报考大学专业，以及某个工厂计划引进某种新设备</p>
+</li>
+</ol>
+<h4 id="2计划和控制关系分类">2计划和控制关系分类</h4>
+<ol>
+<li><strong>计划性决策</strong>：国家或组织的方针政策以及较长时期的计划</li>
+<li><strong>控制性决策</strong>：是在执行方针政策或实施计划过程中，需要作出的决策。包括执行政策或实施计划的决策以及当政策或计划根据实际情况进行调整时的决策。
+计划性决策大多属于特殊性决策，控制性决策有特殊的，有常规的。</li>
+</ol>
+<blockquote>
+<p>在执行方针政策和实施计划的过程中，需要作出的决策属于（C）</p>
+<p>A.常规决策B.特殊性决策C.控制性决策D.计划性决策</p>
+</blockquote>
+<h3 id="三决策的程序">三、决策的程序</h3>
+<ol>
+<li><strong>确定目标</strong>，确定目标是决策的前提</li>
+<li><strong>拟定多个可行方案</strong>。拟定可行方案，是科学决策的关键</li>
+<li><strong>预测可能发生的自然状态，计算不同方案在不同的自然状态下的收益值</strong>（损失值），编制决策收益表（损失表）。决策收益表又叫决策矩阵.</li>
+<li><strong>以决策收益表为依据，运用不同的决策标准进行决策分析，选择最优方案。</strong></li>
+</ol>
+<h3 id="四在不同环境下的决策">四、在不同环境下的决策</h3>
+<p>自然状态：不是决策者所能控制的未来状态。</p>
+<ol>
+<li><strong>确定条件</strong>下的决策：只存在一种自然状态</li>
+<li><strong>不确定条件</strong>下的决策：存在一个以上的自然状态，而决策者不了解其他状态，甚至不完全了解如何把概率分配给自然状态。
+<ol>
+<li>最大最大决策标准</li>
+<li>最大最小决策标准</li>
+<li>最小最大遗憾值决策标准</li>
+<li>现实主义决策标准</li>
+</ol>
+</li>
+<li><strong>风险条件</strong>下的决策：存在一个以上的自然状态，但是决策者具有将概率值分配到每个可能状态的信息。
+<ol>
+<li>最大期望收益值标准</li>
+<li>最小期望损失值标准</li>
+</ol>
+</li>
+</ol>
+<blockquote>
+<p>存在多个或两个以上可行方案,每个自然状态可以估算出他的概率值，不同可行方案在不同自然状态下的收益值或损失值可以定量计算出来，这种决策类型属于（D）</p>
+<p>A.乐观条件下决策B.确定条件下决策C.不确定条件下决策D.风险决策</p>
+</blockquote>
+<h3 id="五不确定条件下的决策">五、不确定条件下的决策</h3>
+<p>有以下特征：</p>
+<ol>
+<li>有一个明确的决策目标</li>
+<li>可拟定两个以上可行方案以供比较、选择。</li>
+<li>存在一种以上的自然状态</li>
+<li>可以预测或估计出不同可行方案在不同自然状态下的收益损失值。</li>
+</ol>
+<h4 id="51最大最大决策标准">5.1、最大最大决策标准</h4>
+<p>又称为<strong>乐观主义者</strong>的决策标准，决策时，只考虑将来会发生最好的自然状态即把最好的自然状态发生的概率定为1，其他状态的概率定位0。</p>
+<p>它的决策程序：
+首先从每个方案中选择一个最大的收益值，然后再从这些最大的收益值所代表的不同方案中，选择一个收益值最大的方案作为备选方案。即<strong>大中取大</strong>。</p>
+<p><img src="/assets/images/decision-analysis/3%E5%A4%A7%E5%A4%A7.png" alt="3大大"></p>
+<h4 id="52最大最小决策标准">5.2、最大最小决策标准</h4>
+<p>又称为<strong>保守主义者</strong>的决策标准（悲观主义决策标准），决策时，只考虑将来会发生最好的自然状态即把最好的自然状态发生的概率定为1，其他状态的概率定位0。</p>
+<p>它的决策程序：
+首先从每个方案中选择一个最小的收益值，然后再从这些最小的收益值所代表的不同方案中，选择一个收益值最大的方案作为备选方案。即<strong>小中取大</strong>。</p>
+<p><img src="/assets/images/decision-analysis/3%E5%A4%A7%E5%B0%8F.png" alt="3大小"></p>
+<h4 id="53最小最大遗憾值决策标准">5.3、最小最大遗憾值决策标准</h4>
+<p>遗憾值：在决策过程中，当某一中自然状态可能出现时，决策者由于决策失误没有选择最好的方案，而是选择了其他方案，因而会感到遗憾，这<strong>两方案值之差</strong>称为遗憾值。</p>
+<p>它的决策程序：
+先把收益表转化为遗憾值表，以<strong>遗憾指为基础</strong>，从每个方案中选择一个最大的遗憾值，然后再从这些最小的所代表的不同方案中，选择一个遗憾值最小的方案作为备选方案。即<strong>大中取小</strong>。</p>
+<p><img src="/assets/images/decision-analysis/3%E5%B0%8F%E5%A4%A7.png" alt="3小大"></p>
+<h4 id="54现实主义决策标准">5.4、现实主义决策标准</h4>
+<p>也称为<strong>折中主义</strong>决策标准，它把未来出现最好的状态的概率定为<code>a</code>，最差的状态的概率为<code>1-a</code>，其他中间状态的概率定为0，即考虑两头的情况。</p>
+<p>他的决策程序：
+计算每个方案的折中收益值，选择折中后最大的收益值对应的方案作为备选方案。</p>
+<p>计算公式为：</p>
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>c</mi><msub><mi>v</mi><mi>i</mi></msub><mo>=</mo><mi>a</mi><mo separator="true">⋅</mo><mi>m</mi><mi>a</mi><mi>x</mi><mo stretchy="false">[</mo><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false">]</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>a</mi><mo stretchy="false">)</mo><mo separator="true">⋅</mo><mi>m</mi><mi>i</mi><mi>n</mi><mo stretchy="false">[</mo><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">cv_i=a·max[a_{ij}]+(1-a)·min[a_{ij}]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord mathnormal">c</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord mathnormal">a</span><span class="mpunct">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">ma</span><span class="mord mathnormal">x</span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mpunct">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">min</span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span></span></div><p><code>i</code>：方案数
+<code>j</code>：自然状态数（产品）
+<code>ca_i</code>：第i个方案的折中收益值
+<code>a</code>：概率值（折中系数），0&lt;a&lt;1（题目中会告诉）
+<code>a_ij</code>：方案Ai在遇到自然状态θi情况下，所获得的收益</p>
+<p><img src="/assets/images/decision-analysis/3%E6%8A%98%E4%B8%AD.png" alt="3折中"></p>
+<p>所以最后选择A1</p>
+<h3 id="六风险条件下的决策">六、风险条件下的决策</h3>
+<p>风险情况下的决策一般又叫<strong>统计型决策</strong>或<strong>随机型决策</strong>，主要是根据多种不同的自然状态可能发生的概率决策的。 所以依据的标准主要是<strong>期望值</strong>标准。</p>
+<p>特征：</p>
+<ol>
+<li>有一个明确的决策目标</li>
+<li>存在多个可行方案</li>
+<li>存在多个自然状态，并且每个自然状态可以估算出它的概率值</li>
+<li>不同可行性方案在不同状态下的收益损失可以定量计算下来。风险情况下的决策所依据的标准主要是期望值标准。</li>
+</ol>
+<h4 id="期望">期望</h4>
+<p>在概率论和统计学中，一个离散型随机变量的期望值（或数学期望，亦简称期望），是试验中每次可能的结果乘以其结果概率的总和。</p>
+<p>例如：掷一枚公平的六面骰子，其每次“点数”的期望值是3.5，计算如下：</p>
+<p><img src="/assets/images/decision-analysis/3mean.png" alt="mean"></p>
+<p>不过如上所说明的，3.5虽然是“点数”的期望值，但却不属于可能结果中的任一个，没有可能掷出此点数。</p>
+<h4 id="61最大期望收益值标准">6.1、最大期望收益值标准</h4>
+<p>在风险的条件下进行决策，一般最常用的决策标准就是期望利润标准，也叫<strong>贝叶斯标准</strong>。</p>
+<p>采用期望值利润标准进行决策，通常步骤如下：</p>
+<ol>
+<li>确定概率值</li>
+<li>计算条件利润</li>
+</ol>
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>C</mi><msub><mi>P</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mi>P</mi><mo separator="true">⋅</mo><msub><mi>Q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>−</mo><mi>C</mi><mo separator="true">⋅</mo><msub><mi>L</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><mi>S</mi><mo separator="true">⋅</mo><msub><mi>L</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">CP_{ij}=P·Q_{ij}-C·L_{ij}+S·L_{ij}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mpunct">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mpunct">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mpunct">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span></div><p><code>PQ</code>：利润（Q是最多售出数）
+<code>CL</code>：成本
+<code>SL</code>：折余值（亏损）</p>
+<p><img src="/assets/images/decision-analysis/3%E6%9C%9F%E6%9C%9B.png" alt="3期望"></p>
+<p>就是</p>
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mn>0.1</mn><mo>∗</mo><mn>4500</mn><mo>+</mo><mn>0.2</mn><mo>∗</mo><mn>4500</mn><mo>+</mo><mn>0.4</mn><mo>∗</mo><mn>4500</mn><mo>+</mo><mn>0.3</mn><mo>∗</mo><mn>4500</mn><mo>=</mo><mn>4500</mn></mrow><annotation encoding="application/x-tex">0.1*4500+0.2*4500+0.4*4500+0.3*4500=4500</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4500</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4500</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4500</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4500</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4500</span></span></span></span></span></div><ol start="3">
+<li>计算各个方案的期望利润与选择最优方案。</li>
+<li>具有精确情报资料的最大期望收益值的计算和情报价值的计算。</li>
+</ol>
+<h4 id="62最小期望损失值标准">6.2、最小期望损失值标准</h4>
+<p>这是与最大期望收益值标准相对应的一种标准，是以选择期望损失值最小的方案为最优方案。</p>
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>i</mi><mtext>方案的期望</mtext><mo>=</mo><mi>m</mi><mi>i</mi><mi>n</mi><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></munderover><mi>C</mi><msubsup><mi>P</mi><mrow><mi>i</mi><mi>j</mi></mrow><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo separator="true">⋅</mo><msub><mi>B</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">i方案的期望=min \sum_{j=1}^m CP_{ij}&#x27;·B_j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">i</span><span class="mord cjk_fallback">方案的期望</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.0652em;vertical-align:-1.4138em;"></span><span class="mord mathnormal">min</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6514em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4138em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-2.453em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3831em;"><span></span></span></span></span></span></span><span class="mpunct">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span></div><p><code>B</code>：概率
+<code>CP</code>：i列方案损失值</p>
+<p><img src="/assets/images/decision-analysis/3%E6%9C%9F%E6%9C%9B%E6%8D%9F%E5%A4%B1.png" alt="3期望损失"></p>
+<h3 id="七决策树">七、决策树</h3>
+<p>决策收益表是期望收益决策标准单阶段决策的重要工具，除此以外，决策树不仅可以解决单阶段决策问题，还可以解决收益表不易表达的多阶段序列决策问题。</p>
+<p>▢方块结点是<strong>决策结点</strong>，其引出的数枝称为<strong>方案枝</strong>。</p>
+<p>◯圆圈结点是<strong>状态结点</strong>，其引出的数枝称为<strong>状态枝</strong>。</p>
+<p><img src="/assets/images/decision-analysis/3%E5%86%B3%E7%AD%96%E6%A0%91.png" alt="3决策树"></p>
+<p><img src="/assets/images/decision-analysis/3%E5%86%B3%E7%AD%96%E6%A0%912.png" alt="3决策树2"></p>
+<h4 id="决策树的优点">决策树的优点</h4>
+<ol>
+<li>它构成决策过程，使决策者能够以一种顺序的，有条理的方式接近决策。</li>
+<li>它要求决策者检验所有可能的结果，合一的和不合意的意义要检验。</li>
+<li>它以一种非常简明的方式，把决策过程传给别人，说明对未来的每一种假设。</li>
+<li>通过集中注意于每一个财政数字，概率和优先的假设—— 一次一个，以便分组来讨论各种方案。</li>
+<li>能够和计算机一起使用，模拟多种不同组合的假设。</li>
+</ol>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

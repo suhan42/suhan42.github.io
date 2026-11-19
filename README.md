@@ -19,6 +19,7 @@ npm run test:first-image  # 校验首图提取规则和边界
 npm run test:post-assets  # 校验相对图片规划、命名空间和冲突检测
 npm run assets:sync       # 预览全部文章的源图片归档计划
 npm run test:markdown  # 校验自定义 Markdown 规则和代码保护边界
+npm run test:image-policy # 校验 CSDN 图片 no-referrer 注入范围
 npm run test:theme     # 校验 themes.json 与 themes.css 的主题颜色一致
 npm run build          # 清理 site/ 并执行 Eleventy 构建
 npm run serve          # 本地预览，默认 http://localhost:8080
@@ -53,6 +54,7 @@ title: 文章标题
 date: 2026-11-09
 slug: stable-url-slug
 category: it
+subcategory: linux                    # 可选，文章在子目录时必填，必须与目录名一致
 tags:
   - example
 summary: 一句话摘要，用于首页卡片、RSS 和搜索。 # 可选
@@ -68,7 +70,7 @@ status: published                     # 或 draft，draft 不进首页和公开�
 3. `summary` 可选；缺省时列表、RSS 和搜索索引统一取正文第一段生成展示摘要，需要精确控制时再显式填写。
 4. 站内图片可以直接写 `/assets/images/...`，也可以在文章目录内使用 `./图片.png` 或 `.\图片.png`。`build` / `serve` 启动前会自动执行全量同步：把源图片归档到 `assets/images/<命名空间>/<文件名>`、改写 Markdown/HTML 与 `cover`，然后删除文章目录中的源图片。构建期还保留虚拟兜底，确保直接运行 Eleventy 时相对图片也能输出到 `site/assets/images/`。
 5. 文章型 HTML（如《白色相簿2》攻略）与 Markdown 同等对待，都放 `src/content/posts/` 且要求完整 front matter；独立交互页放 `src/content/custom/`，不进文章集合。
-6. 子分类由文章目录决定：`src/content/posts/git/example.md` 的目录名 `git` 是子分类，front matter 的 `category` 是父分类；只有小写英文、数字和连字符目录会派生子分类。中文等非 slug 目录视为文章资源包，不生成子分类页，图片命名空间回退到 front matter `slug`。子分类展示名可在 `src/_data/category-labels.json` 中按父分类和 slug 配置，未配置时回退显示 slug。
+6. 子分类由 front matter 的 `subcategory` 显式声明，目录名必须与它一致：例如 `src/content/posts/git/example.md` 中目录是 `git`，front matter 就写 `subcategory: git`，`category: it` 仍是父分类。根目录文章不写 `subcategory`。目录名和 id 只允许小写英文、数字和连字符；中文只作为展示名配置在 `src/_data/category-labels.json`，例如 `database` 显示“数据库”、`operations-research` 显示“运筹学”。
 7. Markdown 行内高亮使用 `==文字==`，构建后会渲染为 `<mark>文字</mark>`；普通比较表达式请放进代码块或行内代码。
 8. 数学公式使用 `$...$` 行内写法或 `$$...$$` 块级写法，构建期由 KaTeX 渲染；公式不要放在代码块里。
 9. 上下标使用 `H~2~O` 和 `y^2^=4`；公式内部的上下标请放在 `$...$` 或 `$$...$$` 中。
@@ -76,10 +78,12 @@ status: published                     # 或 draft，draft 不进首页和公开�
 11. `assets:sync` 按“复制到 `assets/images/<命名空间>/` → 改写正文和 front matter `cover` → 校验写入 → 删除源图”的顺序执行，任一步失败会自动回滚并保留系统临时目录里的迁移日志。日常写作直接运行 `npm run build` 即可；需要单独预览时运行 `npm run assets:sync`，确认后执行 `npm run assets:sync -- --write`。相对图片必须位于当前文章目录内；出现 `../` 或跨文章目录引用时会明确报错，不自动猜测共享图片。
 12. 页面标题始终取 front matter 的 `title`，由布局统一渲染；正文 H1/H2 都只是内容标题，允许重复使用 H1，不接管页面标题，模板不强制降级。目录会把页面标题放在首项，正文第一个 H1 与 `title` 同名时不重复插入。
 
+标签统一使用受控集合：`llm`、`agent`、`rag`、`prompt`、`database`、`linux`、`git`、`markdown`、`python`、`operations-research`、`security`、`workflow`、`static-site`、`wechat`、`c`、`cpp`、`essay`、`game`。新增文章优先复用这些标签，不再添加一次性细碎标签。
+
 ### 文章图片归档口径
 
 - 规范源位置：`assets/images/<命名空间>/<文件名>`；构建产物对应 `site/assets/images/<命名空间>/<文件名>`。
-- 命名空间：合法 slug 子分类目录使用目录名，例如 `git/`；根目录文章和中文等非 slug 资源包目录使用 front matter `slug`，例如 `lct`。
+- 命名空间：子目录文章优先使用 front matter `subcategory`，例如 `git/`、`database/`；根目录文章和资源包目录使用 front matter `slug`，例如 `lct`。
 - 迁移顺序：先复制到规范位置，再改写 Markdown 或文章型 HTML 中的图片 URL 和 `cover`，校验写入成功后，最后删除文章目录中的源图片。
 - 相对图片边界：只允许引用当前文章目录内的真实图片；`../`、跨文章目录引用、缺失文件、未知扩展名和相对指向 `assets/images` 都必须报错。
 - 图片输出采用文件名扁平化：例如 `./imgs/符号.png` 会变为 `assets/images/lct/符号.png`；同一命名空间内同名但内容不同的图片必须 fail-fast。
@@ -125,6 +129,7 @@ npm run validate:content	# 校验文章 front matter、slug 唯一性和路径�
 npm run test:first-image	# 校验首图提取规则和边界
 npm run test:post-assets	# 校验相对图片规划、命名空间和冲突检测
 npm run test:markdown		# 校验自定义 Markdown 规则和代码保护边界
+npm run test:image-policy	# 校验 CSDN 图片 no-referrer 注入范围
 npm run test:theme		# 校验 themes.json 与 themes.css 的主题颜色一致
 
 npm run assets:sync		# 预览源图片归档计划；build 的 prebuild 会自动执行写入

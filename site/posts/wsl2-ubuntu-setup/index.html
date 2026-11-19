@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>WSL2 配置 Ubuntu - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">WSL2 配置 Ubuntu</a></li>
+<li class="toc-item toc-level-1"><a href="#wsl2%E9%85%8D%E7%BD%AEubuntu-2404-lts">WSL2配置Ubuntu 24.04 LTS</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%80%E5%89%8D%E7%BD%AE%E6%9D%A1%E4%BB%B6%E6%A3%80%E6%9F%A5">📋 一、前置条件检查</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BA%8C%E5%BD%BB%E5%BA%95%E6%B8%85%E7%90%86%E6%97%A7%E7%89%88-wsl-%E7%8E%AF%E5%A2%83">🧹 二、彻底清理旧版 WSL 环境</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%89%E9%87%8D%E6%96%B0%E5%90%AF%E7%94%A8%E5%B9%B6%E5%AE%89%E8%A3%85-wsl2">⚙️ 三、重新启用并安装 WSL2</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%9B%9B%E5%9C%A8-d-%E7%9B%98%E5%AE%89%E8%A3%85-ubuntu-2204">四、在 D 盘安装 Ubuntu 22.04</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BA%94%E9%A6%96%E6%AC%A1%E8%BF%9B%E5%85%A5%E7%B3%BB%E7%BB%9F%E4%B8%8E%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE">五、首次进入系统与基础配置</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%85%AD%E8%A7%A3%E5%86%B3%E6%97%A0%E6%B3%95%E8%81%94%E7%BD%91">六、解决无法联网</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%83%E6%81%A2%E5%A4%8D%E9%BB%98%E8%AE%A4%E7%99%BB%E5%BD%95%E7%94%A8%E6%88%B7%E8%BF%81%E7%A7%BB%E5%90%8E%E5%8F%98-root-%E7%9A%84%E4%BF%AE%E5%A4%8D">👤 七、恢复默认登录用户（迁移后变 root 的修复）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%85%AB%E6%B5%8B%E8%AF%95-gpu-cuda%E5%8F%AF%E9%80%89">🧰 八、测试 GPU / CUDA（可选）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%9C%80%E7%BB%88%E7%BB%93%E6%9E%84%E9%AA%8C%E8%AF%81">最终结构验证</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/linux/" class="post-category">
+        it / Linux      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/linux/">#linux</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">WSL2 配置 Ubuntu</h1>
+
+    <div class="post-body">
+<h1 id="wsl2配置ubuntu-2404-lts">WSL2配置Ubuntu 24.04 LTS</h1>
+<blockquote>
+<p><a href="https://blog.csdn.net/qq_46111980/article/details/153474067">WSL2 + Ubuntu 22.04 全流程安装与避坑指南（适配 D 盘）_wsl --install -d ubuntu-CSDN博客</a></p>
+</blockquote>
+<hr>
+<h2 id="一前置条件检查">📋 一、前置条件检查</h2>
+<ul>
+<li>
+<p>Windows 已升级到 21H2 或更高版本；</p>
+</li>
+<li>
+<p>已安装 NVIDIA 显卡驱动 ≥ 510（支持 CUDA 12）；</p>
+</li>
+<li>
+<p>Windows 已安装 PowerShell 7+；</p>
+</li>
+<li>
+<p>本机具备管理员权限；</p>
+</li>
+<li>
+<p>可联网。</p>
+</li>
+</ul>
+<h2 id="二彻底清理旧版-wsl-环境">🧹 二、彻底清理旧版 WSL 环境</h2>
+<p>很多用户安装不干净是因为旧版本遗留。执行以下命令可完全重置。</p>
+<p>1️⃣ 查看已安装发行版</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --list --all</span></span>
+<span class="line"><span class="line-number">2</span><span>wsl -l</span></span></code></pre>
+<p>如果看到：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>Ubuntu</span></span>
+<span class="line"><span class="line-number">2</span><span>Ubuntu-20.04</span></span>
+<span class="line"><span class="line-number">3</span><span>docker-desktop</span></span></code></pre>
+<p>说明旧版本仍存在。</p>
+<p>如果没有直接跳转到3.2</p>
+<p>2️⃣ <strong>注销所有旧发行版</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --unregister Ubuntu</span></span>
+<span class="line"><span class="line-number">2</span><span>wsl --unregister Ubuntu-20.04</span></span>
+<span class="line"><span class="line-number">3</span><span>wsl --unregister docker-desktop</span></span>
+<span class="line"><span class="line-number">4</span><span>wsl --unregister docker-desktop-data</span></span></code></pre>
+<p>3️⃣ <strong>卸载系统组件（可选彻底清理）</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --shutdown</span></span>
+<span class="line"><span class="line-number">2</span><span>dism.exe /online /disable-feature /featurename:Microsoft-Windows-Subsystem-Linux /norestart</span></span>
+<span class="line"><span class="line-number">3</span><span>dism.exe /online /disable-feature /featurename:VirtualMachinePlatform /norestart</span></span></code></pre>
+<p>在“应用和功能”中卸载：</p>
+<ul>
+<li>Windows Subsystem for Linux Update</li>
+<li>Ubuntu</li>
+<li>Docker Desktop</li>
+</ul>
+<h2 id="三重新启用并安装-wsl2">⚙️ 三、重新启用并安装 WSL2</h2>
+<p>1️⃣ <strong>启用系统组件</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart</span></span>
+<span class="line"><span class="line-number">2</span><span>dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart</span></span></code></pre>
+<p>重启电脑：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>shutdown /r /t 0</span></span></code></pre>
+<p>2️⃣ <strong>安装 WSL 内核</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --install --no-distribution</span></span></code></pre>
+<p>3️⃣ <strong>设置默认版本</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --set-default-version 2</span></span></code></pre>
+<h2 id="四在-d-盘安装-ubuntu-2204">四、在 D 盘安装 Ubuntu 22.04</h2>
+<p>默认情况下，WSL 会安装在 C 盘。我们将其导出迁移到 D 盘，释放空间。</p>
+<p>1️⃣ <strong>安装 Ubuntu 22.04</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">wsl</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --install</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -d</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Ubuntu-22.04</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 我安装24.04</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">wsl</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --install</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --distribution</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Ubuntu-24.04</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --location</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> D:</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\W</span><span style="color:#032F62;--shiki-dark:#9ECBFF">SL</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\U</span><span style="color:#032F62;--shiki-dark:#9ECBFF">buntu</span></span></code></pre>
+<p>首次启动后根据提示创建用户（如 jiahao）。如果提示：“wsl: 检测到 localhost 配置，但未镜像 到 WSL。NAT 模式下的 WSL 不支持 localhost。”这是正常的不用管他。</p>
+<p>2️⃣ <strong>导出系统镜像</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --shutdown wsl --export Ubuntu-22.04 D:\WSL\ubuntu.tar</span></span></code></pre>
+<p>3️⃣ <strong>注销旧系统</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --unregister Ubuntu-22.04</span></span></code></pre>
+<p>4️⃣ <strong>导入到 D 盘</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --import Ubuntu-22.04 D:\WSL\Ubuntu D:\WSL\ubuntu.tar --version 2</span></span></code></pre>
+<p>5️⃣ 删除</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>del D:\WSL\ubuntu.tar</span></span></code></pre>
+<p>验证迁移：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl --list --verbose</span></span></code></pre>
+<p>应显示：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>Ubuntu-22.04 Stopped 2</span></span></code></pre>
+<h2 id="五首次进入系统与基础配置">五、首次进入系统与基础配置</h2>
+<p>启动：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>wsl -d Ubuntu-22.04</span></span></code></pre>
+<p>更新系统：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>sudo apt update &#x26;&#x26; sudo apt upgrade -y</span></span>
+<span class="line"><span class="line-number">2</span><span>sudo apt install -y build-essential git curl wget vim python3.11 python3.11-venv</span></span></code></pre>
+<h2 id="六解决无法联网">六、解决无法联网</h2>
+<p>⚠️ 默认 WSL 网络为 NAT 模式，不能自动继承 Windows  daili。 你会遇到 curl 卡住、apt update timeout 的问题。</p>
+<p>1️⃣ 在 Windows 的🐱(🪜)中启用 LAN</p>
+<p>进入🐱设置 → 开启局域网</p>
+<p>确认配置中有：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>allow-lan: true bind-address: 0.0.0.0 mixed-port: 7897</span></span></code></pre>
+<p>重点是第二行：<strong>bind-address: 0.0.0.0</strong>，这一步很关键，🐱的配置文件是config.yaml，同时需要注意端口没错。</p>
+<p>然后重启🐱。</p>
+<p>2️⃣ <strong>在 PowerShell 验证端口监听</strong></p>
+<p>我们需要得到两条信息：WSL的内网ip和🐱的转发端口（第一步已经得到了）</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>netstat -ano | findstr 7897</span></span></code></pre>
+<p>✅ 期望输出：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>TCP    0.0.0.0:7897   0.0.0.0:0   LISTENING</span></span>
+<span class="line"><span class="line-number">2</span><span>……</span></span></code></pre>
+<p>3️⃣ <strong>在 WSL 中获取主机 IP</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>cat /etc/resolv.conf | grep nameserver</span></span></code></pre>
+<p>输出示例：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>nameserver 172.19.48.1</span></span></code></pre>
+<p>测试是否连通，在WSL里面执行：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>nc -zv 172.19.48.1 7897</span></span></code></pre>
+<p>如果输出：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>Connection to 172.19.48.1 7897 port [tcp/*] succeeded!</span></span></code></pre>
+<p>说明端口没被挡住。如果失败，则管理员权限单开一个Powershell，然后输入（注意替换端口）：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>netsh advfirewall firewall add rule name="Allow Clash from WSL" dir=in action=allow protocol=TCP localport=7897</span></span></code></pre>
+<p>这条命令会让 Windows 接受来自 WSL 的请求访问端口 7897。</p>
+<p>之后再回到 WSL 执行：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>nc -zv 172.19.48.1 7897</span></span></code></pre>
+<p>应当返回 succeeded ✅。</p>
+<p>4️⃣ <strong>手动设置</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>export http_proxy="http://172.19.48.1:7897"</span></span>
+<span class="line"><span class="line-number">2</span><span>export https_proxy="http://172.19.48.1:7897"</span></span></code></pre>
+<p>验证：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>curl -I https://www.google.com</span></span></code></pre>
+<p>返回 HTTP/2 200 即表示成功。</p>
+<p>然后执行：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>echo 'Acquire { HTTP::proxy "http://172.19.48.1:7897"; HTTPS::proxy "http://172.19.48.1:7897"; };' | \</span></span>
+<span class="line"><span class="line-number">2</span><span>sudo tee /etc/apt/apt.conf.d/proxy.conf</span></span></code></pre>
+<p>能更新包列表就说明 apt 已走DL。</p>
+<p>5️⃣ <strong>永久生效（添加到 .bashrc）</strong></p>
+<p>编辑：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>nano ~/.bashrc</span></span></code></pre>
+<p>添加（注意端口需要替换成自己的🐱实际端口）：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>win_ip=$(grep nameserver /etc/resolv.conf | awk '{print $2}')</span></span>
+<span class="line"><span class="line-number">2</span><span>export http_proxy="http://$win_ip:7897"</span></span>
+<span class="line"><span class="line-number">3</span><span>export https_proxy="http://$win_ip:7897"</span></span>
+<span class="line"><span class="line-number">4</span><span>export HTTP_PROXY=$http_proxy</span></span>
+<span class="line"><span class="line-number">5</span><span>export HTTPS_PROXY=$https_proxy</span></span>
+<span class="line"><span class="line-number">6</span><span>echo "[WSL] Proxy set to $http_proxy"</span></span></code></pre>
+<p>保存并执行：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>source ~/.bashrc</span></span></code></pre>
+<h2 id="七恢复默认登录用户迁移后变-root-的修复">👤 七、恢复默认登录用户（迁移后变 root 的修复）</h2>
+<p>迁移导入后 WSL 默认用 root 登录。</p>
+<p>1️⃣ <strong>查看用户</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>ls /home</span></span></code></pre>
+<p>会看到账户：suhan（你自己的）</p>
+<p>2️⃣ <strong>切换回用户</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>su - suhan</span></span></code></pre>
+<p>3️⃣ <strong>设置默认启动用户</strong></p>
+<p>在 PowerShell 中：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>Ubuntu-22.04.exe config --default-user suhan</span></span></code></pre>
+<p>下次启动 WSL 就会自动进入你的账户。</p>
+<hr>
+<h2 id="八测试-gpu-cuda可选">🧰 八、测试 GPU / CUDA（可选）</h2>
+<p>确保驱动版本 ≥ 510：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>nvidia-smi</span></span></code></pre>
+<p>输出显示显卡信息即代表 GPU 直通成功。</p>
+<hr>
+<h2 id="最终结构验证">最终结构验证</h2>
+<p>查看系统</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>cat /etc/os-release</span></span></code></pre>
+<p>确认代理</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>echo $http_proxy</span></span></code></pre>
+<p>确认 GPU</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>nvidia-smi</span></span></code></pre>
+<p>确认挂载路径（应在 D 盘）</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>df -h | grep /</span></span></code></pre>
+<p>输出路径指向：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>/mnt/d/WSL/Ubuntu/</span></span></code></pre>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

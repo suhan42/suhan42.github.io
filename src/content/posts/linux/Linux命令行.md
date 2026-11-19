@@ -3,10 +3,9 @@ title: Linux 命令行
 date: 2023-01-22
 slug: linux-command
 category: it
+subcategory: linux
 tags:
   - linux
-  - shell
-  - note
 summary: 这是一份 Linux 命令行速查笔记，覆盖 shell 基础概念、常用操作、版本查询和日常维护中容易忘记的命令用法。
 status: published
 ---
@@ -36,6 +35,10 @@ ifconfig
 ```
 
 ens33的inet后面是IP地址
+
+在[Ubuntu](https://so.csdn.net/so/search?q=Ubuntu&spm=1001.2101.3001.7020) 20.04中，不建议使用ifconfig命令。这就是为什么会收到有关缺少的ifconfig命令的错误的原因。若想要查看ip地址。可以使用`ip addr`命令，它几乎可以执行与ifconfig命令相同的任务
+
+
 
 桥接模式：虚拟机和win内网公用一个网络、局域网
 NAT:虚拟机和win主机公用一个网络、使用虚拟网卡
@@ -86,7 +89,7 @@ sudo su (root)  #切换root
 
 ### su切换账户
 
-switch user
+(switch user)
 
 su是最简单的身份切换名，用su我们能够进行不论什么用户的切换，一般都是su – username，然后输入password就ok了，可是root用su切换到其它身份的时候是不须要输入password的。
 
@@ -125,8 +128,10 @@ sudo passwd 用户名
 
 (Manual)
 
+```shell
 man pwd						就是获得pwd这个命令的命令手册
-man -h 							help
+man -h 						help
+```
 
 
 
@@ -736,7 +741,7 @@ vim /usr/lib/firewalld/services/ssh.xml
 
 
 ```xml
-  <port protocol="tcp" port="8080"/>
+<port protocol="tcp" port="8080"/>
 ```
 
 systemctl restart firewalld 		重启防火墙

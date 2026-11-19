@@ -3,9 +3,9 @@ title: typora 手册
 date: 2026-10-22
 slug: typora-index
 category: it
+subcategory: markdown
 tags:
   - markdown
-  - typora
 summary: Typora 常用 Markdown 语法、快捷键、表格、数学公式和导出技巧整理。
 status: published
 ---

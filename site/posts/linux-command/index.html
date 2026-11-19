@@ -143,12 +143,10 @@
   <article class="post-page">
     <div class="post-meta">
       <a href="/categories/it/linux/" class="post-category">
-        it / linux      </a>
+        it / Linux      </a>
       <time datetime="2023-01-22">2023-01-22</time>
       <span aria-hidden="true">/</span>
       <a href="/tags/linux/">#linux</a>
-      <a href="/tags/shell/">#shell</a>
-      <a href="/tags/note/">#note</a>
     </div>
 
     <h1 id="post-title" class="post-title">Linux 命令行</h1>
@@ -164,6 +162,7 @@
 <p>查询ip(Linux)</p>
 <pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">ifconfig</span></span></code></pre>
 <p>ens33的inet后面是IP地址</p>
+<p>在<a href="https://so.csdn.net/so/search?q=Ubuntu&amp;spm=1001.2101.3001.7020">Ubuntu</a> 20.04中，不建议使用ifconfig命令。这就是为什么会收到有关缺少的ifconfig命令的错误的原因。若想要查看ip地址。可以使用<code>ip addr</code>命令，它几乎可以执行与ifconfig命令相同的任务</p>
 <p>桥接模式：虚拟机和win内网公用一个网络、局域网
 NAT:虚拟机和win主机公用一个网络、使用虚拟网卡
 仅主机：和桥接类似，虚拟机无法上网</p>
@@ -214,7 +213,7 @@ NAT:虚拟机和win主机公用一个网络、使用虚拟网卡
 <p>2).若用户具有可运行sudo的权限。那么让用户输入用户自己的password，注意这里输入的是用户自己的password。</p>
 <p>3).假设password正确。变開始进行sudo后面的命令，root运行sudo是不须要输入password的，切换到的身份与运行者身份同样的时候。也不须要输入password。</p>
 <h3 id="su切换账户">su切换账户</h3>
-<p>switch user</p>
+<p>(switch user)</p>
 <p>su是最简单的身份切换名，用su我们能够进行不论什么用户的切换，一般都是su – username，然后输入password就ok了，可是root用su切换到其它身份的时候是不须要输入password的。</p>
 <p>格式为两种：</p>
 <blockquote>
@@ -232,8 +231,8 @@ NAT:虚拟机和win主机公用一个网络、使用虚拟网卡
 <pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> passwd</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 用户名</span></span></code></pre>
 <h3 id="man用户手册">man(用户手册)</h3>
 <p>(Manual)</p>
-<p>man pwd						就是获得pwd这个命令的命令手册
-man -h 							help</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">man</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> pwd</span><span style="color:#032F62;--shiki-dark:#9ECBFF">						就是获得pwd这个命令的命令手册</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">man</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -h</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 						help</span></span></code></pre>
 <h3 id="echo回声">echo(回声)</h3>
 <pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> hello</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> world</span></span></code></pre>
 <h3 id="cd换地方">cd(换地方)</h3>
@@ -778,7 +777,7 @@ systemctl stop firewalld					关闭防火墙
 systemctl restart firewalld				重启防火墙</p>
 <p>白名单</p>
 <pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vim</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /usr/lib/firewalld/services/ssh.xml</span></span></code></pre>
-<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  &#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">port</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> protocol</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"tcp"</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> port</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"8080"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">/></span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">port</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> protocol</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"tcp"</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> port</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"8080"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">/></span></span></code></pre>
 <p>systemctl restart firewalld 		重启防火墙</p>
 <h3 id="这里是搜索-mysql">这里是搜索 MySQL</h3>
 <p>find命令查询，速度会慢点

@@ -177,6 +177,7 @@ title: marked 造轮子
 date: 2023-01-23
 slug: marked-blog-generator
 category: it
+subcategory: blog
 tags:
   - marked
   - markdown
@@ -193,19 +194,20 @@ status: published
 | `title` | 是 | 非空字符串 | 页面和列表展示标题，允许中文、书名号和空格 |
 | `date` | 是 | ISO 日期或日期时间 | 发布或写作时间，是唯一排序依据 |
 | `slug` | 是 | `/^[a-z0-9]+(?:-[a-z0-9]+)*$/` | URL 标识，全站唯一 |
-| `category` | 是 | 小写英文 slug | 文章所属父分类；子分类由文章所在的第一层目录名派生，不写进 front matter |
+| `category` | 是 | 小写英文 slug | 文章所属父分类 |
+| `subcategory` | 否 | 小写英文 slug | 文章位于子目录时必填，必须与第一层目录名一致；根目录文章不写 |
 | `tags` | 否 | 字符串数组 | 小写标签，用于跨主题聚合 |
 | `summary` | 否 | 非空字符串 | 首页、RSS 和搜索摘要；缺省时由正文第一段生成展示摘要 |
 | `cover` | 否 | 站点绝对路径或文章目录内相对路径 | 显式覆盖首页卡片封面；缺省时自动取正文第一张真实 `<img>`，仍无图时只渲染纯文字卡 |
 | `status` | 是 | `published` 或 `draft` | 非 published 文章不进入首页、集合、RSS 和搜索索引 |
 
-文章源图片的规范归档位置是 `assets/images/<命名空间>/<文件名>`。新增或导入文章后，应执行 materialize：复制图片到规范位置，改写 Markdown 或文章型 HTML 中的图片 URL 与 front matter `cover`，校验写入成功后删除文章目录中的源图片。命名空间优先使用合法子分类目录名，目录名不是 slug 时回退到 front matter `slug`；相对路径只在当前文章目录内有效，`../` 或跨文章目录引用必须明文报错，不自动猜测共享图片。图片按文件名扁平化到命名空间，同一目标文件名内容不一致时必须 fail-fast。
+文章源图片的规范归档位置是 `assets/images/<命名空间>/<文件名>`。新增或导入文章后，应执行 materialize：复制图片到规范位置，改写 Markdown 或文章型 HTML 中的图片 URL 与 front matter `cover`，校验写入成功后删除文章目录中的源图片。命名空间优先使用 front matter `subcategory`，没有声明时回退到合法子分类目录名，再回退到 front matter `slug`；相对路径只在当前文章目录内有效，`../` 或跨文章目录引用必须明文报错，不自动猜测共享图片。图片按文件名扁平化到命名空间，同一目标文件名内容不一致时必须 fail-fast。
 
-`npm run build` 的 `prebuild` 和 `npm run serve` 的 `preserve` 会执行 `assets:sync --write`，扫描全部文章并完成源图片 materialize；同步是幂等的，没有相对图片时不产生改动。`scripts/post-assets.mjs` 仍提供构建期虚拟兜底：如果直接运行 Eleventy 或仍有未同步的相对图片，图片会通过 passthrough copy 输出到 `site/assets/images/<命名空间>/<文件名>`，并在渲染结果中改写为 `/assets/images/...`。外部图片应显式使用完整 HTTPS URL。首页卡片从构建后的正文 HTML 中读取第一张真实 `<img>`，代码块中的图片语法不会参与提取；front matter `cover` 始终优先，用于需要单独裁切或更换卡面时。
+`npm run build` 的 `prebuild` 和 `npm run serve` 的 `preserve` 会执行 `assets:sync --write`，扫描全部文章并完成源图片 materialize；同步是幂等的，没有相对图片时不产生改动。`scripts/post-assets.mjs` 仍提供构建期虚拟兜底：如果直接运行 Eleventy 或仍有未同步的相对图片，图片会通过 passthrough copy 输出到 `site/assets/images/<命名空间>/<文件名>`，并在渲染结果中改写为 `/assets/images/...`。外部图片应显式使用完整 HTTPS URL；CSDN 图床会按 Referer 拒绝站外请求，构建输出阶段由 `scripts/csdn-image-policy.mjs` 只给 CSDN 图片补 `referrerpolicy="no-referrer"`。首页卡片从构建后的正文 HTML 中读取第一张真实 `<img>`，代码块中的图片语法不会参与提取；front matter `cover` 始终优先，用于需要单独裁切或更换卡面时。
 
-子分类使用目录表达：`src/content/posts/git/example.md` 中，`git` 是子分类，front matter 的 `category: it` 是父分类，最终父分类页为 `/categories/it/`，子分类页为 `/categories/it/git/`。根目录文章没有子分类；当前只支持一层子分类目录，只有可直接作为 URL slug 的目录名才会派生子分类。中文等非 slug 目录作为文章资源包使用，不生成分类页，并且同一目录内的文章必须使用同一个父分类。
+子分类使用 front matter 显式声明：`src/content/posts/git/example.md` 中，front matter 写 `subcategory: git`，目录也必须是 `git/`，`category: it` 是父分类，最终父分类页为 `/categories/it/`，子分类页为 `/categories/it/git/`。根目录文章没有子分类；当前只支持一层子分类目录，目录名和 id 只允许小写英文、数字和连字符，并且同一目录内的文章必须使用同一个父分类。
 
-子分类 URL 始终使用目录 slug，页面标题、分类树、文章卡片和文章页中的展示名由 `src/_data/category-labels.json` 覆盖。配置按父分类分组，例如 `it.flowchart = "程序流程图"` 会让 `/categories/it/flowchart/` 显示中文名，未配置的 slug 继续显示 slug 本身。
+子分类 URL 始终使用英文 id，页面标题、分类树、文章卡片和文章页中的展示名由 `src/_data/category-labels.json` 覆盖。配置按父分类分组，例如 `it.database = "数据库"` 会让 `/categories/it/database/` 显示“数据库”，`it.operations-research = "运筹学"` 会让 `/categories/it/operations-research/` 显示“运筹学”。
 
 页面标题始终取 front matter 的 `title`，由布局统一渲染 `post-title`。正文 H1/H2 都只是内容标题，允许重复使用 H1，不接管页面标题，模板不强制降级。目录会自动补齐 id 并把页面标题放在首项，正文第一个 H1 与 `title` 同名时不重复插入。
 
@@ -324,6 +326,7 @@ npm ci
 npm run validate:content
 npm run test:first-image
 npm run test:markdown
+npm run test:image-policy
 npm run test:theme
 npm run build
 npm run validate:output
@@ -331,7 +334,7 @@ npm run publish:pages:check
 npm run publish:pages
 ```
 
-`validate:content` 校验 front matter、必填字段、slug 唯一性、日期格式、图片路径和状态枚举。`test:first-image` 校验首页首图提取规则。`test:markdown` 校验自定义 Markdown 规则和代码保护边界。`test:theme` 校验 `themes.json` 的 theme-color 与 `themes.css` 的主题背景一致。`build` 先清理 `site/`，再执行 Eleventy 构建。`validate:output` 检查输出文件、失效链接、反斜杠路径、对 `node_modules` 的引用和 published 文章数量。
+`validate:content` 校验 front matter、必填字段、slug 唯一性、日期格式、图片路径和状态枚举。`test:first-image` 校验首页首图提取规则。`test:markdown` 校验自定义 Markdown 规则和代码保护边界。`test:image-policy` 校验只给 CSDN 图片注入 no-referrer。`test:theme` 校验 `themes.json` 的 theme-color 与 `themes.css` 的主题背景一致。`build` 先清理 `site/`，再执行 Eleventy 构建。`validate:output` 检查输出文件、失效链接、反斜杠路径、对 `node_modules` 的引用和 published 文章数量。
 
 `publish:pages:check` 校验当前分支为 `main`、`site/` 没有未提交改动、发布根目录包含 `index.html` 和 `.nojekyll`，但不会推送。`publish:pages` 只发布已经提交到当前 HEAD 的 `site/` 内容；必须先由项目所有者确认提交并推送 `main`，未提交的本地构建不会自动进入发布分支。
 

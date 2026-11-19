@@ -1,4 +1,4 @@
-// 构建期文章图片规划测试：覆盖根目录、子分类、资源包目录、路径改写和冲突检测。
+// 构建期文章图片规划测试：覆盖根目录、子分类、front matter subcategory、资源包目录、路径改写和冲突检测。
 
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -74,6 +74,7 @@ try {
       "date: 2026-11-13",
       "slug: git-example",
       "category: it",
+      "subcategory: git",
       "status: published",
       "---",
       "",
@@ -124,12 +125,16 @@ try {
   );
 
   const bundlePlan = createPostAssetPlan(bundlePost, { postsDir, imagesDir });
-  assert(bundlePlan.namespace === "lct", "非 slug 目录应回退到 front matter slug");
+  assert(bundlePlan.namespace === "lct", "未声明 subcategory 的中文目录应回退到 front matter slug");
   assert(
     bundlePlan.replacements.get(".\\符号.png") === "/assets/images/lct/符号.png",
     "资源包目录中的中文图片应正常规划"
   );
-  assert(getPostSubcategory(bundlePost, postsDir) === "", "资源包目录不应派生子分类");
+  assert(getPostSubcategory(bundlePost, null, postsDir) === "", "未声明 subcategory 的中文目录不应派生子分类");
+  assert(
+    getPostSubcategory(bundlePost, { subcategory: "flowchart" }, postsDir) === "flowchart",
+    "front matter 的 subcategory 应覆盖目录推断"
+  );
 
   const rewritten = rewritePostImageReferences(
     [

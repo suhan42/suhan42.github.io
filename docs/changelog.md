@@ -4,6 +4,26 @@
 
 ## 2026-11-18
 
+### 批量导入 47 篇笔记
+
+- 子分类改为 front matter 的 `subcategory` 显式声明英文 id，目录名必须与 id 一致；`数据库`、`运筹学` 目录已改名为 `database`、`operations-research`，中文只作为 `category-labels.json` 的展示名。
+- 图片命名空间优先使用 `subcategory`，其次回退到合法目录名和 front matter `slug`；已有绝对路径图片不强制搬迁。
+- 内容校验新增规则：子目录文章必须声明 `subcategory` 且与目录一致，根目录文章不能声明；`test-post-assets` 覆盖 front matter 覆盖目录推断的场景。
+- `src/content/posts/` 新增 47 篇 Markdown 笔记，统一补齐 `title`、`date`、`slug`、`category`、`tags`、`summary` 和 `status`，父分类均为 `it`，发布日期统一为 `2026-11-18`。
+- 新增内容覆盖 LLM、RAG、数据库、运筹学、Python、Git、Linux、Markdown 和微信小程序；47 个 slug 全部唯一，文章页、IT 分类页、首页分页和搜索索引均已生成。
+- 52 张源图片通过 `assets:sync --write` 迁移到 `assets/images/<slug>/` 并改写正文；RAG 两篇文章共用的 3 张图片统一归档到 `assets/images/rag/`，避免同一源图被规划到两个目录。
+- `src/content/posts/AGENTS.md` 是目录级协作说明，不是文章；`validate:content`、构建图片规划、迁移脚本和 Eleventy 构建统一跳过该文件。
+- `微信小程序.md` 的 4 张 `imgs-vxp` 图片在仓库和 git 历史中均不存在，正文引用暂以 HTML 注释保留，页面先发布文字内容；待补图后恢复引用。
+- `微信小程序.md`、`Dify.md` 和 `shell脚本.md` 含 `{{ ... }}`、`{# ... }` 等 Nunjucks 敏感文本，front matter 增加 `templateEngineOverride: md`，避免正文被模板引擎解析。
+- 旧 `关于Git使用.html` 跳转改到 `/posts/git-usage/`；已删除且无等价文章的 `MySQL自查表.html` 回退到 `/categories/it/`，两处内部链接同步修正。
+- `程序流程图` 恢复为 `flowchart` 子分类：文章移入 `flowchart/`，front matter 增加 `subcategory: flowchart`，`category-labels.json` 显示“程序流程图”。
+- `程序流程图` 的 9 张图片从 `assets/images/lct/` 迁移到 `assets/images/flowchart/`，正文中的 9 处绝对路径同步改写。
+- CSDN 图床会按 Referer 拒绝站外请求；新增 `scripts/csdn-image-policy.mjs`，在 HTML 输出阶段只给 CSDN 图片补 `referrerpolicy="no-referrer"`，其他图床和本地图片不受影响，`数据库基础` 等文章恢复远程图片直接引用。
+- 新增 `npm run test:image-policy`，覆盖 CSDN 主机识别、已有 `referrerpolicy` 保留、Runoob 和本地图片不注入。
+- 标签从 86 个细碎标签收敛为 18 个受控标签：`llm`、`agent`、`rag`、`prompt`、`database`、`linux`、`git`、`markdown`、`python`、`operations-research`、`security`、`workflow`、`static-site`、`wechat`、`c`、`cpp`、`essay`、`game`；Docker 和程序流程图保留空标签，由子分类负责归类。
+- 验证结果：`validate:content` 通过 61 个文件，`build` 生成 107 个模板文件和 117 个 HTML 页面，`validate:output` 通过 61 篇 published、95 个 sitemap URL；`test:post-assets`、`test:markdown`、`test:first-image`、`test:image-policy` 通过。
+- 内容清点表更新为当前 61 篇 published、18 个标签页、10 个子分类；`database`、`operations-research`、`flowchart`、`llm`、`rag` 等均已生成分类页。
+
 ### CSS Box 特殊页退役
 
 - 删除 `src/content/custom/box.html`、`assets/css/box.css` 和仅供该页使用的 `assets/images/box/` 图片资源。

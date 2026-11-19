@@ -1,6 +1,6 @@
 # 发布验收清单
 
-更新时间：2026-11-13
+更新时间：2026-11-18
 
 本清单服务于人工发布流程，不使用 CI/CD。P0 只建立迁移前的基线检查；P2 到 P5 的具体命令在对应阶段实现后逐步启用。每个检查项必须由人确认，不允许因为脚本通过就跳过人工验收。
 
@@ -20,6 +20,8 @@
 2026-11-11 本地内容更新：新增 3 篇 Docker 文章，`validate:content` 通过 14 个文件，`build` 生成 53 个文件，`validate:output` 通过 64 个 HTML 页面、13 篇 published；线上抽查和 `gh-pages` 同步待发布时重新执行。
 
 2026-11-13 本地内容更新：新增《程序流程图》，9 张源图片已归档到 `assets/images/lct/`，正文和卡片封面改写为 `/assets/images/lct/...`，文章目录中的源图已删除；文章移入 `flowchart/` 子分类目录，子分类页 `/categories/it/flowchart/` 显示中文名“程序流程图”。`validate:content` 通过 15 个文件，`build` 生成 55 个模板文件，`validate:output` 通过 66 个 HTML 页面、14 篇 published。
+
+2026-11-18 本地内容更新：批量导入 47 篇笔记并补齐 front matter，子分类改为 front matter `subcategory` 显式声明英文 id，`数据库`、`运筹学` 目录改名为 `database`、`operations-research`，`程序流程图` 恢复为 `flowchart/` 子分类；52 张源图片归档到 `assets/images/<slug>/`，RAG 共用图归档到 `assets/images/rag/`。标签从 86 个收敛为 18 个受控标签。`validate:content` 通过 61 个文件，`build` 生成 107 个模板文件和 117 个 HTML 页面，`validate:output` 通过 61 篇 published、95 个 sitemap URL；`微信小程序.md` 的 4 张 `imgs-vxp` 图片缺失，引用暂以 HTML 注释保留；人工视觉验收和发布仍需在补图后执行。
 
 ## P0：迁移前基线
 
@@ -42,8 +44,8 @@
 | 13 个内容对象的日期逐项确认 | √ | 日期以当前 front matter 为准并用于排序，不再单独标注待确认；禁止使用当前 `mtime` 作为证据 |
 | slug 全站唯一且符合规范 | √ | 内容校验确认只允许小写英文、数字和连字符 |
 | 摘要兜底策略确认 | √ | `summary` 可选，缺省时列表、RSS 和搜索索引取正文第一段 |
-| 父分类集确认 | 待确认 | 实际使用 `acgn`、`essay`、`it`，是否作为最终集合需项目所有者确认；子分类由目录派生 |
-| 受控标签集确认 | 待确认 | 当前生成 21 个标签页，是否作为最终受控集需项目所有者确认 |
+| 父分类集确认 | 待确认 | 实际使用 `acgn`、`essay`、`it`，是否作为最终集合需项目所有者确认；子分类由 front matter `subcategory` 显式声明并与目录一致 |
+| 受控标签集确认 | 待确认 | 当前生成 18 个标签页，是否作为最终受控集需项目所有者确认 |
 | 输出封面路径统一为 `/assets/images/...` | √ | 源文件可使用文章目录内相对路径，构建期自动改写；输出校验确认无反斜杠和死链 |
 | 源图片归档到 `assets/images/<命名空间>/` | √ | `prebuild` / `preserve` 在构建和预览前执行全量同步，提交前检查迁移输出和 `git status` |
 | 跨文章目录的 `../` 图片引用明确报错 | √ | 内容校验、虚拟管线和迁移脚本统一限制在当前文章目录内，并提示共享图片改用 `/assets/images/...` |
@@ -64,6 +66,7 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | 文章图片规划测试可用 | √ | `npm run test:post-assets` 覆盖相对路径、命名空间回退、cover 改写、冲突检测、CLI 迁移幂等和跨目录拒绝 |
 | Markdown 规则回归测试可用 | √ | `npm run test:markdown` 覆盖高亮、数学、上下标、Callouts、删除线和代码保护，共 12 项 |
 | 首图提取测试可用 | √ | `npm run test:first-image` 覆盖正常首图、注释、代码文本、data/blob 和属性边界 |
+| 图片外链策略测试可用 | √ | `npm run test:image-policy` 校验只给 CSDN 图片补 `referrerpolicy="no-referrer"`，Runoob 和本地图不受影响 |
 | 主题配置测试可用 | √ | `npm run test:theme` 校验 `themes.json` 与 `themes.css` 的四套主题背景色一致 |
 | 站点资源不引用 `node_modules` | √ | 旧 highlight 样式已删除；当前构建不引用 `node_modules` |
 | 构建产物只在迁移分支本地验证 | √ | `npm run build` 生成 10 个文章页和静态资源 |
@@ -84,22 +87,22 @@ P1 是迁移前历史阶段；旧生成链路已经在 P5 退役，不再要求�
 | 移动端导航可用 | √ | 原生 details 菜单、主题按钮、外部点击和 Esc 关闭均验证通过 |
 | 自定义页面资源完整 | √ | Divergence 无 404 且手机端两行显示；烟花页无外部依赖和脚本错误 |
 | 关于页迁移完成 | √ | 新阅读线和主题变量下版式正常 |
-| 站内链接抽查无 404 | √ | `npm run validate:output` 通过 64 个 HTML 页面 |
+| 站内链接抽查无 404 | √ | `npm run validate:output` 通过 117 个 HTML 页面 |
 
 ## P4：站点能力
 
 | 检查项 | 状态 | 说明 |
 |---|---|---|
-| 归档页生成 | √ | `/archive/` 按年份分组，2023 年 9 篇、2026 年 4 篇 |
+| 归档页生成 | √ | `/archive/` 按年份分组，2023 年 7 篇、2024 年 1 篇、2025 年 1 篇、2026 年 52 篇 |
 | 分类页生成 | √ | `/categories/{acgn,essay,it}/` 三个父分类页，文章列表正确 |
-| 子分类页生成 | √ | 目录派生的 `/categories/it/docker/`、`/categories/it/flowchart/`、`/categories/it/git/`、`/categories/it/markdown/` 页面，左侧文件夹树和当前项高亮正常 |
-| 标签页生成 | √ | `/tags/{tag}/` 21 个页面，由 collection 派生 |
-| 搜索索引生成 | √ | `/data/search-index.json` 13 篇 published，draft 排除，JSON 格式有效 |
-| RSS 生成 | √ | `/feed.xml` 13 条 item，RFC 822 日期 |
-| sitemap 生成 | √ | `/sitemap.xml` 43 个 URL |
+| 子分类页生成 | √ | 10 个英文 id 子分类页，包含 `/categories/it/database/`、`/categories/it/operations-research/`、`/categories/it/flowchart/`、`/categories/it/llm/`、`/categories/it/rag/`，展示名由 `category-labels.json` 提供 |
+| 标签页生成 | √ | `/tags/{tag}/` 18 个页面，由 collection 派生 |
+| 搜索索引生成 | √ | `/data/search-index.json` 61 篇 published，draft 排除，JSON 格式有效 |
+| RSS 生成 | √ | `/feed.xml` 61 条 item，RFC 822 日期 |
+| sitemap 生成 | √ | `/sitemap.xml` 95 个 URL |
 | 404 页面生成 | √ | `/404.html` 继承站点骨架 |
 | SEO 基础字段生成 | √ | 页面 title 组合站点名；description 和 Open Graph 留到后续增强 |
-| 输出校验脚本通过 | √ | `npm run validate:output` 通过 64 个 HTML 页面，链接和资源完整 |
+| 输出校验脚本通过 | √ | `npm run validate:output` 通过 117 个 HTML 页面，链接和资源完整 |
 
 ## P5：清理与发布
 
@@ -137,6 +140,7 @@ npm run validate:content
 npm run test:first-image
 npm run test:post-assets
 npm run test:markdown
+npm run test:image-policy
 npm run test:theme
 npm run assets:sync
 npm run build

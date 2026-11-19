@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Prompt Engineering - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#prompt-engineering">Prompt Engineering</a></li>
+<li class="toc-item toc-level-2"><a href="#token">Token</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AA%97%E5%8F%A3">上下文窗口</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%8A%80%E5%B7%A7">技巧</a></li>
+<li class="toc-item toc-level-3"><a href="#1-%E7%94%A8-xml-%E6%A0%87%E7%AD%BE%E5%88%86%E7%A6%BB%E6%95%B0%E6%8D%AE%E4%B8%8E%E6%8C%87%E4%BB%A4">1. 用 XML 标签分离数据与指令</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%B8%B8%E7%94%A8%E6%A0%87%E7%AD%BE%E4%B8%80%E8%A7%88">常用标签一览</a></li>
+<li class="toc-item toc-level-3"><a href="#2-%E6%8E%A7%E5%88%B6%E8%BE%93%E5%87%BA%E6%A0%BC%E5%BC%8F">2. 控制输出格式</a></li>
+<li class="toc-item toc-level-3"><a href="#3-%E8%AE%A9-ai-%E9%80%90%E6%AD%A5%E6%80%9D%E8%80%83">3. 让 AI 逐步思考</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%B9%BB%E8%A7%89hallucination">幻觉（Hallucination）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%94%E7%A7%8D%E9%98%B2%E5%B9%BB%E8%A7%89%E7%AD%96%E7%95%A5">五种防幻觉策略</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%98%B2%E5%B9%BB%E8%A7%89-system-prompt-%E6%A8%A1%E6%9D%BF">防幻觉 System Prompt 模板</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%85%B6%E4%BB%96prompt">其他Prompt</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%8F%90%E7%A4%BA%E8%AF%8D%E9%93%BEprompt-chaining">提示词链（Prompt Chaining）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%85%83%E6%8F%90%E7%A4%BAmeta-prompting">元提示（Meta-Prompting）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%80%9F%E6%9F%A5%E8%A1%A8%E5%9B%9B%E8%A6%81%E7%B4%A0%E6%A1%86%E6%9E%B6">速查表：四要素框架</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%90%84%E6%8A%80%E5%B7%A7%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%80%E8%A7%88">各技巧适用场景一览</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%8F%91%E5%B8%83%E5%89%8D%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95">发布前检查清单</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/llm/">#llm</a>
+      <a href="/tags/prompt/">#prompt</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Prompt Engineering</h1>
+
+    <div class="post-body">
+<h1 id="prompt-engineering">Prompt Engineering</h1>
+<p><a href="https://api-docs.deepseek.com/zh-cn/prompt-library/">Prompt Library | DeepSeek API Docs</a></p>
+<p>**Prompt（提示词）**是你给 LLM 的输入，它告诉模型你想要什么，就像给助理下达指令——指令越清晰，结果越好。Prompt 的质量直接决定了回答的质量。</p>
+<p>一个好的 Prompt 通常由以下四个部分组成：</p>
+<ul>
+<li>上下文：角色、背景</li>
+<li>指令：明确任务目标</li>
+<li>实例（可选）：范例、反例</li>
+<li>格式要求</li>
+<li>知识数据（XML）（补充）</li>
+</ul>
+<p>与 AI 对话时，消息分为<strong>三种角色</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">比喻</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>System（系统提示）</strong></td>
+<td style="text-align:left">幕后导演</td>
+<td style="text-align:left">设定 AI 的身份、规则和行为准则，在对话开始前生效</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>User（用户）</strong></td>
+<td style="text-align:left">演员搭档</td>
+<td style="text-align:left">你每次发出的消息，提出任务或问题</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Assistant（助手）</strong></td>
+<td style="text-align:left">AI 演员</td>
+<td style="text-align:left">AI 的回复；也可以预填内容，让 AI 从那里继续</td>
+</tr>
+</tbody>
+</table>
+<p>示例：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>[System]</span></span>
+<span class="line"><span class="line-number">2</span><span>你是一位专业的中文写作助手，擅长商务邮件和报告撰写。</span></span>
+<span class="line"><span class="line-number">3</span><span>回答时保持正式、简洁的风格。</span></span>
+<span class="line"><span class="line-number">4</span><span></span></span>
+<span class="line"><span class="line-number">5</span><span>[User]</span></span>
+<span class="line"><span class="line-number">6</span><span>帮我起草一封给客户的道歉邮件，原因是产品延期两周交货。</span></span>
+<span class="line"><span class="line-number">7</span><span></span></span>
+<span class="line"><span class="line-number">8</span><span>[Assistant]</span></span>
+<span class="line"><span class="line-number">9</span><span>尊敬的客户，</span></span>
+<span class="line"><span class="line-number">10</span><span>首先，我们对此次交货延误深表歉意……</span></span></code></pre>
+<h2 id="token">Token</h2>
+<p>AI 模型不是以&quot;字&quot;或&quot;词&quot;为单位处理文本的，而是以 Token 为单位。Token 是介于字符和单词之间的文本片段：</p>
+<ul>
+<li>英文中，1 个单词 ≈ 1–2 个 Token</li>
+<li>中文中，1 个汉字 ≈ 1–2 个 Token（通常比英文消耗更多）</li>
+<li>标点符号、空格也各自占用 Token</li>
+<li>经验公式：<strong>1000 Token ≈ 750 个英文单词 ≈ 500 个中文汉字</strong></li>
+</ul>
+<h2 id="上下文窗口">上下文窗口</h2>
+<p>每个模型都有一个<strong>上下文窗口（Context Window）</strong>，即它在一次对话中能处理的最大 Token 数量。超过这个上限，模型就会&quot;忘记&quot;最早的内容。</p>
+<blockquote>
+<p><strong>写作建议：<strong>把最重要的指令放在提示词的</strong>开头或结尾</strong>，中间位置的内容在长上下文中容易被模型&quot;忽视&quot;——这是大模型的已知特性，称为&quot;迷失在中间（Lost in the Middle）&quot;现象。</p>
+</blockquote>
+<h2 id="技巧">技巧</h2>
+<h3 id="1-用-xml-标签分离数据与指令">1. 用 XML 标签分离数据与指令</h3>
+<p>如果指令和数据混在一起，AI 可能无法分辨哪些是你的指令、哪些是数据内容。这既会导致逻辑混乱，在开放应用中还存在<strong>安全风险</strong>（即提示词注入攻击）。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>请完成以下任务：</span></span>
+<span class="line"><span class="line-number">2</span><span>1. 比较两份简历各自的优势</span></span>
+<span class="line"><span class="line-number">3</span><span>2. 判断谁更适合"产品经理"职位</span></span>
+<span class="line"><span class="line-number">4</span><span>3. 给出 50 字以内的录用建议</span></span>
+<span class="line"><span class="line-number">5</span><span></span></span>
+<span class="line"><span class="line-number">6</span><span>&#x3C;resume_A></span></span>
+<span class="line"><span class="line-number">7</span><span>张三，5 年产品经验，主导过三款 DAU 百万级产品，</span></span>
+<span class="line"><span class="line-number">8</span><span>擅长数据分析和用户访谈……</span></span>
+<span class="line"><span class="line-number">9</span><span>&#x3C;/resume_A></span></span>
+<span class="line"><span class="line-number">10</span><span></span></span>
+<span class="line"><span class="line-number">11</span><span>&#x3C;resume_B></span></span>
+<span class="line"><span class="line-number">12</span><span>李四，3 年产品经验，有 0-1 创业经历，</span></span>
+<span class="line"><span class="line-number">13</span><span>连续两次带领团队完成融资里程碑……</span></span>
+<span class="line"><span class="line-number">14</span><span>&#x3C;/resume_B></span></span>
+<span class="line"><span class="line-number">15</span><span></span></span>
+<span class="line"><span class="line-number">16</span><span>&#x3C;position></span></span>
+<span class="line"><span class="line-number">17</span><span>产品经理，负责 B2B SaaS 产品线，</span></span>
+<span class="line"><span class="line-number">18</span><span>有 PMF 探索经验者优先。</span></span>
+<span class="line"><span class="line-number">19</span><span>&#x3C;/position></span></span></code></pre>
+<h4 id="常用标签一览">常用标签一览</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">标签</th>
+<th style="text-align:left">适合包裹的内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&lt;document&gt;</code></td>
+<td style="text-align:left">待分析的文档或文章</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;user_input&gt;</code></td>
+<td style="text-align:left">来自外部的、不完全可信的用户输入</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;context&gt;</code></td>
+<td style="text-align:left">背景信息、参考资料</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;example&gt;</code></td>
+<td style="text-align:left">示例内容</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;question&gt;</code></td>
+<td style="text-align:left">需要回答的具体问题</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;data&gt;</code></td>
+<td style="text-align:left">需要处理的数据</td>
+</tr>
+</tbody>
+</table>
+<p>标签名称要有实际含义。<code>&lt;resume_A&gt;</code> 比 <code>&lt;text1&gt;</code> 更好——AI 能从标签名理解内容的性质，输出质量会更高。</p>
+<h3 id="2-控制输出格式">2. 控制输出格式</h3>
+<ul>
+<li>方法一：直接描述你想要的格式</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>分析以下产品评论的情感，以 JSON 格式输出，包含以下字段：</span></span>
+<span class="line"><span class="line-number">2</span><span>- sentiment：值为 "positive"、"negative" 或 "neutral"</span></span>
+<span class="line"><span class="line-number">3</span><span>- score：0 到 10 的整数，代表情感强度</span></span>
+<span class="line"><span class="line-number">4</span><span>- key_phrases：最多 3 个关键短语组成的列表</span></span>
+<span class="line"><span class="line-number">5</span><span>- summary：不超过 20 字的中文摘要</span></span>
+<span class="line"><span class="line-number">6</span><span></span></span>
+<span class="line"><span class="line-number">7</span><span>只输出 JSON，不要有任何额外的解释文字。</span></span>
+<span class="line"><span class="line-number">8</span><span></span></span>
+<span class="line"><span class="line-number">9</span><span>&#x3C;review></span></span>
+<span class="line"><span class="line-number">10</span><span>这款耳机的降噪效果出乎意料地好，戴上就像进入了另一个世界。</span></span>
+<span class="line"><span class="line-number">11</span><span>但续航只有 18 小时有点让人失望，价格也略贵……</span></span>
+<span class="line"><span class="line-number">12</span><span>&#x3C;/review></span></span>
+<span class="line"><span class="line-number">13</span><span>期望输出：</span></span>
+<span class="line"><span class="line-number">14</span><span></span></span>
+<span class="line"><span class="line-number">15</span><span>{</span></span>
+<span class="line"><span class="line-number">16</span><span>  "sentiment": "positive",</span></span>
+<span class="line"><span class="line-number">17</span><span>  "score": 7,</span></span>
+<span class="line"><span class="line-number">18</span><span>  "key_phrases": ["降噪效果好", "续航偏短", "价格略贵"],</span></span>
+<span class="line"><span class="line-number">19</span><span>  "summary": "降噪优秀但续航和价格略有不足"</span></span>
+<span class="line"><span class="line-number">20</span><span>}</span></span></code></pre>
+<ul>
+<li>方法二：提供模板让 AI 填写</li>
+</ul>
+<p>比起描述格式，直接给一个模板让 AI 填空更可靠：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>请用以下模板生成产品分析报告：</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>## [产品名称] 分析报告</span></span>
+<span class="line"><span class="line-number">4</span><span></span></span>
+<span class="line"><span class="line-number">5</span><span>### 核心优势</span></span>
+<span class="line"><span class="line-number">6</span><span>- [优势1]</span></span>
+<span class="line"><span class="line-number">7</span><span>- [优势2]</span></span>
+<span class="line"><span class="line-number">8</span><span>- [优势3]</span></span>
+<span class="line"><span class="line-number">9</span><span></span></span>
+<span class="line"><span class="line-number">10</span><span>### 主要风险</span></span>
+<span class="line"><span class="line-number">11</span><span>- [风险1]</span></span>
+<span class="line"><span class="line-number">12</span><span>- [风险2]</span></span>
+<span class="line"><span class="line-number">13</span><span></span></span>
+<span class="line"><span class="line-number">14</span><span>### 综合评分</span></span>
+<span class="line"><span class="line-number">15</span><span>[X/10 分，一句话理由]</span></span>
+<span class="line"><span class="line-number">16</span><span></span></span>
+<span class="line"><span class="line-number">17</span><span>---</span></span>
+<span class="line"><span class="line-number">18</span><span>产品信息：[在此粘贴产品信息]</span></span></code></pre>
+<ul>
+<li>方法三：预填充（进阶技巧）</li>
+</ul>
+<p>在 AI 的回复开头预先写入一些内容，强制它从那里继续。这是 API 开发中控制格式最可靠的方式：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>messages = [</span></span>
+<span class="line"><span class="line-number">2</span><span>    {"role": "user", "content": "分析这段代码并输出 JSON 格式的问题报告。"},</span></span>
+<span class="line"><span class="line-number">3</span><span>    {"role": "assistant", "content": "```json\n{"}  # 预填充，强制输出 JSON</span></span>
+<span class="line"><span class="line-number">4</span><span>]</span></span></code></pre>
+<h3 id="3-让-ai-逐步思考">3. 让 AI 逐步思考</h3>
+<p>对于复杂问题，直接要求 AI 给答案，效果往往不如让它<strong>先思考，再作答</strong>。</p>
+<p>它每次只预测下一个词。如果你直接要它给结论，它会根据问题直接猜结论。如果你让它先把推理过程写出来，那些推理内容会成为生成结论的依据，<strong>准确率会显著提升</strong>。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>请先在 &#x3C;analysis> 标签中逐条分析这份合同各条款的利弊，</span></span>
+<span class="line"><span class="line-number">2</span><span>然后在 &#x3C;verdict> 标签中给出最终判断（有利/不利/中性），</span></span>
+<span class="line"><span class="line-number">3</span><span>并说明主要理由。</span></span></code></pre>
+<h2 id="幻觉hallucination">幻觉（Hallucination）</h2>
+<p>幻觉（Hallucination）是指 AI 自信地输出了错误的、不存在的，或者凭空捏造的信息。这是大语言模型的固有局限，但通过提示词设计，可以大幅降低它的发生率。</p>
+<ul>
+<li>为什么 AI 会幻觉？</li>
+</ul>
+<p>语言模型的本质是预测接下来最可能出现的词。当它不知道某个信息时，不会像人一样说我不知道——而是会生成一个<strong>听起来合理的</strong>回答。</p>
+<p>这就像一个努力想表现好的实习生，宁可给出一个听起来专业的猜测，也不愿承认自己不知道。</p>
+<h3 id="五种防幻觉策略">五种防幻觉策略</h3>
+<ul>
+<li><strong>策略 1：明确允许 AI 说我不知道（最简单有效）</strong></li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>System Prompt 中加入：</span></span>
+<span class="line"><span class="line-number">2</span><span>如果你不确定某个信息，请直接说"我没有关于这个问题的可靠信息"，</span></span>
+<span class="line"><span class="line-number">3</span><span>不要猜测或编造答案。不确定 ≠ 失败，诚实才是好助手。</span></span></code></pre>
+<ul>
+<li><strong>策略 2：限制 AI 只使用你提供的信息</strong></li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>请请只根据 &#x3C;reference> 标签中的内容回答问题。</span></span>
+<span class="line"><span class="line-number">2</span><span>如果参考资料中没有足够的信息，请回答："根据提供的资料，无法回答这个问题。"</span></span>
+<span class="line"><span class="line-number">3</span><span></span></span>
+<span class="line"><span class="line-number">4</span><span>&#x3C;reference></span></span>
+<span class="line"><span class="line-number">5</span><span>[你提供的文档内容]</span></span>
+<span class="line"><span class="line-number">6</span><span>&#x3C;/reference></span></span>
+<span class="line"><span class="line-number">7</span><span></span></span>
+<span class="line"><span class="line-number">8</span><span>&#x3C;question></span></span>
+<span class="line"><span class="line-number">9</span><span>[用户的问题]</span></span>
+<span class="line"><span class="line-number">10</span><span>&#x3C;/question></span></span></code></pre>
+<ul>
+<li><strong>策略 3：先找证据，再给结论</strong></li>
+</ul>
+<p>把思维链技巧用在防幻觉上：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>在回答之前，请先在 &#x3C;evidence> 中找出文档里</span></span>
+<span class="line"><span class="line-number">2</span><span>直接支持你结论的句子或段落，再在 &#x3C;answer> 中给出结论。</span></span>
+<span class="line"><span class="line-number">3</span><span>如果找不到支持性证据，就说找不到。</span></span></code></pre>
+<ul>
+<li><strong>策略 4：要求标注置信度</strong></li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>对于你回答中的每个关键信息，请在括号内标注置信度：</span></span>
+<span class="line"><span class="line-number">2</span><span>（高置信度）= 你非常确定</span></span>
+<span class="line"><span class="line-number">3</span><span>（中置信度）= 你有一定把握但不完全确定</span></span>
+<span class="line"><span class="line-number">4</span><span>（低置信度）= 你只是猜测，建议用户自行核实</span></span></code></pre>
+<ul>
+<li><strong>策略 5：降低随机性（API 开发者）</strong></li>
+</ul>
+<p>在 API 调用中将 <code>temperature</code> 设为 <code>0</code>，让模型的输出更保守、更确定，减少&quot;创意性&quot;发挥带来的错误，适合事实性任务。</p>
+<h3 id="防幻觉-system-prompt-模板">防幻觉 System Prompt 模板</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>你是一位严谨的研究助手。你必须遵守以下规则：</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>1. 只基于用户提供的文档内容回答问题。</span></span>
+<span class="line"><span class="line-number">4</span><span>2. 如果文档中没有足够信息，请明确说明：</span></span>
+<span class="line"><span class="line-number">5</span><span>   "根据提供的资料，无法回答这个问题。"</span></span>
+<span class="line"><span class="line-number">6</span><span>3. 引用具体信息时，指出它来自哪个段落。</span></span>
+<span class="line"><span class="line-number">7</span><span>4. 不要用你自己的训练知识来"补充"文档之外的内容。</span></span>
+<span class="line"><span class="line-number">8</span><span>5. 对于数字、日期、专有名词，格外谨慎，宁可说不确定也不要猜。</span></span></code></pre>
+<p><strong>高风险领域特别提醒：</strong> 在医疗、法律、财务等专业场景中，幻觉的代价极高。必须提供权威参考文档，限制 AI 在文档范围内回答，并在输出中提示用户向专业人士核实。</p>
+<h2 id="其他prompt">其他Prompt</h2>
+<h3 id="提示词链prompt-chaining">提示词链（Prompt Chaining）</h3>
+<p>当一个任务过于复杂，单条提示词无法可靠完成时，可以把它<strong>拆分成多个子任务，依次执行，前一步的输出作为下一步的输入</strong>——这就是提示词链（Prompt Chaining）。</p>
+<p>把所有要求塞进一个超长提示词，会导致以下问题：</p>
+<ul>
+<li>AI 容易遗漏某些子任务</li>
+<li>前后步骤的逻辑相互干扰</li>
+<li>出错时难以定位问题在哪一步</li>
+<li>Token 消耗高，成本上升</li>
+</ul>
+<p>提示词链把复杂任务分而治之，每一步都能独立验证质量，整体可靠性大幅提升。</p>
+<h3 id="元提示meta-prompting">元提示（Meta-Prompting）</h3>
+<p>当你不知道如何写一个好的提示词时，有一个被严重低估的方法：<strong>直接让 AI 帮你写或改进提示词</strong>。这就是元提示（Meta-Prompting）——用提示词来生成提示词。</p>
+<h2 id="速查表四要素框架">速查表：四要素框架</h2>
+<p>每次写提示词时，检查是否涵盖了这四个核心要素：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">要素</th>
+<th style="text-align:left">问自己</th>
+<th style="text-align:left">示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>角色</strong></td>
+<td style="text-align:left">AI 应该以什么身份回答？</td>
+<td style="text-align:left">你是一位专业的……</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>指令</strong></td>
+<td style="text-align:left">AI 具体要做什么？</td>
+<td style="text-align:left">请分析/总结/生成/翻译……</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>背景</strong></td>
+<td style="text-align:left">AI 需要知道什么前提信息？</td>
+<td style="text-align:left">读者是……，用途是……</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>限制</strong></td>
+<td style="text-align:left">有什么格式/长度/边界要求？</td>
+<td style="text-align:left">不超过…字，以 JSON 输出，不要涉及……</td>
+</tr>
+</tbody>
+</table>
+<h3 id="各技巧适用场景一览">各技巧适用场景一览</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">技巧</th>
+<th style="text-align:left">适合什么时候用</th>
+<th style="text-align:left">核心语句</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">角色设定</td>
+<td style="text-align:left">需要专业深度时</td>
+<td style="text-align:left">&quot;你是一位有 X 年经验的……&quot;</td>
+</tr>
+<tr>
+<td style="text-align:left">清晰指令</td>
+<td style="text-align:left">每次（永远需要）</td>
+<td style="text-align:left">&quot;面向…，不超过…字，不要……&quot;</td>
+</tr>
+<tr>
+<td style="text-align:left">Token 意识</td>
+<td style="text-align:left">长文档、API 开发、多轮对话</td>
+<td style="text-align:left">关键信息放开头/结尾，精简 System Prompt</td>
+</tr>
+<tr>
+<td style="text-align:left">XML 标签</td>
+<td style="text-align:left">提示词混合数据与指令时</td>
+<td style="text-align:left">用语义化标签包裹数据内容</td>
+</tr>
+<tr>
+<td style="text-align:left">格式模板</td>
+<td style="text-align:left">需要固定结构的输出时</td>
+<td style="text-align:left">直接给出带占位符的模板</td>
+</tr>
+<tr>
+<td style="text-align:left">思维链</td>
+<td style="text-align:left">推理、判断、分析类任务</td>
+<td style="text-align:left">&quot;先在 <code>&lt;thinking&gt;</code> 中分析，再在 <code>&lt;answer&gt;</code> 中作答&quot;</td>
+</tr>
+<tr>
+<td style="text-align:left">少样本示例</td>
+<td style="text-align:left">难以用文字描述的风格/格式</td>
+<td style="text-align:left">提供 2-3 个输入→输出的例子</td>
+</tr>
+<tr>
+<td style="text-align:left">防幻觉设计</td>
+<td style="text-align:left">事实性任务、高风险场景</td>
+<td style="text-align:left">&quot;只使用提供的文档，不确定请说明&quot;</td>
+</tr>
+<tr>
+<td style="text-align:left">提示词链</td>
+<td style="text-align:left">复杂多步骤任务、流水线开发</td>
+<td style="text-align:left">拆分子任务，前一步输出传入下一步</td>
+</tr>
+<tr>
+<td style="text-align:left">元提示</td>
+<td style="text-align:left">不知如何写提示词、需要快速起草</td>
+<td style="text-align:left">&quot;帮我生成/改进以下提示词，说明设计理由&quot;</td>
+</tr>
+<tr>
+<td style="text-align:left">五段式架构</td>
+<td style="text-align:left">构建完整的 AI 应用时</td>
+<td style="text-align:left">角色 + 数据 + 规则 + 格式 + 示例</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="发布前检查清单">发布前检查清单</h2>
+<p>每次提示词上线或分享之前，过一遍这个清单：</p>
+<ul>
+<li>[ ] 指令是否清晰无歧义？读给一个陌生人听，他们能理解吗？</li>
+<li>[ ] 数据和指令是否用 XML 标签分离？</li>
+<li>[ ] 是否明确了输出格式和长度限制？</li>
+<li>[ ] 对于推理类任务，是否要求了&quot;先思考再回答&quot;？</li>
+<li>[ ] 是否提供了 2-3 个高质量的示例？</li>
+<li>[ ] 是否允许 AI 说&quot;我不知道&quot;？</li>
+<li>[ ] 是否在多种不同输入上做了测试？</li>
+<li>[ ] 边界情况（空输入、异常输入）是否处理了？</li>
+<li>[ ] 复杂任务是否考虑拆分为提示词链？</li>
+<li>[ ] 关键指令是否放在提示词的开头或结尾位置？</li>
+<li>[ ] 是否记录了当前版本号和修改日志？</li>
+</ul>
+<hr>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

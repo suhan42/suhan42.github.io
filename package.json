@@ -20,13 +20,14 @@
     "test:first-image": "node scripts/test-first-image.mjs",
     "test:post-assets": "node scripts/test-post-assets.mjs",
     "test:markdown": "node scripts/test-markdown.mjs",
+    "test:image-policy": "node scripts/test-image-policy.mjs",
     "test:theme": "node scripts/test-theme-config.mjs",
     "fonts:prune": "node scripts/prune-katex-fonts.mjs",
     "publish:pages:check": "node scripts/publish-pages.mjs --check",
     "publish:pages": "node scripts/publish-pages.mjs",
     "clean": "node scripts/clean-site.mjs",
-    "prebuild": "node scripts/migrate-post-assets.mjs --all --write",
-    "preserve": "node scripts/migrate-post-assets.mjs --all --write",
+    "prebuild": "npm run validate:content && node scripts/migrate-post-assets.mjs --all --write",
+    "preserve": "npm run validate:content && node scripts/migrate-post-assets.mjs --all --write",
     "build": "npm run clean && npx @11ty/eleventy && node scripts/generate-redirects.mjs",
     "serve": "npx @11ty/eleventy --serve"
   }

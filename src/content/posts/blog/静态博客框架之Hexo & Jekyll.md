@@ -3,10 +3,9 @@ title: 静态博客框架之 Hexo 与 Jekyll
 date: 2023-01-22
 slug: hexo-and-jekyll
 category: it
+subcategory: blog
 tags:
   - static-site
-  - hexo
-  - jekyll
 summary: 这篇笔记对比 Hexo 和 Jekyll 两个静态博客框架，分析各自的生态、部署方式和适用场景，并说明选择 Hexo 的原因。
 status: published
 ---

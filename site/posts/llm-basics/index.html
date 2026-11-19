@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>LLM 基础 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">LLM 基础</a></li>
+<li class="toc-item toc-level-1"><a href="#llm">LLM</a></li>
+<li class="toc-item toc-level-2"><a href="#transformer">Transformer</a></li>
+<li class="toc-item toc-level-2"><a href="#vllm">vLLM</a></li>
+<li class="toc-item toc-level-3"><a href="#vllm%E4%B8%8Ellm%E7%9A%84%E6%9C%AC%E8%B4%A8%E5%8C%BA%E5%88%AB%E6%8E%A8%E7%90%86%E5%BC%95%E6%93%8Evs%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B">vLLM与LLM的本质区别：推理引擎vs语言模型</a></li>
+<li class="toc-item toc-level-2"><a href="#moemixture-of-experts">MoE（Mixture of Experts）</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/llm/">#llm</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">LLM 基础</h1>
+
+    <div class="post-body">
+<h1 id="llm">LLM</h1>
+<p>大语言模型（Large Language Model，简称 LLM）是 AI Agent 的大脑，理解它是构建智能 Agent 的基础。</p>
+<p>大语言模型之所以能与你对话、写文章、编程，本质上是它在根据你给出的文本（提示），一个字一个字地<strong>猜</strong>出最合理的下文。</p>
+<p>简单来说，大语言模型是一个经过海量文本数据训练的深度学习模型，它能够理解和生成人类语言。大语言模型通过分析互联网上的海量文本，学习语言的统计规律，当收到输入时，根据学到的规律生成最合理的续写。</p>
+<p>LLM 逐词生成文本的过程——它每次只预测一个词，然后将这个新词纳入输入，继续预测下一个词，如此循环直到生成完整回答：</p>
+<p><img src="https://www.runoob.com/wp-content/uploads/2026/02/d689a96f-f89a-4a55-83d7-fe5aa789d836.png" alt="img"></p>
+<h2 id="transformer">Transformer</h2>
+<p>底层核心技术——<strong>Transformer 架构</strong>。</p>
+<p>Transformer 的工作方式核心流程分为三个阶段：</p>
+<ol>
+<li><strong>输入处理</strong>：你的话被拆分成词或字（Token），并转换成计算机能理解的数字（向量）。</li>
+<li><strong>理解上下文（核心）</strong>：<strong>自注意力机制（Self-Attention）<strong>开始工作。它让模型在处理句子中每一个词时，都能权衡句子中</strong>所有其他词</strong>的重要性。这个过程是<strong>并行</strong>的，速度极快。</li>
+<li><strong>生成与循环</strong>：模型基于对所有词的理解，计算出概率分布，预测下一个最可能出现的词。选中并输出这个词后，将其作为新的输入，重复整个过程，直到生成完整回答。</li>
+</ol>
+<p><img src="/assets/images/llm-basics/Transformer.png" alt="Transformer"></p>
+<p><strong>自注意力机制</strong>是 Transformer 最关键的创新。以句子&quot;苹果的手机它的电池很大&quot;为例，当模型处理<strong>它</strong>这个词时，自注意力机制会帮助模型判断<strong>它</strong>与<strong>苹果</strong>和<strong>手机</strong>高度相关。下图展示了这一过程中的注意力权重分布：</p>
+<p><img src="/assets/images/llm-basics/%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E4%BE%8B%E5%AD%90.png" alt="自注意力机制例子"></p>
+<p>正是这种能<strong>并行处理</strong>并<strong>深度理解全局上下文</strong>的能力，使得基于 Transformer 的 LLM 在语言任务上远超以往技术（如 RNN）。</p>
+<hr>
+<p>使用Transformer作为语言翻译的典型流程图：</p>
+<p><img src="https://i-blog.csdnimg.cn/direct/ef957eb80f474f3cbb4f7d2a4bff4680.png" alt="在这里插入图片描述" referrerpolicy="no-referrer"></p>
+<ol>
+<li>
+<p>待翻译的文字；</p>
+</li>
+<li>
+<p>在进入Encoder前的预处理；</p>
+</li>
+<li>
+<p>Encoder对文字进行Encoding处理；</p>
+</li>
+<li>
+<p>Embeddings就是Encoder的结果，是原来文字的向量化表示；</p>
+</li>
+<li>
+<p>Decoder的部分输出，每次执行翻译一个单词；</p>
+</li>
+<li>
+<p>Decoder一次仅生成一次翻译；</p>
+</li>
+<li>
+<p>最后翻译的结果。</p>
+</li>
+</ol>
+<p>总结下来，就只有两个关键步骤：</p>
+<ul>
+<li>使用Encoder将输入转换为Embeddings；</li>
+<li>使用Decoder对Embeddings进行处理，并将Embeddings表示的结果转换为输出结果。</li>
+</ul>
+<h2 id="vllm">vLLM</h2>
+<h3 id="vllm与llm的本质区别推理引擎vs语言模型">vLLM与LLM的本质区别：推理引擎vs语言模型</h3>
+<p><a href="https://blog.csdn.net/AI_Scout/article/details/154749565">vLLM vs LLM：推理引擎如何让大模型性能提升24倍？_vllm和llm区别-CSDN博客</a></p>
+<p><strong>LLM</strong> 指的是基于深度学习训练的大型语言模型，其核心能力在于理解和生成自然语言文本。现代 LLM 通常具有数百亿到上千亿参数，采用 Transformer 架构，通过自注意力机制捕捉长距离依赖关系，并结合预训练+微调策略实现多任务适应性。LLM 的主要职责是提供智能能力，即生成文本、回答问题或完成自然语言理解任务。</p>
+<p><strong>vLLM</strong>（Vectorized Large Language Model Inference/Serving System）
+vLLM 是一个 <strong>开源推理框架</strong>，由伯克利大学团队开发，专门用于提升 LLM 的推理效率和显存利用率。它并不是新的语言模型，而是<strong>为 LLM 提供高效执行环境的工具</strong>。</p>
+<p>vLLM 的核心技术包括：</p>
+<ul>
+<li><strong>PagedAttention（分页注意力）</strong>：将注意力键值对（KV Cache）存储在非连续显存空间，借鉴操作系统分页机制，显著减少显存碎片化和预留浪费，提高显存利用率至 95% 以上。</li>
+<li><strong>Continuous Batching（连续批处理）</strong>：动态合并多个请求的计算任务，提高 GPU 吞吐量，支持更多并发请求。</li>
+</ul>
+<p>通过这些技术，vLLM 可以将传统 LLM 的推理性能提升高达 24 倍，尤其适合生成式 AI 应用和高并发场景。</p>
+<p>总结：</p>
+<ul>
+<li>LLM：核心是模型本身，提供智能能力和语言理解生成能力，负责语言理解和生成。</li>
+<li>vLLM：核心是推理框架，优化模型在 GPU 上的运行效率和吞吐量，负责提供高效执行环境，优化显存和吞吐量。</li>
+</ul>
+<p>在实际部署中，选择 vLLM 可以显著提升 LLM 的推理性能，尤其在高并发或显存受限的环境下表现突出。</p>
+<hr>
+<p>模型越大，推理越慢、越贵。于是出现了 MoE</p>
+<h2 id="moemixture-of-experts">MoE（Mixture of Experts）</h2>
+<p><strong>混合专家模型 (Mixed Expert Models，简称 MoEs)</strong> 是一种<strong>神经网络架构设计</strong>，不是独立的模型类型，而是 LLM 的&quot;内部结构&quot;。</p>
+<p><strong>解决什么问题</strong>：</p>
+<ul>
+<li>Dense LLM（如 GPT-3、Llama 2）：每次推理都要激活<strong>全部参数</strong>，成本高</li>
+<li>MoE LLM（如 GPT-4、DeepSeek-V3、Qwen3）：每次推理只激活<strong>部分参数</strong>（稀疏激活），速度快、成本低</li>
+</ul>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

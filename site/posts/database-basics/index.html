@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>数据库基础 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">数据库基础</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%B8%80%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA">一、数据库系统概论</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%85%B3%E7%B3%BB%E6%95%B0%E6%8D%AE%E5%BA%93">关系数据库</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93-nosql">非关系型数据库 NoSQL</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E7%BB%93%E6%9E%84">数据库系统结构</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%89%E7%BA%A7%E6%A8%A1%E5%BC%8F%E4%BA%8C%E7%BA%A7%E6%98%A0%E8%B1%A1">三级模式、二级映象</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E6%B2%A1%E6%95%B4%E7%90%86">数据模型（没整理）</a></li>
+<li class="toc-item toc-level-3"><a href="#3%E7%A7%8D%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B">3种数据模型</a></li>
+<li class="toc-item toc-level-4"><a href="#1%E5%B1%82%E6%AC%A1%E6%A8%A1%E5%9E%8B">1.层次模型</a></li>
+<li class="toc-item toc-level-4"><a href="#2%E7%BD%91%E7%8A%B6%E6%A8%A1%E5%9E%8B">2.网状模型</a></li>
+<li class="toc-item toc-level-4"><a href="#3%E5%85%B3%E7%B3%BB%E6%A8%A1%E5%9E%8B">3.关系模型</a></li>
+<li class="toc-item toc-level-3"><a href="#3%E7%A7%8D%E7%BA%A6%E6%9D%9F%E5%AE%8C%E6%95%B4%E6%80%A7">3种约束完整性</a></li>
+<li class="toc-item toc-level-4"><a href="#1%E5%AE%9E%E4%BD%93%E5%AE%8C%E6%95%B4%E6%80%A7">1.实体完整性</a></li>
+<li class="toc-item toc-level-4"><a href="#2%E5%8F%82%E7%85%A7%E5%AE%8C%E6%95%B4%E6%80%A7">2.参照完整性</a></li>
+<li class="toc-item toc-level-4"><a href="#3%E7%94%A8%E6%88%B7%E5%AE%9A%E4%B9%89%E5%AE%8C%E6%95%B4%E6%80%A7">3.用户定义完整性</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%AE%8C%E6%95%B4%E6%80%A7%E7%BA%A6%E6%9D%9F%E5%91%BD%E5%90%8D%E5%AD%90%E5%8F%A5">完整性约束命名子句</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%A6%82%E5%BF%B5%E6%A8%A1%E5%9E%8B%E9%80%BB%E8%BE%91%E6%A8%A1%E5%9E%8B%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B">概念模型、逻辑模型、物理模型</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%9B%9Bsql">四、SQL</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/database/" class="post-category">
+        it / 数据库      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/database/">#database</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">数据库基础</h1>
+
+    <div class="post-body">
+<h1 id="一数据库系统概论">一、数据库系统概论</h1>
+<p><strong>Data：数据</strong>，是数据库中存储的基本对象，是描述事物的符号记录。</p>
+<p><strong>Database：数据库</strong>，是长期储存在计算机内、有组织的、可共享的大量数据的集合。</p>
+<p><strong>DBMS：数据库管理系统</strong>，是位于用户与操作系统之间的一层数据管理软件系统，用于科学地组织、存储和管理数据、高效地获取和维护数据。</p>
+<p><strong>DBS：数据库系统</strong>，指在计算机系统中引入数据库后的系统，一般由数据库、数据库管理系统、应用系统、数据库管理员（DBA）构成。</p>
+<p>数据库系统DBS：由数据库DB、数据库管理系统DBMS、应用系统和数据库管理员构成。</p>
+<p>数据库就是一个存储结构化数据的仓库。</p>
+<p>数据库系统由数据库、数据库管理系统、应用系统和数据库管理员构成。</p>
+<h2 id="关系数据库">关系数据库</h2>
+<p>关系数据库是创建在关系模型基础上的数据库，借助于集合代数等数学概念和方法来处理数据库中的数据。现实世界中的各种实体以及实体之间的各种联系均用关系模型来表示。</p>
+<p>几乎所有的数据库管理系统都配备了一个开放式数据库连接（ODBC）驱动程序，令各个数据库之间得以互相集成。</p>
+<p>典型代表有：MySQL、Oracle、Microsoft SQL Server、Access、PostgreSQL、DB2、MariaDB</p>
+<h2 id="非关系型数据库-nosql">非关系型数据库 NoSQL</h2>
+<p>非关系型数据库也被称为 NoSQL 数据库，NoSQL 并不是某个具体数据库，它泛指所有非关系型数据库。</p>
+<p>非关系型数据库种类有很多，我们列举其中较为流行的几种。</p>
+<ol>
+<li><strong>键值（Key-Value）存储数据库</strong></li>
+</ol>
+<p>键值数据库主要是使用一个哈希表，表中有一个特定的键和一个指针指向特定的数据。Key/value 模型的键值数据库的优势在于，通过键的 hash 码可以快速查询到 value，并且能够应对高并发。</p>
+<p>市面上成熟的产品有，Memcached、Redis、MemcacheDB、Berkeley DB。前两个可能比较有名，做缓存的数据库。</p>
+<ol start="2">
+<li><strong>列存储（Column-oriented）数据库</strong></li>
+</ol>
+<p>列存储数据库又被称为面向可扩展性的分布式数据库，它反转了传统的行存储数据库。</p>
+<p>最典型的产品应用就是，Hbase，大数据存储用的非常多。</p>
+<ol start="3">
+<li><strong>面向文档数据库</strong></li>
+</ol>
+<p>文档数据库是一种非关系数据库，旨在将半结构化数据存储为文档，其中文档包括 XML、YAML、JSON、BSON、office 文档等。</p>
+<p>简而言之，就是将数据保存到以上类似格式的文档中，数据库中的每个记录都是以文档形式存在的，相互之间不再存在关联关系。</p>
+<p>典型的应用就是，MongoDB、CouchDB。</p>
+<h2 id="数据库系统结构">数据库系统结构</h2>
+<h3 id="三级模式二级映象">三级模式、二级映象</h3>
+<p>数据库的三级系统结构：<strong>外模式</strong>、<strong>模式</strong>和<strong>内模式</strong>。</p>
+<p><strong>内模式</strong>：又称为存储模式，是对数据库物理结构和存储方式的描述，是数据在数据库内部的表示方式。<strong>一个数据库只有一个内模式</strong>。</p>
+<p><strong>模式</strong>：是对数据库中全体数据的逻辑结构和特征的描述。</p>
+<p><strong>外模式</strong>：又称为子模式或用户模式，它是数据库用户能够看见和使用的局部数据的逻辑结构和特征的描述，是数据库用户的数据<strong>视图</strong>。通常是模式的子集。<strong>一个数据库可有多个外模式</strong>。</p>
+<p>二级映像：外模式/模式映像、模式/内模式映像。</p>
+<p>数据库三级模式通过二级映象在 DBMS 内部实现这三个抽象层次的联系和转换。</p>
+<p>外模式面向应用程序， 通过外模式/模式映象与逻辑模式建立联系， 实现数据的逻辑独立性。 模式/内模式映象建立模式与内模式之间的一对一映射， 实现数据的物理独立性。</p>
+<h2 id="数据模型没整理">数据模型（没整理）</h2>
+<p><strong>数据模型</strong>：是用来抽象、表示和处理现实世界中的数据和信息的工具，是对现实世界的模拟，是数据库系统的核心和基础。</p>
+<p>数据模型组成3元素有<strong>数据结构</strong>、<strong>数据操作</strong>和<strong>完整性约束</strong>。</p>
+<p>常见的数据模型包括：关系、层次、网状、面向对象、对象关系映射等几种。</p>
+<p>关系模型的完整性约束包括：<strong>实体完整性</strong>、<strong>参照完整性</strong>和<strong>用户定义完整性</strong>。</p>
+<h3 id="3种数据模型">3种数据模型</h3>
+<h4 id="1层次模型">1.层次模型</h4>
+<p>定义：层次数据模型是用树状&lt;层次&gt;结构来组织数据的数据模型。</p>
+<p>其实层次数据模型就是的图形表示就是一个倒立生长的树，由基本数据结构中的树（或者二叉树）的定义可知，每棵树都有且仅有一个根节点，其余的节点都是非根节点。每个节点表示一个记录类型对应与实体的概念，记录类型的各个字段对应实体的各个属性。各个记录类型及其字段都必须记录。</p>
+<p><strong>1.有且只有一个结点没有双亲结点，这个结点称为根节点；2.根以外的其它结点有且仅有一个双亲结点。</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/20200706172308540.png" alt="在这里插入图片描述" referrerpolicy="no-referrer"></p>
+<h4 id="2网状模型">2.网状模型</h4>
+<p>定义：用有向图表示实体和实体之间的联系的数据结构模型称为网状数据模型。</p>
+<p>其实，网状数据模型可以看做是放松层次数据模型的约束性的一种扩展。网状数据模型中所有的节点允许脱离父节点而存在，也就是说说在整个模型中允许存在两个或多个没有根节点的节点，同时也允许一个节点存在一个或者多个的父节点，成为一种网状的有向图。因此节点之间的对应关系不再是1:n，而是一种m:n的关系，从而克服了层次状数据模型的缺点。</p>
+<p><strong>1.允许一个以上的结点无双亲；2.一个结点可以有多余一个的双亲</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/20200706172458450.png" alt="在这里插入图片描述" referrerpolicy="no-referrer"></p>
+<h4 id="3关系模型">3.关系模型</h4>
+<p>关系型数据模型对应的数据库自然就是关系型数据库了，这是目前应用最多的数据库。</p>
+<p>**定义：**使用表格表示实体和实体之间关系的数据模型称之为关系数据模型。</p>
+<p>关系型数据库是目前最流行的数据库，同时也是被普遍使用的数据库，如MySQL就是一种流行的数据库。支持关系数据模型的数据库管理系统称为关系型数据库管理系统。在用户观点下，关系模型中数据的逻辑结构是<strong>一张二维表，它由行和列组成。</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/2020070617275372.png" alt="在这里插入图片描述" referrerpolicy="no-referrer"></p>
+<ul>
+<li>关系（Relation）：一个关系对应通常所说的一张表。</li>
+<li>元组（Tuple）：表中的一行即为一个元组。</li>
+<li>属性（Attrubute）：表中的一列即为一个属性，给每一个属性起一个名称即属性名。</li>
+<li>码（Key）：表中的某个属性组，它可以唯一确定一个元组。</li>
+<li>域（Domain）：属性的取值范围。</li>
+<li>分量：元组中的一个属性值。</li>
+<li>关系模式：对关系的描述，如：学生（学号，姓名，年龄，性别，系，年级）</li>
+<li>关系数据库： 依照关系模型建立的数据库称为关系数据库。 它是在某个应用领域的所有关系的集合。</li>
+<li>主键： 能够唯一地标识一个元组的属性或属性组称为关系的键或候选键。 若一个关系有多个候选键则可选其一作为主键(Primary key)。</li>
+<li>外键：如果一个关系的一个或一组属性引用(参照)了另一个关系的主键，则称这个或这组属性为外码或外键(Foreign key)。</li>
+</ul>
+<p>关系最基本的规范条件：关系的每一个分量必须是一个不可分的数据项，不允许表中还有表。</p>
+<p><img src="https://img-blog.csdnimg.cn/2020070617304299.png" alt="在这里插入图片描述" referrerpolicy="no-referrer"></p>
+<h3 id="3种约束完整性">3种约束完整性</h3>
+<p>关系数据模型定义了三种约束完整性：实体完整性、参照完整性以及用户定义完整性。</p>
+<h4 id="1实体完整性">1.实体完整性</h4>
+<p>实体完整性是指<strong>实体的主属性不能取空值</strong>。</p>
+<p>实体完整性规则规定实体的所有主属性都不能为空。实体完整性针对基本关系而言的，一个基本关系对应着现实世界中的一个主题，例如上例中的学生表对应着学生这个实体。现实世界中的实体是可以区分的，他们具有某种唯一性标志，这种标志在关系模型中称之为主码，主码的属性也就是主属性不能为空。</p>
+<ol>
+<li>一种定义为列级约束条件，另一种定义为表级约束条件。在create table中用primary key定义。</li>
+<li>完整性检查和违约处理。</li>
+</ol>
+<h4 id="2参照完整性">2.参照完整性</h4>
+<p>在关系数据库中主要是<strong>值的外键参照的完整性</strong>。</p>
+<p>若A关系中的某个或者某些属性参照B或其他几个关系中的属性，那么在关系A中该属性要么为空，要么必须出现B或者其他的关系的对应属性中。如上表中的选课关系的stu_id和cour_id分别是参考学生和课程的外键，那么对于现实的系统而言，stu_id和cour_id必须分别出现在学生和课程关系中，这就是外键参考的完整性，同时删除的时候根据设置的不同有不同的处理方式。</p>
+<ul>
+<li>在create table中用foreign key短语定义哪些列为外码列，用references短语指明这些外码参照哪些表的主码。</li>
+<li>对被参照表和参照表进行增删改查操作时很有可能破坏参照完整性，必须进行检查。</li>
+</ul>
+<p><img src="https://pic4.zhimg.com/80/v2-b3105f173cc1c947f1a13567133c3b9f_720w.webp" alt="img"></p>
+<ul>
+<li>违约处理：reject（拒绝执行）、cascade（级联）、set-null（设置为空）</li>
+</ul>
+<p><img src="https://pic1.zhimg.com/80/v2-fbe782c381a74474303bbd824c50dee8_720w.webp" alt="img"></p>
+<h4 id="3用户定义完整性">3.用户定义完整性</h4>
+<p>用户定义完整性是<strong>针对某一个具体关系的约束条件</strong>。</p>
+<p>它反映的某一个具体应用所对应的数据必须满足一定的约束条件。例如，某些属性必须取唯一值，某些值的范围为0-100等。</p>
+<p>列值非空：NOT NULL短语</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> sc</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sno </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">not null</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sname </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">not null</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
+<p>列值唯一：UNIQUE短语</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> student</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    (sname </span><span style="color:#D73A49;--shiki-dark:#F97583">varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">50</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">unique</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sage </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
+<p>check：指定列值应该满足的条件</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> student</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">   (sage </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583"> check</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(sage</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#005CC5;--shiki-dark:#79B8FF">19</span><span style="color:#24292E;--shiki-dark:#E1E4E8">),</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ssex </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">check</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(ssex </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'男'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'女'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)));</span></span></code></pre>
+<blockquote>
+<p>例如：</p>
+<p>学生（学号，姓名，课程号，性别，....）
+课程（课程号，课程名，学分）；
+选修（学号，课程名，成绩）</p>
+<p>如</p>
+<p>这里学生的性别只能取“男”，“女”</p>
+<p>学分只能取1-...分
+成绩只能取1-100分</p>
+</blockquote>
+<h4 id="完整性约束命名子句">完整性约束命名子句</h4>
+<p>提供constraint，用来对完整性命名</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">constraint</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">完整性约束条件名</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [PRIMARY KEY短语|FOREIGN KEY短语|CHECK短语]</span></span></code></pre>
+<hr>
+<h3 id="概念模型逻辑模型物理模型">概念模型、逻辑模型、物理模型</h3>
+<ul>
+<li><strong>数据库及数据仓库模型设计的三个主要步骤</strong></li>
+</ul>
+<p>概念模型设计 , 逻辑模型设计 , 物理模型设计 是<strong>数据库及数据仓库模型设计的三个主要步骤</strong>。</p>
+<p><strong>概念模型</strong>：也称信息模型，是按用户的观点来对数据和信息建模，主要用于数据库设计。</p>
+<p><strong>逻辑模型</strong>：是按计算机系统的观点对数据建模，用于DBMS实现。</p>
+<p><strong>物理模型</strong>：是对数据最底层的抽象，描述数据在系统内部的表示方式和存取方法，在磁盘或磁带上的存储方式和存取方法，是面向计算机系统的。</p>
+<hr>
+<p><strong>实体和属性</strong>：客观存在并可相互区别的事物称为实体。实体所具有的某一特性称为属性。</p>
+<p>实体型之间的联系分为一对一、一对多和多对多三种类型。</p>
+<p><strong>E-R图</strong>：即实体-关系图，用于描述现实世界的事物及其相互关系，是数据库概念模型设计的主要工具。</p>
+<p><strong>关系模式</strong>：从用户观点看，关系模式是由一组关系组成，每个关系的数据结构是一张规范化的二维表。</p>
+<p><strong>型/值</strong>：型是对某一类数据的结构和属性的说明；值是型的一个具体赋值，是型的实例。</p>
+<p><strong>数据库模式</strong>：是对数据库中全体数据的逻辑结构（数据项的名字、类型、取值范围等）和特征（数据之间的联系以及数据有关的安全性、完整性要求）的描述。</p>
+<hr>
+<h1 id="四sql">四、SQL</h1>
+<p>SQL：结构化查询语言的简称， 是关系数据库的标准语言。</p>
+<p>SQL 是一种通用的、 功能极强的关系数据库语言， 是对关系数据存取的标准接口， 也是不同数据库系统之间互操作的基础。集数据查询、数据操作、数据定义、和数据控制功能于一体。</p>
+<p><strong>数据定义</strong>：数据定义功能包括模式定义、表定义、视图和索引的定义。</p>
+<p><strong>嵌套查询</strong>：指将一个查询块嵌套在另一个查询块的 WHERE 子句或 HAVING 短语的条件中的查询。</p>
+<p>SQL 数据定义语句的操作对象有：模式、表、视图和索引。</p>
+<p>SQL 数据定义语句的命令动词是：CREATE、DROP 和 ALTER。</p>
+<p>RDBMS 中索引一般采用 B+树或 HASH 来实现。</p>
+<p>索引可以分为唯一索引、非唯一索引和聚簇索引三种类型。</p>
+<p><img src="https://img-blog.csdn.net/20130903204444156" alt="img" referrerpolicy="no-referrer"></p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

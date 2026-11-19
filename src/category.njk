@@ -56,7 +56,7 @@ eleventyComputed:
       <div class="post-list">
         {% for post in collections.publishedPosts %}
         {% if post.data.category == categoryPage.parent %}
-        {% if categoryPage.kind == "parent" or (post.inputPath | postSubcategory) == categoryPage.slug %}
+        {% if categoryPage.kind == "parent" or (post.inputPath | postSubcategory(post.data)) == categoryPage.slug %}
           {% include "partials/post-card.njk" %}
         {% endif %}
         {% endif %}

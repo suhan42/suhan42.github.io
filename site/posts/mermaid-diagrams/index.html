@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Mermaid 画图 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Mermaid 画图</a></li>
+<li class="toc-item toc-level-1"><a href="#mermaid">mermaid</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%9B%BEgraph">图(graph)</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%8A%82%E7%82%B9%E5%BD%A2%E7%8A%B6">节点形状</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%9E%E7%BA%BF%E5%BD%A2%E7%8A%B6">连线形状</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%AD%90%E5%9B%BE">子图</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%BA%8C%E5%8F%89%E6%A0%91">二叉树</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%88%91%E5%B8%B8%E7%94%A8%E7%9A%84">我常用的</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%BB%93%E6%9E%84%E5%90%AB%E4%B9%89">结构含义</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%BB%93%E7%82%B9%E5%90%AB%E4%B9%89">结点含义</a></li>
+<li class="toc-item toc-level-1"><a href="#uml%E7%B1%BB%E5%9B%BEclassdiagram">UML类图(classDiagram)</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%B1%BB%E5%85%B3%E7%B3%BB%E8%BF%9E%E7%BA%BF">类关系连线</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%B1%BB%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%92%8C%E6%96%B9%E6%B3%95">类成员变量和方法</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%B3%9B%E5%9E%8B">泛型</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BF%AE%E9%A5%B0%E8%AF%8D">修饰词</a></li>
+<li class="toc-item toc-level-4"><a href="#%E7%B1%BB%E7%9A%84%E6%B3%A8%E9%87%8A">类的注释</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BE%8B%E5%AD%90">例子</a></li>
+<li class="toc-item toc-level-1"><a href="#%E6%97%B6%E5%BA%8F%E5%9B%BEsequencediagram">时序图(sequenceDiagram)</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8F%82%E4%B8%8E%E8%80%85-%E6%A8%A1%E5%9D%97%E5%A3%B0%E6%98%8E">参与者--模块声明</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%9E%E7%BA%BF">连线</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7">高级特性</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%BE%AA%E7%8E%AF">循环</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%88%86%E6%94%AF">分支</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%B3%A8%E9%87%8A">注释</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%94%98%E7%89%B9%E5%9B%BEgantt">甘特图(gantt)</a></li>
+<li class="toc-item toc-level-1"><a href="#%E9%A5%BC%E5%9B%BE">饼图</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%8F%82%E8%80%83">参考</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/markdown/" class="post-category">
+        it / Markdown      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/markdown/">#markdown</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Mermaid 画图</h1>
+
+    <div class="post-body">
+<h1 id="mermaid">mermaid</h1>
+<p><strong>Mermaid</strong> 是一种开源的可交互式的数据可视化库，它使用 Markdown 标记语言来生成图表和流程图。它通常用于生成网站或文档中的图表。Mermaid 不属于任何公司，而是一个由社区开发和维护的开源项目。</p>
+<p><strong>官方网站</strong>： <a href="https://link.zhihu.com/?target=https%3A//mermaid-js.github.io/%E2%80%8B">https://mermaid-js.github.io/</a></p>
+<p>启用 markdown 绘图块与代码块非常像：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ```mermaid</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#032F62;--shiki-dark:#9ECBFF">   ··· 绘图指令 ···</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ```</span></span></code></pre>
+<p>需要用到关键字<code>mermaid</code></p>
+<h1 id="图graph">图(graph)</h1>
+<p>绘制流程图的第一行是流程图的声明，包含关键字 <code>graph</code> 和流程图方向。</p>
+<p>【拓展】<strong>Flowchart</strong>：适合复杂的流程图，支持更多的节点类型和样式，适合专业场景。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Orchestrator</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"协调者（Orchestrator）&#x3C;br/>任务分解 · 调度 · 结果综合"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#E36209;--shiki-dark:#FFAB70"> 并行执行</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"并行执行"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">        direction</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">        AgentA</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"子 Agent A&#x3C;br/>代码审查"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">        AgentB</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"子 Agent B&#x3C;br/>安全检测"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">        AgentC</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"子 Agent C&#x3C;br/>性能分析"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Result</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"结果汇总&#x3C;br/>综合各子 Agent 输出"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Orchestrator </span><span style="color:#D73A49;--shiki-dark:#F97583">-->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">分发任务</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> AgentA</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Orchestrator </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> AgentB</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Orchestrator </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> AgentC</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#E36209;--shiki-dark:#FFAB70">    AgentA </span><span style="color:#D73A49;--shiki-dark:#F97583">-.->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">返回结果</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Result</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">    AgentB </span><span style="color:#D73A49;--shiki-dark:#F97583">-.-></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Result</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">    AgentC </span><span style="color:#D73A49;--shiki-dark:#F97583">-.-></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Result</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Orchestrator fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">5b21b6</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 并行执行 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff7ed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f97316</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">c2410c</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style AgentA fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">10b981</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style AgentB fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">10b981</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style AgentC fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">10b981</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Result fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">dbeafe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">2563eb</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">1e40af</span></span></code></pre>
+<p>流程图方向包含以下标识：</p>
+<ul>
+<li>TB，从上到下</li>
+<li>TD，从上到下</li>
+<li>BT，从下到上</li>
+<li>RL，从右到左</li>
+<li>LR，从左到右</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>graph LR</span></span>
+<span class="line"><span class="line-number">2</span><span>A-->B  </span></span>
+<span class="line"><span class="line-number">3</span><span>B-->C  </span></span>
+<span class="line"><span class="line-number">4</span><span>C-->D  </span></span>
+<span class="line"><span class="line-number">5</span><span>D-->A</span></span></code></pre>
+<p>例如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">A</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">B  </span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">B</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">C  </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">C</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">D  </span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">D</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">A</span></span></code></pre>
+<h3 id="节点形状">节点形状</h3>
+<ul>
+<li>默认节点 A</li>
+<li>文本节点 B[bname]</li>
+<li>圆角节点 C(cname)</li>
+<li>圆形节点 D((dname))</li>
+<li>非对称节点 E&gt;ename]</li>
+<li>菱形节点 F{fname}</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>graph TB  </span></span>
+<span class="line"><span class="line-number">2</span><span>%% 我是备注</span></span>
+<span class="line"><span class="line-number">3</span><span>A  </span></span>
+<span class="line"><span class="line-number">4</span><span>B[bname]  </span></span>
+<span class="line"><span class="line-number">5</span><span>C(cname)  </span></span>
+<span class="line"><span class="line-number">6</span><span>D((dname))  </span></span>
+<span class="line"><span class="line-number">7</span><span>E>ename]  </span></span>
+<span class="line"><span class="line-number">8</span><span>F{fname}</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB  </span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">A  </span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">B</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">bname</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">C</span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">cname</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  </span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">D</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">dname</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  </span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">E</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#032F62;--shiki-dark:#9ECBFF">ename</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  </span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">F</span><span style="color:#D73A49;--shiki-dark:#F97583">{</span><span style="color:#032F62;--shiki-dark:#9ECBFF">fname</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span></code></pre>
+<h3 id="连线形状">连线形状</h3>
+<p>节点间的连接线有多种形状，可以在连接线中加入标签：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>graph LR</span></span>
+<span class="line"><span class="line-number">2</span><span>箭头连接A1-->B1 </span></span>
+<span class="line"><span class="line-number">3</span><span>开放连接A2---B2</span></span>
+<span class="line"><span class="line-number">4</span><span>可以增长A2.1----B2.1</span></span>
+<span class="line"><span class="line-number">5</span><span></span></span>
+<span class="line"><span class="line-number">6</span><span>标签连接A3--text---B3</span></span>
+<span class="line"><span class="line-number">7</span><span>箭头标签连接A4--text-->B4</span></span>
+<span class="line"><span class="line-number">8</span><span></span></span>
+<span class="line"><span class="line-number">9</span><span>虚线开放连接A5-.-B5</span></span>
+<span class="line"><span class="line-number">10</span><span>虚线箭头连接A6-.->B6</span></span>
+<span class="line"><span class="line-number">11</span><span></span></span>
+<span class="line"><span class="line-number">12</span><span>标签虚线连接A7-.text.-B7</span></span>
+<span class="line"><span class="line-number">13</span><span>标签虚线箭头连接A8-.text.->B8</span></span>
+<span class="line"><span class="line-number">14</span><span></span></span>
+<span class="line"><span class="line-number">15</span><span>粗线开放连接A9===B9</span></span>
+<span class="line"><span class="line-number">16</span><span>粗线箭头连接A10==>B10</span></span>
+<span class="line"><span class="line-number">17</span><span>标签粗线开放连接A11==text===B11</span></span>
+<span class="line"><span class="line-number">18</span><span>标签粗线箭头连接A12==text==>B12</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">%% 我是备注</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">箭头连接A1</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">B1 </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">开放连接A2</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">B2</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">可以增长A2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#D73A49;--shiki-dark:#F97583">----</span><span style="color:#E36209;--shiki-dark:#FFAB70">B2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">标签连接A3</span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#032F62;--shiki-dark:#9ECBFF">text</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">B3</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">箭头标签连接A4</span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#032F62;--shiki-dark:#9ECBFF">text</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">B4</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">虚线开放连接A5</span><span style="color:#D73A49;--shiki-dark:#F97583">-.-</span><span style="color:#E36209;--shiki-dark:#FFAB70">B5</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">虚线箭头连接A6</span><span style="color:#D73A49;--shiki-dark:#F97583">-.-></span><span style="color:#E36209;--shiki-dark:#FFAB70">B6</span></span>
+<span class="line"><span class="line-number">12</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">标签虚线连接A7</span><span style="color:#D73A49;--shiki-dark:#F97583">-.</span><span style="color:#032F62;--shiki-dark:#9ECBFF">text</span><span style="color:#D73A49;--shiki-dark:#F97583">.-</span><span style="color:#E36209;--shiki-dark:#FFAB70">B7</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">标签虚线箭头连接A8</span><span style="color:#D73A49;--shiki-dark:#F97583">-.</span><span style="color:#032F62;--shiki-dark:#9ECBFF">text</span><span style="color:#D73A49;--shiki-dark:#F97583">.-></span><span style="color:#E36209;--shiki-dark:#FFAB70">B8</span></span>
+<span class="line"><span class="line-number">15</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">粗线开放连接A9</span><span style="color:#D73A49;--shiki-dark:#F97583">===</span><span style="color:#E36209;--shiki-dark:#FFAB70">B9</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#E36209;--shiki-dark:#FFAB70">粗线箭头连接A10</span><span style="color:#D73A49;--shiki-dark:#F97583">==></span><span style="color:#E36209;--shiki-dark:#FFAB70">B10</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">标签粗线开放连接A11</span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#032F62;--shiki-dark:#9ECBFF">text</span><span style="color:#D73A49;--shiki-dark:#F97583">===</span><span style="color:#E36209;--shiki-dark:#FFAB70">B11</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">标签粗线箭头连接A12</span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#032F62;--shiki-dark:#9ECBFF">text</span><span style="color:#D73A49;--shiki-dark:#F97583">==></span><span style="color:#E36209;--shiki-dark:#FFAB70">B12</span></span></code></pre>
+<h3 id="子图">子图</h3>
+<p>markdown 的语法中，还允许用户添加子图，子图就是以 <code>subgraph</code>关键字标识的graph，并以<code>end</code>结尾，但所有节点名都是全局的，并不隔离，因此子图之间是可以相互连接的。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>graph LR</span></span>
+<span class="line"><span class="line-number">2</span><span>    subgraph g1</span></span>
+<span class="line"><span class="line-number">3</span><span>    	a1*-->b1*</span></span>
+<span class="line"><span class="line-number">4</span><span>    end</span></span>
+<span class="line"><span class="line-number">5</span><span></span></span>
+<span class="line"><span class="line-number">6</span><span>    subgraph g2</span></span>
+<span class="line"><span class="line-number">7</span><span>    	a2*-->b2*</span></span>
+<span class="line"><span class="line-number">8</span><span>    end</span></span>
+<span class="line"><span class="line-number">9</span><span>    </span></span>
+<span class="line"><span class="line-number">10</span><span>    subgraph g3</span></span>
+<span class="line"><span class="line-number">11</span><span>    	a3*-->b3*</span></span>
+<span class="line"><span class="line-number">12</span><span>    end</span></span>
+<span class="line"><span class="line-number">13</span><span>a3*-->a2*</span></span></code></pre>
+<p>a3*--&gt;a2* 放在哪里都可以</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> g1</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">    	a1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">*</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">b1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">*</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> g2</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">    	a2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">*</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">b2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">*</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> g3</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">    	a3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">*</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">b3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">*</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">a3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">*</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">a2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">*</span></span></code></pre>
+<h1 id="二叉树">二叉树</h1>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>%%使用mermaid语言</span></span>
+<span class="line"><span class="line-number">2</span><span>graph TB</span></span>
+<span class="line"><span class="line-number">3</span><span>%%(())代表圆</span></span>
+<span class="line"><span class="line-number">4</span><span>A((A))</span></span>
+<span class="line"><span class="line-number">5</span><span>B((B))</span></span>
+<span class="line"><span class="line-number">6</span><span>C((C))</span></span>
+<span class="line"><span class="line-number">7</span><span>D((D))</span></span>
+<span class="line"><span class="line-number">8</span><span>E((E))</span></span>
+<span class="line"><span class="line-number">9</span><span>A---B</span></span>
+<span class="line"><span class="line-number">10</span><span>A---C</span></span>
+<span class="line"><span class="line-number">11</span><span>%%F中为空字符</span></span>
+<span class="line"><span class="line-number">12</span><span>B---F(( ))</span></span>
+<span class="line"><span class="line-number">13</span><span>%%设置F属性为填充为白色，边框宽度为0</span></span>
+<span class="line"><span class="line-number">14</span><span>style F fill: #f100,stroke-width:0px </span></span>
+<span class="line"><span class="line-number">15</span><span>B---D</span></span>
+<span class="line"><span class="line-number">16</span><span>C---E</span></span>
+<span class="line"><span class="line-number">17</span><span>%%G中为空字符</span></span>
+<span class="line"><span class="line-number">18</span><span>C---G(( ))</span></span>
+<span class="line"><span class="line-number">19</span><span></span></span>
+<span class="line"><span class="line-number">20</span><span>%%设置F属性为填充为白色，边框宽度为0</span></span>
+<span class="line"><span class="line-number">21</span><span>style G fill: #f100, stroke-width:0px </span></span>
+<span class="line"><span class="line-number">22</span><span></span></span>
+<span class="line"><span class="line-number">23</span><span>%%将第3条连接线的宽度设为0,就看不见这条线了</span></span>
+<span class="line"><span class="line-number">24</span><span>linkStyle 2 stroke:#0ff,stroke-width:0px</span></span>
+<span class="line"><span class="line-number">25</span><span>%%将第16条连接线的宽度设为0,就看不见这条线了</span></span>
+<span class="line"><span class="line-number">26</span><span>linkStyle 5 stroke:#0ff,stroke-width:0px;</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">%%使用mermaid语言</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%(())代表圆</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">A</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">A</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">B</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">B</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">C</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">C</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">D</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">D</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">E</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">E</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">A</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">B</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">A</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">C</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%F中为空字符</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">B</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">F</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%设置F属性为填充为白色，边框宽度为0</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">style F fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: #</span><span style="color:#E36209;--shiki-dark:#FFAB70">f100</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px </span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">B</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">D</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">C</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">E</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%G中为空字符</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">C</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">G</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">19</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%设置F属性为填充为白色，边框宽度为0</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">style G fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: #</span><span style="color:#E36209;--shiki-dark:#FFAB70">f100</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px </span></span>
+<span class="line"><span class="line-number">22</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%将第3条连接线的宽度设为0,就看不见这条线了</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">linkStyle 2 stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">0ff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%将第16条连接线的宽度设为0,就看不见这条线了</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#E36209;--shiki-dark:#FFAB70">linkStyle 5 stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">0ff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p>eg2</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">21</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">2</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">31</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">3</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">41</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">4</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">21</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">31</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">22</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">2</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">n2</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">22</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">32</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">3</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span></code></pre>
+<h2 id="我常用的">我常用的</h2>
+<h3 id="结构含义">结构含义</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>graph TB</span></span>
+<span class="line"><span class="line-number">2</span><span>1((36))---2((m))</span></span></code></pre>
+<p>1和2表示结点，括号内的内容是结点的权，或者名字。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">36</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">m</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span></code></pre>
+<h3 id="结点含义">结点含义</h3>
+<ul>
+<li>1((1))：根</li>
+<li>21((2))：第二层的第一个结点
+<ul>
+<li>同理31((3))：第三层的第一个结点</li>
+</ul>
+</li>
+<li>3n1(( ))：第三层第一个空结点</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>graph TB</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>%%左子树</span></span>
+<span class="line"><span class="line-number">4</span><span>1((1))---21((2))---31((3))---41((4))</span></span>
+<span class="line"><span class="line-number">5</span><span>21---3n1(( ))</span></span>
+<span class="line"><span class="line-number">6</span><span>31---4n1(( ))</span></span>
+<span class="line"><span class="line-number">7</span><span></span></span>
+<span class="line"><span class="line-number">8</span><span>%%右子树</span></span>
+<span class="line"><span class="line-number">9</span><span>1((1))---22((2))---3n2(( ))</span></span>
+<span class="line"><span class="line-number">10</span><span>22---32((3))</span></span>
+<span class="line"><span class="line-number">11</span><span></span></span>
+<span class="line"><span class="line-number">12</span><span>%%隐藏结点</span></span>
+<span class="line"><span class="line-number">13</span><span>style 3n1 fill: #f100,stroke-width:0px</span></span>
+<span class="line"><span class="line-number">14</span><span>style 4n1 fill: #f100,stroke-width:0px</span></span>
+<span class="line"><span class="line-number">15</span><span>style 3n2 fill: #f100,stroke-width:0px</span></span>
+<span class="line"><span class="line-number">16</span><span>%%隐藏路径</span></span>
+<span class="line"><span class="line-number">17</span><span>linkStyle 3,4,6 stroke:#0ff,stroke-width:0px</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%左子树</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">21</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">2</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">31</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">3</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">41</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">4</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">21</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">3n1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">31</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">4n1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%右子树</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">22</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">2</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">3n2</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">22</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">32</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">3</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">11</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">style 3n1 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: #</span><span style="color:#E36209;--shiki-dark:#FFAB70">f100</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">style 4n1 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: #</span><span style="color:#E36209;--shiki-dark:#FFAB70">f100</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">style 3n2 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: #</span><span style="color:#E36209;--shiki-dark:#FFAB70">f100</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px</span></span>
+<span class="line"><span class="line-number">15</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">linkStyle 3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">6 stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">0ff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px</span></span></code></pre>
+<p>采用二叉树的顺序存储——完全二叉树</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>graph TB</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>%%左子树</span></span>
+<span class="line"><span class="line-number">4</span><span>1((1))---2((1))---4((1))---8((4))</span></span>
+<span class="line"><span class="line-number">5</span><span>2---5((2))---10((10))</span></span>
+<span class="line"><span class="line-number">6</span><span>4---9(( ))</span></span>
+<span class="line"><span class="line-number">7</span><span>5---11(( ))</span></span>
+<span class="line"><span class="line-number">8</span><span></span></span>
+<span class="line"><span class="line-number">9</span><span>%%右子树</span></span>
+<span class="line"><span class="line-number">10</span><span>1((1))---3((4))</span></span>
+<span class="line"><span class="line-number">11</span><span></span></span>
+<span class="line"><span class="line-number">12</span><span>%%隐藏结点</span></span>
+<span class="line"><span class="line-number">13</span><span>style 9 fill: #f100,stroke-width:0px</span></span>
+<span class="line"><span class="line-number">14</span><span>style 11 fill: #f100,stroke-width:0px</span></span>
+<span class="line"><span class="line-number">15</span><span>%%隐藏路径</span></span>
+<span class="line"><span class="line-number">16</span><span>linkStyle 5,6 stroke:#0ff,stroke-width:0px</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%左子树</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">4</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">8</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">4</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">5</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">2</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">10</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">10</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">4</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">9</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">5</span><span style="color:#D73A49;--shiki-dark:#F97583">---</span><span style="color:#E36209;--shiki-dark:#FFAB70">11</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#D73A49;--shiki-dark:#F97583"> ))</span></span>
+<span class="line"><span class="line-number">8</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%右子树</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span><span style="color:#D73A49;--shiki-dark:#F97583">))---</span><span style="color:#E36209;--shiki-dark:#FFAB70">3</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">4</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">11</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%隐藏结点</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">style 9 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: #</span><span style="color:#E36209;--shiki-dark:#FFAB70">f100</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">style 11 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: #</span><span style="color:#E36209;--shiki-dark:#FFAB70">f100</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#6A737D;--shiki-dark:#6A737D">%%隐藏路径</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">linkStyle 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">6 stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">0ff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">0px</span></span></code></pre>
+<h1 id="uml类图classdiagram">UML类图(classDiagram)</h1>
+<p>绘制UML类图的关键字是<code>classDiagram</code>。</p>
+<h3 id="类关系连线">类关系连线</h3>
+<ul>
+<li>实现：&lt;|..    示例：<code>A&lt;|..B:实现</code>      类与接口的关系</li>
+<li>继承：&lt;|--   示例：<code>C &lt;|-- D:继承</code>  子类与父类的关系</li>
+<li>组合：*--     示例：<code>E *-- F:组合</code>    整体与部分的关系，部分不能离开整体单独存在。</li>
+<li>聚合：o--     示例：<code>G o-- H:聚合</code>    整体与部分的关系，部分可以离开整体单独存在。</li>
+<li>关联：&quot;1..<em>&quot; -- &quot;1..</em>&quot;     示例：<code>I &quot;1..*&quot; -- &quot;1..*&quot; J :关联</code>    一种拥有关系，一个类知道另一个类的属性和方法。</li>
+<li>依赖：&lt;--     示例：<code>K &lt;-- L :依赖</code>    一种使用关系，一个类的实现需要另一个类的协助。</li>
+</ul>
+<p>例如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>classDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>class A</span></span>
+<span class="line"><span class="line-number">4</span><span>class B</span></span>
+<span class="line"><span class="line-number">5</span><span>A &#x3C;|.. B:实现</span></span>
+<span class="line"><span class="line-number">6</span><span></span></span>
+<span class="line"><span class="line-number">7</span><span>class C</span></span>
+<span class="line"><span class="line-number">8</span><span>class D</span></span>
+<span class="line"><span class="line-number">9</span><span>C &#x3C;|-- D:继承</span></span>
+<span class="line"><span class="line-number">10</span><span></span></span>
+<span class="line"><span class="line-number">11</span><span>class E</span></span>
+<span class="line"><span class="line-number">12</span><span>class F</span></span>
+<span class="line"><span class="line-number">13</span><span>E *-- F:组合</span></span>
+<span class="line"><span class="line-number">14</span><span></span></span>
+<span class="line"><span class="line-number">15</span><span>class G</span></span>
+<span class="line"><span class="line-number">16</span><span>class H</span></span>
+<span class="line"><span class="line-number">17</span><span>G o-- H:聚合</span></span>
+<span class="line"><span class="line-number">18</span><span></span></span>
+<span class="line"><span class="line-number">19</span><span>class I</span></span>
+<span class="line"><span class="line-number">20</span><span>class J</span></span>
+<span class="line"><span class="line-number">21</span><span>I "1..*" -- "1..*" J :关联</span></span>
+<span class="line"><span class="line-number">22</span><span></span></span>
+<span class="line"><span class="line-number">23</span><span>class K</span></span>
+<span class="line"><span class="line-number">24</span><span>class L</span></span>
+<span class="line"><span class="line-number">25</span><span>K &#x3C;-- L :依赖</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">classDiagram</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> A</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> B</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">A</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;|..</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> B</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF">实现</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> C</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> D</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">C</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;|--</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> D</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF">继承</span></span>
+<span class="line"><span class="line-number">10</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> E</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> F</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6F42C1;--shiki-dark:#B392F0">E</span><span style="color:#D73A49;--shiki-dark:#F97583"> *--</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> F</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF">组合</span></span>
+<span class="line"><span class="line-number">14</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> G</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> H</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#6F42C1;--shiki-dark:#B392F0">G</span><span style="color:#D73A49;--shiki-dark:#F97583"> o--</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> H</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF">聚合</span></span>
+<span class="line"><span class="line-number">18</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> I</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> J</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#6F42C1;--shiki-dark:#B392F0">I</span><span style="color:#D73A49;--shiki-dark:#F97583"> "1..*"</span><span style="color:#D73A49;--shiki-dark:#F97583"> --</span><span style="color:#D73A49;--shiki-dark:#F97583"> "1..*"</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> J</span><span style="color:#D73A49;--shiki-dark:#F97583"> :</span><span style="color:#032F62;--shiki-dark:#9ECBFF">关联</span></span>
+<span class="line"><span class="line-number">22</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> K</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> L</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#6F42C1;--shiki-dark:#B392F0">K</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;--</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> L</span><span style="color:#D73A49;--shiki-dark:#F97583"> :</span><span style="color:#032F62;--shiki-dark:#9ECBFF">依赖</span></span></code></pre>
+<h3 id="类成员变量和方法">类成员变量和方法</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>classDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span>class Student {</span></span>
+<span class="line"><span class="line-number">3</span><span>    +String name</span></span>
+<span class="line"><span class="line-number">4</span><span>    +int age</span></span>
+<span class="line"><span class="line-number">5</span><span>    - Address address</span></span>
+<span class="line"><span class="line-number">6</span><span>    +getAddress() Address</span></span>
+<span class="line"><span class="line-number">7</span><span>    -setAddress() void</span></span>
+<span class="line"><span class="line-number">8</span><span>}</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">classDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Student</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">    +String</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> name</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    +int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> age</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">    -</span><span style="color:#D73A49;--shiki-dark:#F97583"> Address</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> address</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">    +</span><span style="color:#6F42C1;--shiki-dark:#B392F0">getAddress</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">Address</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">    -</span><span style="color:#6F42C1;--shiki-dark:#B392F0">setAddress</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">void</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span></code></pre>
+<h3 id="泛型">泛型</h3>
+<p>使用<code>~</code>代替java中的&lt;&gt;表示泛型</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>classDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span>class A{</span></span>
+<span class="line"><span class="line-number">3</span><span>    +List~String~ list</span></span>
+<span class="line"><span class="line-number">4</span><span>}</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">classDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> A</span><span style="color:#D73A49;--shiki-dark:#F97583">{</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">    +List</span><span style="color:#24292E;--shiki-dark:#E1E4E8">~</span><span style="color:#D73A49;--shiki-dark:#F97583">String</span><span style="color:#24292E;--shiki-dark:#E1E4E8">~ </span><span style="color:#6F42C1;--shiki-dark:#B392F0">list</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span></code></pre>
+<h3 id="修饰词">修饰词</h3>
+<table>
+<thead>
+<tr>
+<th>可见性</th>
+<th>表示</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>public</td>
+<td>+</td>
+</tr>
+<tr>
+<td>private</td>
+<td>-</td>
+</tr>
+<tr>
+<td>protected</td>
+<td>#</td>
+</tr>
+</tbody>
+</table>
+<h4 id="类的注释">类的注释</h4>
+<p>使用&lt;&lt;注释&gt;&gt;可以在类名上添加注释，以表示接口、抽象类、枚举等</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>表示</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>接口</td>
+<td>&lt;&lt;interface&gt;&gt;</td>
+</tr>
+<tr>
+<td>抽象类</td>
+<td>&lt;&lt;abstract&gt;&gt;</td>
+</tr>
+<tr>
+<td>枚举</td>
+<td>&lt;&lt;enum&gt;&gt;</td>
+</tr>
+</tbody>
+</table>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>classDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>class A {</span></span>
+<span class="line"><span class="line-number">4</span><span>    &#x3C;&#x3C;interface>></span></span>
+<span class="line"><span class="line-number">5</span><span>}</span></span>
+<span class="line"><span class="line-number">6</span><span>class B {</span></span>
+<span class="line"><span class="line-number">7</span><span>    &#x3C;&#x3C;abstract>></span></span>
+<span class="line"><span class="line-number">8</span><span>}</span></span>
+<span class="line"><span class="line-number">9</span><span>class C {</span></span>
+<span class="line"><span class="line-number">10</span><span>    &#x3C;&#x3C;enum>></span></span>
+<span class="line"><span class="line-number">11</span><span>}</span></span>
+<span class="line"><span class="line-number">12</span><span>class D {</span></span>
+<span class="line"><span class="line-number">13</span><span>    &#x3C;&#x3C;任何你想要注释的内容>></span></span>
+<span class="line"><span class="line-number">14</span><span>}</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">classDiagram</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> A</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    &#x3C;&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">interface</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> B</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    &#x3C;&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">abstract</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> C</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    &#x3C;&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">enum</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> D</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    &#x3C;&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">任何你想要注释的内容</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span></code></pre>
+<h3 id="例子">例子</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>classDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span>class Run {</span></span>
+<span class="line"><span class="line-number">3</span><span>    &#x3C;&#x3C;interface>></span></span>
+<span class="line"><span class="line-number">4</span><span>    +run() void</span></span>
+<span class="line"><span class="line-number">5</span><span>}</span></span>
+<span class="line"><span class="line-number">6</span><span>class Animal {</span></span>
+<span class="line"><span class="line-number">7</span><span>    &#x3C;&#x3C;abstract>></span></span>
+<span class="line"><span class="line-number">8</span><span>    +run() void</span></span>
+<span class="line"><span class="line-number">9</span><span>}</span></span>
+<span class="line"><span class="line-number">10</span><span>class Dog {</span></span>
+<span class="line"><span class="line-number">11</span><span>    -Color color</span></span>
+<span class="line"><span class="line-number">12</span><span>    +eat(Food) void</span></span>
+<span class="line"><span class="line-number">13</span><span>    +run() void</span></span>
+<span class="line"><span class="line-number">14</span><span>}</span></span>
+<span class="line"><span class="line-number">15</span><span>class Color {</span></span>
+<span class="line"><span class="line-number">16</span><span>    &#x3C;&#x3C;enum>></span></span>
+<span class="line"><span class="line-number">17</span><span>    -int r</span></span>
+<span class="line"><span class="line-number">18</span><span>    -int g</span></span>
+<span class="line"><span class="line-number">19</span><span>    -int b</span></span>
+<span class="line"><span class="line-number">20</span><span>}</span></span>
+<span class="line"><span class="line-number">21</span><span>class Food {</span></span>
+<span class="line"><span class="line-number">22</span><span>    +String name</span></span>
+<span class="line"><span class="line-number">23</span><span>}</span></span>
+<span class="line"><span class="line-number">24</span><span></span></span>
+<span class="line"><span class="line-number">25</span><span>Run &#x3C;|.. Animal</span></span>
+<span class="line"><span class="line-number">26</span><span>Animal &#x3C;|-- Dog</span></span>
+<span class="line"><span class="line-number">27</span><span>Dog &#x3C;-- Food</span></span>
+<span class="line"><span class="line-number">28</span><span>Dog o--Color</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">classDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Run</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    &#x3C;&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">interface</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    +</span><span style="color:#6F42C1;--shiki-dark:#B392F0">run</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">void</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Animal</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    &#x3C;&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">abstract</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">    +</span><span style="color:#6F42C1;--shiki-dark:#B392F0">run</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">void</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Dog</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">    -Color</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> color</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">    +</span><span style="color:#6F42C1;--shiki-dark:#B392F0">eat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">Food</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">void</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">    +</span><span style="color:#6F42C1;--shiki-dark:#B392F0">run</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">void</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Color</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    &#x3C;&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">enum</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">    -int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> r</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">    -int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> g</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">    -int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> b</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Food</span><span style="color:#D73A49;--shiki-dark:#F97583"> {</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#D73A49;--shiki-dark:#F97583">    +String</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> name</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Run</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;|..</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Animal</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Animal</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;|--</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Dog</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Dog</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;--</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Food</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Dog</span><span style="color:#D73A49;--shiki-dark:#F97583"> o--</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Color</span></span></code></pre>
+<h1 id="时序图sequencediagram">时序图(sequenceDiagram)</h1>
+<p>用来描述两个或更多模块之间的交互过程首选就是时序图，markdown 也同样提供了绘制时序图的功能。</p>
+<p>绘制时序图的关键字是<code>sequenceDiagram</code>。</p>
+<h3 id="参与者-模块声明">参与者--模块声明</h3>
+<p>作为多个模块之间交互过程的表现，首要的工作就是要声明共有哪些模块。</p>
+<p>我们需要通过<code>participant</code>关键字进行声明，声明的顺序就是模块从左到右的展示顺序。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>sequenceDiagram  </span></span>
+<span class="line"><span class="line-number">2</span><span>participant B  </span></span>
+<span class="line"><span class="line-number">3</span><span>participant A</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">sequenceDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> B</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> A</span></span></code></pre>
+<p>语法:<code>【对象1】【连线】【对象2】:【消息内容】</code></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>sequenceDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span>客户端-->>服务器:发起请求</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">sequenceDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">客户端</span><span style="color:#D73A49;--shiki-dark:#F97583">-->></span><span style="color:#E36209;--shiki-dark:#FFAB70">服务器</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF">发起请求</span></span></code></pre>
+<h3 id="连线">连线</h3>
+<p>markdown 时序图支持以下连线方式：</p>
+<ul>
+<li>无箭头实线 -&gt;</li>
+<li>有箭头实线 -&gt;&gt;</li>
+<li>无箭头虚线 --&gt;</li>
+<li>有箭头虚线 --&gt;&gt;</li>
+<li>带x实线 -x</li>
+<li>带x虚线 --x</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">sequenceDiagram</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  </span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> server  </span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> CA  </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> client  </span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">CA</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 这是我的公钥  </span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">CA</span><span style="color:#D73A49;--shiki-dark:#F97583">-->></span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 下发证书  </span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">-></span><span style="color:#E36209;--shiki-dark:#FFAB70">client</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 建立连接  </span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">client</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 我要 RSA 算法加密的公钥  </span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">-->></span><span style="color:#E36209;--shiki-dark:#FFAB70">client</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 下发证书与公钥  </span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">client</span><span style="color:#D73A49;--shiki-dark:#F97583">-->></span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 上报通过公钥加密的随机数  </span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 生成对称加密秘钥  </span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">client</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 加密通信  </span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">client</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 加密通信  </span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">client</span><span style="color:#D73A49;--shiki-dark:#F97583">-x</span><span style="color:#E36209;--shiki-dark:#FFAB70">server</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 关闭连接  </span></span></code></pre>
+<h3 id="高级特性">高级特性</h3>
+<p>在实际的使用场景中，往往并不是这样简单地相互通信，而是需要分支、循环等特殊处理，markdown也同样可以支持。</p>
+<h4 id="循环">循环</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span> loop Loop_text  </span></span>
+<span class="line"><span class="line-number">2</span><span>  ... statements...  </span></span>
+<span class="line"><span class="line-number">3</span><span> end  </span></span></code></pre>
+<h4 id="分支">分支</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>alt Describing_text  </span></span>
+<span class="line"><span class="line-number">2</span><span>...statements...  </span></span>
+<span class="line"><span class="line-number">3</span><span>else  </span></span>
+<span class="line"><span class="line-number">4</span><span>...statements...  </span></span>
+<span class="line"><span class="line-number">5</span><span>end  </span></span>
+<span class="line"><span class="line-number">6</span><span></span></span>
+<span class="line"><span class="line-number">7</span><span>*# 推荐在没有else的情况下使用 opt(option,选择)* </span></span>
+<span class="line"><span class="line-number">8</span><span></span></span>
+<span class="line"><span class="line-number">9</span><span>opt Describing_text  </span></span>
+<span class="line"><span class="line-number">10</span><span>...statements...  </span></span>
+<span class="line"><span class="line-number">11</span><span>End</span></span></code></pre>
+<h4 id="注释">注释</h4>
+<p>注释或者称之为便签，用来对模块做额外标记。</p>
+<ul>
+<li>单个标签</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>note [right of | left of][Actor]: Text</span></span></code></pre>
+<ul>
+<li>给多个模块打标签</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>note over [Actor1, Actor2...]:Text</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">sequenceDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Doctor</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Bob</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">note</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> right of</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Bob</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Bob is a patient</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">loop</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Look Bob each hour</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">Doctor</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">Bob</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> How are you?</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">alt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Bob is sick</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">Bob</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">Doctor</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Not so good.</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">Bob</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">Doctor</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Fine, thank you.</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">loop</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Ask about patient</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">Doctor</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">Bob</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Inquire about the situation</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">opt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Extra response</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">Bob</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">Doctor</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF">Thanks for asking</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">end</span></span>
+<span class="line"><span class="line-number">21</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#D73A49;--shiki-dark:#F97583">note</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> right of</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Doctor</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> hourly ask finished</span></span></code></pre>
+<h1 id="甘特图gantt">甘特图(gantt)</h1>
+<p>在项目管理中，甘特图是一个非常得力的好帮手，通过甘特图，我们可以对整个项目的进展情况一目了然。</p>
+<p>用 markdown 绘制甘特图十分简单快捷。</p>
+<p>他有以下关键字：</p>
+<ul>
+<li>dateFormat -- 日期格式</li>
+<li>section -- 模块声明</li>
+<li>Completed -- 已经完成</li>
+<li>Active -- 进行中</li>
+<li>Future -- 待后续处理</li>
+<li>crit -- 关键阶段</li>
+</ul>
+<p>下面是一个完整的甘特图展示：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>gantt</span></span>
+<span class="line"><span class="line-number">2</span><span>    dateFormat  YYYY-MM-DD</span></span>
+<span class="line"><span class="line-number">3</span><span>    title Adding GANTT diagram functionality to mermaid</span></span>
+<span class="line"><span class="line-number">4</span><span>    section A section</span></span>
+<span class="line"><span class="line-number">5</span><span>    Completed task             :done,    des1, 2014-01-06,2014-01-08</span></span>
+<span class="line"><span class="line-number">6</span><span>    Active task                :active,  des2, 2014-01-09, 3d</span></span>
+<span class="line"><span class="line-number">7</span><span>    Future task                :         des3, after des2, 5d</span></span>
+<span class="line"><span class="line-number">8</span><span>    Future task2               :         des4, after des3, 5d</span></span>
+<span class="line"><span class="line-number">9</span><span></span></span>
+<span class="line"><span class="line-number">10</span><span>    section Critical tasks</span></span>
+<span class="line"><span class="line-number">11</span><span>    Completed task in the critical line :crit, done, 2014-01-06,24h</span></span>
+<span class="line"><span class="line-number">12</span><span>    Implement parser and jison          :crit, done, after des1, 2d</span></span>
+<span class="line"><span class="line-number">13</span><span>    Create tests for parser             :crit, active, 3d</span></span>
+<span class="line"><span class="line-number">14</span><span>    Future task in critical line        :crit, 5d</span></span>
+<span class="line"><span class="line-number">15</span><span>    Create tests for renderer           :2d</span></span>
+<span class="line"><span class="line-number">16</span><span>    Add to mermaid                      :1d</span></span>
+<span class="line"><span class="line-number">17</span><span></span></span>
+<span class="line"><span class="line-number">18</span><span>    section Documentation</span></span>
+<span class="line"><span class="line-number">19</span><span>    Describe gantt syntax               :active, a1, after des1, 3d</span></span>
+<span class="line"><span class="line-number">20</span><span>    Add gantt diagram to demo page      :after a1  , 20h</span></span>
+<span class="line"><span class="line-number">21</span><span>    Add another diagram to demo page    :doc1, after a1  , 48h</span></span>
+<span class="line"><span class="line-number">22</span><span></span></span>
+<span class="line"><span class="line-number">23</span><span>    section Last section</span></span>
+<span class="line"><span class="line-number">24</span><span>    Describe gantt syntax               :after doc1, 3d</span></span>
+<span class="line"><span class="line-number">25</span><span>    Add gantt diagram to demo page      : 20h</span></span>
+<span class="line"><span class="line-number">26</span><span>    Add another diagram to demo page    : 48h</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">gantt</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    dateFormat</span><span style="color:#6F42C1;--shiki-dark:#B392F0">  YYYY-MM-DD</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">    title</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Adding GANTT diagram functionality to mermaid</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    section</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> A section</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Completed task             </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#6F42C1;--shiki-dark:#B392F0">done</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,    des1, 2014-01-06,2014-01-08</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Active task                </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#6F42C1;--shiki-dark:#B392F0">active</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,  des2, 2014-01-09, 3d</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Future task                </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">         des3, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">after</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> des2, 5d</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Future task2               </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">         des4, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">after</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> des3, 5d</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">    section</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Critical tasks</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Completed task in the critical line </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#6F42C1;--shiki-dark:#B392F0">crit</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">done</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, 2014-01-06,24h</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Implement parser and jison          </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#6F42C1;--shiki-dark:#B392F0">crit</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">done</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">after</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> des1, 2d</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Create tests for parser             </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#6F42C1;--shiki-dark:#B392F0">crit</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">active</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, 3d</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Future task in critical line        </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#6F42C1;--shiki-dark:#B392F0">crit</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, 5d</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Create tests for renderer           </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">2d</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Add to mermaid                      </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">1d</span></span>
+<span class="line"><span class="line-number">17</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">    section</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Documentation</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Describe gantt syntax               </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#6F42C1;--shiki-dark:#B392F0">active</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, a1, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">after</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> des1, 3d</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Add gantt diagram to demo page      </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#6F42C1;--shiki-dark:#B392F0">after</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a1  , 20h</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Add another diagram to demo page    </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">doc1, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">after</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a1  , 48h</span></span>
+<span class="line"><span class="line-number">22</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#D73A49;--shiki-dark:#F97583">    section</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Last section</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Describe gantt syntax               </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#6F42C1;--shiki-dark:#B392F0">after</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> doc1, 3d</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Add gantt diagram to demo page      </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 20h</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    Add another diagram to demo page    </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 48h</span></span></code></pre>
+<h1 id="饼图">饼图</h1>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">pie</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> showData</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    title</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Nocturne 主题色彩分布</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    "Background #211d25" </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 40</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    "Text #d4c5e2" </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 30</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    "Accent #b080ff" </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 15</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    "Secondary #2a2532" </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 10</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    "Code #1a1620" </span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 5</span></span></code></pre>
+<h1 id="参考">参考</h1>
+<p><a href="https://www.zhihu.com/question/425169802/answer/2921661716">如何用mermaid画二叉树? - Numb的回答 - 知乎</a></p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

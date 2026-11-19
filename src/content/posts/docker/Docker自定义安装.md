@@ -3,6 +3,7 @@ title: Docker 自定义安装
 date: 2026-11-11
 slug: docker-custom-install
 category: it
+subcategory: docker
 status: published
 ---
 

@@ -9,13 +9,14 @@ const REDIRECT_MAP = {
   'htmls/c自查表.html': '/posts/c-reference/',
   'htmls/Linux命令行.html': '/posts/linux-command/',
   'htmls/marked造轮子.html': '/posts/marked-blog-generator/',
-  'htmls/MySQL自查表.html': '/posts/mysql-reference/',
+  // MySQL 自查表已删除且没有等价文章，旧地址回退到 IT 分类页。
+  'htmls/MySQL自查表.html': '/categories/it/',
   // 测试页已删除，旧地址保留回首页的兼容跳转。
   'htmls/test.html': '/',
   'htmls/vi、vim.html': '/posts/vi-and-vim/',
   'htmls/what did you learn from your heartbreak.html': '/posts/learn-from-heartbreak/',
   'htmls/《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理].html': '/posts/wa2-playthrough-guide/',
-  'htmls/关于Git使用.html': '/posts/about-git/',
+  'htmls/关于Git使用.html': '/posts/git-usage/',
   'htmls/静态博客框架之Hexo & Jekyll.html': '/posts/hexo-and-jekyll/',
   'views/divergence/divergence.html': '/custom/divergence-meter/',
   'views/fireworks.html': '/custom/happy-new-year/',

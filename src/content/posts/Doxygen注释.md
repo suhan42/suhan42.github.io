@@ -4,10 +4,8 @@ date: 2024-04-22
 slug: doxygen-comments
 category: it
 tags:
-  - doxygen
-  - documentation
-  - c
   - cpp
+  - c
 summary: Doxygen 的使用方法与常用注释命令整理，覆盖文件、结构体、函数、常量和变量的注释写法。
 status: published
 ---

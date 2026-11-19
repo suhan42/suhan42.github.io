@@ -3,6 +3,7 @@ title: docker-compose.yml 和 docker-compose.override.yml
 date: 2026-11-11
 slug: docker-compose-config
 category: it
+subcategory: docker
 status: published
 ---
 

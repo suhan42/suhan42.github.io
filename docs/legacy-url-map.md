@@ -1,6 +1,6 @@
 # 旧 URL 清单与迁移策略
 
-更新时间：2026-11-10
+更新时间：2026-11-18
 
 本表记录迁移前公开站点的入口和内容页 URL，以及迁移后的实际处理结果。GitHub Pages 只能托管静态文件，不能配置 HTTP 301，因此“跳转页”指的是包含 meta refresh、canonical 和可见链接的静态页面，不承诺真实 HTTP 301。
 
@@ -17,12 +17,12 @@
 | `./htmls/c自查表.html` | C 自查表 | 静态跳转页 | `/posts/c-reference/` | √ | 目标与 front matter slug 一致 |
 | `./htmls/Linux命令行.html` | Linux 命令行 | 静态跳转页 | `/posts/linux-command/` | √ | 目标与 front matter slug 一致 |
 | `./htmls/marked造轮子.html` | marked 造轮子 | 静态跳转页 | `/posts/marked-blog-generator/` | √ | 目标与 front matter slug 一致 |
-| `./htmls/MySQL自查表.html` | MySQL 自查表 | 静态跳转页 | `/posts/mysql-reference/` | √ | 目标与 front matter slug 一致 |
+| `./htmls/MySQL自查表.html` | MySQL 自查表 | 静态跳转页 | `/categories/it/` | √ | 原文章已删除，回退到 IT 分类页 |
 | `./htmls/test.html` | photo test | 静态跳转页 | `/` | √ | 文章已标记为 draft，旧页回到首页而不是公开文章页 |
 | `./htmls/vi、vim.html` | vi 与 vim | 静态跳转页 | `/posts/vi-and-vim/` | √ | 目标与 front matter slug 一致 |
 | `./htmls/what did you learn from your heartbreak.html` | what did you learn from your heartbreak | 静态跳转页 | `/posts/learn-from-heartbreak/` | √ | 目标与 front matter slug 一致 |
 | `./htmls/《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理].html` | 《白色相簿2》[通关推荐顺序]和[官方剧情资源全整理] | 静态跳转页 | `/posts/wa2-playthrough-guide/` | √ | 保留文章型 HTML 正文，目标与 front matter slug 一致 |
-| `./htmls/关于Git使用.html` | 关于 Git 使用 | 静态跳转页 | `/posts/about-git/` | √ | 目标与 front matter slug 一致 |
+| `./htmls/关于Git使用.html` | 关于 Git 使用 | 静态跳转页 | `/posts/git-usage/` | √ | 由 `git/Git使用.md` 接替 |
 | `./htmls/静态博客框架之Hexo & Jekyll.html` | 静态博客框架之 Hexo 与 Jekyll | 静态跳转页 | `/posts/hexo-and-jekyll/` | √ | 目标与 front matter slug 一致 |
 | `./views/divergence/divergence.html` | 倒计时 | 静态跳转页 | `/custom/divergence-meter/` | √ | 交互页已迁移，资源位于 `/assets/custom/divergence-meter/` |
 | `./views/box.html` | 关于 css 中 box 的使用 | 已退役 | 无 | √ | 特殊页及其 Works 卡片按所有者要求删除 |

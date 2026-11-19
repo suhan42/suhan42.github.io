@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Function Calling 与工具调用 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Function Calling 与工具调用</a></li>
+<li class="toc-item toc-level-1"><a href="#function-calling-tool-use">Function Calling /Tool Use</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86">函数调用的核心原理</a></li>
+<li class="toc-item toc-level-2"><a href="#agentic-loop%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E7%9A%84%E5%AE%8C%E6%95%B4%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B">Agentic Loop：工具调用的完整工作流程</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%B7%A5%E5%85%B7%E5%AE%9A%E4%B9%89name-description-parameters-%E6%80%8E%E4%B9%88%E5%86%99">工具定义：name / description / parameters 怎么写</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%A0%87%E5%87%86%E5%B7%A5%E5%85%B7-schema-%E7%BB%93%E6%9E%84">标准工具 Schema 结构</a></li>
+<li class="toc-item toc-level-2"><a href="#tool-choice%E6%8E%A7%E5%88%B6%E6%A8%A1%E5%9E%8B%E4%BD%95%E6%97%B6%E8%B0%83%E7%94%A8%E5%B7%A5%E5%85%B7">tool_choice：控制模型何时调用工具</a></li>
+<li class="toc-item toc-level-2"><a href="#parallel-function-calling%E5%90%8C%E6%97%B6%E5%A4%84%E7%90%86%E5%A4%9A%E4%B8%AA%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8">Parallel Function Calling：同时处理多个工具调用</a></li>
+<li class="toc-item toc-level-2"><a href="#strict-mode%E7%A1%AE%E4%BF%9D%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E4%B8%A5%E6%A0%BC%E7%AC%A6%E5%90%88-schema">Strict Mode：确保工具调用严格符合 Schema</a></li>
+<li class="toc-item toc-level-2"><a href="#react%E4%B8%8Efunction-calling%E5%B7%AE%E5%BC%82%E8%A7%A3%E6%9E%90">ReAct与Function Calling差异解析</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/llm/">#llm</a>
+      <a href="/tags/agent/">#agent</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Function Calling 与工具调用</h1>
+
+    <div class="post-body">
+<h1 id="function-calling-tool-use">Function Calling /Tool Use</h1>
+<blockquote>
+<p><a href="https://www.cnblogs.com/qiniushanghai/p/19937290">Function Calling 完整指南（2026）：原理、代码示例、主流模型对比与最佳实践 - 七牛云行业应用 - 博客园</a></p>
+</blockquote>
+<p>这是Agent和普通聊天机器人最本质的区别——Agent能调用工具，能对外部世界产生影响。</p>
+<p><strong>函数调用（Function Calling）</strong>，也称为<strong>工具调用（Tool Calling）</strong>，是现代大语言模型（LLM）的一项重要能力。它允许模型在对话过程中识别用户意图，并生成结构化的函数调用指令，从而与外部系统、API 或工具进行交互。</p>
+<blockquote>
+<p>两者是同一机制的不同叫法：OpenAI 称之为 Function Calling（近期统称 Tool Use），Anthropic 统一称为 Tool Use，DeepSeek 与 OpenAI 兼容也使用 Function Calling。</p>
+</blockquote>
+<hr>
+<p>你需要深度理解的东西:</p>
+<p><strong>工具定义怎么写</strong>。工具的描述不是随便写的，描述的质量直接影响模型会不会调用这个工具、调用时参数填得对不对。这是个很微妙的东西，需要自己多试。</p>
+<p><strong>工具调用的完整循环</strong>。模型决定调用工具 → 解析模型输出的工具调用参数 → 实际执行工具 → 把工具结果返回给模型!→模型继续推理。这个循环里每个环节都可能出问题，要能debug。</p>
+<p><strong>并行工具调用</strong>。现在主流模型支持在一次响应里同时调用多个工具，怎么处理这种情况，怎么合并多个工具的结果，是进阶一点的内容，但值得了解。</p>
+<p><strong>错误处理</strong>。工具调用失败了怎么办，模型参数填错了怎么办，工具超时了怎么办。这些异常情况在生产环境里是必须处理的。</p>
+<hr>
+<h2 id="函数调用的核心原理">函数调用的核心原理</h2>
+<p>关键认知：大语言模型本质上只会输出文本，它不会也不能自己去执行函数调用。函数的实际执行由用户/客户端负责。</p>
+<p>这是理解函数调用机制的关键。整个流程如下：</p>
+<p><img src="/assets/images/function-calling/%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B.jpg" alt="img"></p>
+<p>流程图：</p>
+<p><img src="https://www.runoob.com/wp-content/uploads/2026/02/runoob-funcall-runoob-scaled.png" alt="img"></p>
+<h2 id="agentic-loop工具调用的完整工作流程">Agentic Loop：工具调用的完整工作流程</h2>
+<p><strong>Agentic Loop</strong> 是 Function Calling 的<strong>执行模型</strong>：你的应用程序驱动一个 while 循环，持续处理模型的工具调用请求，直到模型返回最终答案。</p>
+<p>完整流程（以 Client Tool 为例）：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">. 发送请求（携带 tools 数组 </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 用户消息）</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        ↓</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">. 模型返回 stop_reason: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"tool_use"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">（含 tool_use </span><span style="color:#D73A49;--shiki-dark:#F97583">block</span><span style="color:#24292E;--shiki-dark:#E1E4E8">）</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        ↓</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">. 你的代码执行工具（数据库查询、API 调用等）</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        ↓</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">. 将 tool_result 回传（新一轮请求：原消息 </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 模型响应 </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 工具结果）</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        ↓</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">. 重复步骤 </span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">–</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">，直到 stop_reason </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "end_turn"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">（或 </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"max_tokens"</span><span style="color:#D73A49;--shiki-dark:#F97583"> /</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "refusal"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">）</span></span></code></pre>
+<p><strong>stop_reason 速查：</strong></p>
+<table>
+<thead>
+<tr>
+<th>stop_reason</th>
+<th>含义</th>
+<th>你需要做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tool_use</code></td>
+<td>模型要调用工具</td>
+<td>执行工具 → 回传结果 → 继续循环</td>
+</tr>
+<tr>
+<td><code>end_turn</code></td>
+<td>模型给出最终答案</td>
+<td>读取 content，循环结束</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td>达到输出 token 上限</td>
+<td>按需截断处理</td>
+</tr>
+<tr>
+<td><code>refusal</code></td>
+<td>模型拒绝继续</td>
+<td>检查内容策略</td>
+</tr>
+<tr>
+<td><code>pause_turn</code>（服务端工具）</td>
+<td>服务端迭代达上限</td>
+<td>重发对话让模型继续</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>可引用结论</strong>：Agentic Loop 的规范形式是&quot;while stop_reason == tool_use，执行工具并继续对话&quot;；循环在任何其他 stop_reason 时退出，包括 end_turn、max_tokens、stop_sequence 或 refusal（来源：Anthropic Tool Use 官方文档，2026.04）。</p>
+</blockquote>
+<h2 id="工具定义name-description-parameters-怎么写">工具定义：name / description / parameters 怎么写</h2>
+<p><strong>工具定义是 Function Calling 效果好坏的关键——模型完全依赖 description 决定是否调用工具，description 写得清晰准确直接影响调用成功率。</strong></p>
+<h3 id="标准工具-schema-结构">标准工具 Schema 结构</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D"># OpenAI / DeepSeek 兼容格式（Chat Completions API）</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">tools </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    {</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#032F62;--shiki-dark:#9ECBFF">        "type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"function"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#032F62;--shiki-dark:#9ECBFF">        "function"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "name"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"get_weather"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,                          </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 唯一标识符，snake_case</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "description"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: (                                </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 关键：告诉模型何时调用此工具</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                "获取指定城市的当前天气信息，包括温度、天气状况和湿度。"</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                "仅在用户明确询问天气时调用，不用于历史气候查询。"</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            ),</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "parameters"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                "type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"object"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                "properties"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                    "city"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                        "type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"string"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                        "description"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"城市名称，如'北京'或'Shanghai'"</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                    },</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                    "unit"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                        "type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"string"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                        "enum"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"celsius"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"fahrenheit"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                        "description"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"温度单位，默认 celsius"</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                    }</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                },</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                "required"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"city"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]                        </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 必填参数列表</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            },</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "strict"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">True</span><span style="color:#6A737D;--shiki-dark:#6A737D">                                  # 启用 strict mode（推荐）</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span></code></pre>
+<p><strong>description 写作要点：</strong></p>
+<ol>
+<li><strong>说明用途，而非重复函数名</strong>：<code>&quot;查询当前天气&quot;</code> 优于 <code>&quot;get_weather function&quot;</code></li>
+<li><strong>说明何时调用、何时不调用</strong>：减少误触发</li>
+<li><strong>说明参数的值域和格式</strong>：<code>&quot;格式为 YYYY-MM-DD&quot;</code> 比 <code>&quot;日期&quot;</code> 有效得多</li>
+<li><strong>保持简洁</strong>：description 会占用 token 成本，避免冗长</li>
+</ol>
+<blockquote>
+<p><strong>可引用结论</strong>：Anthropic 数据显示，在 LAB-Bench FigQA 和 SWE-bench 等基准测试中，添加基础工具可产生超出预期的能力提升，通常超越人类专家基准（来源：Anthropic Tool Use 文档，2026.04）。</p>
+</blockquote>
+<h2 id="tool-choice控制模型何时调用工具">tool_choice：控制模型何时调用工具</h2>
+<p><strong><code>tool_choice</code> 参数控制模型的工具调用策略，四种取值覆盖从&quot;完全自主&quot;到&quot;强制指定&quot;的全部场景。</strong></p>
+<table>
+<thead>
+<tr>
+<th>tool_choice 值</th>
+<th>含义</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&quot;auto&quot;</code>（默认）</td>
+<td>模型自主决定是否调用</td>
+<td>通用对话，让模型按需判断</td>
+</tr>
+<tr>
+<td><code>&quot;required&quot;</code></td>
+<td>必须调用至少一个工具</td>
+<td>强制提取结构化数据</td>
+</tr>
+<tr>
+<td><code>&quot;none&quot;</code></td>
+<td>禁止所有工具调用</td>
+<td>纯文本生成，不允许工具调用</td>
+</tr>
+<tr>
+<td><code>{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;get_weather&quot;}}</code></td>
+<td>强制调用指定工具</td>
+<td>工具 A/B 测试、固定调用路径</td>
+</tr>
+</tbody>
+</table>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> openai </span><span style="color:#D73A49;--shiki-dark:#F97583">import</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> OpenAI</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">client </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> OpenAI(</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">    api_key</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"YOUR_KEY"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">    base_url</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"https://api.qnaigc.com/v1"</span><span style="color:#6A737D;--shiki-dark:#6A737D">   # 七牛云 AI 推理 API，国内直连</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 强制提取结构化数据（required）</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">response </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> client.chat.completions.create(</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">    model</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"deepseek-v4-flash"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">    tools</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">tools,</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">    tool_choice</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"required"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,                 </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 必须调用工具，不允许纯文本回复</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    messages</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[{</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"role"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"user"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"content"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"帮我查一下北京今天的天气"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}]</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span></code></pre>
+<h2 id="parallel-function-calling同时处理多个工具调用">Parallel Function Calling：同时处理多个工具调用</h2>
+<p><img src="https://img2024.cnblogs.com/blog/3674498/202604/3674498-20260427144511957-1341420516.png" alt="FunctionCalling-img2"></p>
+<p><strong>Parallel Function Calling 允许模型在一次响应中输出多个 tool_use block，你的应用可并行执行所有工具调用，显著减少总延迟。</strong> 上例中&quot;北京和上海今天天气怎么样？&quot;会触发两个并发的 <code>get_weather</code> 调用。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 处理并发工具调用（示例：两个天气查询同时触发）</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">import</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> concurrent.futures</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> choice.finish_reason </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "tool_calls"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    tool_calls </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> choice.message.tool_calls   </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 可能包含多个 tool_call</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">    with</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> concurrent.futures.ThreadPoolExecutor() </span><span style="color:#D73A49;--shiki-dark:#F97583">as</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> executor:</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        futures </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            tc.id: executor.submit(</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                execute_tool,</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                tc.function.name,</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                json.loads(tc.function.arguments)</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            )</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">            for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tc </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tool_calls</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tc </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tool_calls:</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        messages.append({</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "role"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"tool"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "tool_call_id"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: tc.id,</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "content"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: futures[tc.id].result()   </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 并行执行结果</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        })</span></span></code></pre>
+<p><strong>支持 Parallel Function Calling 的模型：</strong> GPT-4o、GPT-4.1、GPT-5（OpenAI）；DeepSeek V4 Flash/Pro；Claude Opus 4.7（通过 <code>tool_choice: {type: &quot;auto&quot;}</code> 自动并行）。</p>
+<h2 id="strict-mode确保工具调用严格符合-schema">Strict Mode：确保工具调用严格符合 Schema</h2>
+<p><strong><code>strict: true</code> 告诉模型必须严格遵守你定义的 JSON Schema，输出不会出现 Schema 中未定义的字段，适用于需要机器解析工具调用结果的生产场景。</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D"># OpenAI / DeepSeek strict mode</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"function"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    "name"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"create_order"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    "strict"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">True</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,                          </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 开启 strict mode</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#032F62;--shiki-dark:#9ECBFF">    "parameters"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#032F62;--shiki-dark:#9ECBFF">        "type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"object"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#032F62;--shiki-dark:#9ECBFF">        "additionalProperties"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">False</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,        </span><span style="color:#6A737D;--shiki-dark:#6A737D"># strict mode 要求此字段为 False</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#032F62;--shiki-dark:#9ECBFF">        "properties"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "product_id"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"string"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "quantity"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"integer"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#032F62;--shiki-dark:#9ECBFF">            "address"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"string"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        },</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#032F62;--shiki-dark:#9ECBFF">        "required"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"product_id"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"quantity"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"address"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p><strong>DeepSeek strict mode（Beta）</strong>：使用 <code>base_url=&quot;https://api.deepseek.com/beta&quot;</code>，支持 object/string/number/integer/boolean/array/enum/anyOf/$ref。注意：string 不支持 <code>minLength/maxLength</code>，array 不支持 <code>minItems/maxItems</code>（来源：DeepSeek API 文档，2026.04）。</p>
+<p><strong>Anthropic strict tool use</strong>：在工具定义中加 <code>&quot;strict&quot;: true</code>，确保 Claude 的工具调用始终匹配 Schema。</p>
+<h2 id="react与function-calling差异解析">ReAct与Function Calling差异解析</h2>
+<p>在大语言模型（LLM）中，<strong>ReAct</strong>与<strong>Function Calling</strong>是两种常见的外部工具调用策略，它们在<strong>核心逻辑、执行流程、适用场景</strong>等方面存在显著差异。</p>
+<ul>
+<li><strong>ReAct策略</strong> ReAct（Reason + Act）将<strong>推理</strong>与<strong>行动</strong>结合，通过“<strong>思考 → 行动 → 观察</strong>”的循环迭代完成任务。模型会先生成推理步骤，选择合适的工具调用，并根据返回结果动态调整后续策略。这种方式适合<strong>多轮推理、探索性任务</strong>，能在未知或不确定的环境中灵活应对，例如数据分析、故障排查等。但由于需要多次交互，<strong>延迟和Token消耗较高</strong>。</li>
+<li><strong>Function Calling策略</strong> Function Calling是一种<strong>指令到工具的直接映射</strong>机制。模型根据用户意图匹配预定义函数，并提取参数执行调用，通常是<strong>单步或固定流程</strong>，返回结构化结果（如JSON）。它适合<strong>标准化、流程固定</strong>的任务，如API调用、数据查询等，<strong>执行效率高、资源消耗低</strong>，但在模糊需求或多步推理场景下适应性较差。</li>
+</ul>
+<p>主要区别：</p>
+<ul>
+<li><strong>决策方式</strong>：Function Calling是固定决策，ReAct是动态决策。</li>
+<li><strong>适用场景</strong>：Function Calling适合高频、低延迟的结构化任务；ReAct适合复杂、开放性问题。</li>
+<li><strong>性能与成本</strong>：Function Calling响应快、Token开销小；ReAct准确性高但成本高。</li>
+</ul>
+<p>示例对比：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8"># Function Calling示例</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"function"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"get_weather"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"arguments"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"city"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"北京"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8"># ReAct示例</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Thought</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: 用户需要北京天气</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Action</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#6F42C1;--shiki-dark:#B392F0">get_weather</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(city</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"北京"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Observation</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"temp"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">25</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"condition"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"晴"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Reflect</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: 信息完整，可生成回复</span></span></code></pre>
+<p>选型建议：</p>
+<p>明确目标、路径清晰 → Function Calling</p>
+<p>需多步推理、动态调整 → ReAct 在实际应用中，可采用混合架构：结构化任务走Function Calling，开放性问题走ReAct，以兼顾效率与灵活性。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Shell 脚本 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Shell 脚本</a></li>
+<li class="toc-item toc-level-1"><a href="#shell%E4%B8%8Ebash">shell与bash</a></li>
+<li class="toc-item toc-level-2"><a href="#bash%E8%84%9A%E6%9C%AC%E5%9F%BA%E7%A1%80">Bash脚本基础</a></li>
+<li class="toc-item toc-level-1"><a href="#shell%E8%84%9A%E6%9C%AC%E6%96%87%E4%BB%B6">shell脚本文件</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90">修改文件权限</a></li>
+<li class="toc-item toc-level-4"><a href="#%E8%BF%90%E8%A1%8C">运行</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BC%95%E7%94%A8%E5%92%8C%E8%BD%AC%E4%B9%89">引用和转义</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%BC%B1%E5%BC%95%E7%94%A8">弱引用” ”</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%BC%BA%E5%BC%95%E7%94%A8">强引用' '</a></li>
+<li class="toc-item toc-level-4"><a href="#%E8%BD%AC%E4%B9%89">转义\</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8F%98%E9%87%8F">变量</a></li>
+<li class="toc-item toc-level-4"><a href="#readonly%E5%8F%AA%E8%AF%BB%E5%8F%98%E9%87%8F">readonly只读变量</a></li>
+<li class="toc-item toc-level-4"><a href="#unset%E5%88%A0%E9%99%A4%E5%8F%98%E9%87%8F">unset删除变量</a></li>
+<li class="toc-item toc-level-4"><a href="#%E8%BE%93%E5%87%BA%E5%AD%97%E7%AC%A6%E5%A4%A7%E5%B0%8F%E9%95%BF%E5%BA%A6">输出字符大小（长度）</a></li>
+<li class="toc-item toc-level-4"><a href="#expr%E5%AF%BB%E6%89%BE%E5%AD%97%E7%AC%A6">expr寻找字符</a></li>
+<li class="toc-item toc-level-4"><a href="#%E8%BF%94%E5%9B%9E%E9%83%A8%E5%88%86%E9%95%BF%E5%BA%A6%E4%B8%B2%E5%86%85%E5%AE%B9">返回部分长度串内容</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%AE%97%E6%9C%AF%E8%BF%90%E7%AE%97%E7%AC%A6">算术运算符</a></li>
+<li class="toc-item toc-level-3"><a href="#sh%E8%AE%A1%E7%AE%97%E5%91%BD%E4%BB%A4">sh计算命令</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BF%90%E7%AE%97%E7%AC%A6">字符串运算符</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%AF%BB%E5%8F%96">读取</a></li>
+<li class="toc-item toc-level-4"><a href="#read">read</a></li>
+<li class="toc-item toc-level-4"><a href="#printf">printf</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%95%B0%E7%BB%84">数组</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%8B%BC%E6%8E%A5%E5%AD%97%E7%AC%A6%E4%B8%B2">拼接字符串</a></li>
+<li class="toc-item toc-level-3"><a href="#ifs">IFS</a></li>
+<li class="toc-item toc-level-3"><a href="#test">test</a></li>
+<li class="toc-item toc-level-3"><a href="#sh%E6%9D%A1%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%8F%82%E6%95%B0">sh条件测试参数</a></li>
+<li class="toc-item toc-level-4"><a href="#o%E8%A1%A8%E7%A4%BA-%E6%88%96or">-o表示 或or</a></li>
+<li class="toc-item toc-level-3"><a href="#if">if</a></li>
+<li class="toc-item toc-level-3"><a href="#for">for</a></li>
+<li class="toc-item toc-level-4"><a href="#sh%E8%84%9A%E6%9C%AC%E4%B8%AD%E7%9A%84for">sh脚本中的for</a></li>
+<li class="toc-item toc-level-4"><a href="#in">in</a></li>
+<li class="toc-item toc-level-4"><a href="#section">(( ))</a></li>
+<li class="toc-item toc-level-4"><a href="#seq">seq</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%A4%84%E7%90%86%E5%BC%95%E7%94%A8">处理引用</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%B5%8C%E5%A5%97">嵌套</a></li>
+<li class="toc-item toc-level-3"><a href="#while">while</a></li>
+<li class="toc-item toc-level-3"><a href="#until">until</a></li>
+<li class="toc-item toc-level-3"><a href="#case">case</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C">文件操作</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%96%87%E4%BB%B6%E8%BF%90%E7%AE%97%E7%AC%A6">文件运算符</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%BD%AC%E4%B9%89%E5%AD%97%E7%AC%A6">$转义字符</a></li>
+<li class="toc-item toc-level-4"><a href="#0">$0</a></li>
+<li class="toc-item toc-level-4"><a href="#%E9%81%8D%E5%8E%86%E8%BE%93%E5%85%A5%E7%9A%84%E5%8F%82%E6%95%B0">遍历输入的参数</a></li>
+<li class="toc-item toc-level-4"><a href="#section-2">$@ $*</a></li>
+<li class="toc-item toc-level-4"><a href="#shift">shift</a></li>
+<li class="toc-item toc-level-2"><a href="#csv">CSV</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%84%9A%E6%9C%AC%E6%96%87%E4%BB%B6">脚本文件</a></li>
+<li class="toc-item toc-level-4"><a href="#break-continue">break &amp; continue</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/linux/" class="post-category">
+        it / Linux      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/linux/">#linux</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Shell 脚本</h1>
+
+    <div class="post-body">
+<h1 id="shell与bash">shell与bash</h1>
+<p>常见的 shell 解释器有 sh、bash 这两种，其他的 ksh、csh 和 zsh 等是不常见的。Mac OS 中默认安装了以上所有类型，Windows 需要自行安装，Linux 更不用说了。就像上面说的，只要一门语言有解释器，就可以作为 shell 使用。比如 Java 有第三方解释器 Jshell，PHP 有 PHP Shell。如果你用过 windows，那你对 cmd 这个词一定不陌生，它是 windows shell，官方名称叫做 command interpreter。</p>
+<h2 id="bash脚本基础">Bash脚本基础</h2>
+<p>BASH = GNU Bourne-Again Shell,BASH 是 GNU 组织开发和推广的一个项目。
+Bash脚本类似批处理,简单来讲就是把许多的指令集合在一起,并提供循环、条件、判断等重要功能,语法简单实用,用以编写程序,大大简化管理员的操作,并可以完成图形工具所无法实现的功能。</p>
+<h1 id="shell脚本文件">shell脚本文件</h1>
+<p>1.创建包含bash命令的文本文件。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">touch</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> test.sh</span></span></code></pre>
+<p>文件的第一行应为:</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span></code></pre>
+<p>2.使文件可执行(使用chmod +x scripts)</p>
+<p>3.将文件放置在用户的$PATH的目录中</p>
+<p>~/bin – 用于用户的私有程序
+/usr/local/bin – 本地开发、系统上的其他人使用的脚本
+/usr/local/sbin - 本地开发、由root使用的脚本</p>
+<p>直接运行脚本和使用source命令运行脚本是不同的!</p>
+<h4 id="修改文件权限">修改文件权限</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">chmod</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> +x</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> test.sh</span></span></code></pre>
+<h4 id="运行">运行</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">./test.sh</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">bash</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> test.sh</span></span></code></pre>
+<h3 id="引用和转义">引用和转义</h3>
+<h4 id="弱引用">弱引用” ”</h4>
+<p>将字符串放置在双引号中，保留字符串中所有字符的文字值，</p>
+<p>$、`、\和 ! 字符除外</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#显示date字符</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "date"</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">date</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "`</span><span style="color:#6F42C1;--shiki-dark:#B392F0">date</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`"</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">2022年</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 09月</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 16日</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 星期五</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 11:13:00</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> CST</span></span></code></pre>
+<h4 id="强引用">强引用' '</h4>
+<p>将字符串放置在单引号中，保留字符串中所有字符的文字值，同时禁用所有扩展</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#显示`date`字符，这里' '由于强引所以仅为字符</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '`date`'</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span><span style="color:#6F42C1;--shiki-dark:#B392F0">date</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span></span></code></pre>
+<h4 id="转义">转义\</h4>
+<p>非引用的\是转义字符。它保留了下一个字符的文字值。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#没有转义的</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `</span><span style="color:#6F42C1;--shiki-dark:#B392F0">date</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">2022年</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 09月</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 16日</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 星期五</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 11:13:44</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> CST</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6A737D;--shiki-dark:#6A737D">#转义后的</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> \`</span><span style="color:#032F62;--shiki-dark:#9ECBFF">date</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\`</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span><span style="color:#6F42C1;--shiki-dark:#B392F0">date</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span></span></code></pre>
+<h3 id="变量">变量</h3>
+<p>shell变量用于为稍后在脚本中使用的名称指定值,并且仅限于shell命令行或从中声明变量的脚本。</p>
+<p><strong>定义的变量一般为大写字母。</strong></p>
+<p>若要定义或指定值:
+FRUIT=apple</p>
+<p>若要参考或使用变量:
+$FRUIT
+${FRUIT}</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> TIME=`</span><span style="color:#6F42C1;--shiki-dark:#B392F0">date</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $TIME</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">2022年</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 09月</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 16日</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 星期五</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 11:17:07</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> CST</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "the time is ${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">TIME</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}"</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">the</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> time</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> is</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 2022年</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 09月</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 16日</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 星期五</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 11:17:07</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> CST</span></span></code></pre>
+<h4 id="readonly只读变量">readonly只读变量</h4>
+<p>使用 <strong>readonly</strong> 命令可以将变量定义为只读变量，只读变量的值不能被改变。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">myUrl</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"http://xxx/shell/"</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">readonly</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> myUrl</span></span></code></pre>
+<h4 id="unset删除变量">unset删除变量</h4>
+<p>使用 <strong>unset</strong> 命令可以删除变量。语法：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#005CC5;--shiki-dark:#79B8FF">unset</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> variable_name</span></span></code></pre>
+<p>变量被删除后不能再次使用。unset 命令不能删除只读变量。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/sh</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">myUrl</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"http://xxx/shell/"</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">unset</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> myUrl</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $myUrl</span></span></code></pre>
+<h4 id="输出字符大小长度">输出字符大小（长度）</h4>
+<p>变量前加 #</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">your_name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"www.baidu.com"</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ${</span><span style="color:#D73A49;--shiki-dark:#F97583">#</span><span style="color:#24292E;--shiki-dark:#E1E4E8">your_name}</span></span></code></pre>
+<h4 id="expr寻找字符">expr寻找字符</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">a</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"adsadadasdasd"</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `</span><span style="color:#6F42C1;--shiki-dark:#B392F0">expr</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> index "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF">" d`</span></span></code></pre>
+<p>返回 a 中包含 d 中任意字符的<strong>第一个</strong>位置。</p>
+<p>第一个位置出现的是d，所以一定是2</p>
+<h4 id="返回部分长度串内容">返回部分长度串内容</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">your_name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"www.baidu.com"</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ${your_name</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">4</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">5}</span></span></code></pre>
+<p>这里<code>:4:5</code>表示从第4个字符开始，输出5个</p>
+<h3 id="算术运算符"><strong>算术运算符</strong></h3>
+<p>算术运算符指的是可以在程序中实现加、减、乘、除等数学运算的运算符。</p>
+<p>++ 增量后
+– 减量后
+- 减法
++ 加法
+** 幂运算
+* 乘法
+/ 除法
+% 余数
++= 加等
+-= 减等</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> let</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> A=1+2</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $A</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">3</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> let</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> A=2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">**</span><span style="color:#032F62;--shiki-dark:#9ECBFF">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">  #2^2</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $A</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">4</span></span></code></pre>
+<h3 id="sh计算命令">sh计算命令</h3>
+<p>用$[]表示数学运算
+用expr表示数学运算
+用let指示数学运算
+用(())表示数学运算。bash内建功能,效率高</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[2+4]</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">6</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `</span><span style="color:#6F42C1;--shiki-dark:#B392F0">expr</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 2+4`</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">2+4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> let</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> A=2+4</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $A</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">6</span></span></code></pre>
+<p>sh脚本中：</p>
+<p>1</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">a</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">10</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">b</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">20</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">c</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span><span style="color:#6F42C1;--shiki-dark:#B392F0">expr</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">a</span><span style="color:#032F62;--shiki-dark:#9ECBFF">} + ${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">b</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}`</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$c</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span></code></pre>
+<p>2</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">c</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `</span><span style="color:#6F42C1;--shiki-dark:#B392F0">expr</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 10</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> + </span><span style="color:#005CC5;--shiki-dark:#79B8FF">20</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$c</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span></code></pre>
+<p>3</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">c</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 10</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> +</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 20</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ]</span><span style="color:#6A737D;--shiki-dark:#6A737D">		#var3=$[ $var1*$var2 ]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$c</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">sum</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$num </span><span style="color:#6F42C1;--shiki-dark:#B392F0">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $sum</span><span style="color:#032F62;--shiki-dark:#9ECBFF">]</span></span></code></pre>
+<p>4</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">sum</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">0</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 2</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 3</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 4</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 5</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 7</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 8</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 9</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 10</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	let</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> sum+=j</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $sum</span></span></code></pre>
+<p>5</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">sum</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">0</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8">((i</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;i</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	sum</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$((</span><span style="color:#6F42C1;--shiki-dark:#B392F0">i+sum</span><span style="color:#24292E;--shiki-dark:#E1E4E8">))</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">8</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $sum</span></span></code></pre>
+<h3 id="字符串运算符">字符串运算符</h3>
+<ul>
+<li>= ：判断字符串相等</li>
+<li>!= ：判断字符串不相等</li>
+<li>-z：判断字符串长度为0</li>
+<li>-n ：判断字符串长度不为0</li>
+<li>$ ：判断字符串不为空</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">a</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"abc"</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">b</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"efg"</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ $a </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $b ]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> = </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> : a 等于 b"</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> = </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> : a 不等于 b"</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">12</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ $a </span><span style="color:#D73A49;--shiki-dark:#F97583">!=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $b ]</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> != </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> : a 不等于 b"</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> != </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> : a 等于 b"</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">19</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-z</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $a ]</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "-z </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> : a的长度为0 "</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "-z </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> : a的长度不为0"</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">26</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-n</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $a ]</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "-n </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> : a的长度不为0"</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "-n </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> : a的长度为0"</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">33</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ $a ]</span></span>
+<span class="line"><span class="line-number">35</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">36</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ：字符串不为空 "</span></span>
+<span class="line"><span class="line-number">37</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> : 字符串为空"</span></span>
+<span class="line"><span class="line-number">39</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span></code></pre>
+<h3 id="读取">读取</h3>
+<h4 id="read">read</h4>
+<p>从标准输入中读取数据并赋值给变量。如果没有进行重定向，默认就是从键盘读取用户输入的数据；如果进行了重定向，那么可以从文件中读取数据。</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-a array</td>
+<td>把读取的数据赋值给数组 array，从下标 0 开始。</td>
+</tr>
+<tr>
+<td>-d delimiter</td>
+<td>用字符串 delimiter 指定读取结束的位置，而不是一个换行符（读取到的数据不包括 delimiter）。</td>
+</tr>
+<tr>
+<td>-e</td>
+<td>在获取用户输入的时候，对功能键进行编码转换，不会直接显式功能键对应的字符。</td>
+</tr>
+<tr>
+<td>-n num</td>
+<td>读取 num 个字符，而不是整行字符。</td>
+</tr>
+<tr>
+<td>-p prompt</td>
+<td>显示提示信息，提示内容为 prompt。</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>原样读取（Raw mode），不把反斜杠字符解释为转义字符。</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>静默模式（Silent mode），不会在屏幕上显示输入的字符。当输入密码和其它确认信息的时候，这是很有必要的。</td>
+</tr>
+<tr>
+<td>-t seconds</td>
+<td>设置超时时间，单位为秒。如果用户没有在指定时间内输入完成，那么 read 将会返回一个非 0 的退出状态，表示读取失败。</td>
+</tr>
+<tr>
+<td>-u fd</td>
+<td>使用文件描述符 fd 作为输入源，而不是标准输入，类似于重定向。</td>
+</tr>
+</tbody>
+</table>
+<p>case:</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "请输入网址"</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">read</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> url</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">ping</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $url</span></span></code></pre>
+<h4 id="printf">printf</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">printf</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "%10s %8s %4s\n"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 姓名</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 性别</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 年龄</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">printf</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "%10s %8s %4.2f\n"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 刘德华</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 男</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 56</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">printf</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "%10s %8s %4.2f\n"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 周润发</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 男</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 90</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">printf</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "%10s %8s %4.2f\n"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 赵本山</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 男</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 70</span></span></code></pre>
+<h3 id="数组">数组</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">#定义数组</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">arr</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 4</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">lisi</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $arr</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "第一个元素${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">arr</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[0]}"</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "第二个元素${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">arr</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[1]}"</span></span>
+<span class="line"><span class="line-number">12</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "数组的元素为：${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">arr</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#032F62;--shiki-dark:#9ECBFF">]}"</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "数组的元素为：${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">arr</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#032F62;--shiki-dark:#9ECBFF">]}"</span></span>
+<span class="line"><span class="line-number">15</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "${</span><span style="color:#D73A49;--shiki-dark:#F97583">#</span><span style="color:#24292E;--shiki-dark:#E1E4E8">name</span><span style="color:#032F62;--shiki-dark:#9ECBFF">}"</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "数组的长度为：${</span><span style="color:#D73A49;--shiki-dark:#F97583">#</span><span style="color:#24292E;--shiki-dark:#E1E4E8">arr</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#032F62;--shiki-dark:#9ECBFF">]}"</span></span>
+<span class="line"><span class="line-number">18</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#6A737D;--shiki-dark:#6A737D">#关联性</span></span>
+<span class="line"><span class="line-number">20</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#D73A49;--shiki-dark:#F97583">declare</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -A</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> site </span><span style="color:#6A737D;--shiki-dark:#6A737D">#site=(["baidu"]="www.baidu.com" ["google"]="www.google.com" ["taobao"]="www.taobao.com")</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#6F42C1;--shiki-dark:#B392F0">site[</span><span style="color:#6F42C1;--shiki-dark:#B392F0">"baidu"</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]</span><span style="color:#032F62;--shiki-dark:#9ECBFF">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0">"www.baidu.com"</span></span>
+<span class="line"><span class="line-number">23</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">site</span><span style="color:#032F62;--shiki-dark:#9ECBFF">["baidu"]}"</span></span></code></pre>
+<h4 id="拼接字符串">拼接字符串</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">list</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"alibaba tengxun baidu"</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">list</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$list</span><span style="color:#032F62;--shiki-dark:#9ECBFF">" google"</span><span style="color:#6A737D;--shiki-dark:#6A737D"> #在后面加上google</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> state </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $list</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $state</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span></code></pre>
+<h3 id="ifs">IFS</h3>
+<ol>
+<li>IFS的默认值为：空白（包括：空格，tab, 和新行)，将其ASSII码用十六进制打印出来就是：20 09 0a。</li>
+<li>IFS对空格的空白的处理和其他字符不一样，左右两边的纯空白会被忽略，多个连续的空白被当成一个IFS处理。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/sh</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">IFS</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'|'</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">text</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'a a a a|b b b b|c c c c'</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $text;</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> echo $i;</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> a</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> b</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6F42C1;--shiki-dark:#B392F0">c</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> c</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> c</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> c</span></span></code></pre>
+<p>从文件中获取</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 读取文件中的字段</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">file</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"t.txt"</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">IFS</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">';'</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> state </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">cat</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $file)</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $state</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">11</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6F42C1;--shiki-dark:#B392F0">123</span></span>
+<span class="line"><span class="line-number">14</span></span>
+<span class="line"><span class="line-number">15</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#6F42C1;--shiki-dark:#B392F0">222</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#6F42C1;--shiki-dark:#B392F0">333</span></span></code></pre>
+<p>t.txt</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>123;;</span></span>
+<span class="line"><span class="line-number">2</span><span>222</span></span>
+<span class="line"><span class="line-number">3</span><span>333</span></span></code></pre>
+<h3 id="test">test</h3>
+<p>文件类型判断</p>
+<table>
+<thead>
+<tr>
+<th>选 项</th>
+<th>作 用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-b filename</td>
+<td>判断文件是否存在，并且是否为块设备文件。</td>
+</tr>
+<tr>
+<td>-c filename</td>
+<td>判断文件是否存在，并且是否为字符设备文件。</td>
+</tr>
+<tr>
+<td>-d filename</td>
+<td>判断文件是否存在，并且是否为目录文件。</td>
+</tr>
+<tr>
+<td>-e filename</td>
+<td>判断文件是否存在。</td>
+</tr>
+<tr>
+<td>-f filename</td>
+<td>判断文件是否存在，井且是否为普通文件。</td>
+</tr>
+<tr>
+<td>-L filename</td>
+<td>判断文件是否存在，并且是否为符号链接文件。</td>
+</tr>
+<tr>
+<td>-p filename</td>
+<td>判断文件是否存在，并且是否为管道文件。</td>
+</tr>
+<tr>
+<td>-s filename</td>
+<td>判断文件是否存在，并且是否为非空。</td>
+</tr>
+<tr>
+<td>-S filename</td>
+<td>判断该文件是否存在，并且是否为套接字文件。</td>
+</tr>
+</tbody>
+</table>
+<p>文件权限判断</p>
+<table>
+<thead>
+<tr>
+<th>选 项</th>
+<th>作 用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-r filename</td>
+<td>判断文件是否存在，并且是否拥有读权限。</td>
+</tr>
+<tr>
+<td>-w filename</td>
+<td>判断文件是否存在，并且是否拥有写权限。</td>
+</tr>
+<tr>
+<td>-x filename</td>
+<td>判断文件是否存在，并且是否拥有执行权限。</td>
+</tr>
+<tr>
+<td>-u filename</td>
+<td>判断文件是否存在，并且是否拥有 SUID 权限。</td>
+</tr>
+<tr>
+<td>-g filename</td>
+<td>判断文件是否存在，并且是否拥有 SGID 权限。</td>
+</tr>
+<tr>
+<td>-k filename</td>
+<td>判断该文件是否存在，并且是否拥有 SBIT 权限。</td>
+</tr>
+</tbody>
+</table>
+<p>文件比较</p>
+<table>
+<thead>
+<tr>
+<th>选 项</th>
+<th>作 用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>filename1 -nt filename2</td>
+<td>判断 filename1 的修改时间是否比 filename2 的新。</td>
+</tr>
+<tr>
+<td>filename -ot filename2</td>
+<td>判断 filename1 的修改时间是否比 filename2 的旧。</td>
+</tr>
+<tr>
+<td>filename1 -ef filename2</td>
+<td>判断 filename1 是否和 filename2 的 inode 号一致，可以理解为两个文件是否为同一个文件。这个判断用于判断硬链接是很好的方法</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sh条件测试参数">sh条件测试参数</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-eq</td>
+<td style="text-align:left">等于则为真</td>
+</tr>
+<tr>
+<td style="text-align:left">-ne</td>
+<td style="text-align:left">不等于则为真</td>
+</tr>
+<tr>
+<td style="text-align:left">-gt</td>
+<td style="text-align:left">大于则为真</td>
+</tr>
+<tr>
+<td style="text-align:left">-ge</td>
+<td style="text-align:left">大于等于则为真</td>
+</tr>
+<tr>
+<td style="text-align:left">-lt</td>
+<td style="text-align:left">小于则为真</td>
+</tr>
+<tr>
+<td style="text-align:left">-le</td>
+<td style="text-align:left">小于等于则为真</td>
+</tr>
+</tbody>
+</table>
+<p>test测试、检查某个条件是否成立，包含数值、字符和文件</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">num1</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">100</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">num2</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">100</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> test</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[num1]</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -eq</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[num2]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "两个数相等！"</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "两个数不相等"</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">11</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ $[num1] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $[num2] ]</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#005CC5;--shiki-dark:#79B8FF">        echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "两个数相等！"</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#005CC5;--shiki-dark:#79B8FF">        echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "两个数不相等"</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">18</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#24292E;--shiki-dark:#E1E4E8">result</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[num1+num2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$result</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">21</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#24292E;--shiki-dark:#E1E4E8">str1</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"baidu"</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#24292E;--shiki-dark:#E1E4E8">str2</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"google"</span></span>
+<span class="line"><span class="line-number">24</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> test</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $str1 </span><span style="color:#032F62;--shiki-dark:#9ECBFF">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $str2</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "两个字符串相等"</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "两个字符串不等"</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span></code></pre>
+<p>-e 判断文件是否存在。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">cd</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /bin</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> test</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -e</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ./bash</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件已存在"</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件不存在"</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span></code></pre>
+<h4 id="o表示-或or">-o表示 或or</h4>
+<p>-a表示 并且and</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">cd</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /bin</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> test</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -e</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ./notFile</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -o</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -e</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ./bash</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "至少一个文件存在"</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "两个文件都存在"</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span></code></pre>
+<p>-gt：大于则为真</p>
+<p>-lt：小于则为真</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">a</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">10</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">b</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">20</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ $a </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $b ]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "a等于b"</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ $a </span><span style="color:#D73A49;--shiki-dark:#F97583">-gt</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $b ]</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "a大于b"</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ $a </span><span style="color:#D73A49;--shiki-dark:#F97583">-lt</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $b ]</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "a小于b"</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "没有意义"</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span></code></pre>
+<p>另一种判断大小</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">a</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">10</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">b</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">20</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (( $a </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $b ))</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "a等于b"</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (( $a </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $b ))</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "a大于b"</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (( $a </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $b ))</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "a小于b"</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "没有符合条件"</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span></code></pre>
+<h3 id="if">if</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ command ];</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">     符合该条件执行的语句</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ command ];</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">     符合该条件执行的语句</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">     符合该条件执行的语句</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span></code></pre>
+<p>例子</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">#输入学生成绩，根据成绩判断输出五级制成绩（优、良、中、差、不及格）</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">while</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> :</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "请输入学生成绩"</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	read</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> grade</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	grade</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$((</span><span style="color:#6F42C1;--shiki-dark:#B392F0">10#$grade</span><span style="color:#24292E;--shiki-dark:#E1E4E8">))	</span><span style="color:#6A737D;--shiki-dark:#6A737D">#转换为10进制，比如前面有0：09</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">	if</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> test</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $grade </span><span style="color:#005CC5;--shiki-dark:#79B8FF">-ge</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 90</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#005CC5;--shiki-dark:#79B8FF">		echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "优秀"</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">	elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (($grade </span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 80</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#005CC5;--shiki-dark:#79B8FF">		echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "良好"</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">	elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (($grade </span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 70</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#005CC5;--shiki-dark:#79B8FF">		echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "中等"</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">	elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (($grade </span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 60</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#005CC5;--shiki-dark:#79B8FF">		echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "差"</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">	else</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#005CC5;--shiki-dark:#79B8FF">		echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "不及格"</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">	fi</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "-----"</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span></code></pre>
+<h3 id="for">for</h3>
+<p>也是用分号隔离</p>
+<blockquote>
+<p>for 变量名 in 列表值
+do
+操作
+done</p>
+</blockquote>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#每0.5s输出echo一次</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> for</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> TEST</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> anna1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> anna2</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> anna3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> echo $TEST;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sleep</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0.5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna1</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna2</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna3</span></span></code></pre>
+<p>常见括号式</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ((i=1;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">i</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;5;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">i++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $i;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">1</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">2</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">3</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">4</span></span></code></pre>
+<p>另一种打印形式</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">anna@Ubuntu-virtual-machine:~/Desktop$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> for</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> NN</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> {1..5}</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $NN;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">1</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">2</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">3</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">4</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">5</span></span></code></pre>
+<h4 id="sh脚本中的for">sh脚本中的for</h4>
+<h4 id="in">in</h4>
+<p>for 变量名 in 列表;do 语句块 done</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> var </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 2</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 3</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 4</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 5</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 7</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 8</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 9</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 10</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "数值是：</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$var</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span></code></pre>
+<p>也可以输出字符串</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> str </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> This</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> is</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> string</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $str</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">This</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">is</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6F42C1;--shiki-dark:#B392F0">a</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">string</span></span></code></pre>
+<h4 id="section">(( ))</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">sum</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">0</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8">((i</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;i</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	sum</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$((</span><span style="color:#6F42C1;--shiki-dark:#B392F0">i+sum</span><span style="color:#24292E;--shiki-dark:#E1E4E8">))</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">8</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $sum</span></span>
+<span class="line"><span class="line-number">10</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">55</span></span></code></pre>
+<h4 id="seq">seq</h4>
+<p><code>seq</code> 仅适用于数字。字母不行。</p>
+<p>1、默认从1开始，这里到5</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bini/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `</span><span style="color:#6F42C1;--shiki-dark:#B392F0">seq</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $i</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">1</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">2</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6F42C1;--shiki-dark:#B392F0">3</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">4</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">5</span></span></code></pre>
+<p>2、可以指定起始位置、增量步幅。</p>
+<p>假设你要列出 3 的倍数。指定起点（在此示例中为第一个 3 ），增量（第二个 3）和终点（9）。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bini/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `</span><span style="color:#6F42C1;--shiki-dark:#B392F0">seq</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 9</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $i</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">3</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">6</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6F42C1;--shiki-dark:#B392F0">9</span></span></code></pre>
+<p>你可以选择使用负增量（即减量）将数字从大变小。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bini/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> `</span><span style="color:#6F42C1;--shiki-dark:#B392F0">seq</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 12</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -3</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $i</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">12</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6F42C1;--shiki-dark:#B392F0">6</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">3</span></span></code></pre>
+<h4 id="处理引用">处理引用</h4>
+<ol>
+<li>利用反斜杠进行转义 <code>\'</code></li>
+<li>或双引号进行操作</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> test </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> I</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> don</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\'</span><span style="color:#032F62;--shiki-dark:#9ECBFF">t</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> know</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> if</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "this'll"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> work</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "word：</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$test</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">word：I</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6F42C1;--shiki-dark:#B392F0">word：don</span><span style="color:#6F42C1;--shiki-dark:#B392F0">'t</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">word：know</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">word：if</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6F42C1;--shiki-dark:#B392F0">word：this'</span><span style="color:#6F42C1;--shiki-dark:#B392F0">ll</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#6F42C1;--shiki-dark:#B392F0">word：work</span></span></code></pre>
+<h4 id="嵌套">嵌套</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (( a</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; a</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;a</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ))</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "外层循环：</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$a</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">	for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (( b</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;b</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; b</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ))</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">	do</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">		echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "-内层循环：</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$b</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">	done</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">10</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">外层循环：1</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6F42C1;--shiki-dark:#B392F0">-内层循环：1</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#6F42C1;--shiki-dark:#B392F0">-内层循环：2</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#6F42C1;--shiki-dark:#B392F0">-内层循环：3</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#6F42C1;--shiki-dark:#B392F0">外层循环：2</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#6F42C1;--shiki-dark:#B392F0">-内层循环：1</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#6F42C1;--shiki-dark:#B392F0">-内层循环：2</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#6F42C1;--shiki-dark:#B392F0">-内层循环：3</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#6F42C1;--shiki-dark:#B392F0">外层循环：3</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#6F42C1;--shiki-dark:#B392F0">-内层循环：1</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#6F42C1;--shiki-dark:#B392F0">-内层循环：2</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#6F42C1;--shiki-dark:#B392F0">-内层循环：3</span></span></code></pre>
+<h3 id="while">while</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bini/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">i</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">while(( $i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ))</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "True </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$i</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	let</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "i++"</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "false </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$i</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">True</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">True</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6F42C1;--shiki-dark:#B392F0">True</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#6F42C1;--shiki-dark:#B392F0">True</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 4</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#6F42C1;--shiki-dark:#B392F0">True</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 6</span></span></code></pre>
+<p>用读取read执行循环:</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "按下&#x3C;CTRL-D>退出"</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -n</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "输入你喜欢的网站："</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">while</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> read</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> url</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$url是一个不错的网站</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span></code></pre>
+<h3 id="until">until</h3>
+<p>until条件为真时退出循环，为假时，进行循环</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">a</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">0</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">until</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">!</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $a </span><span style="color:#D73A49;--shiki-dark:#F97583">-lt</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 10</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $a</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	a</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span><span style="color:#6F42C1;--shiki-dark:#B392F0">expr</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> + </span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#032F62;--shiki-dark:#9ECBFF">`</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span></code></pre>
+<h3 id="case">case</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "输入1到4之间的数字"</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">read</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> num</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">case</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $num </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#032F62;--shiki-dark:#DBEDFF">	1</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "你选择了1"</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">		;;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#032F62;--shiki-dark:#DBEDFF">	2</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "你选择了2"</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">		;;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#032F62;--shiki-dark:#DBEDFF">	3</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "你选择了3"</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">		;;</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#032F62;--shiki-dark:#DBEDFF">	4</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "你选择了4"</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">		;;</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">	*)</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "你没有输入1-4之间的数字"</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">		;;</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">esac</span></span>
+<span class="line"><span class="line-number">17</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#6F42C1;--shiki-dark:#B392F0">输入1到4之间的数字</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#6F42C1;--shiki-dark:#B392F0">2</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#6F42C1;--shiki-dark:#B392F0">你选择了2</span></span></code></pre>
+<p>支持字符串判断</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">url</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"baidu"</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">case</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$url</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#D73A49;--shiki-dark:#F97583"> in</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#032F62;--shiki-dark:#9ECBFF">	"baidu"</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "百度"</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">		;;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#032F62;--shiki-dark:#9ECBFF">	"google"</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "谷歌"</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">		;;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">esac</span></span>
+<span class="line"><span class="line-number">10</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">百度</span></span></code></pre>
+<h3 id="文件操作">文件操作</h3>
+<p>获取Desktop目录下的所有文件，进行判断</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> file </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /root/Desktop/*</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">	if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-d</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$file</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">	then</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">		echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$file</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 是一个目录"</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">	elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-f</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$file</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ]</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">	then</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">		echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$file</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 是一个文件"</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">	fi</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span></code></pre>
+<h4 id="文件运算符">文件运算符</h4>
+<ul>
+<li>-r : 文件可读</li>
+<li>-w : 文件可写</li>
+<li>-x : 文件可执行</li>
+<li>-f : 文件是一个普通文件</li>
+<li>-d : 文件是一个目录</li>
+<li>-s : 文件不为空</li>
+<li>-e : 文件存在</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">#文件运算符</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">#-r -w -x -f -d -s -e</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">file</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"/home/h705/桌面/sh_de/9-20-1.sh"</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-r</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $file ]</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件可读"</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件不可读"</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">14</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-w</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $file ]</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件可写"</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件不可写"</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">21</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-x</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $file ]</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件可执行"</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件不可执行"</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">28</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-f</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $file ]</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件是一个普通文件"</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">33</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件不是一个普通文件"</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">35</span></span>
+<span class="line"><span class="line-number">36</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-d</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $file ]</span></span>
+<span class="line"><span class="line-number">37</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件是一个目录"</span></span>
+<span class="line"><span class="line-number">39</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">40</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件不是一个目录"</span></span>
+<span class="line"><span class="line-number">41</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">42</span><span style="color:#6A737D;--shiki-dark:#6A737D">#判断文件是否为空，不为空返回true</span></span>
+<span class="line"><span class="line-number">43</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-s</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $file ]</span></span>
+<span class="line"><span class="line-number">44</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">45</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件不为空"</span></span>
+<span class="line"><span class="line-number">46</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">47</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件为空"</span></span>
+<span class="line"><span class="line-number">48</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">49</span></span>
+<span class="line"><span class="line-number">50</span><span style="color:#6A737D;--shiki-dark:#6A737D">#判断文件存在不存在，存在返回true</span></span>
+<span class="line"><span class="line-number">51</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-e</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $file ]</span></span>
+<span class="line"><span class="line-number">52</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">53</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件存在"</span></span>
+<span class="line"><span class="line-number">54</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">55</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "文件不存在"</span></span>
+<span class="line"><span class="line-number">56</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span></code></pre>
+<h2 id="转义字符">$转义字符</h2>
+<p>在linux shell脚本中经常用到字符<span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>，下面是</mtext></mrow><annotation encoding="application/x-tex">，下面是</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">，下面是</span></span></span></span></span>的一些常见用法</p>
+<ul>
+<li>$#	传给脚本的参数个数</li>
+<li>$0	脚本本身的名字</li>
+<li>$1	传递给该shell脚本的第一个参数</li>
+<li>$2	传递给该shell脚本的第二个参数</li>
+<li>$@	传给脚本的所有参数的列表</li>
+<li>$*	以一个单字符串显示所有向脚本传递的参数，与位置变量不同，参数可超过9个</li>
+<li>$$	脚本运行的当前进程ID号</li>
+<li>$?	显示最后命令的退出状态，0表示没有错误，其他表示有错误</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> hello</span><span style="color:#E36209;--shiki-dark:#FFAB70"> $1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> !</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">exit</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[root@localhost Desktop]# bash test.sh</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">hello</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> !</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[root@localhost Desktop]# bash test.sh 11</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">hello</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 11</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> !</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[root@localhost Desktop]# bash test.sh 11 3 </span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">hello</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 11</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> !</span></span></code></pre>
+<h4 id="0">$0</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#005CC5;--shiki-dark:#79B8FF">$#</span><span style="color:#D73A49;--shiki-dark:#F97583"> -ne</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">then</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "提示：$(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">basename</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> $0</span><span style="color:#032F62;--shiki-dark:#9ECBFF">) 需要两个参数"</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	num</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$</span><span style="color:#032F62;--shiki-dark:#9ECBFF">[</span><span style="color:#E36209;--shiki-dark:#FFAB70"> $1</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> *</span><span style="color:#E36209;--shiki-dark:#FFAB70"> $2</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "第一个数是：</span><span style="color:#005CC5;--shiki-dark:#79B8FF">$1</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "第二个数是：</span><span style="color:#005CC5;--shiki-dark:#79B8FF">$2</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "乘积是：</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$num</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">fi</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#005CC5;--shiki-dark:#79B8FF">exit</span></span>
+<span class="line"><span class="line-number">12</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[root@localhost Desktop]# bash test.sh 2</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#6F42C1;--shiki-dark:#B392F0">提示：test.sh</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 需要两个参数</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[root@localhost Desktop]# bash test.sh 2 2</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#6F42C1;--shiki-dark:#B392F0">第一个数是：2</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#6F42C1;--shiki-dark:#B392F0">第二个数是：2</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#6F42C1;--shiki-dark:#B392F0">乘积是：4</span></span></code></pre>
+<h4 id="遍历输入的参数">遍历输入的参数</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "使用左移进行遍历"</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">count</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">while</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [ </span><span style="color:#D73A49;--shiki-dark:#F97583">-n</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#005CC5;--shiki-dark:#79B8FF">$1</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "#</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$count</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> = </span><span style="color:#005CC5;--shiki-dark:#79B8FF">$1</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	let</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> count++</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	shift</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">11</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[root@localhost Desktop]# bash test.sh m n</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#6F42C1;--shiki-dark:#B392F0">使用左移进行遍历</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#6A737D;--shiki-dark:#6A737D">#1 = m</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#6A737D;--shiki-dark:#6A737D">#2 = n</span></span></code></pre>
+<h4 id="section-2">$@ $*</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "变量 </span><span style="color:#005CC5;--shiki-dark:#79B8FF">\$</span><span style="color:#032F62;--shiki-dark:#9ECBFF">* 显示的信息是：</span><span style="color:#005CC5;--shiki-dark:#79B8FF">$*</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">count</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> param </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#005CC5;--shiki-dark:#79B8FF">$*</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "使用</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\$</span><span style="color:#032F62;--shiki-dark:#9ECBFF">*第#</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$count</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> = </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$param</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	let</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> count++</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "---"</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "变量 </span><span style="color:#005CC5;--shiki-dark:#79B8FF">\$</span><span style="color:#032F62;--shiki-dark:#9ECBFF">@ 显示的信息是：</span><span style="color:#005CC5;--shiki-dark:#79B8FF">$@</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">count</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1</span></span>
+<span class="line"><span class="line-number">13</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> param </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#005CC5;--shiki-dark:#79B8FF">$@</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "使用</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\$</span><span style="color:#032F62;--shiki-dark:#9ECBFF">@第#</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$count</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> = </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$param</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	let</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> count++</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#005CC5;--shiki-dark:#79B8FF">exit</span></span>
+<span class="line"><span class="line-number">20</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[root@localhost Desktop]# bash test.sh a b c</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#6F42C1;--shiki-dark:#B392F0">变量</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> $*</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 显示的信息是：a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> c</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#6F42C1;--shiki-dark:#B392F0">使用$*第#1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> =</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> c</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#6F42C1;--shiki-dark:#B392F0">---</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#6F42C1;--shiki-dark:#B392F0">变量</span><span style="color:#E36209;--shiki-dark:#FFAB70"> $@</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 显示的信息是：a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> c</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#6F42C1;--shiki-dark:#B392F0">使用$@第#1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> =</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> a</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#6F42C1;--shiki-dark:#B392F0">使用$@第#2</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> =</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> b</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#6F42C1;--shiki-dark:#B392F0">使用$@第#3</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> =</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> c</span></span></code></pre>
+<h4 id="shift">shift</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "所有的参数是：</span><span style="color:#005CC5;--shiki-dark:#79B8FF">$*</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "左移2个"</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">shift</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#6A737D;--shiki-dark:#6A737D">		#左移</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#E36209;--shiki-dark:#FFAB70"> $1</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">exit</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[root@localhost Desktop]# bash test.sh a b c</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6F42C1;--shiki-dark:#B392F0">所有的参数是：a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> b</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> c</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">左移2个</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">c</span></span></code></pre>
+<h2 id="csv">CSV</h2>
+<p>（没弄会</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">input</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"name.csv"</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">while</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> IFS</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">','</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> read</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> loginname</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> name</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "adding </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$loginname</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">	useradd</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -c</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$name</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -m</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $loginname</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$input</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span class="line-number">9</span></span></code></pre>
+<h2 id="脚本文件">脚本文件</h2>
+<h4 id="break-continue">break &amp; continue</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">while</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> :</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "请输入1-4之间的数字"</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">	read</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> num</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">	case</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $num </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#032F62;--shiki-dark:#DBEDFF">		1</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#032F62;--shiki-dark:#DBEDFF">2</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#032F62;--shiki-dark:#DBEDFF">3</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#032F62;--shiki-dark:#DBEDFF">4</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "你输入的数字是：</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$num</span><span style="color:#032F62;--shiki-dark:#9ECBFF">!"</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">			;;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">		*)</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "你输入的不是1-4之间的数字"</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6A737D;--shiki-dark:#6A737D">			#break</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">			continue</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#005CC5;--shiki-dark:#79B8FF">			echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "游戏结束"</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">			;;</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">	esac</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span></code></pre>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

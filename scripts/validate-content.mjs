@@ -17,6 +17,26 @@ import {
 const POSTS_DIR = 'src/content/posts';
 const REQUIRED_FIELDS = ['title', 'date', 'slug', 'category', 'status'];
 const STATUS_VALUES = ['published', 'draft'];
+const ALLOWED_TAGS = new Set([
+  'llm',
+  'agent',
+  'rag',
+  'prompt',
+  'database',
+  'linux',
+  'git',
+  'markdown',
+  'python',
+  'operations-research',
+  'security',
+  'workflow',
+  'static-site',
+  'wechat',
+  'c',
+  'cpp',
+  'essay',
+  'game'
+]);
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}(?:T[\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?$/;
 
@@ -70,7 +90,7 @@ function walkDirectory(dir) {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
       files.push(...walkDirectory(fullPath));
-    } else if (/\.(md|html)$/.test(entry.name) && !entry.name.startsWith('.')) {
+    } else if (/\.(md|html)$/.test(entry.name) && !entry.name.startsWith('.') && entry.name !== 'AGENTS.md') {
       files.push(fullPath);
     }
   }
@@ -119,6 +139,17 @@ for (const filePath of files) {
     errors.push(`${relativePath}: category 必须是可作为 URL 的小写英文 slug "${data.category}"`);
   }
 
+  const tags = Array.isArray(data.tags) ? data.tags : [];
+  for (const tag of tags) {
+    if (typeof tag !== 'string' || !ALLOWED_TAGS.has(tag)) {
+      errors.push(`${relativePath}: 标签必须使用受控集合 "${tag}"`);
+    }
+  }
+
+  if (data.subcategory && !SUBCATEGORY_PATTERN.test(data.subcategory)) {
+    errors.push(`${relativePath}: subcategory 必须是英文 slug "${data.subcategory}"`);
+  }
+
   const relativeToPosts = relativePath.slice(`${POSTS_DIR}/`.length);
   const segments = relativeToPosts.split('/');
   if (segments.length > 2) {
@@ -127,7 +158,15 @@ for (const filePath of files) {
 
   if (segments.length === 2) {
     const folder = segments[0];
-    // 非 slug 目录视为文章资源包，不参与分类；只有合法 slug 目录才派生分类页。
+    if (!SUBCATEGORY_PATTERN.test(folder)) {
+      errors.push(`${relativePath}: 子目录名必须是英文 slug "${folder}"`);
+    }
+    if (!data.subcategory) {
+      errors.push(`${relativePath}: 子目录文章必须声明 subcategory`);
+    } else if (data.subcategory !== folder) {
+      errors.push(`${relativePath}: subcategory "${data.subcategory}" 与目录 "${folder}" 不一致`);
+    }
+    // 同一子分类目录只能属于一个父分类。
     if (SUBCATEGORY_PATTERN.test(folder) && data.category) {
       const previousCategory = folderCategories.get(folder);
       if (previousCategory && previousCategory !== data.category) {
@@ -136,6 +175,8 @@ for (const filePath of files) {
         folderCategories.set(folder, data.category);
       }
     }
+  } else if (segments.length === 1 && data.subcategory) {
+    errors.push(`${relativePath}: 根目录文章不能声明 subcategory，请放入 "${data.subcategory}/" 目录`);
   }
 
   if (data.cover) {
@@ -157,4 +198,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`校验通过：${files.length} 个文件，slug 全部唯一，核心字段完整；子分类目录与父分类一致。`);
+console.log(`校验通过：${files.length} 个文件，slug 全部唯一，核心字段完整；subcategory 与目录一致。`);

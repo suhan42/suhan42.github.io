@@ -5,7 +5,6 @@ slug: learn-from-heartbreak
 category: essay
 tags:
   - essay
-  - english
 summary: 这篇随笔用英文整理了从失恋中获得的思考：失去不是终点，这些经历会塑造更成熟的心智和更长久的关系。
 status: published
 ---

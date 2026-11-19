@@ -6,7 +6,6 @@ category: it
 tags:
   - c
   - cpp
-  - note
 summary: 这是一份 C 和 C++ 常见问题的自查笔记，覆盖编译器行为、头文件宏、字符编码、main 函数签名等容易踩坑的知识点。
 status: published
 ---

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Hermes Agent - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#hermes-agent">Hermes Agent</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84">整体架构</a></li>
+<li class="toc-item toc-level-2"><a href="#%E7%89%B9%E7%82%B9">特点</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%A5%E7%A8%8B">上下文工程</a></li>
+<li class="toc-item toc-level-3"><a href="#mechanical-enforcement%E6%9C%BA%E6%A2%B0%E5%BC%8F%E7%BA%A6%E6%9D%9F">Mechanical Enforcement：机械式约束</a></li>
+<li class="toc-item toc-level-3"><a href="#feedback-loops-verification%E5%8F%8D%E9%A6%88%E9%97%AD%E7%8E%AF%E4%B8%8E%E9%AA%8C%E8%AF%81">Feedback Loops &amp;Verification：反馈闭环与验证</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%AD%E9%97%B4%E4%BB%B6">中间件</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%AE%89%E8%A3%85">安装</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85">快速安装</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85">手动安装</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-1%E5%85%8B%E9%9A%86%E4%BB%93%E5%BA%93">步骤 1：克隆仓库</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-2%E5%AE%89%E8%A3%85-uv-%E5%B9%B6%E5%88%9B%E5%BB%BA%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83">步骤 2：安装 uv 并创建虚拟环境</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-3%E5%AE%89%E8%A3%85-python-%E4%BE%9D%E8%B5%96">步骤 3：安装 Python 依赖</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-4%E5%88%9B%E5%BB%BA%E9%85%8D%E7%BD%AE%E7%9B%AE%E5%BD%95">步骤 4：创建配置目录</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-5%E6%B7%BB%E5%8A%A0-api-%E5%AF%86%E9%92%A5">步骤 5：添加 API 密钥</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-6%E5%B0%86-hermes-%E6%B7%BB%E5%8A%A0%E5%88%B0-path">步骤 6：将 hermes 添加到 PATH</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-7%E9%85%8D%E7%BD%AE%E6%82%A8%E7%9A%84%E6%8F%90%E4%BE%9B%E5%95%86">步骤 7：配置您的提供商</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AD%A5%E9%AA%A4-8%E9%AA%8C%E8%AF%81%E5%AE%89%E8%A3%85">步骤 8：验证安装</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%95%85%E9%9A%9C%E6%8E%92%E9%99%A4">故障排除</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%B6%88%E6%81%AF%E7%BD%91%E5%85%B3">消息网关</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%AE%89%E5%85%A8%E8%80%83%E8%99%91">安全考虑</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/llm/">#llm</a>
+      <a href="/tags/agent/">#agent</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Hermes Agent</h1>
+
+    <div class="post-body">
+<h1 id="hermes-agent">Hermes Agent</h1>
+<p><a href="https://www.runoob.com/ai-agent/hermes-agent.html">Hermes Agent | 菜鸟教程</a></p>
+<p>Hermes Agent 是 Nous Research 开源的自主 AI Agent 框架。</p>
+<ul>
+<li>GitHub 仓库：https://github.com/nousresearch/hermes-agent</li>
+<li>Hermes Agent 官网：https://hermes-agent.nousresearch.com/</li>
+</ul>
+<p><strong>【与Harness工程的关系】就是通过Harness工程，具体实现的一个应用框架实现。</strong></p>
+<p>官方定义：</p>
+<blockquote>
+<p>The agent that grows with you.
+一个会随着使用不断成长的 Agent。</p>
+</blockquote>
+<p>Hermes Agent 的核心理念是：<strong>让 AI 成为长期在线的数字员工，而非一次性聊天机器人。</strong></p>
+<p>Hermes Agent 是业内少见的<strong>原生内置学习闭环的 AI Agent</strong>，可从执行经验中沉淀技能、自主优化能力、持久化知识、检索历史对话，并在跨会话中持续完善用户认知模型。</p>
+<p>Hermes Agent 支持自由切换任意大模型，包括 <strong>Nous Portal、OpenRouter（200+ 模型）、OpenAI、GLM、Kimi、MiniMax</strong> 等，执行 <code>hermes model</code> 即可切换，无需改代码、无厂商锁定。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">提供商</th>
+<th style="text-align:left">说明</th>
+<th style="text-align:left">设置方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Nous Portal</strong></td>
+<td style="text-align:left">订阅制，零配置</td>
+<td style="text-align:left">通过 <code>hermes model</code> 进行 OAuth 登录</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>OpenAI Codex</strong></td>
+<td style="text-align:left">ChatGPT OAuth，使用 Codex 模型</td>
+<td style="text-align:left">通过 <code>hermes model</code> 进行设备代码认证</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Anthropic</strong></td>
+<td style="text-align:left">直接使用 Claude 模型</td>
+<td style="text-align:left">通过 Claude Code 认证或 Anthropic API 密钥</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>OpenRouter</strong></td>
+<td style="text-align:left">多提供商路由</td>
+<td style="text-align:left">输入您的 API 密钥</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>DeepSeek</strong></td>
+<td style="text-align:left">直接 DeepSeek API 访问</td>
+<td style="text-align:left">设置 <code>DEEPSEEK_API_KEY</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Hugging Face</strong></td>
+<td style="text-align:left">通过统一路由器访问 20+ 开放模型</td>
+<td style="text-align:left">设置 <code>HF_TOKEN</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>自定义端点</strong></td>
+<td style="text-align:left">VLLM、SGLang、Ollama 或任何 OpenAI 兼容 API</td>
+<td style="text-align:left">设置基础 URL 和 API 密钥</td>
+</tr>
+</tbody>
+</table>
+<h2 id="整体架构">整体架构</h2>
+<p>整体流程：</p>
+<p><img src="https://www.runoob.com/wp-content/uploads/2026/04/runoob_1778902606748.png" alt="img"></p>
+<p>架构图：</p>
+<p><img src="https://www.runoob.com/wp-content/uploads/2026/04/425bde75-892c-4560-8d76-89d15c7e7555.webp" alt="img"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">模块</th>
+<th style="text-align:left">作用</th>
+<th style="text-align:left">示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">接入层（Clients）</td>
+<td style="text-align:left">接收用户请求</td>
+<td style="text-align:left">Web、App、API、飞书</td>
+</tr>
+<tr>
+<td style="text-align:left">输入层（Input）</td>
+<td style="text-align:left">处理各种输入数据</td>
+<td style="text-align:left">文本、图片、PDF、Excel</td>
+</tr>
+<tr>
+<td style="text-align:left">调度器（Agent Orchestrator）</td>
+<td style="text-align:left">理解任务并拆分执行流程</td>
+<td style="text-align:left">分析需求 → 制定计划</td>
+</tr>
+<tr>
+<td style="text-align:left">能力层（Capabilities）</td>
+<td style="text-align:left">提供执行能力</td>
+<td style="text-align:left">对话、检索、代码执行</td>
+</tr>
+<tr>
+<td style="text-align:left">记忆层（Memory）</td>
+<td style="text-align:left">保存上下文和历史信息</td>
+<td style="text-align:left">会话记忆、长期记忆</td>
+</tr>
+<tr>
+<td style="text-align:left">知识层（Knowledge）</td>
+<td style="text-align:left">提供知识检索能力</td>
+<td style="text-align:left">RAG、向量数据库</td>
+</tr>
+<tr>
+<td style="text-align:left">模型层（Model Layer）</td>
+<td style="text-align:left">提供推理能力</td>
+<td style="text-align:left">GPT、Claude、本地模型</td>
+</tr>
+<tr>
+<td style="text-align:left">工具层（Tools）</td>
+<td style="text-align:left">调用外部工具完成任务</td>
+<td style="text-align:left">搜索、数据库、API</td>
+</tr>
+<tr>
+<td style="text-align:left">外部服务层（External Services）</td>
+<td style="text-align:left">对接业务系统</td>
+<td style="text-align:left">ERP、CRM、云服务</td>
+</tr>
+<tr>
+<td style="text-align:left">基础设施层（Infrastructure）</td>
+<td style="text-align:left">支撑系统运行</td>
+<td style="text-align:left">权限、日志、监控</td>
+</tr>
+</tbody>
+</table>
+<h2 id="特点">特点</h2>
+<h3 id="上下文工程">上下文工程</h3>
+<p>Hermes Agent 的四层记忆系统本质上就是一套Context Engineering方案：</p>
+<ul>
+<li>MEMORY.md（短期记忆）：当前会话的偏好和上下文</li>
+<li>USER.md（用户画像）：跨会话的用户偏好积累</li>
+<li>SQLite FTS5（长期记忆）：全文检索历史对话和经验</li>
+<li>外部Provider（扩展记忆）：对接8种以上外部知识源</li>
+</ul>
+<h3 id="mechanical-enforcement机械式约束">Mechanical Enforcement：机械式约束</h3>
+<h3 id="feedback-loops-verification反馈闭环与验证">Feedback Loops &amp;Verification：反馈闭环与验证</h3>
+<h3 id="中间件">中间件</h3>
+<h2 id="安装">安装</h2>
+<h3 id="快速安装">快速安装</h3>
+<p><strong>Windows 系统说明</strong>：不支持原生 Windows 环境，请先安装 WSL2，再在 WSL2 终端中执行命令。以下安装命令适用于 Linux、macOS 与 WSL2 系统：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">curl</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -fsSL</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> bash</span></span></code></pre>
+<p>安装程序会自动处理所有依赖项：</p>
+<ul>
+<li><strong>uv</strong> — 快速 Python 包管理器</li>
+<li><strong>Python 3.11</strong> — 通过 uv 安装，无需 sudo</li>
+<li><strong>Node.js v22</strong> — 用于浏览器自动化和 WhatsApp 桥接</li>
+<li><strong>ripgrep</strong> — 快速文件搜索</li>
+<li><strong>ffmpeg</strong> — TTS 音频格式转换</li>
+</ul>
+<p><img src="https://www.runoob.com/wp-content/uploads/2026/04/9eecf986-5c45-4099-8221-4ef1b2b98d9c.png" alt="img"></p>
+<h3 id="手动安装">手动安装</h3>
+<p>如果您更喜欢完全控制安装过程，请按照以下步骤操作。</p>
+<h4 id="步骤-1克隆仓库">步骤 1：克隆仓库</h4>
+<p>使用 <code>--recurse-submodules</code> 克隆以获取所需的子模块：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>git clone --recurse-submodules https://github.com/NousResearch/hermes-agent.git</span></span>
+<span class="line"><span class="line-number">2</span><span>cd hermes-agent</span></span></code></pre>
+<p>如果已经克隆但没有子模块：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>git submodule update --init --recursive</span></span></code></pre>
+<h4 id="步骤-2安装-uv-并创建虚拟环境">步骤 2：安装 uv 并创建虚拟环境</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span># 安装 uv（如果尚未安装）</span></span>
+<span class="line"><span class="line-number">2</span><span>curl -LsSf https://astral.sh/uv/install.sh | sh</span></span>
+<span class="line"><span class="line-number">3</span><span></span></span>
+<span class="line"><span class="line-number">4</span><span># 创建 Python 3.11 的虚拟环境（uv 会在需要时下载，无需 sudo）</span></span>
+<span class="line"><span class="line-number">5</span><span>uv venv venv --python 3.11</span></span></code></pre>
+<p><strong>提示：<strong>您</strong>不需要</strong>激活虚拟环境来使用 <code>hermes</code>。入口点有一个硬编码的 shebang 指向虚拟环境中的 Python，因此全局链接后即可使用。</p>
+<h4 id="步骤-3安装-python-依赖">步骤 3：安装 Python 依赖</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span># 告诉 uv 要安装到哪个虚拟环境</span></span>
+<span class="line"><span class="line-number">2</span><span>export VIRTUAL_ENV="$(pwd)/venv"</span></span>
+<span class="line"><span class="line-number">3</span><span></span></span>
+<span class="line"><span class="line-number">4</span><span># 安装所有扩展</span></span>
+<span class="line"><span class="line-number">5</span><span>uv pip install -e ".[all]"</span></span></code></pre>
+<p>如果您只想要核心智能体（不包含 Telegram/Discord/cron 支持）：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>uv pip install -e "."</span></span></code></pre>
+<p><strong>可选扩展说明：</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">扩展</th>
+<th style="text-align:left">功能</th>
+<th style="text-align:left">安装命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>all</code></td>
+<td style="text-align:left">包含以下所有功能</td>
+<td style="text-align:left"><code>uv pip install -e &quot;.[all]&quot;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>messaging</code></td>
+<td style="text-align:left">Telegram 和 Discord 网关</td>
+<td style="text-align:left"><code>uv pip install -e &quot;.[messaging]&quot;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>cron</code></td>
+<td style="text-align:left">定时任务的 Cron 表达式解析</td>
+<td style="text-align:left"><code>uv pip install -e &quot;.[cron]&quot;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>voice</code></td>
+<td style="text-align:left">CLI 麦克风输入和音频播放</td>
+<td style="text-align:left"><code>uv pip install -e &quot;.[voice]&quot;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mcp</code></td>
+<td style="text-align:left">模型上下文协议支持</td>
+<td style="text-align:left"><code>uv pip install -e &quot;.[mcp]&quot;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>honcho</code></td>
+<td style="text-align:left">AI 原生记忆（Honcho 集成）</td>
+<td style="text-align:left"><code>uv pip install -e &quot;.[honcho]&quot;</code></td>
+</tr>
+</tbody>
+</table>
+<p>我们可以组合使用：<code>uv pip install -e &quot;.[messaging,cron]&quot;</code></p>
+<h4 id="步骤-4创建配置目录">步骤 4：创建配置目录</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span># 创建目录结构</span></span>
+<span class="line"><span class="line-number">2</span><span>mkdir -p ~/.hermes/{cron,sessions,logs,memories,skills,pairing,hooks,image_cache,audio_cache,whatsapp/session}</span></span>
+<span class="line"><span class="line-number">3</span><span></span></span>
+<span class="line"><span class="line-number">4</span><span># 复制示例配置文件</span></span>
+<span class="line"><span class="line-number">5</span><span>cp cli-config.yaml.example ~/.hermes/config.yaml</span></span>
+<span class="line"><span class="line-number">6</span><span></span></span>
+<span class="line"><span class="line-number">7</span><span># 创建空的 .env 文件用于存储 API 密钥</span></span>
+<span class="line"><span class="line-number">8</span><span>touch ~/.hermes/.env</span></span></code></pre>
+<h4 id="步骤-5添加-api-密钥">步骤 5：添加 API 密钥</h4>
+<p>打开 <code>~/.hermes/.env</code> 并添加至少一个 LLM 提供商密钥：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span># 必需 — 至少一个 LLM 提供商：</span></span>
+<span class="line"><span class="line-number">2</span><span>OPENROUTER_API_KEY=sk-or-v1-your-key-here</span></span>
+<span class="line"><span class="line-number">3</span><span></span></span>
+<span class="line"><span class="line-number">4</span><span># 可选 — 启用其他工具：</span></span>
+<span class="line"><span class="line-number">5</span><span>FIRECRAWL_API_KEY=fc-your-key          # 网页搜索和抓取</span></span>
+<span class="line"><span class="line-number">6</span><span>FAL_KEY=your-fal-key                   # 图像生成（FLUX）</span></span></code></pre>
+<p>或者通过 CLI 设置：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>hermes config set OPENROUTER_API_KEY sk-or-v1-your-key-here</span></span></code></pre>
+<h4 id="步骤-6将-hermes-添加到-path">步骤 6：将 hermes 添加到 PATH</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>mkdir -p ~/.local/bin</span></span>
+<span class="line"><span class="line-number">2</span><span>ln -sf "$(pwd)/venv/bin/hermes" ~/.local/bin/hermes</span></span></code></pre>
+<p>如果 <code>~/.local/bin</code> 不在 PATH 中，请添加到 shell 配置：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span># Bash</span></span>
+<span class="line"><span class="line-number">2</span><span>echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc &#x26;&#x26; source ~/.bashrc</span></span>
+<span class="line"><span class="line-number">3</span><span></span></span>
+<span class="line"><span class="line-number">4</span><span># Zsh</span></span>
+<span class="line"><span class="line-number">5</span><span>echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc &#x26;&#x26; source ~/.zshrc</span></span></code></pre>
+<h4 id="步骤-7配置您的提供商">步骤 7：配置您的提供商</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>hermes model       # 选择您的 LLM 提供商和模型</span></span></code></pre>
+<h4 id="步骤-8验证安装">步骤 8：验证安装</h4>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>hermes version    # 检查命令是否可用</span></span>
+<span class="line"><span class="line-number">2</span><span>hermes doctor     # 运行诊断以验证一切正常</span></span>
+<span class="line"><span class="line-number">3</span><span>hermes status     # 检查您的配置</span></span>
+<span class="line"><span class="line-number">4</span><span>hermes chat -q "Hello! What tools do you have available?"</span></span></code></pre>
+<h4 id="故障排除">故障排除</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">问题</th>
+<th style="text-align:left">解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>hermes: command not found</code></td>
+<td style="text-align:left">重新加载 shell（<code>source ~/.bashrc</code>）或检查 PATH</td>
+</tr>
+<tr>
+<td style="text-align:left">API 密钥未设置</td>
+<td style="text-align:left">运行 <code>hermes model</code> 配置提供商，或 <code>hermes config set OPENROUTER_API_KEY your_key</code></td>
+</tr>
+<tr>
+<td style="text-align:left">更新后配置丢失</td>
+<td style="text-align:left">运行 <code>hermes config check</code> 然后 <code>hermes config migrate</code></td>
+</tr>
+</tbody>
+</table>
+<p>如需更多诊断信息，运行 <code>hermes doctor</code> — 它会告诉您缺少什么以及如何修复。</p>
+<blockquote>
+<p>**提示：**您可以随时通过 <code>hermes model</code> 切换提供商——无需更改代码，没有锁定。</p>
+</blockquote>
+<h2 id="消息网关">消息网关</h2>
+<p>Hermes Agent 消息网关允许您通过多个平台与智能体交互——Telegram、Discord、Slack、WhatsApp、Signal、Email、Home Assistant 等。</p>
+<p>从一个网关向 15+ 个平台发送消息。无论您身在何处，都可以与 Hermes 保持联系。</p>
+<h2 id="安全考虑">安全考虑</h2>
+<p><strong>重要：</strong></p>
+<ul>
+<li>不要将 API 密钥提交到源代码控制</li>
+<li>使用环境变量或安全的凭据存储</li>
+<li>限制允许与智能体交互的用户/频道</li>
+<li>定期轮换 API 密钥</li>
+<li>在公共平台上启用命令审批</li>
+</ul>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

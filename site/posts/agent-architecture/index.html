@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Agent 架构 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#agent-%E6%9E%B6%E6%9E%84">Agent 架构</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%8E%A8%E7%90%86%E4%B8%8E%E8%A7%84%E5%88%92reasoning-planning">推理与规划（Reasoning &amp; Planning）</a></li>
+<li class="toc-item toc-level-2"><a href="#cot-%E6%80%9D%E7%BB%B4%E9%93%BE">CoT 思维链</a></li>
+<li class="toc-item toc-level-3"><a href="#cot-%E7%9A%84%E4%BD%9C%E7%94%A8">CoT 的作用</a></li>
+<li class="toc-item toc-level-3"><a href="#few-shot-cot-%E6%8F%90%E7%A4%BA%E8%AF%8D%E8%AE%BE%E8%AE%A1">Few-shot CoT 提示词设计</a></li>
+<li class="toc-item toc-level-2"><a href="#react">ReAct</a></li>
+<li class="toc-item toc-level-3"><a href="#react%E4%B8%8Efunction-calling%E5%B7%AE%E5%BC%82">ReAct与Function Calling差异</a></li>
+<li class="toc-item toc-level-3"><a href="#react%E5%AE%9E%E4%BE%8B">ReAct实例</a></li>
+<li class="toc-item toc-level-2"><a href="#plan-and-execute%E8%A7%84%E5%88%92%E5%85%88%E8%A1%8C%E7%9A%84%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%BC%8F">Plan-and-Execute（规划先行的执行模式）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%A4%E7%A7%8D%E5%8F%98%E4%BD%93">两种变体</a></li>
+<li class="toc-item toc-level-2"><a href="#multi-agent%E5%A4%9A-agent-%E5%8D%8F%E4%BD%9C">Multi-Agent（多 Agent 协作）</a></li>
+<li class="toc-item toc-level-2"><a href="#tot-%E4%B8%8E-%E6%A0%91%E7%8A%B6%E5%A4%9A%E8%B7%AF%E5%BE%84%E6%8E%A2%E7%B4%A2">ToT 与 树状多路径探索</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92-mcts-%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%A0%91%E6%90%9C%E7%B4%A2">任务规划 &amp; MCTS (蒙特卡洛树搜索)</a></li>
+<li class="toc-item toc-level-2"><a href="#reflexion%E8%87%AA%E6%88%91%E5%8F%8D%E6%80%9D%E4%B8%8E%E7%BA%A0%E9%94%99">Reflexion（自我反思与纠错）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%A4%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F">两种实现方式</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%AE%9E%E4%BE%8Breflexion-%E7%9A%84%E5%8F%8D%E6%80%9D%E6%8F%90%E7%A4%BA%E8%AF%8D%E8%AE%BE%E8%AE%A1">实例：Reflexion 的反思提示词设计</a></li>
+<li class="toc-item toc-level-2"><a href="#rag-agent%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E5%9E%8B%E6%99%BA%E8%83%BD%E4%BD%93">RAG + Agent（检索增强型智能体）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%BC%96%E6%8E%92workflow-dag">工作流编排（Workflow / DAG）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%BA%AF-agent-vs-dag-%E5%B7%A5%E4%BD%9C%E6%B5%81">纯 Agent vs DAG 工作流</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BB%BB%E5%8A%A1%E5%88%86%E8%A7%A3%E7%AD%96%E7%95%A5%E4%B8%8E%E5%B7%A5%E7%A8%8B%E5%8C%96%E5%AE%9E%E8%B7%B5">任务分解策略与工程化实践</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94%E6%80%BB%E7%BB%93">框架对比总结</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%A8%AA%E5%90%91%E5%AF%B9%E6%AF%94%E4%B8%8E%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9">横向对比与如何选择</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%B8%B8%E8%A7%81%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F">常见组合模式</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%B8%B8%E8%A7%81%E8%AF%AF%E5%8C%BA">常见误区</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/llm/">#llm</a>
+      <a href="/tags/agent/">#agent</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Agent 架构</h1>
+
+    <div class="post-body">
+<h1 id="agent-架构">Agent 架构</h1>
+<blockquote>
+<p>本文假设你已了解大语言模型（LLM）的基本概念，以及&quot;工具调用&quot;（Function Calling）的基本思路。如果还不熟悉，可以先了解这两个基础知识。</p>
+<p><a href="https://www.runoob.com/ai-agent/reasoning-planning.html">推理与规划（Reasoning &amp; Planning） | 菜鸟教程</a></p>
+<p><a href="https://www.runoob.com/ai-agent/agent-architecture.html">Agent 架构 | 菜鸟教程</a></p>
+</blockquote>
+<p><strong>Agent 架构</strong>是指 Agent 系统中各个组件的组织方式，决定了 Agent 的能力边界、可靠性、灵活性和适用场景。</p>
+<p>Agent 的工作方式本质上是一个<strong>循环（Loop）</strong>——感知当前状态，推理下一步，执行行动，再次感知……直到任务完成。</p>
+<p>不同架构的差异，就在于如何组织和扩展这个基本循环。</p>
+<p><img src="https://www.runoob.com/wp-content/uploads/2026/05/d274cacd-ee56-4e65-9330-0c792d33c1a2.webp" alt="img"></p>
+<h2 id="推理与规划reasoning-planning">推理与规划（Reasoning &amp; Planning）</h2>
+<p>在构建自主 AI Agent 的过程中，如果说大语言模型（LLM）是 Agent 的大脑，工具调用（Tool Use）是手脚，那么**推理与规划（Reasoning &amp; Planning）**就是将其从简单的问答机升级为自主问题解决者的核心引擎。</p>
+<p>复杂的现实任务往往无法通过一次生成（One-pass generation）完成。AI 需要具备拆解目标、逻辑推演、探索路径、自我修正以及调度工具的能力。</p>
+<ul>
+<li>没有 <strong>Reasoning</strong>，Agent 只是一个<strong>被动响应的工具调用器</strong>（你说一步它做一步，不会理解意图）</li>
+<li>没有 <strong>Planning</strong>，Agent 只是一个<strong>单步执行器</strong>（无法处理复杂、多步骤的任务）</li>
+</ul>
+<p>只有当这两者结合时，Agent 才能真正做到<strong>理解目标 → 拆解路径 → 动态调整 → 自主完成</strong>，这也是 Agent 区别于普通 Chatbot 或简单 Workflow 的本质所在。</p>
+<p>以下是目前业界最主流的推理与规划框架。</p>
+<hr>
+<h2 id="cot-思维链">CoT 思维链</h2>
+<p><a href="https://www.zhihu.com/tardis/zm/art/670907685?source_id=1005">一文读懂：思维链 CoT（Chain of Thought）</a></p>
+<blockquote>
+<p><strong>思维链（Chain of Thought, CoT）：逐步推理</strong></p>
+</blockquote>
+<p>传统 LLM 生成答案时往往是直觉式的一步到位。</p>
+<p>思维链（CoT）的核心思想是：<strong>强制要求模型在输出最终答案前，先显式地输出中间的推理步骤（Let's think step by step）</strong>。这种做法能显著激活模型在复杂数学、逻辑推理和常识问答中的潜力。</p>
+<p>CoT 不仅让模型有了更多的计算时间（token 数量代表计算量），还让后续的生成能建立在前面正确的逻辑基础上。</p>
+<p><strong>一个完整的包含 CoT 的 Prompt 往往由指令（Instruction），逻辑依据（Rationale），示例（Exemplars）三部分组成。以是否包含示例为区分，可以将 CoT 分为 Zero-Shot-CoT 与 Few-Shot-CoT。</strong></p>
+<h3 id="cot-的作用">CoT 的作用</h3>
+<ol>
+<li>COT允许模型把一个复杂问题拆解成多个步骤，也就是说需要更多推理步骤的问题可以多分点计算量。</li>
+<li>COT提供了一个观察模型为何会犯错的窗口，因此也就提供了一个debug模型的机会</li>
+<li>COT能用在数学应用题、常识推理和符号操作上，也就有可能用在任何人类通过语言能解决的问题上</li>
+<li>COT支持任何语言模型使用，加在 few-shot的样例中就能生效。省去了重新训练模型的功夫。</li>
+</ol>
+<p>实例：</p>
+<ul>
+<li>**Zero-Shot提示：**模型只根据任务的描述生成响应，不需要任何示例。</li>
+<li>**One-Shot提示：**只提供一个例子。</li>
+<li>**Few-Shot提示：**提供几个例子。在提示中的作用是通过少量样本引导模型对特定任务进行学习和执行，例如通过提供少量风格或主题示例，引导模型产出具有相似风格或主题的创作。</li>
+</ul>
+<h3 id="few-shot-cot-提示词设计">Few-shot CoT 提示词设计</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span># 通过提供包含推理过程的示例，引导模型进行 CoT 推理</span></span>
+<span class="line"><span class="line-number">2</span><span>prompt = """</span></span>
+<span class="line"><span class="line-number">3</span><span>问题：罗杰有5个网球。他又买了2罐网球。每罐有3个网球。他现在共有多少个网球？</span></span>
+<span class="line"><span class="line-number">4</span><span>解答：罗杰一开始有5个网球。2罐网球，每罐3个，共计 2 * 3 = 6 个网球。5 + 6 = 11。答案是11。</span></span>
+<span class="line"><span class="line-number">5</span><span></span></span>
+<span class="line"><span class="line-number">6</span><span>问题：食堂有23个苹果。如果他们用掉20个做午餐，又买了6个，现在有多少个苹果？</span></span>
+<span class="line"><span class="line-number">7</span><span>解答：食堂本来有23个苹果。用掉20个后剩下 23 - 20 = 3 个。又买了6个，现在有 3 + 6 = 9 个。答案是9。</span></span>
+<span class="line"><span class="line-number">8</span><span></span></span>
+<span class="line"><span class="line-number">9</span><span>问题：{user_question}</span></span>
+<span class="line"><span class="line-number">10</span><span>解答："""</span></span></code></pre>
+<h2 id="react">ReAct</h2>
+<ul>
+<li><strong>推理 + 行动循环（Reasoning + Acting）</strong></li>
+<li>ReAct = Reasoning（推理）+ Acting（行动）</li>
+</ul>
+<p>如果说 CoT 只是在模型内部闭门造车，那么 <strong>ReAct（Reason + Act）</strong> 则是让模型睁开眼睛看世界。它将内部逻辑推理（Thought）与外部工具交互（Action）交织在一起，形成一个动态的闭环反馈系统。这是一个持续的 <strong>思考-行动</strong> 循环，直到任务完成为止。</p>
+<p>ReAct 是一种让 LLM 交替进行推理和行动的框架，通过让模型显式地展示思考过程来提高复杂任务的解决能力。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">graph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">A</span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">Reason 思考</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#032F62;--shiki-dark:#9ECBFF">LLM 推理</span><span style="color:#D73A49;--shiki-dark:#F97583">)--</span><span style="color:#032F62;--shiki-dark:#9ECBFF">1.生成计划</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">B</span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">Action 行动</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#032F62;--shiki-dark:#9ECBFF">调用工具</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">B</span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#032F62;--shiki-dark:#9ECBFF">2.执行动作</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">C</span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">Observe 观察</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#032F62;--shiki-dark:#9ECBFF">获取结果</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">C</span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#032F62;--shiki-dark:#9ECBFF">3.接受反馈</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">D</span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">Memory 记忆</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#032F62;--shiki-dark:#9ECBFF">存储上下文</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">D</span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#E36209;--shiki-dark:#FFAB70">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">更新记忆</span><span style="color:#24292E;--shiki-dark:#E1E4E8">，</span><span style="color:#E36209;--shiki-dark:#FFAB70">再推理</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70">A</span></span>
+<span class="line"><span class="line-number">10</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">style A fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ffedd5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f97316</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">c2410c</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">style B fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">8b5cf6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">6d28d9</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">style C fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ccfbf1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">14b8a6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">0f766e</span></span></code></pre>
+<h3 id="react与function-calling差异">ReAct与Function Calling差异</h3>
+<p>[ReAct与Function Calling差异解析](./Function Calling.md#ReAct与Function Calling差异解析)</p>
+<h3 id="react实例">ReAct实例</h3>
+<blockquote>
+<p>让我们用一个具体的例子来跟踪这个循环：<strong>帮我在北京找一家评分高于 4.5 的意大利餐厅，并告诉我它的地址和招牌菜。</strong></p>
+<p>循环步骤分解：</p>
+<p><strong>1、思考 (Think/Reason)</strong>：</p>
+<ul>
+<li><strong>大脑分析</strong>：Agent 的大脑（LLM）接收到目标，它会分析：这是一个信息查询任务，我需要先找到符合条件的餐厅，然后获取其详细信息。我应该使用搜索工具。</li>
+<li><strong>生成指令</strong>：大脑生成一个清晰的内部指令，例如：我需要调用 <code>search_web</code> 工具，关键词是北京意大利餐厅评分 4.5。</li>
+</ul>
+<p><strong>2、行动 (Act)</strong>：</p>
+<ul>
+<li><strong>调用工具</strong>：Agent 根据上一步的指令，调用 <code>search_web</code> 工具并传入关键词。</li>
+<li><strong>执行</strong>：工具开始工作，在互联网上执行搜索，并返回一堆原始的搜索结果列表。</li>
+</ul>
+<p><strong>3、观察 (Observe)</strong>：</p>
+<ul>
+<li><strong>接收反馈</strong>：Agent 获取到工具执行的结果（即搜索到的网页摘要或链接列表）。</li>
+</ul>
+<p><strong>4、再思考 (Think Again)</strong>：</p>
+<ul>
+<li><strong>大脑再分析</strong>：大脑看到搜索结果后，继续分析：我已经得到了一些餐厅名字。但用户要的是地址和招牌菜。我需要选择第一个结果（比如：Bottega 意库），然后调用工具获取它的详细信息。</li>
+<li><strong>生成新指令</strong>：调用 <code>get_restaurant_details</code> 工具，餐厅名称为 <strong>Bottega 意库</strong>。</li>
+</ul>
+<p><strong>5、再行动 (Act Again)</strong> -&gt; <strong>再观察 (Observe Again)</strong>：</p>
+<ul>
+<li>这个<strong>思考-行动-观察</strong>的循环会继续，直到大脑认为已经收集到足够的信息来<strong>达成目标</strong>。</li>
+</ul>
+<p><strong>6、最终响应 (Final Answer)</strong>：</p>
+<ul>
+<li>当大脑判断任务完成后，它会将所有的观察结果（记忆）整合起来，生成一个结构化、人性化的最终答案给用户：&quot;找到一家符合要求的餐厅：<strong>Bottega 意库</strong>。地址：北京市朝阳区三里屯路 XX 号。招牌菜：黑松露披萨、手工提拉米苏。&quot;</li>
+</ul>
+</blockquote>
+<p><strong>局限性：</strong> ReAct 在短期的、步骤清晰的任务中表现优异。但由于整个思维和动作历史都积压在同一个上下文窗口中，当任务链条过长时，极易陷入死循环或因为上下文超载而遗忘初始目标。</p>
+<h2 id="plan-and-execute规划先行的执行模式">Plan-and-Execute（规划先行的执行模式）</h2>
+<p>为了解决 ReAct 在长线任务中的疲软，Plan-and-Execute 将思考和行动进行了解耦。规划 + 执行架构将 Agent 的工作拆分为两个明确阶段：先<strong>规划（Plan）</strong>，再<strong>执行（Execute）</strong>。</p>
+<p>在规划阶段，模型不执行任何操作，只生成一份详细的执行步骤列表。在执行阶段，系统依次完成每个步骤。这种分离让用户可以在执行前审查计划，就像 <strong>Claude Code</strong> 的 <strong>Plan Mode</strong> 一样。</p>
+<p>系统通常分为两个独立的角色：</p>
+<ol>
+<li><strong>Planner（规划者）</strong>：负责接收大目标，生成详细的 Step-by-Step 子任务列表。</li>
+<li><strong>Executor（执行者）</strong>：负责按顺序执行这些子任务。执行器通常就是一个小型的 ReAct Agent，每次只专注完成当前的一个小目标。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">    UserTask</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"用户任务"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Planner</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"规划器（Planner）&#x3C;br/>生成分步执行计划"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#E36209;--shiki-dark:#FFAB70"> 执行计划</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"执行计划"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">        direction</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Step1</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"步骤 1&#x3C;br/>收集信息"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Step2</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"步骤 2&#x3C;br/>分析处理"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Step3</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"步骤 3&#x3C;br/>输出结果"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Step1 </span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#032F62;--shiki-dark:#9ECBFF">> Step2 </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Step3</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Executor</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"执行器（Executor）&#x3C;br/>依序完成每个步骤&#x3C;br/>（每次独立上下文）"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Complete</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"完成任务"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">    UserTask </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Planner</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Planner </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> 执行计划</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Step3 </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Executor</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Executor </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Complete</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Executor </span><span style="color:#D73A49;--shiki-dark:#F97583">-.->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">动态重新规划&#x3C;br/></span><span style="color:#24292E;--shiki-dark:#E1E4E8">（</span><span style="color:#032F62;--shiki-dark:#9ECBFF">可选</span><span style="color:#24292E;--shiki-dark:#E1E4E8">）</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Step3</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style UserTask fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f3f4f6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">6b7280</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">374151</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Planner fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">5b21b6</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 执行计划 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">6b7280</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-dasharray</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#E36209;--shiki-dark:#FFAB70">5 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">374151</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Step1 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">10b981</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Step2 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">10b981</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Step3 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">10b981</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Executor fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff1f2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f43f5e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">9f1239</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Complete fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">6b7280</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">374151</span></span></code></pre>
+<h3 id="两种变体">两种变体</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">变体</th>
+<th style="text-align:left">行为</th>
+<th style="text-align:left">典型场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">静态规划</td>
+<td style="text-align:left">计划一次性生成，按顺序线性执行，不中途调整</td>
+<td style="text-align:left">流程固定、步骤明确的任务，如数据迁移脚本</td>
+</tr>
+<tr>
+<td style="text-align:left">动态规划</td>
+<td style="text-align:left">每执行一步后重新评估，根据结果调整后续计划</td>
+<td style="text-align:left">结果不确定的任务，如调试、探索性数据分析</td>
+</tr>
+</tbody>
+</table>
+<p>动态规划更健壮，但实现复杂度更高，且每步重新规划会消耗额外的 token。</p>
+<blockquote>
+<p>Plan &amp; Execute 的代价是增加了推理轮次，对于简单任务反而是一种浪费。如果一个任务可以在 3 步内完成，直接用单 Agent 循环更高效。</p>
+</blockquote>
+<h2 id="multi-agent多-agent-协作">Multi-Agent（多 Agent 协作）</h2>
+<p>一个 Orchestrator（协调者、编排器）负责任务拆解和调度，多个 Subagent 各司其职，并行或串行地完成子任务，结果汇聚回 Orchestrator 做综合。</p>
+<p>当单个 Agent 面临上下文窗口不足或任务过于复杂时，多 Agent 架构提供了一个优雅的解决方案：<strong>让多个专门化的子 Agent 并行工作</strong>，由一个 Orchestrator（协调者）统筹全局。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Orchestrator</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"协调者（Orchestrator）&#x3C;br/>任务分解 · 调度 · 结果综合"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#E36209;--shiki-dark:#FFAB70"> 并行区</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"并行执行"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">        direction</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">        AgentA</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"子 Agent A&#x3C;br/>代码审查"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">        AgentB</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"子 Agent B&#x3C;br/>安全检测"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">        AgentC</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"子 Agent C&#x3C;br/>性能分析"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Result</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"结果汇总&#x3C;br/>综合各子 Agent 输出"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Orchestrator </span><span style="color:#D73A49;--shiki-dark:#F97583">-->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">分发任务</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> AgentA</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Orchestrator </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> AgentB</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Orchestrator </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> AgentC</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#E36209;--shiki-dark:#FFAB70">    AgentA </span><span style="color:#D73A49;--shiki-dark:#F97583">-.->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">返回结果</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Result</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">    AgentB </span><span style="color:#D73A49;--shiki-dark:#F97583">-.-></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Result</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">    AgentC </span><span style="color:#D73A49;--shiki-dark:#F97583">-.-></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Result</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Orchestrator fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">5b21b6</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 并行区 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff7ed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">c2410c</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style AgentA fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">10b981</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style AgentB fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">10b981</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style AgentC fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">10b981</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Result fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">dbeafe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">2563eb</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">1e40af</span></span></code></pre>
+<p><strong>独立上下文</strong>是核心优势：每个子 Agent 拥有<strong>独立的上下文窗口</strong>。代码审查 Agent 深度阅读 auth.py 不会影响性能分析 Agent 的判断；安全检测 Agent 产生的大量中间输出不会挤占其他 Agent 的空间。</p>
+<ul>
+<li>
+<p>优点</p>
+<ul>
+<li>
+<p>天然支持并行，速度快</p>
+</li>
+<li>
+<p>子 Agent 各自独立，上下文互不干扰</p>
+</li>
+<li>
+<p>可以专门化每个子 Agent 的角色</p>
+</li>
+</ul>
+</li>
+<li>
+<p>缺点</p>
+<ul>
+<li>
+<p>协调逻辑复杂，调试困难</p>
+</li>
+<li>
+<p>多个 Agent 并行的 Token 成本更高</p>
+</li>
+<li>
+<p>Orchestrator 本身可能成为瓶颈</p>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>多 Agent 协作的主要成本是编排开销。如果子任务非常简单（每个只需 1-2 步），编排开销可能超过实际工作的开销，此时单 Agent 更合适。</p>
+</blockquote>
+<h2 id="tot-与-树状多路径探索">ToT 与 树状多路径探索</h2>
+<p>无论是 CoT 还是 Plan-and-Execute，本质上都是<strong>线性</strong>的路径探索。但在写代码、解数学题或创意写作时，人类往往会设想多种方案，评估后选择最佳的，甚至在发现错误时回溯。</p>
+<p><strong>ToT（Tree of Thoughts，思维树）</strong> 将推理过程建模为一棵树：节点是当前的思维状态。模型会在每一个分支点生成多个候选 Thought，然后通过内部的 Evaluator（评估器）对这些节点进行打分（如：可行、可能有风险、不可行）。结合 <strong>BFS（广度优先搜索）</strong> 或 <strong>DFS（深度优先搜索）</strong> 算法，决定是继续深入还是回溯重试。</p>
+<h2 id="任务规划-mcts-蒙特卡洛树搜索">任务规划 &amp; MCTS (蒙特卡洛树搜索)</h2>
+<ul>
+<li><strong>复杂任务拆解与搜索</strong></li>
+</ul>
+<p>在涉及战略游戏或极高难度的推理任务（如前沿的数学验证、复杂的代码仓库重构）时，简单的 ToT 仍不够高效。业界开始将 LLM 与传统的强化学习搜索算法 <strong>MCTS（Monte Carlo Tree Search）</strong> 结合（类似 AlphaGo 的核心逻辑）。</p>
+<ul>
+<li><strong>LLM 作为策略网络（Policy Network）</strong>：提供启发式的下一步行动建议，减少无意义的分支扩展。</li>
+<li><strong>LLM/代码环境作为价值网络（Value Network）</strong>：通过仿真执行（Rollout）预判某个行动序列的最终胜率或成功率。</li>
+<li><strong>优势</strong>：在庞大的解空间中，能够找到最具有全局最优潜力的规划路径。</li>
+</ul>
+<h2 id="reflexion自我反思与纠错">Reflexion（自我反思与纠错）</h2>
+<p>人类在执行任务时，如果第一次失败了，会总结经验教训并在下一次尝试中规避错误。</p>
+<p><strong>Reflexion</strong> 框架赋予了 Agent 类似的能力。</p>
+<p>在 Reflexion 闭环中，为 Agent 增加了一个<strong>质检环节</strong>：每次生成输出后，都由一个**评判者（Critic）**来评估质量。当 Agent 的输出被判定为失败（例如：测试用例未通过、API 报错）时，会触发一个 <strong>Reviewer 机制</strong>。</p>
+<p>LLM 被要求根据历史动作和失败的反馈写一段口语化的反思（Reflection），例如：<em>&quot;我刚才使用了错误的 API 参数格式，下一次我应该查阅文档后再传递 JSON&quot;</em>。这段反思会被存入情景记忆（Episodic Memory）中，作为下一次尝试的上下文提示，从而大幅提升 Agent 的自愈合能力。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Executor</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"执行器（Executor）&#x3C;br/>生成初始输出"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Critic</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"评判者（Critic）&#x3C;br/>评估质量与正确性"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Reviser</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"修正器（Reviser）&#x3C;br/>根据反馈改进输出"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Final</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"输出最终结果"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Executor </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Critic</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Critic </span><span style="color:#D73A49;--shiki-dark:#F97583">-->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"通过"</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Final</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Critic </span><span style="color:#D73A49;--shiki-dark:#F97583">-->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"未通过"</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Reviser</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Reviser </span><span style="color:#D73A49;--shiki-dark:#F97583">-.->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"重新生成&#x3C;br/>（通常设置最大迭代次数限制）"</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Executor</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Executor fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">059669</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Critic fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">5b21b6</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Reviser fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff1f2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">e11d48</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">9f1239</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Final fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f0fdf4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">16a34a</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">14532d</span></span></code></pre>
+<h3 id="两种实现方式">两种实现方式</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">方式</th>
+<th style="text-align:left">机制</th>
+<th style="text-align:left">优点</th>
+<th style="text-align:left">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">自我反思</td>
+<td style="text-align:left">同一个模型先执行再评估自己的输出</td>
+<td style="text-align:left">实现简单，无额外模型成本</td>
+<td style="text-align:left">模型可能对自己的错误&quot;视而不见&quot;</td>
+</tr>
+<tr>
+<td style="text-align:left">Critic 模型</td>
+<td style="text-align:left">用独立的评判模型评估执行模型的输出</td>
+<td style="text-align:left">更客观，能发现执行模型盲区</td>
+<td style="text-align:left">增加模型调用成本和延迟</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>&quot;写单元测试 → 运行测试 → 观察失败 → 修复代码 → 再次运行&quot;——这就是反思架构的经典应用。测试结果本身就是 Critic 的反馈信号。</p>
+</blockquote>
+<h3 id="实例reflexion-的反思提示词设计">实例：Reflexion 的反思提示词设计</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>reflection_prompt = """</span></span>
+<span class="line"><span class="line-number">2</span><span>你是一个正在尝试编写 Python 爬虫的 AI 助手。</span></span>
+<span class="line"><span class="line-number">3</span><span>这是你刚才执行的代码：{previous_code}</span></span>
+<span class="line"><span class="line-number">4</span><span>这是运行环境返回的错误信息：{error_traceback}</span></span>
+<span class="line"><span class="line-number">5</span><span></span></span>
+<span class="line"><span class="line-number">6</span><span>请深刻反思：</span></span>
+<span class="line"><span class="line-number">7</span><span></span></span>
+<span class="line"><span class="line-number">8</span><span>1. 错误发生的根本原因是什么？</span></span>
+<span class="line"><span class="line-number">9</span><span>2. 在下一次尝试中，你具体的修改策略是什么？</span></span>
+<span class="line"><span class="line-number">10</span><span></span></span>
+<span class="line"><span class="line-number">11</span><span></span></span>
+<span class="line"><span class="line-number">12</span><span>请将反思记录下来，以指导后续的行动。</span></span>
+<span class="line"><span class="line-number">13</span><span>"""</span></span></code></pre>
+<ul>
+<li>
+<p>优点</p>
+<ul>
+<li>
+<p>显著提升输出质量</p>
+</li>
+<li>
+<p>可以设置明确的质量标准</p>
+</li>
+<li>
+<p>适合有客观评判标准的任务</p>
+</li>
+</ul>
+</li>
+<li>
+<p>缺点</p>
+<ul>
+<li>
+<p>多次迭代增加延迟和成本</p>
+</li>
+<li>
+<p>需要设置最大迭代次数防止死循环</p>
+</li>
+<li>
+<p>评判标准难以形式化时效果有限</p>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>反思循环每次迭代都是一次额外的 LLM 调用，会明显增加延迟。此外需要设置反思次数上限，否则模型可能陷入&quot;永远不满意&quot;的死循环。</p>
+</blockquote>
+<h2 id="rag-agent检索增强型智能体">RAG + Agent（检索增强型智能体）</h2>
+<p>在 Agent 的工具集里加入向量检索能力，让 Agent 在推理过程中动态查询外部知识库，克服上下文窗口的限制。</p>
+<p>RAG（Retrieval-Augmented Generation，检索增强生成）本是一种让 LLM 查询外部知识库的技术。当它与 Agent 结合时，变得更加强大：Agent 可以<strong>主动决定何时检索、检索什么</strong>，而不是每次都被动地检索一次。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">    UserQuery</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"用户查询"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 检索环节</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">        ActiveRetrieval</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"主动检索&#x3C;br/>决定检索时机与内容"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">        KnowledgeBase</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"知识库&#x3C;br/>文档 / 向量数据库&#x3C;br/>代码库 / 记忆"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">    EnhancedReasoning</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"增强推理&#x3C;br/>结合知识库内容推理"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">    ExecuteAction</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"执行行动&#x3C;br/>基于知识的精准操作"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">    UserQuery </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> ActiveRetrieval</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    ActiveRetrieval </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;--></span><span style="color:#24292E;--shiki-dark:#E1E4E8">|"</span><span style="color:#E36209;--shiki-dark:#FFAB70">查询 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">/ </span><span style="color:#E36209;--shiki-dark:#FFAB70">返回</span><span style="color:#24292E;--shiki-dark:#E1E4E8">"| </span><span style="color:#E36209;--shiki-dark:#FFAB70">KnowledgeBase</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    ActiveRetrieval </span><span style="color:#D73A49;--shiki-dark:#F97583">-->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"增强上下文"</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> EnhancedReasoning</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">    EnhancedReasoning </span><span style="color:#D73A49;--shiki-dark:#F97583">-.->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"按需再检索"</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> KnowledgeBase</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">    EnhancedReasoning </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> ExecuteAction</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style UserQuery fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f3f4f6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">6b7280</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">374151</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style ActiveRetrieval fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">059669</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style KnowledgeBase fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff7ed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ea580c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">9a3412</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style EnhancedReasoning fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">5b21b6</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style ExecuteAction fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff1f2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">e11d48</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">9f1239</span></span></code></pre>
+<ul>
+<li>
+<p>与普通 RAG 的关键区别：</p>
+<ul>
+<li>
+<p>普通 RAG 是&quot;被动、一次性&quot;的：用户提问时固定检索一次，将结果塞入 Prompt。</p>
+</li>
+<li>
+<p><strong>RAG + Agent 则不同</strong>：Agent 自主判断在推理的哪个环节需要补充知识、需要检索什么，并可以多次查询知识库，直到获得足够的信息来完成任务。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="工作流编排workflow-dag">工作流编排（Workflow / DAG）</h2>
+<p>把 Agent 行为固化为一张<strong>有向无环图（DAG）</strong>，每个节点是一个 LLM 调用或工具调用，边表示数据依赖关系，由框架驱动执行。</p>
+<p>这是最接近传统软件工程的一种 Agent 架构。与前面几种架构的最大区别在于：<strong>Agent 的自主决策空间被限制在单个节点内部</strong>，节点之间的流转是预先定义好的，不可更改。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Input</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"数据输入"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Output</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"输出"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#E36209;--shiki-dark:#FFAB70"> 并行区</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"并行执行"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">        direction TB</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">        TaskA</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"任务 A&#x3C;br/>独立并行执行"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">        TaskB</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"任务 B&#x3C;br/>独立并行执行"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Merge</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"聚合节点&#x3C;br/>等待依赖，整合结果"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Input </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> TaskA</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Input </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> TaskB</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">    TaskA </span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#E36209;--shiki-dark:#FFAB70">A</span><span style="color:#24292E;--shiki-dark:#E1E4E8">、</span><span style="color:#E36209;--shiki-dark:#FFAB70">B 均完成后才触发</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Merge</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">    TaskB </span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#E36209;--shiki-dark:#FFAB70">A</span><span style="color:#24292E;--shiki-dark:#E1E4E8">、</span><span style="color:#E36209;--shiki-dark:#FFAB70">B 均完成后才触发</span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Merge</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Merge </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Output</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Input fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f3f4f6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">9ca3af</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">374151</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Output fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f3f4f6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">9ca3af</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">374151</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 并行区 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style TaskA fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">059669</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style TaskB fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ecfdf5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">059669</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">064e3b</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Merge fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">5b21b6</span></span></code></pre>
+<h3 id="纯-agent-vs-dag-工作流">纯 Agent vs DAG 工作流</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">特性</th>
+<th style="text-align:left">纯 Agent</th>
+<th style="text-align:left">DAG 工作流</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">流程控制</td>
+<td style="text-align:left">模型自主决定下一步</td>
+<td style="text-align:left">预定义的 DAG 图决定</td>
+</tr>
+<tr>
+<td style="text-align:left">可预测性</td>
+<td style="text-align:left">低，每次运行路径可能不同</td>
+<td style="text-align:left">高，运行路径确定</td>
+</tr>
+<tr>
+<td style="text-align:left">可调试性</td>
+<td style="text-align:left">难，依赖日志追踪</td>
+<td style="text-align:left">易，每个节点输入输出明确</td>
+</tr>
+<tr>
+<td style="text-align:left">容错性</td>
+<td style="text-align:left">依赖模型自行恢复</td>
+<td style="text-align:left">框架提供重试、断点续跑</td>
+</tr>
+<tr>
+<td style="text-align:left">灵活性</td>
+<td style="text-align:left">高，可应对意外情况</td>
+<td style="text-align:left">低，只能走预定义路径</td>
+</tr>
+</tbody>
+</table>
+<p>DAG 的 &quot;无环&quot;（Acyclic）特性意味着工作流是<strong>确定性的</strong>——没有无限循环，执行路径可以完全预测，失败的节点可以单独重试。</p>
+<hr>
+<h2 id="任务分解策略与工程化实践">任务分解策略与工程化实践</h2>
+<p>在实际生产级的 AI 智能体开发中，纯靠 LLM &quot;零样本&quot;进行复杂规划是不稳定的。常用的混合干预策略包括：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">干预策略</th>
+<th style="text-align:left">核心做法</th>
+<th style="text-align:left">适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>子任务模板化 (SOP)</strong></td>
+<td style="text-align:left">不让 LLM 自由规划，而是预先定义好标准操作程序（SOP），让 LLM 在固定的状态机（State Machine）中流转。</td>
+<td style="text-align:left">客服系统、标准化的数据清洗流水线。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>HITL (Human-in-the-Loop)</strong></td>
+<td style="text-align:left">在 Planner 生成任务列表后，中断执行，要求人类用户进行确认、修改或审批（Approve），然后再交由 Executor 执行。</td>
+<td style="text-align:left">高风险操作：如删除数据库记录、发送群发邮件、大额资金转账。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>RLHF 引导规划</strong></td>
+<td style="text-align:left">利用强化学习和人类偏好反馈，专门微调大模型的规划能力，使其更倾向于生成安全、高效的步骤组合。</td>
+<td style="text-align:left">底层大语言模型基座的训练阶段（如 OpenAI 的 o1 模型训练）。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="框架对比总结">框架对比总结</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">模式</th>
+<th style="text-align:left">核心机制</th>
+<th style="text-align:left">优点</th>
+<th style="text-align:left">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>CoT</strong></td>
+<td style="text-align:left">Step-by-Step 线性推理</td>
+<td style="text-align:left">实现极简，显著提升基础推理准确度</td>
+<td style="text-align:left">无法调用外部工具，容易一条道走到黑</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ReAct</strong></td>
+<td style="text-align:left">交替思考与行动闭环</td>
+<td style="text-align:left">动态适应环境，能通过观测实时调整</td>
+<td style="text-align:left">上下文容易随步骤累积而爆炸，迷失初衷</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Plan-and-Execute</strong></td>
+<td style="text-align:left">先拆解为子任务，再隔离执行</td>
+<td style="text-align:left">极其适合长线复杂任务，上下文清晰</td>
+<td style="text-align:left">面对突发变化（规划本身出错时）不够灵活</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ToT / MCTS</strong></td>
+<td style="text-align:left">树状搜索，评估回溯</td>
+<td style="text-align:left">能解决最高难度的复杂逻辑问题</td>
+<td style="text-align:left">计算成本极其高昂，Token 消耗呈指数级</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Reflexion</strong></td>
+<td style="text-align:left">基于失败反馈生成反思记忆</td>
+<td style="text-align:left">具备自我纠错和持续进化的能力</td>
+<td style="text-align:left">依赖明确的反馈信号（如代码编译器报错）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="横向对比与如何选择">横向对比与如何选择</h3>
+<p>从多个维度对比六种架构，帮助你快速定位适合的选项。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">架构</th>
+<th style="text-align:left">自主性</th>
+<th style="text-align:left">可预测性</th>
+<th style="text-align:left">并行能力</th>
+<th style="text-align:left">适合任务复杂度</th>
+<th style="text-align:left">典型实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">单 Agent 循环</td>
+<td style="text-align:left">高</td>
+<td style="text-align:left">低</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">中低</td>
+<td style="text-align:left">Claude Code 默认模式</td>
+</tr>
+<tr>
+<td style="text-align:left">规划 + 执行</td>
+<td style="text-align:left">中</td>
+<td style="text-align:left">中</td>
+<td style="text-align:left">部分</td>
+<td style="text-align:left">中高</td>
+<td style="text-align:left">Claude Code Plan Mode</td>
+</tr>
+<tr>
+<td style="text-align:left">多 Agent 协作</td>
+<td style="text-align:left">高</td>
+<td style="text-align:left">低</td>
+<td style="text-align:left">强</td>
+<td style="text-align:left">高</td>
+<td style="text-align:left">AutoGen, CrewAI</td>
+</tr>
+<tr>
+<td style="text-align:left">反思 / 自我修正</td>
+<td style="text-align:left">中</td>
+<td style="text-align:left">中</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">中</td>
+<td style="text-align:left">Reflexion, Self-Refine</td>
+</tr>
+<tr>
+<td style="text-align:left">RAG + Agent</td>
+<td style="text-align:left">高</td>
+<td style="text-align:left">中</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">中高</td>
+<td style="text-align:left">LangChain RAG Agent</td>
+</tr>
+<tr>
+<td style="text-align:left">工作流编排</td>
+<td style="text-align:left">低</td>
+<td style="text-align:left">高</td>
+<td style="text-align:left">强</td>
+<td style="text-align:left">高（固定流程）</td>
+<td style="text-align:left">LangGraph, Prefect</td>
+</tr>
+</tbody>
+</table>
+<h3 id="常见组合模式">常见组合模式</h3>
+<p>实际生产系统通常会组合使用多种架构，以下是几种成熟的组合模式：</p>
+<p>工作流编排 + 多 Agent：用 DAG 定义主流程，每个节点内部是一个独立的 Agent。例如 CI/CD 流水线中，代码检查节点是 Code Review Agent，安全扫描节点是 Security Agent。</p>
+<p>多 Agent + RAG：多个 Subagent 共享同一个向量知识库，各自根据子任务按需检索。例如客服系统中，订单查询 Agent 和退款处理 Agent 都查询同一个知识库但检索不同的内容。</p>
+<p>规划执行 + 反思：先规划再执行，但每个步骤执行后加入反思环节确保质量。适合对质量要求极高的任务。</p>
+<h3 id="常见误区">常见误区</h3>
+<p>误区一：架构越复杂越好</p>
+<p>多 Agent 协作看起来很强大，但如果你的任务用单 Agent 循环在 5 步内就能完成，引入编排开销反而降低效率。原则：用能满足需求的最简架构。</p>
+<p>误区二：反思一定能提升质量</p>
+<p>自我反思的有效性取决于模型的自我评估能力。如果质量要求极其严格，考虑使用 Critic 模型或引入外部验证（如代码自动测试）。</p>
+<p>误区三：DAG 工作流不需要 Agent</p>
+<p>DAG 定义了流程骨架，但每个节点内部仍然可以是 Agent 调用。工作流编排和 Agent 能力不是互斥的，而是互补的——DAG 提供可靠性，Agent 提供灵活性。</p>
+<p>误区四：上下文窗口大了就不需要 RAG</p>
+<p>即使模型支持 1M token 的上下文窗口，把所有文档塞进去仍然不是最优方案。RAG 的价值不仅在于&quot;装得下&quot;，更在于<strong>精准检索</strong>——减少噪音、降低推理成本、提高答案准确性。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 import { bundledLanguages, createHighlighter } from "shiki";
 import { transformerRenderLineNumber } from "@shikijs/transformers";
 import { firstImage } from "./scripts/first-image.mjs";
+import { addCsdnReferrerPolicy } from "./scripts/csdn-image-policy.mjs";
 import {
   buildPostAssetPlans,
   getPostSubcategory,
@@ -34,7 +35,7 @@ function getSubcategoryLabel(parent, subcategory) {
   return categoryLabels[parent]?.[subcategory] || subcategory;
 }
 
-// 分类树只从已发布文章的 category 和合法 slug 目录派生。
+// 分类树只从已发布文章的 category 和合法分类目录派生，目录名支持中文。
 function buildCategoryTree(posts) {
   const tree = new Map();
   for (const post of posts) {
@@ -43,7 +44,7 @@ function buildCategoryTree(posts) {
     if (!tree.has(parent)) tree.set(parent, { slug: parent, label: parent, subcategories: new Map(), postCount: 0 });
     const node = tree.get(parent);
     node.postCount += 1;
-    const subcategory = getPostSubcategory(post.inputPath);
+    const subcategory = getPostSubcategory(post.inputPath, post.data);
     if (subcategory) {
       const child =
         node.subcategories.get(subcategory) || {
@@ -175,6 +176,15 @@ function renderTableOfContents(headings) {
 }
 
 export default function (eleventyConfig) {
+  // AGENTS.md 是目录内的协作说明，不是文章；构建时必须跳过，避免被当成正文发布。
+  eleventyConfig.ignores.add("src/content/posts/AGENTS.md");
+
+  // CSDN 图床会按 Referer 拒绝站外请求；只给 CSDN 图片补 no-referrer，其他远程图保持默认行为。
+  eleventyConfig.addTransform("csdn-image-referrer", (content, outputPath) => {
+    if (!outputPath || !outputPath.endsWith(".html")) return content;
+    return addCsdnReferrerPolicy(content);
+  });
+
   // 清理 Nunjucks 块标签两侧的缩进与换行，避免构建产物出现只有空格的尾随行。
   eleventyConfig.setNunjucksEnvironmentOptions({ trimBlocks: true, lstripBlocks: true });
 
@@ -225,14 +235,14 @@ export default function (eleventyConfig) {
     return currentUrl.startsWith(itemUrl);
   });
 
-  // 文章所属子分类直接取自目录；文章链接优先指向父分类下的子分类页。
-  eleventyConfig.addFilter("postSubcategory", (inputPath) => getPostSubcategory(inputPath));
-  eleventyConfig.addFilter("postSubcategoryLabel", (inputPath, category) => {
-    const subcategory = getPostSubcategory(inputPath);
+  // 文章所属子分类优先取自 front matter，目录名只作为旧文章兜底；文章链接优先指向父分类下的子分类页。
+  eleventyConfig.addFilter("postSubcategory", (inputPath, data) => getPostSubcategory(inputPath, data));
+  eleventyConfig.addFilter("postSubcategoryLabel", (inputPath, data, category) => {
+    const subcategory = getPostSubcategory(inputPath, data);
     return subcategory ? getSubcategoryLabel(category, subcategory) : "";
   });
-  eleventyConfig.addFilter("postCategoryUrl", (inputPath, category) => {
-    const subcategory = getPostSubcategory(inputPath);
+  eleventyConfig.addFilter("postCategoryUrl", (inputPath, data, category) => {
+    const subcategory = getPostSubcategory(inputPath, data);
     return subcategory ? `/categories/${category}/${subcategory}/` : `/categories/${category}/`;
   });
 

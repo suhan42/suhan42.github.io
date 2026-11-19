@@ -3,10 +3,10 @@ title: marked 造轮子
 date: 2023-01-23
 slug: marked-blog-generator
 category: it
+subcategory: blog
 tags:
-  - marked
-  - markdown
   - static-site
+  - markdown
 summary: 这篇笔记记录如何用 marked 和 highlight.js 手写一个轻量博客生成器，覆盖 marked 的基本用法、自定义渲染器、代码高亮和常见问题排查。
 status: published
 ---

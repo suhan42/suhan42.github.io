@@ -17,6 +17,7 @@ import {
 
 export const POSTS_DIR = resolve("src/content/posts");
 export const IMAGES_DIR = resolve("assets/images");
+// 子分类 id 使用小写英文、数字和连字符；目录名必须与 front matter 的 subcategory 保持一致。
 export const SUBCATEGORY_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const POST_FILE_PATTERN = /\.(?:md|html)$/i;
 
@@ -48,7 +49,7 @@ function walkPostFiles(dir) {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
       files.push(...walkPostFiles(fullPath));
-    } else if (POST_FILE_PATTERN.test(entry.name) && !entry.name.startsWith(".")) {
+    } else if (POST_FILE_PATTERN.test(entry.name) && !entry.name.startsWith(".") && entry.name !== "AGENTS.md") {
       files.push(fullPath);
     }
   }
@@ -63,19 +64,30 @@ function getSubcategoryFromFile(postFile, postsDir) {
   return SUBCATEGORY_PATTERN.test(segments[0]) ? segments[0] : "";
 }
 
-// 输入路径可能是 Eleventy 的相对路径，也可能来自 CLI；统一解析后只把合法 slug 目录视为子分类。
-export function getPostSubcategory(inputPath, postsDir = POSTS_DIR) {
+// 优先使用 front matter 声明的 subcategory；没有声明时才回退到目录名，保持旧文章兼容。
+// 第二个参数必须是 front matter data；需要自定义文章根目录时显式传第三个参数，避免把路径误当 data。
+export function getPostSubcategory(inputPath, data = null, postsDir = POSTS_DIR) {
+  if (typeof data === "string") {
+    throw new Error("getPostSubcategory 的第二个参数必须是 front matter data；自定义 postsDir 请传第三个参数");
+  }
+  const declared = String(data?.subcategory || "").trim();
+  if (declared) {
+    if (!SUBCATEGORY_PATTERN.test(declared)) {
+      throw new Error(`subcategory 必须是英文 slug：${displayPath(resolve(inputPath))}`);
+    }
+    return declared;
+  }
   return getSubcategoryFromFile(resolve(inputPath), resolve(postsDir));
 }
 
-// 子分类目录优先作为图片命名空间；非 slug 目录是文章资源包，回退到 front matter slug。
+// 子分类优先使用 front matter 的 subcategory，其次使用目录名；资源包和根目录文章回退到 slug。
 function getNamespace(postFile, data, postsDir) {
-  const subcategory = getSubcategoryFromFile(postFile, postsDir);
+  const subcategory = getPostSubcategory(postFile, data, postsDir);
   if (subcategory) return subcategory;
   const slug = String(data?.slug || "").trim();
   if (SUBCATEGORY_PATTERN.test(slug)) return slug;
   throw new Error(
-    `无法确定图片命名空间：${displayPath(postFile)} 的目录名不是合法 slug，front matter slug 也不是合法 slug`
+    `无法确定图片命名空间：${displayPath(postFile)} 的目录名不是合法分类目录，front matter slug 也不是合法 slug`
   );
 }
 

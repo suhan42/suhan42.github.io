@@ -1,5 +1,14 @@
 {
   "it": {
-    "flowchart": "程序流程图"
+    "blog": "博客",
+    "database": "数据库",
+    "docker": "Docker",
+    "flowchart": "程序流程图",
+    "git": "Git",
+    "linux": "Linux",
+    "llm": "LLM",
+    "markdown": "Markdown",
+    "operations-research": "运筹学",
+    "rag": "RAG"
   }
 }

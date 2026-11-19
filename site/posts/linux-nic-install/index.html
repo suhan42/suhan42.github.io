@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Linux 网卡驱动安装 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Linux 网卡驱动安装</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%BD%91%E5%8D%A1%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B">网卡安装教程</a></li>
+<li class="toc-item toc-level-2"><a href="#1-%E6%94%B9%E5%9B%BD%E5%86%85%E6%BA%90">1. 改国内源</a></li>
+<li class="toc-item toc-level-2"><a href="#2-%E6%9B%B4%E6%96%B0%E8%BD%AF%E4%BB%B6%E5%88%97%E8%A1%A8%E4%B8%8E%E8%BD%AF%E4%BB%B6">2. 更新软件列表与软件</a></li>
+<li class="toc-item toc-level-2"><a href="#3-%E5%AE%89%E8%A3%85linux%E5%86%85%E6%A0%B8%E5%A4%B4">3. 安装Linux内核头</a></li>
+<li class="toc-item toc-level-2"><a href="#4-%E5%AE%89%E8%A3%85%E9%A9%B1%E5%8A%A8">4. 安装驱动</a></li>
+<li class="toc-item toc-level-3"><a href="#1-%E5%85%88%E7%A1%AE%E8%AE%A4%E7%A1%AC%E4%BB%B6%E6%98%AF%E5%90%A6%E8%A2%AB%E8%AF%86%E5%88%AB">1. 先确认硬件是否被识别</a></li>
+<li class="toc-item toc-level-3"><a href="#2-%E5%A6%82%E6%9E%9C-lsusb-%E8%83%BD%E7%9C%8B%E5%88%B0%E6%97%A0%E7%BA%BF%E7%BD%91%E5%8D%A1">2. 如果 lsusb 能看到无线网卡</a></li>
+<li class="toc-item toc-level-3"><a href="#3-%E5%AE%89%E8%A3%85%E7%BD%91%E5%8D%A1%E9%A9%B1%E5%8A%A8">3. 安装网卡驱动</a></li>
+<li class="toc-item toc-level-4"><a href="#%E7%BC%96%E8%AF%91%E9%A9%B1%E5%8A%A8">编译驱动</a></li>
+<li class="toc-item toc-level-3"><a href="#4-%E9%AA%8C%E8%AF%81">4. 验证</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%BD%BF%E7%94%A8%E7%BD%91%E5%8D%A1%E4%B8%8A%E7%BD%91%E8%BF%9E%E6%8E%A5wifi">使用网卡上网（连接WiFi）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%81%A2%E5%A4%8D-managed-%E6%A8%A1%E5%BC%8F">恢复 Managed 模式</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%BF%9E%E6%8E%A5-wifi">连接 WiFi</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%96%B9%E6%B3%95-1%E7%94%A8-networkmanager%E5%9B%BE%E5%BD%A2%E7%95%8C%E9%9D%A2">方法 1：用 NetworkManager（图形界面）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%96%B9%E6%B3%95-2%E5%91%BD%E4%BB%A4%E8%A1%8C">方法 2：命令行</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%AA%8C%E8%AF%81%E8%BF%9E%E6%8E%A5">验证连接</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%85%B6%E4%BB%96%E6%8A%80%E5%B7%A7">✨其他技巧</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%BB%88%E6%9E%81%E6%8C%89%E8%8A%AF%E7%89%87%E5%AE%89%E8%A3%85">终极：按芯片安装</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/linux/" class="post-category">
+        it / Linux      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/linux/">#linux</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Linux 网卡驱动安装</h1>
+
+    <div class="post-body">
+<h1 id="网卡安装教程">网卡安装教程</h1>
+<p>如果你已经是国内源请直接跳到第三步安装内核头，但是记得更新列表与软件</p>
+<h2 id="1-改国内源">1. 改国内源</h2>
+<p>只是为了提高下载速度哈，再此提醒一下：</p>
+<p>而且/etc/apt/sources.list里面只能启用一个源，同时写进去多个源，每个软件源镜像站同步时间不一样，有的镜像站里同一个时间有些软件包是新的，有的是旧的，你这样添加多个源进去如果更新，软件源镜像站之前同步时间不一样包会冲突（大佬原话）</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vim</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /etc/apt/sources.list</span><span style="color:#6A737D;--shiki-dark:#6A737D">	#编辑kali源列表文件</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">#按i转到编辑模式后，将以下信息替换掉原本内容，按Esc后输入:wq保存并推出</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6A737D;--shiki-dark:#6A737D">#阿里云</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">deb</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> http://mirrors.aliyun.com/kali</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> main</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> non-free</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> contrib</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">deb-src</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> http://mirrors.aliyun.com/kali</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> main</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> non-free</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> contrib</span></span></code></pre>
+<h2 id="2-更新软件列表与软件">2. 更新软件列表与软件</h2>
+<p><strong>只更新索引</strong>，不碰已安装的包</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">apt-get</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> update</span><span style="color:#6A737D;--shiki-dark:#6A737D">	#更新软件列表</span></span></code></pre>
+<p>根据索引，<strong>升级已安装的包</strong>到最新版：【注意】耗时长</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">apt-get</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> upgrade</span><span style="color:#6A737D;--shiki-dark:#6A737D">	#更新软件</span></span></code></pre>
+<h2 id="3-安装linux内核头">3. 安装Linux内核头</h2>
+<p>内核头：这个东西定义了内核组件之间的接口也定义了内核和用户空间之间的接口，说人话就是安装或编译一些跟系统有关的应用要重新编译系统，所以必须安装内核头</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> linux-headers-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">uname</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)	</span><span style="color:#6A737D;--shiki-dark:#6A737D">#安装与自己相对应的内核头</span></span></code></pre>
+<p>假如安装内核头文件报了这样一个错误（反正我报了）：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">┌──(root</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> kali</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)-[~/桌面]</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">└─#</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> linux-headers-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">uname</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">正在读取软件包列表...</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 完成</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">正在分析软件包的依赖关系树...</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 完成</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">正在读取状态信息...</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 完成</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                 </span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">E:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 无法定位软件包</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> linux-headers-5.10.0-kali7-amd64</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">E:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 无法按照</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> glob</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ‘linux-headers-5.10.0-kali7-amd64’</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 找到任何软件包</span></span></code></pre>
+<p>或者报错：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">WARNING:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> does</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> not</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> have</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> a</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> stable</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> CLI</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> interface.</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Use</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> with</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> caution</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> scripts.</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">linux-headers-6.12.34+rpt-common-rpi/kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 1:6.12.34-1+rpt1+0kali2</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> all</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">linux-headers-6.19.14+kali-amd64/kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14-1+kali1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> amd64</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">  Header</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> files</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> for</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Linux</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14+kali-amd64</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">linux-headers-6.19.14+kali-cloud-amd64/kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14-1+kali1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> amd64</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">  Header</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> files</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> for</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Linux</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14+kali-cloud-amd64</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">linux-headers-6.19.14+kali-common/kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14-1+kali1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> all</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">  Common</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> header</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> files</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> for</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Linux</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14+kali</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6F42C1;--shiki-dark:#B392F0">linux-headers-6.19.14+kali-rt-amd64/kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14-1+kali1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> amd64</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">  Header</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> files</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> for</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> Linux</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14+kali-rt-amd64</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">linux-headers-amd64/kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14-1+kali1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> amd64</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6F42C1;--shiki-dark:#B392F0">linux-headers-cloud-amd64/kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14-1+kali1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> amd64</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#6F42C1;--shiki-dark:#B392F0">linux-headers-rt-amd64/kali-rolling</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 6.19.14-1+kali1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> amd64</span></span></code></pre>
+<p>如果没报错就直接看第四步，报错是因为软件源中不一定有相对应的内核头文件。看看软件源里有哪个版本的内核头，咱们换内核</p>
+<p>你的内核仓库里面没有，这里的 Kali 仓库已经跳到了 <code>6.19.14</code>。</p>
+<p>升级内核：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> update</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> linux-image-amd64</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> linux-headers-amd64</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">reboot</span><span style="color:#6A737D;--shiki-dark:#6A737D">	#重启</span></span></code></pre>
+<p>重启之后</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">uname</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#6A737D;--shiki-dark:#6A737D">	#显示操作系统的发行版号</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 重新安装内核头</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> linux-headers-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">uname</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span></code></pre>
+<p>检查确认内核和头文件是否一致：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>uname -r</span></span>
+<span class="line"><span class="line-number">2</span><span>dpkg -l | grep linux-headers</span></span></code></pre>
+<h2 id="4-安装驱动">4. 安装驱动</h2>
+<p>现在插上你的无线网卡。</p>
+<h3 id="1-先确认硬件是否被识别">1. 先确认硬件是否被识别</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 查看所有 USB 设备</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">lsusb</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 查看 PCI 设备（内置网卡）</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">lspci</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> grep</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -i</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> net</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 查看网络接口（不管有没有 wlan0）</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">ip</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> link</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> show</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 查看无线设备</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6F42C1;--shiki-dark:#B392F0">iw</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> dev</span></span></code></pre>
+<p>查看当前驱动</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ethtool</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -i</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span></span></code></pre>
+<h3 id="2-如果-lsusb-能看到无线网卡">2. 如果 lsusb 能看到无线网卡</h3>
+<p>例如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>└─$ lsusb</span></span>
+<span class="line"><span class="line-number">2</span><span>Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub</span></span>
+<span class="line"><span class="line-number">3</span><span>Bus 001 Device 003: ID 0bda:b711 Realtek Semiconductor Corp. RTL8188GU 802.11n WLAN Adapter (After Modeswitch)</span></span>
+<span class="line"><span class="line-number">4</span><span>Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub</span></span>
+<span class="line"><span class="line-number">5</span><span>Bus 002 Device 002: ID 0e0f:0003 VMware, Inc. Virtual Mouse</span></span>
+<span class="line"><span class="line-number">6</span><span>Bus 002 Device 003: ID 0e0f:0002 VMware, Inc. Virtual USB Hub</span></span></code></pre>
+<p>可以看到第二行，你的 <code>RTL8188GU</code> USB WiFi 网卡已经成功直通到虚拟机了。</p>
+<h3 id="3-安装网卡驱动">3. 安装网卡驱动</h3>
+<p>在库中搜索看有没有网卡的驱动</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>apt search rtl8188gu</span></span></code></pre>
+<p>如果没有，那么就需要从源码编译。</p>
+<ul>
+<li>安装编译依赖</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>sudo apt install build-essential dkms git</span></span></code></pre>
+<p>找一个位置下载驱动</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">mkdir</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -p</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> temp</span><span style="color:#6A737D;--shiki-dark:#6A737D">  # 新建一个文件夹(有就不用新建)</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">cd</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> temp</span></span></code></pre>
+<p>下载驱动源码 RTL8188GU 常用的是 <code>rtl8188gu</code> 或 <code>rtl8188eus</code> 驱动项目。最活跃的是这个：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">git</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> clone</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> https://github.com/McMCCRU/rtl8188gu.git</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">cd</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl8188gu</span></span></code></pre>
+<p>如果上面的仓库不可用，试试开源项目（<strong>但是比较老</strong>）</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">git</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> clone</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> https://github.com/lwfinger/rtl8xxxu.git</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">cd</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl8xxxu</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">make</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> make</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> modprobe</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl8xxxu</span></span></code></pre>
+<h4 id="编译驱动">编译驱动</h4>
+<p><code>make</code> 是一个<strong>构建工具</strong>，用于自动化编译程序。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">make</span><span style="color:#6A737D;--shiki-dark:#6A737D">			# 编译驱动，生成 8188gu.ko 文件</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> make</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#6A737D;--shiki-dark:#6A737D">  # 把编译好的模块安装到系统目录</span></span></code></pre>
+<p>这个命令是<strong>加载编译好的驱动模块</strong>到内核中。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>sudo modprobe rtl8188fu</span></span></code></pre>
+<p>如果 sudo make install 不行</p>
+<p>手动安装</p>
+<p>编译好的模块在当前目录，直接手动复制：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#005CC5;--shiki-dark:#79B8FF">cd</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ~/temp/rtl8188gu</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> cp</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl8188gu.ko</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /lib/modules/</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">uname</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/kernel/drivers/net/wireless/</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> depmod</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -a</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> modprobe</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl8188gu</span></span></code></pre>
+<h3 id="4-验证">4. 验证</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">iwconfig</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 或</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">ip</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> link</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 看是否出现 wlan0</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">ip</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> link</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> show</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 或者</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6F42C1;--shiki-dark:#B392F0">iw</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> dev</span></span>
+<span class="line"><span class="line-number">10</span></span>
+<span class="line"><span class="line-number">11</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 查看驱动加载情况</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6F42C1;--shiki-dark:#B392F0">dmesg</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> grep</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -i</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#6F42C1;--shiki-dark:#B392F0">dmesg</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> grep</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -i</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#6F42C1;--shiki-dark:#B392F0">dmesg</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> grep</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -i</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> firmware</span></span></code></pre>
+<p>应该能看到新的无线网卡接口（如 <code>wlan0</code>）。</p>
+<h1 id="使用网卡上网连接wifi">使用网卡上网（连接WiFi）</h1>
+<h2 id="恢复-managed-模式">恢复 Managed 模式</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ip</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> link</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> set</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> down</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> iw</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> dev</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> set</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> type</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> managed</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ip</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> link</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> set</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> up</span></span></code></pre>
+<h2 id="连接-wifi">连接 WiFi</h2>
+<h3 id="方法-1用-networkmanager图形界面">方法 1：用 NetworkManager（图形界面）</h3>
+<p>如果你用的是 Kali 桌面版，点击右上角网络图标，选择 WiFi 连接即可。</p>
+<h3 id="方法-2命令行">方法 2：命令行</h3>
+<p>启动 NetworkManager：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>sudo systemctl start NetworkManager</span></span></code></pre>
+<p>连接WiFi</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 扫描周围 WiFi</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> nmcli</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> dev</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wifi</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> list</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 连接（替换 SSID 和密码）</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> nmcli</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> dev</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wifi</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> connect</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "你的WiFi名称"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> password</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "你的密码"</span></span></code></pre>
+<h2 id="验证连接">验证连接</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">iwconfig</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">ping</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -c</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 4</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 8.8.8.8</span></span></code></pre>
+<p>先恢复 Managed 模式，然后告诉我你想用哪种方式连接。</p>
+<h1 id="其他技巧">✨其他技巧</h1>
+<p>重新加载 USB 设备</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> modprobe</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl88xxau</span><span style="color:#D73A49;--shiki-dark:#F97583"> 2></span><span style="color:#032F62;--shiki-dark:#9ECBFF">/dev/null</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; </span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> modprobe</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl88xxau</span></span></code></pre>
+<p>查看当前驱动</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ethtool</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -i</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span></span></code></pre>
+<p>替换驱动</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> modprobe</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl8xxxu</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> modprobe</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rtl8188fu</span></span></code></pre>
+<p>undo tx-power
+undo tx-power 命令用来恢复AP内置蓝牙模块的发射功率为缺省值。 缺省情况下，AP内置蓝牙模块的发射功率为0dBm。 AP内置蓝牙模块的发射功率。 枚举值类型。 可取值为：-21、-18、-15、-12、-9、-6、-3、0、1、2、3、4、5，单位为dBm。 用户可以执行该命令修改AP内置蓝牙模块的发射功率。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ip</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> link</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> set</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> down</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ip</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> link</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> set</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> up</span></span></code></pre>
+<h1 id="终极按芯片安装">终极：按芯片安装</h1>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">芯片</th>
+<th style="text-align:left">安装命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">RTL8812AU / RTL8814AU</td>
+<td style="text-align:left"><code>sudo apt install -y realtek-rtl88xxau-dkms</code></td>
+</tr>
+<tr>
+<td style="text-align:left">RTL8188EUS / RTL8188ETV</td>
+<td style="text-align:left"><code>sudo apt install -y realtek-rtl8188eus-dkms</code></td>
+</tr>
+<tr>
+<td style="text-align:left">RTL8821CE / RTL8821CU</td>
+<td style="text-align:left"><code>sudo apt install -y rtl8821cu-dkms</code></td>
+</tr>
+<tr>
+<td style="text-align:left">MT7601U</td>
+<td style="text-align:left"><code>sudo apt install -y mt7601u-dkms</code></td>
+</tr>
+<tr>
+<td style="text-align:left">AR9271 / AR7010</td>
+<td style="text-align:left">已包含在 <code>firmware-atheros</code> 中</td>
+</tr>
+</tbody>
+</table>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>
