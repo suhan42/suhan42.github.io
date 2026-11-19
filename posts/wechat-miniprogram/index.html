@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>微信小程序开发 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">微信小程序开发</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%B8%80%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%9F%BA%E6%9C%AC">一、小程序基本</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%B0%8F%E7%A8%8B%E5%BA%8F%E4%B8%8E%E6%99%AE%E9%80%9A%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E7%9A%84%E5%8C%BA%E5%88%AB">小程序与普通网页开发的区别</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84">项目结构</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%A1%B5%E9%9D%A2%E7%BB%84%E6%88%90">页面组成</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%A1%B9%E7%9B%AE%E9%85%8D%E7%BD%AEjson">项目配置json</a></li>
+<li class="toc-item toc-level-3"><a href="#appjson">app.json</a></li>
+<li class="toc-item toc-level-3"><a href="#projectconfigjson">project.config.json</a></li>
+<li class="toc-item toc-level-3"><a href="#sitemapjson">sitemap.json</a></li>
+<li class="toc-item toc-level-2"><a href="#js%E6%96%87%E4%BB%B6">Js文件</a></li>
+<li class="toc-item toc-level-2"><a href="#wxml%E6%A8%A1%E6%9D%BFhtml">WXML模板（HTML）</a></li>
+<li class="toc-item toc-level-2"><a href="#wxss%E6%A0%B7%E5%BC%8Fcss">WXSS样式（CSS）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%AE%BF%E4%B8%BB%E7%8E%AF%E5%A2%83">宿主环境</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%90%AF%E5%8A%A8%E7%9A%84%E8%BF%87%E7%A8%8B">小程序启动的过程</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%A1%B5%E9%9D%A2%E6%B8%B2%E6%9F%93%E7%9A%84%E8%BF%87%E7%A8%8B">页面渲染的过程</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%B0%8F%E7%A8%8B%E5%BA%8Fapi">小程序API</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%BA%8C%E6%95%B0%E6%8D%AE%E7%BB%91%E5%AE%9A%E7%B1%BBvue">二、数据绑定（类Vue）</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%B8%89%E4%BA%8B%E4%BB%B6%E7%BB%91%E5%AE%9A">三、事件绑定</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%8B%E4%BB%B6%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%9B%9E%E8%B0%83%E5%88%97%E8%A1%A8">事件对象的回调列表</a></li>
+<li class="toc-item toc-level-3"><a href="#bindtap%E7%9A%84%E8%AF%AD%E6%B3%95%E6%A0%BC%E5%BC%8F">bindtap的语法格式</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9C%A8%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0%E4%B8%AD%E4%B8%BAdata%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E8%B5%8B%E5%80%BC">在事件处理函数中为data中的数据赋值</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%8B%E4%BB%B6%E4%BC%A0%E5%8F%82">事件传参</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%AE%9E%E7%8E%B0%E6%96%87%E6%9C%AC%E6%A1%86%E5%92%8Cdata%E4%B9%8B%E9%97%B4%E7%9A%84%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5">实现文本框和data之间的数据同步</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%9B%9B%E9%80%BB%E8%BE%91%E7%BB%93%E6%9E%84%E6%9D%A1%E4%BB%B6%E9%80%BB%E8%BE%91%E5%88%97%E8%A1%A8%E6%B8%B2%E6%9F%93">四、逻辑结构（条件逻辑、列表渲染）</a></li>
+<li class="toc-item toc-level-2"><a href="#41-%E6%9D%A1%E4%BB%B6%E9%80%BB%E8%BE%91">4.1 条件逻辑</a></li>
+<li class="toc-item toc-level-3"><a href="#wxif">wx:if</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%BB%93%E5%90%88-block-%E4%BD%BF%E7%94%A8wxif">结合 &lt;block&gt; 使用wx:if</a></li>
+<li class="toc-item toc-level-3"><a href="#hidden">hidden</a></li>
+<li class="toc-item toc-level-2"><a href="#42-%E5%88%97%E8%A1%A8%E6%B8%B2%E6%9F%93">4.2 列表渲染</a></li>
+<li class="toc-item toc-level-3"><a href="#wxfor">wx:for</a></li>
+<li class="toc-item toc-level-3"><a href="#wxkey%E7%9A%84%E4%BD%BF%E7%94%A8">wx:key的使用</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%BA%94wxss%E6%A8%A1%E6%9D%BF%E6%A0%B7%E5%BC%8Fcss">五、WXSS模板样式（CSS）</a></li>
+<li class="toc-item toc-level-2"><a href="#51-rpx%E5%8D%95%E4%BD%8D">5.1 rpx单位</a></li>
+<li class="toc-item toc-level-2"><a href="#52-%E6%A0%B7%E5%BC%8F%E5%AF%BC%E5%85%A5">5.2 样式导入</a></li>
+<li class="toc-item toc-level-3"><a href="#521%E5%85%A8%E5%B1%80%E6%A0%B7%E5%BC%8F">5.2.1全局样式</a></li>
+<li class="toc-item toc-level-3"><a href="#522%E5%B1%80%E9%83%A8%E6%A0%B7%E5%BC%8F">5.2.2局部样式</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%85%AD%E5%85%A8%E5%B1%80%E9%85%8D%E7%BD%AEappjson">六、全局配置app.json</a></li>
+<li class="toc-item toc-level-2"><a href="#61-window%E8%8A%82%E7%82%B9%E5%B8%B8%E7%94%A8%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9">6.1 window节点常用的配置项</a></li>
+<li class="toc-item toc-level-2"><a href="#62-tabbar">6.2 tabBar</a></li>
+<li class="toc-item toc-level-3"><a href="#tarbar%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9">tarBar的配置项</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%B8%83%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E8%AF%B7%E6%B1%82">七、网络数据请求</a></li>
+<li class="toc-item toc-level-2"><a href="#71-%E9%85%8D%E7%BD%AErequest%E5%90%88%E6%B3%95%E5%9F%9F%E5%90%8D">7.1 配置request合法域名</a></li>
+<li class="toc-item toc-level-2"><a href="#72-%E5%8F%91%E8%B5%B7get%E5%92%8Cpost%E8%AF%B7%E6%B1%82">7.2 发起GET和POST请求</a></li>
+<li class="toc-item toc-level-2"><a href="#73-%E5%9C%A8%E9%A1%B5%E9%9D%A2%E5%88%9A%E5%8A%A0%E8%BD%BD%E6%97%B6%E8%AF%B7%E6%B1%82%E6%95%B0%E6%8D%AE">7.3 在页面刚加载时请求数据</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%85%AB%E9%A1%B5%E9%9D%A2%E5%AF%BC%E8%88%AA">八、页面导航</a></li>
+<li class="toc-item toc-level-2"><a href="#81%E5%A3%B0%E6%98%8E%E5%BC%8F%E5%AF%BC%E8%88%AA">8.1声明式导航</a></li>
+<li class="toc-item toc-level-2"><a href="#82-%E7%BC%96%E7%A8%8B%E5%BC%8F%E5%AF%BC%E8%88%AA">8.2 编程式导航</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%BB%84%E4%BB%B6">组件</a></li>
+<li class="toc-item toc-level-2"><a href="#1%E5%B8%B8%E7%94%A8%E8%A7%86%E5%9B%BE%E5%AE%B9%E5%99%A8%E7%BB%84%E4%BB%B6">1.常用视图容器组件</a></li>
+<li class="toc-item toc-level-2"><a href="#2%E9%87%87%E7%94%A8%E5%9F%BA%E7%A1%80%E5%86%85%E5%AE%B9%E7%BB%84%E4%BB%B6">2.采用基础内容组件</a></li>
+<li class="toc-item toc-level-2"><a href="#3%E5%85%B6%E4%BB%96%E9%87%87%E7%94%A8%E7%BB%84%E4%BB%B6">3.其他采用组件</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%BA%91%E5%BC%80%E5%8F%91">云开发</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">
+        it      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/wechat/">#wechat</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">微信小程序开发</h1>
+
+    <div class="post-body">
+<h1 id="一小程序基本">一、小程序基本</h1>
+<p><a href="https://developers.weixin.qq.com/ebook?action=get_post_info&amp;docid=0008aeea9a8978ab0086a685851c0a">教程 | 《小程序开发指南》</a></p>
+<h2 id="小程序与普通网页开发的区别">小程序与普通网页开发的区别</h2>
+<ol>
+<li>
+<p>运行环境不同</p>
+<ul>
+<li>
+<p>网页运行在浏览器环境中。</p>
+</li>
+<li>
+<p>小程序运行在微信环境中。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>API不同</p>
+<ul>
+<li>
+<p>由于运行环境的不同，所以小程序中无法调用 DOM 和 BOM 的 API。</p>
+</li>
+<li>
+<p>但是，小程序中可以调用微信环境提供的各种 API，例如：地理定位、扫码、支付。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>开发模式不同</p>
+</li>
+</ol>
+<ul>
+<li>网页的开发模式：浏览器+代码编辑器</li>
+<li>小程序有自己的一套标准开发模式：
+<ol>
+<li>申请小程序开发账号；</li>
+<li>安装小程序开发者工具；</li>
+<li>创建和配置小程序项目。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<p>小程序管理后台：https://mp.weixin.qq.com/</p>
+<p><a href="https://developers.weixin.qq.com/miniprogram/dev/framework/">微信开放文档 / 开发</a></p>
+<p>开发工具下载：<a href="https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html">下载</a></p>
+<hr>
+<h2 id="项目结构">项目结构</h2>
+<!-- ![项目结构](imgs-vxp/项目结构.png) -->
+<ul>
+<li><strong>pages 用来存放所有小程序的页面</strong></li>
+<li>utils 用来存放工具性质的模块（例如:格式化时间的自定义模块）</li>
+<li><strong>app.js 小程序项目的入口文件</strong></li>
+<li><strong>app.json 小程序项目的全局配置文件</strong></li>
+<li>app.wxss 小程序项目的全局样式文件</li>
+<li>project.config.json 项目的配置文件</li>
+<li>sitemap.json 用来配置小程序及其页面是否允许被微信索引</li>
+</ul>
+<h2 id="页面组成">页面组成</h2>
+<p>其中，每个页面由 4个基本文件组成，它们分别是:</p>
+<ul>
+<li><code>.js</code> 文件(页面的脚本文件，存放页面的数据、事件处理函数等)</li>
+<li><code>.json</code> 文件(当前页面的配置文件，配置窗口的外观、表现等)</li>
+<li><code>.wxml</code>文件(页面的模板结构文件)</li>
+<li><code>.wxss</code> 文件(当前页面的样式表文件)</li>
+</ul>
+<h2 id="项目配置json">项目配置json</h2>
+<h3 id="appjson">app.json</h3>
+<p><a href="https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html">小程序配置 / 全局配置</a></p>
+<p><code>app.json</code> 内的配置项：</p>
+<ul>
+<li>
+<p><strong>pages</strong>:用来记录当前小程序所有页面的路径</p>
+<ul>
+<li>一开始有两行，就有两个页面。</li>
+<li>在<code>app.json</code> 中新增界面，会<strong>自动创建</strong>新的节目文件夹在pages中。</li>
+<li>只需要调整 app.json -&gt;pages 数组中页面路径的前后顺序，即可修改项目的<strong>首页</strong>。小程序会把排在第一位的页面，当作项目首页进行渲染。</li>
+</ul>
+</li>
+<li>
+<p><strong>window</strong>:全局定义小程序所有页面的背景色、文字颜色等。</p>
+<ul>
+<li>小程序中的每一个页面，可以使用.json文件来对本页面的窗口外观进行配置，<strong>页面中的配置项会覆盖app.json的window中相同的配置项</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong>tabBar</strong>：设置小程序底部的tabBar效果。</p>
+</li>
+<li>
+<p><strong>style</strong>:全局定义小程序组件所使用的样式版本。</p>
+</li>
+</ul>
+<h3 id="projectconfigjson">project.config.json</h3>
+<p><code>project.config.json</code> 是项目配置文件，用来记录我们对小程序开发工具所做的个性化配置，例如:</p>
+<ul>
+<li><strong>setting</strong> 中保存了编译相关的配置。</li>
+<li><strong>projectname</strong> 中保存的是项目名称。</li>
+<li><strong>appid</strong> 中保存的是小程序的账号 ID。</li>
+</ul>
+<h3 id="sitemapjson">sitemap.json</h3>
+<p><code>sitemap.json</code> 文件用来配置小程序页面是否允许<strong>微信索引</strong>。微信现已开放小程序内搜索，效果类似于 PC网页的 SE0。</p>
+<p>当开发者允许微信索引时，微信会通过爬虫的形式，为小程序的页面内容建立索引。当用户的搜索关键字和页面的索引匹配成功的时候，小程序的页面将可能展示在搜索结果中。</p>
+<p>【注意】sitemap 的索引提示是默认开启的。如需要关闭 sitemap 的索引提示，可在小程序项目配置文件 project.config.json 的 setting 中配置字段 checkSiteMap 为 false</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"checkSiteMap"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span></code></pre>
+<h2 id="js文件">Js文件</h2>
+<p>小程序中的 JS 文件分为三大类，分别是：</p>
+<ul>
+<li>app.js
+是整个小程序项目的入口文件，通过调用 App()函数来启动整个小程序</li>
+<li>页面的 .js 文件
+是页面的入口文件，通过调用 Page()函数来创建并运行页面</li>
+<li>普通的 .js 文件
+是普通的功能模块文件，用来封装公共的函数或属性供页面使用</li>
+</ul>
+<h2 id="wxml模板html">WXML模板（HTML）</h2>
+<ul>
+<li>标签名称不同</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>HTML(div,span,img,a)</span></span>
+<span class="line"><span class="line-number">2</span><span>WXML(view,text,image, navigator)</span></span></code></pre>
+<p>view对应div，text对应span。。。</p>
+<ul>
+<li>属性节点不同</li>
+</ul>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>&#x3C;a href="#">超链接&#x3C;/a></span></span>
+<span class="line"><span class="line-number">2</span><span>&#x3C;navigator url="/pages/home/home">&#x3C;/navigator></span></span></code></pre>
+<ul>
+<li>提供了类似于 Vue 中的模板语法</li>
+</ul>
+<p>数据绑定
+列表渲染
+条件渲染</p>
+<h2 id="wxss样式css">WXSS样式（CSS）</h2>
+<ul>
+<li>新增了 rpx 尺寸单位
+<ul>
+<li>CSS 中需要手动进行像素单位换算，例如rem。</li>
+<li>WXSS 在底层支持新的尺寸单位rpx，在不同大小的屏幕上小程序会自动进行换算。</li>
+</ul>
+</li>
+<li>提供了全局的样式和局部样式
+<ul>
+<li>项目根目录中的 app.wxss 会作用于所有小程序页面。</li>
+<li>局部页面的.wxss 样式仅对当前页面生效。</li>
+</ul>
+</li>
+<li>WXSS 仅支持部分 CSS 选择器
+<ul>
+<li><code>.class</code> 和 <code>#id</code></li>
+<li>element</li>
+<li>并集选择器、后代选择器</li>
+<li><code>::after</code>和<code>::before</code>等伪类选择器</li>
+</ul>
+</li>
+</ul>
+<h2 id="宿主环境">宿主环境</h2>
+<p>宿主环境(host environment)指的是程序运行所必须的依赖环境。例如：</p>
+<p>Android 系统和 i0S 系统是两个不同的宿主环境。安卓版的微信 App 是不能在 i0S 环境下运行的，所以 Android 是安卓软件的宿主环境，脱离了宿主环境的软件是没有任何意义的。</p>
+<p><strong>微信小程序</strong>的宿主环境就是 微信。</p>
+<p>小程序的运行环境分成<strong>渲染层</strong>和<strong>逻辑层</strong>，其中 WXML 模板和 WXSS 样式工作在渲染层，JS 脚本工作在逻辑层。</p>
+<p>小程序的渲染层和逻辑层分别由 2 个线程管理：</p>
+<ul>
+<li>
+<p>渲染层的界面使用了 WebView 进行渲染；一个小程序存在多个界面，所以渲染层存在多个 WebView 线程。</p>
+</li>
+<li>
+<p>逻辑层采用 JsCore 线程运行 JS 脚本。</p>
+</li>
+</ul>
+<p>Native 中转： 这两个线程的通信会经由微信客户端（下文中也会采用 Native 来代指微信客户端）做中转，逻辑层发送网络请求也经由 Native 转发，小程序的通信模型下图所示：</p>
+<!-- ![渲染层&逻辑层](imgs-vxp/渲染层&逻辑层.png) -->
+<h3 id="小程序启动的过程">小程序启动的过程</h3>
+<ol>
+<li>把小程序的代码包下载到本地</li>
+<li>解析 app.json 全局配置文件</li>
+<li>执行 app.js 小程序入口文件，调用 App()创建小程序实例</li>
+<li>渲染小程序首页</li>
+<li>小程序启动完成</li>
+</ol>
+<h3 id="页面渲染的过程">页面渲染的过程</h3>
+<ol>
+<li>加载解析页面的 .json 配置文件</li>
+<li>加载页面的.wxml模板和 .wxss 样式</li>
+<li>执行页面的 .js 文件，调用 Page()创建页面实例</li>
+<li>页面渲染完成</li>
+</ol>
+<h2 id="小程序api">小程序API</h2>
+<p>小程序中的API是由宿主环境提供的，开发者可以调用微信提供的能力，如：获取用户信息、本地存储、支付功能等。</p>
+<p>小程序官方把API分为3大类：</p>
+<ol>
+<li>事件监听API</li>
+</ol>
+<p>特点：以on开头，用来监听某些事件的触发</p>
+<p>如：<code>wx.onWindowResize(function callback)</code>监听窗口尺寸变化的事件</p>
+<ol start="2">
+<li>同步API</li>
+</ol>
+<p>特点1：以Sync结尾的API都是同步API
+特点2：同步API的执行结果，可以通过函数返回值直接获取，如果执行出错会抛出异常</p>
+<p>如：<code>wx.setStorageSync('key','value')</code>向本地存储中写入内容</p>
+<ol start="3">
+<li>异步API</li>
+</ol>
+<p>特点：类似于jQuery中的<code>$.ajax(option)</code>函数，需要通过success、fail、complete接收调用的结果。</p>
+<p>如:<code>wx.request()</code>发起网络数据请求，通过success回调函数接收数据。</p>
+<h1 id="二数据绑定类vue">二、数据绑定（类Vue）</h1>
+<p>在 data 中定义数据，
+在 WXML 中使用数据。</p>
+<ol>
+<li>在页面对应的<code>.js</code> 文件中，把数据定义到 data 对象中即可。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Page</span><span style="color:#24292E;--shiki-dark:#E1E4E8">({</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  data: {</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	info: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"init data"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,	</span><span style="color:#6A737D;--shiki-dark:#6A737D">//字符串</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	msgList: [{msg: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'hello'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}, {msg: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'world'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}],	</span><span style="color:#6A737D;--shiki-dark:#6A737D">//数组</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  	randomNum: Math.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">random</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#6A737D;--shiki-dark:#6A737D">  //十以内随机数</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<ol start="2">
+<li>把data中的数据绑定到页面<code>wxml</code>中渲染，但使用 <strong>Mustache 语法</strong>(双大括号)将变量包起来即可。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>{{info}}&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>{{randomNum >=5 ? '数字大于或等于5':'数字小于5'}}&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<p>Mustache 语法有 3 个应用场景</p>
+<ul>
+<li>绑定内容 data</li>
+<li>绑定属性</li>
+<li>运算(三元运算、算术运算等)</li>
+</ul>
+<h1 id="三事件绑定">三、事件绑定</h1>
+<p><strong>事件</strong>是<strong>渲染层到逻辑层的通讯方式</strong>。通过事件可以将用户在渲染层产生的行为，反馈到逻辑层进行业务的处理。</p>
+<p>常用事件如：tap，input，change...</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>绑定方式</th>
+<th>事件描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tap</td>
+<td>bindtap或bind：tap</td>
+<td>手指触摸后马上离开，类似于HTML中的click事件</td>
+</tr>
+<tr>
+<td>inpput</td>
+<td>bindinput或bind：input</td>
+<td>文本框的输入事件</td>
+</tr>
+<tr>
+<td>change</td>
+<td>bindchange或bind：change</td>
+<td>状态改变时触发</td>
+</tr>
+</tbody>
+</table>
+<h3 id="事件对象的回调列表">事件对象的回调列表</h3>
+<p>当事件回调触发的时候，会收到一个事件对象event，它的详细属性如下表：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>事件类型</td>
+</tr>
+<tr>
+<td>timeStamp</td>
+<td>Integer</td>
+<td>页面打开到触发事件所经过的毫秒数</td>
+</tr>
+<tr>
+<td>target</td>
+<td>Object</td>
+<td>触发事件的组件的一些属性值集合</td>
+</tr>
+<tr>
+<td>currentTarget</td>
+<td>Object</td>
+<td>当前组件的一些属性值集合</td>
+</tr>
+<tr>
+<td>detail</td>
+<td>Object</td>
+<td>额外的信息</td>
+</tr>
+<tr>
+<td>touches</td>
+<td>Array</td>
+<td>触摸事件，当前提留在屏幕中的触摸点信息的数组</td>
+</tr>
+<tr>
+<td>changedTouches</td>
+<td>Array</td>
+<td>触摸事件，当前变化的触摸点信息的数组</td>
+</tr>
+</tbody>
+</table>
+<p>target和detail较为重要</p>
+<p><strong>target</strong>和<strong>currentTarget</strong>的区别：target是触发该事件的源头组件，而currentTarget则是当前事件所绑定的组件。</p>
+<h3 id="bindtap的语法格式">bindtap的语法格式</h3>
+<p>在小程序中，不存在HTML中的onclick鼠标点击事件，而是通过tap事件来响应用户的触摸行为。</p>
+<p>使用步骤：</p>
+<p>步骤1:通过bindtap，可以为组件绑定tap触摸事件，语法如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">button</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> type</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"primary"</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> bindtap</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"btnTapHandler"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>按钮&#x3C;/</span><span style="color:#22863A;--shiki-dark:#85E89D">button</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<p>步骤2:在页面的.js文件中定义对应的事件处理函数，事件参数通过形参event（一般写出e）来接受：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">Page</span><span style="color:#24292E;--shiki-dark:#E1E4E8">({</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">    btnTapHandler</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">){   </span><span style="color:#6A737D;--shiki-dark:#6A737D">//按钮的tap事件处理函数</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(e)	  </span><span style="color:#6A737D;--shiki-dark:#6A737D">//事件参数对象e</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">})</span></span></code></pre>
+<h3 id="在事件处理函数中为data中的数据赋值">在事件处理函数中为data中的数据赋值</h3>
+<p>通过调用<code>this.setData(dataObject)</code>方法，可以给页面data中的数据重新赋值。</p>
+<h3 id="事件传参">事件传参</h3>
+<p>小程序中的事件传参比较特殊，不能在绑定事件的同时为事件处理函数传递参数。</p>
+<p>可以为组件提供data-自定义属性传参，其中代表的是参数的名字，如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#22863A;--shiki-dark:#85E89D">button</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> bindtap</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"btnHandler"</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> data-info</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{2}}"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>事件传参&#x3C;/</span><span style="color:#22863A;--shiki-dark:#85E89D">button</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">//最终info会被解析为参数的名字，数值2会被解析为参数的值</span></span></code></pre>
+<p>在事件处理函数中，通过event.target.dataset.参数名即可获取到具体参数的值，示例如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">btnHandler</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(event){</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">	//dataset是一个对象，包含了所有通过data-*传递过来的参数项</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(event.targer.dataset)</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">	//通过dataset可以访问到具体参数的值</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	console.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">log</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(event.target.dataset.info)</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h3 id="实现文本框和data之间的数据同步">实现文本框和data之间的数据同步</h3>
+<p>实现步骤：1）定义数据 2）渲染结构 3）美化样式 4）绑定input事件处理函数</p>
+<h1 id="四逻辑结构条件逻辑列表渲染">四、逻辑结构（条件逻辑、列表渲染）</h1>
+<h2 id="41-条件逻辑">4.1 条件逻辑</h2>
+<h3 id="wxif">wx:if</h3>
+<p>在小程序中，使用wx:if=&quot;{{condition}}&quot;来判断是否需要渲染该代码块:</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{condition}}"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>True&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<p>也可以用wx:elif和wx:else来添加else判断：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{type === 1}}"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>男&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:elif</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{type === 2}}"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>女&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:else</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>保密&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<h3 id="结合-block-使用wxif">结合<code>&lt;block&gt;</code>使用wx:if</h3>
+<p>如果要一次性控制多个组件的展示与隐藏，可以使用一个<code>&lt;block&gt;&lt;/block&gt;</code>标签将多个组件包装起来，并在<code>&lt;block&gt;</code>标签上使用<code>wx:if</code>控制属性</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">block</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{true}}"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">> view1 &#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    &#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">> view2 &#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">block</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<p>注意：<code>&lt;block&gt;</code>并不是一个组件，它只是一个包裹性质的容器，不会再页面中做任何渲染</p>
+<h3 id="hidden">hidden</h3>
+<p>在小程序中，直接使用hidden=“{{condition}}”也能控制元素的显示与隐藏：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> hidden</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{condition}}"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>条件为true隐藏，条件为false显示&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<h2 id="42-列表渲染">4.2 列表渲染</h2>
+<h3 id="wxfor">wx:for</h3>
+<p>通过wx：for可以根据指定的数值，循环渲染重复的组件结构，如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:for</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{array}}"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	索引是：{{index}} 当前项是{{item}}</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<p>默认情况当前循环项的索引用index表示；当前循环项用item表示。</p>
+<p>例子：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">data: {</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    arr: [1,2,3,4]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:for</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{arr}}"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>索引是自带的属性{{index}}，{{item}}&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<h3 id="wxkey的使用">wx:key的使用</h3>
+<p>类似于Vue列表渲染中的<code>:key</code>，小程序在实现列表渲染时，也建议为渲染出来的列表项指定唯一的key值，从而提高渲染效率，如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:for</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{userlist}}"</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:key</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"id"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>{{item.name}}&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<p>例子：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">data: {</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	msgList: [</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">		{id: 1, msg: 'hello'}, </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">		{id: 2, msg: 'world'}</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:for</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"{{msgList}}"</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wx:key</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"id"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>{{item.msg}}&#x3C;/</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic">view</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span></code></pre>
+<h1 id="五wxss模板样式css">五、WXSS模板样式（CSS）</h1>
+<p>WXSS与Web开发中的CSS类似。为了更适合小程序开发，WXSS对CSS做了一些补充以及修改。</p>
+<h2 id="51-rpx单位">5.1 rpx单位</h2>
+<p>rpx是微信小程序独有的，用来解决屏适配的尺寸单位。</p>
+<p>rpx 的实现原理非常简单：鉴于不同设备屏幕的大小不同，为了实现屏幕的自动适配，rpx 把所有设备的屏幕，在宽度上等分为 750 份（即：当前屏幕的总宽度为 750rpx）。</p>
+<h2 id="52-样式导入">5.2 样式导入</h2>
+<p>使用WXSS提供的<code>@import</code>语法，可以导入外联的样式表。</p>
+<p><code>@import</code>后跟需要导入的外联样式表的相对路径，用；表示语句结束，如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>@import "common.WXSS";</span></span></code></pre>
+<h3 id="521全局样式">5.2.1全局样式</h3>
+<p>定义在<code>app.wxss</code>中的样式为全局样式，作用于每一个页面。</p>
+<h3 id="522局部样式">5.2.2局部样式</h3>
+<p>在页面的<code>.wxss</code>文件中定义的样式为局部样式，只作用于当前页面。</p>
+<h1 id="六全局配置appjson">六、全局配置app.json</h1>
+<p><a href="https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html">小程序配置 / 全局配置</a></p>
+<p><code>app.json</code> 内的配置项：</p>
+<ul>
+<li>
+<p><strong>pages</strong>：用来记录当前小程序所有页面的路径。</p>
+<ul>
+<li>一开始有两行，就有两个页面。</li>
+<li>在<code>app.json</code> 中新增界面，会<strong>自动创建</strong>新的节目文件夹在pages中。</li>
+<li>只需要调整 app.json -&gt;pages 数组中页面路径的前后顺序，即可修改项目的<strong>首页</strong>。小程序会把排在第一位的页面，当作项目首页进行渲染。</li>
+</ul>
+</li>
+<li>
+<p><strong>window</strong>：全局定义小程序所有页面的背景色、文字颜色等。</p>
+<ul>
+<li>小程序中的每一个页面，可以使用.json文件来对本页面的窗口外观进行配置，<strong>页面中的配置项会覆盖app.json的window中相同的配置项</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong>tabBar</strong>：设置小程序底部的tabBar效果。</p>
+</li>
+<li>
+<p><strong>style</strong>：全局定义小程序组件所使用的样式版本。</p>
+</li>
+</ul>
+<!-- ![window](imgs-vxp/window.jpeg) -->
+<h2 id="61-window节点常用的配置项">6.1 window节点常用的配置项</h2>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>navigationBarBackgroundColor</td>
+<td>HexColor</td>
+<td>#000000</td>
+<td>导航栏背景颜色，如#000000</td>
+</tr>
+<tr>
+<td>navigationBarTitleText</td>
+<td>String</td>
+<td>字符串</td>
+<td>导航栏标题文字内容</td>
+</tr>
+<tr>
+<td>navigationBarTextStyle</td>
+<td>String</td>
+<td>white</td>
+<td>导航栏标题颜色，仅支持black/white</td>
+</tr>
+<tr>
+<td>backgroundColor</td>
+<td>HexColor</td>
+<td>#ffffff</td>
+<td>窗口的背景色</td>
+</tr>
+<tr>
+<td>backgroundTextStyle</td>
+<td>String</td>
+<td>dark</td>
+<td>下拉loading的样式，仅支持dark/light</td>
+</tr>
+<tr>
+<td>enablePullDowerRefresh</td>
+<td>Bollean</td>
+<td>flase</td>
+<td>是否全局开启下拉刷新</td>
+</tr>
+<tr>
+<td>onReachBottomDistance</td>
+<td>Number</td>
+<td>50</td>
+<td>页面上拉触底事件触发时距页面底部的距离，单位为px</td>
+</tr>
+</tbody>
+</table>
+<h2 id="62-tabbar">6.2 tabBar</h2>
+<p>tabBar是移动端应用常见的页面效果，用于实现多页面的快速切换。小程序中通常将其分为：<strong>底部tabBar和顶部tabBar</strong>。</p>
+<p>例：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"tabBar"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">    "list"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        {</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">            "pagePath"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"pages/index/index"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">            "text"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"text"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">            "iconPath"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"iconPath"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#6A737D;--shiki-dark:#6A737D">//可以没有</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">            "selectedIconPath"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"selectedIconPath"</span><span style="color:#6A737D;--shiki-dark:#6A737D">//可以没有</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    	}</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    ]</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>注意：</p>
+<ol>
+<li>tabBar中只能配置最少2个，最多5个tab页签；</li>
+<li>当渲染顶部tabBar时，不显示icon，只显示文本。</li>
+</ol>
+<p>tabBar的6个组成部分：</p>
+<!-- ![tabBar](imgs-vxp/tabBar.jpeg) -->
+<ol>
+<li>backgroundColor：tabBar的背景色</li>
+<li>selectedIconPath：选中时的图片路径</li>
+<li>boederStyle：tabBar上边框的颜色</li>
+<li>iconPath：未选中时的图片路径</li>
+<li>selectedColor：tabBar上的文字选中时的颜色</li>
+<li>color：tabBar上文字的默认（未选中）颜色</li>
+</ol>
+<h3 id="tarbar的配置项">tarBar的配置项</h3>
+<p><a href="https://www.bilibili.com/video/BV1834y1676P?spm_id_from=333.788.player.switch&amp;vd_source=9d3c5a863c7c6dbd5152dd7c4e9dc492&amp;p=32">14.全局配置 - tabBar_哔哩哔哩_bilibili</a></p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+<th>必填</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>position</td>
+<td>String</td>
+<td>否</td>
+<td>bottom</td>
+<td>tabBar的位置，仅支持bottom/top</td>
+</tr>
+<tr>
+<td>borderStyle</td>
+<td>String</td>
+<td>否</td>
+<td>black</td>
+<td>tabBar上边框的颜色，仅支持black/white</td>
+</tr>
+<tr>
+<td>color</td>
+<td>HexColor</td>
+<td>否</td>
+<td></td>
+<td>tab上文字的默认（未选择）颜色</td>
+</tr>
+<tr>
+<td>selectedColor</td>
+<td>HexColor</td>
+<td>否</td>
+<td></td>
+<td>tab上的文字选中时的颜色</td>
+</tr>
+<tr>
+<td>backgroundColor</td>
+<td>HexColor</td>
+<td>否</td>
+<td></td>
+<td>tabBar的背景色</td>
+</tr>
+<tr>
+<td>list</td>
+<td>Array</td>
+<td>是</td>
+<td></td>
+<td>tab页签的列表，最少2个、最多5个tab</td>
+</tr>
+</tbody>
+</table>
+<p>每个tab项的配置选项：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+<th>必填</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>pagePath</strong></td>
+<td>String</td>
+<td><strong>是</strong></td>
+<td>页面路径，页面必须在pages中预先定义</td>
+</tr>
+<tr>
+<td><strong>text</strong></td>
+<td>String</td>
+<td><strong>是</strong></td>
+<td>tab上显示的文字</td>
+</tr>
+<tr>
+<td>iconPath</td>
+<td>String</td>
+<td>否</td>
+<td>未选中时的图标路径；当position为top时，不显示icon</td>
+</tr>
+<tr>
+<td>selectedIconPath</td>
+<td>String</td>
+<td>否</td>
+<td>选中时的图标路径；当position为top时，不显示icon</td>
+</tr>
+</tbody>
+</table>
+<p>阿里图标库可以下载icon图标，tabBar的相关页面必须放到“pages”的最前面的位置！不然无法显示！</p>
+<h1 id="七网络数据请求">七、网络数据请求</h1>
+<p>小程序官方对数据接口的请求做了两个限制：</p>
+<ol>
+<li>只能请求HTTPS类型的接口；</li>
+<li>必须将接口的域名添加到信任列表中。</li>
+</ol>
+<p><img src="https://i-blog.csdnimg.cn/blog_migrate/60ef21329da9927bd35cedbebb65897d.png" alt="img" referrerpolicy="no-referrer"></p>
+<h2 id="71-配置request合法域名">7.1 配置request合法域名</h2>
+<p>配置步骤：登录微信小程序管理后台-&gt;开发-&gt;开发设置-&gt;服务器域名-&gt;修改request合法域名。</p>
+<p>注意事项：</p>
+<ol>
+<li>域名只支持https协议；</li>
+<li>域名不能使用IP地址或localhost；</li>
+<li>域名必须经过ICP备案；</li>
+<li>服务器域名一个月最多可申请修改5次；</li>
+</ol>
+<h2 id="72-发起get和post请求">7.2 发起GET和POST请求</h2>
+<p>调用微信小程序提供的<code>wx.request()</code>方法，可以发起GET数据请求。</p>
+<p>调用微信小程序提供的<code>wx.request()</code>方法，可以发起POST数据请求。</p>
+<h2 id="73-在页面刚加载时请求数据">7.3 在页面刚加载时请求数据</h2>
+<p>需要在页面刚加载的时候，自动请求一些初始化的数据。此时需要在页面的onLoad事件中调用获取数据的函数。如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>onLoad:function(options){</span></span>
+<span class="line"><span class="line-number">2</span><span>	this.getSwiperList()</span></span>
+<span class="line"><span class="line-number">3</span><span>	this.getGridList()</span></span>
+<span class="line"><span class="line-number">4</span><span>}</span></span></code></pre>
+<p>关于跨域和 Ajax 的说明：</p>
+<p>跨域问题只存在于基于浏览器的web开发中。由于小程序的宿主环境不是浏览器，而是微信客户端，所以小程序中不存在跨域的问题。</p>
+<p>Ajax技术的核心是依赖于浏览器中的XMLHttpRequest这个对象，由于小程序的宿主环境是微信客户端，所以小程序中不能叫做“发起Ajax请求” ，而是叫做“发起网络数据请求”。</p>
+<h1 id="八页面导航">八、页面导航</h1>
+<p>页面导航指的是页面之间的相互跳转。如浏览器中实现页面导航的方式有<a>链接和location.herf</p>
+<p>小程序中实现页面导航的两种方式：</p>
+<ol>
+<li>声明式导航
+<ul>
+<li>在页面上声明一个<code>&lt;navigator&gt;</code>导航组件。</li>
+<li>通过点击<code>&lt;navigator&gt;</code>组件实现页面跳转。</li>
+</ul>
+</li>
+<li>编程式导航
+<ul>
+<li>调用小程序的导航API，实现页面的跳转。</li>
+</ul>
+</li>
+</ol>
+<h2 id="81声明式导航">8.1声明式导航</h2>
+<p>导航到tabBar页面：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>导航到tabBar页面：</span></span>
+<span class="line"><span class="line-number">2</span><span>	tabBar页面指的是被配置为tabBar的页面。</span></span>
+<span class="line"><span class="line-number">3</span><span>	在使用&#x3C;navigator>组件跳转到指定的tabBar页面时，需要指定url属性和open-type属性，其中：</span></span>
+<span class="line"><span class="line-number">4</span><span>		1）url表示要跳转的页面的地址，必须以/开头；</span></span>
+<span class="line"><span class="line-number">5</span><span>		2）open-type表示跳转的方式，必须为switchTab</span></span>
+<span class="line"><span class="line-number">6</span><span>如：&#x3C;navigator url="/pages/message/message" open-type="switchTab">导航到消息页面&#x3C;/navigator></span></span></code></pre>
+<p>导航到非tabBar页面：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>导航到非tabBar页面：</span></span>
+<span class="line"><span class="line-number">2</span><span>	非tabBar页面指的是没有被配置为tabBar的页面。</span></span>
+<span class="line"><span class="line-number">3</span><span>	在使用&#x3C;navigator>组件跳转到指定的非tabBar页面时，需要指定url属性和open-type属性，其中：</span></span>
+<span class="line"><span class="line-number">4</span><span>		1）url表示要跳转的页面的地址，必须以/开头；</span></span>
+<span class="line"><span class="line-number">5</span><span>		2）open-type表示跳转的方式，必须为naviagte</span></span>
+<span class="line"><span class="line-number">6</span><span>如：&#x3C;navigator url="/pages/info/info" open-type="navigate">导航到消息页面&#x3C;/navigator></span></span></code></pre>
+<p>注意：为了简便，在导航到feitabBar页面时，open-type=“naviagte”属性可以省略。</p>
+<p>后退导航</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>后退导航：</span></span>
+<span class="line"><span class="line-number">2</span><span>	如果要后退到上一页或多级页面，则需要指定open-type属性和delta属性，其中：</span></span>
+<span class="line"><span class="line-number">3</span><span>		1）open-type的值必须是navigateBack，表示要进行后退导航</span></span>
+<span class="line"><span class="line-number">4</span><span>		2）delta的值必须是数字，表示要后退的层级</span></span>
+<span class="line"><span class="line-number">5</span><span>如:&#x3C;naviagtor open-type="navigateBack" delta="1">返回上一页&#x3C;/naviagtor></span></span>
+<span class="line"><span class="line-number">6</span><span>注意：如果只是后退到上一页，则可以省略delta属性，因为其默认值就是1</span></span></code></pre>
+<h2 id="82-编程式导航">8.2 编程式导航</h2>
+<p>8.2.1导航到tabBar页面</p>
+<p>调用wx.switchTab(Object object)方法，可以跳转到tabBar页面。其中Object参数对象的属性列表如下：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+<th>是否必选</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>url</td>
+<td>string</td>
+<td>是</td>
+<td>需要跳转的tabBar页面的路径，路径后不能带参数</td>
+</tr>
+<tr>
+<td>success</td>
+<td>function</td>
+<td>否</td>
+<td>接口调用成功的回调函数</td>
+</tr>
+<tr>
+<td>fail</td>
+<td>function</td>
+<td>否</td>
+<td>接口调用失败的回调函数</td>
+</tr>
+<tr>
+<td>complete</td>
+<td>function</td>
+<td>否</td>
+<td>接口调用结束的回调函数（调用成功、失败都会执行）</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://i-blog.csdnimg.cn/blog_migrate/0c4b77489c1682ed584dede1266e91f4.png" alt="img" referrerpolicy="no-referrer"></p>
+<p>8.2.2导航到非tabBar页面</p>
+<p>调用wx.navigateTo(Object object)方法，可以跳转到非tabBar的页面。其中Object参数对象的属性列表如下：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+<th>是否必选</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>url</td>
+<td>string</td>
+<td>是</td>
+<td>需要跳转的tabBar页面的路径，路径后<strong>可以带参数</strong></td>
+</tr>
+<tr>
+<td>success</td>
+<td>function</td>
+<td>否</td>
+<td>接口调用成功的回调函数</td>
+</tr>
+<tr>
+<td>fail</td>
+<td>function</td>
+<td>否</td>
+<td>接口调用失败的回调函数</td>
+</tr>
+<tr>
+<td>complete</td>
+<td>function</td>
+<td>否</td>
+<td>接口调用结束的回调函数（调用成功、失败都会执行）</td>
+</tr>
+</tbody>
+</table>
+<p>8.2.3 后退导航</p>
+<p>调用wx.navigateBack(Object object)方法，可以返回上一页面或多级页面。其中Object参数对象可选的属性如下：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+<th>默认值</th>
+<th>是否必选</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>delta</td>
+<td>number</td>
+<td>1</td>
+<td>否</td>
+<td>返回的页面数，如果delta大于现有页面数，则返回到首页</td>
+</tr>
+<tr>
+<td>success</td>
+<td>function</td>
+<td></td>
+<td>否</td>
+<td>接口调用成功的回调函数</td>
+</tr>
+<tr>
+<td>fail</td>
+<td>function</td>
+<td></td>
+<td>否</td>
+<td>接口调用失败的回调函数</td>
+</tr>
+<tr>
+<td>complete</td>
+<td>function</td>
+<td></td>
+<td>否</td>
+<td>接口调用结束的回调函数（调用失败、成功都会执行）</td>
+</tr>
+</tbody>
+</table>
+<p>十四、导航传参</p>
+<p>14.1 声明式导航传参</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>navigator组件的url属性用来指定将要跳转到的页面的路径。同时，路径的后面还可以携带参数：</span></span>
+<span class="line"><span class="line-number">2</span><span>1）参数与路径之间使用？分隔；</span></span>
+<span class="line"><span class="line-number">3</span><span>2）参数键与参数值用=相连</span></span>
+<span class="line"><span class="line-number">4</span><span>3）不同参数用&#x26;分隔</span></span>
+<span class="line"><span class="line-number">5</span><span>如：&#x3C;naviagtor url="/pages/info/info?name=zs&#x26;age=20">跳转到info页面&#x3C;/naviagtor></span></span></code></pre>
+<p>14.2 编程式导航传参</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>调用wx.navigateTo(Object onject)方法跳转页面时，也可以携带参数，如：</span></span>
+<span class="line"><span class="line-number">2</span><span>	//页面结构 .wxhm</span></span>
+<span class="line"><span class="line-number">3</span><span>	&#x3C;button bindtap="gotoinfo2">跳转到info页面&#x3C;/button></span></span>
+<span class="line"><span class="line-number">4</span><span>	//通过编程式导航，跳转到info页面，并携带参数 .js</span></span>
+<span class="line"><span class="line-number">5</span><span>gotoinfo2(){</span></span>
+<span class="line"><span class="line-number">6</span><span>	wx.navigateTo({</span></span>
+<span class="line"><span class="line-number">7</span><span>		url:'/pages/info/info?name=ls&#x26;gender=男'</span></span>
+<span class="line"><span class="line-number">8</span><span>})</span></span>
+<span class="line"><span class="line-number">9</span><span>}</span></span></code></pre>
+<p>14.3 在onLoad中接收导航参数</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>通过声明式导航传参或编程式导航传参所携带的参数，可以直接在onLoad事件中直接获取到如：</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>//.js文件</span></span>
+<span class="line"><span class="line-number">4</span><span>onLoad:function(options){</span></span>
+<span class="line"><span class="line-number">5</span><span>	console.log(options)</span></span>
+<span class="line"><span class="line-number">6</span><span>},</span></span></code></pre>
+<h1 id="组件">组件</h1>
+<p><a href="https://developers.weixin.qq.com/miniprogram/dev/component/">微信开放文档 / 组件</a></p>
+<h2 id="1常用视图容器组件">1.常用视图容器组件</h2>
+<ol>
+<li>view
+普通视图区域
+类似于HTML中的div，是一个块级元素
+常用来实现页面的布局效果</li>
+<li>scroll-view
+可滚动的视图区域
+常用来实现滚动列表效果</li>
+<li>swiper和swiper-item
+轮播图容器组件和轮播图item组件</li>
+</ol>
+<p>swiper组件的常用属性：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>indicator-dots</td>
+<td>boolean</td>
+<td>false</td>
+<td>是否显示面板指示点</td>
+</tr>
+<tr>
+<td>indicator-color</td>
+<td>color</td>
+<td>rgba（0,0,0,.3）</td>
+<td>指示点颜色</td>
+</tr>
+<tr>
+<td>indicator-active-color</td>
+<td>color</td>
+<td>#000000</td>
+<td>当前选中的指示点颜色</td>
+</tr>
+<tr>
+<td>autoplay</td>
+<td>boolean</td>
+<td>false</td>
+<td>是否自动切换</td>
+</tr>
+<tr>
+<td>interval</td>
+<td>number</td>
+<td>5000</td>
+<td>自动切换时间间隔</td>
+</tr>
+<tr>
+<td>circular</td>
+<td>boolean</td>
+<td>false</td>
+<td>是否采用衔接滑动</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2采用基础内容组件">2.采用基础内容组件</h2>
+<ol>
+<li>text
+文本组件
+类似于HTML中的span标签，是一个行内元素</li>
+<li>rich-text
+富文本组件
+支持把HTML字符串渲染为WXML结构</li>
+</ol>
+<h2 id="3其他采用组件">3.其他采用组件</h2>
+<ol>
+<li>button
+按钮组件
+功能比HTML中的button按钮丰富
+通过open-type属性可以调用微信提供的各种功能（客服、转发、获取用户权限、获取用户信息等）</li>
+<li>image
+图片组件
+image组件默认宽度约300px、高度240px</li>
+</ol>
+<p>image组件的mode属性用来指定图片的裁剪和缩放模式，常用的mode属性值如下：</p>
+<table>
+<thead>
+<tr>
+<th>mode值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>scaleToFill</td>
+<td>（默认值）缩放模式，不保持纵横比缩放图片，使图片的宽高完全拉伸至填满image元素</td>
+</tr>
+<tr>
+<td>aspectFit</td>
+<td>缩放模式，保存纵横比缩放图片，使图片的长边能完全显示出来。也就是说，可以完整地将图片显示出来。</td>
+</tr>
+<tr>
+<td>aspectFill</td>
+<td>缩放模式，保存纵横比缩放图片，使图片的短边能完全显示出来。也就是说，图片通常只在水平或垂直方向是完整的，另一个方向将会发生截取。</td>
+</tr>
+<tr>
+<td>widthFix</td>
+<td>缩放模式，宽度不变，高度自动变化，保持原图宽高比不变。</td>
+</tr>
+<tr>
+<td>heightFix</td>
+<td>缩放模式，高度不变，宽度自动变化，保持原图宽高比不变。</td>
+</tr>
+</tbody>
+</table>
+<ol start="3">
+<li>naviagtor
+页面导航组件
+类似于HTML中的a链接</li>
+</ol>
+<h1 id="云开发">云开发</h1>
+<p><a href="https://developers.weixin.qq.com/miniprogram/dev/wxcloudservice/wxcloud/basis/getting-started.html">云开发 - 介绍</a></p>
+<p><a href="https://developers.weixin.qq.com/miniprogram/dev/wxcloudservice/wxcloud/guide/functions/getting-started.html">开发指引 / 基础能力 / 云函数 / 我的第一个云函数</a></p>
+<p>需要 有一个云开发的文件夹，例如创建一个：<code>cloud</code>。</p>
+<p>那么就要在<code>project.config.json</code>把这个文件夹和云端进行配置：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"cloudfunctionRoot"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"cloud/"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span></code></pre>
+<p><a href="https://developers.weixin.qq.com/miniprogram/dev/wxcloudservice/wxcloud/guide/init.html">开发指引 / 基础能力 / 初始化</a></p>
+<p>修改<code>app.js</code>，配置环境ID（KEY）：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">// app.js</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">App</span><span style="color:#24292E;--shiki-dark:#E1E4E8">({</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">  onLaunch</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">   wx.cloud.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">init</span><span style="color:#24292E;--shiki-dark:#E1E4E8">({</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	   env:</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'KEY'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	   traceUser: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">   })</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">})</span></span></code></pre>
+<p><code>traceUser: true</code>：将用户信息保存到用户管理。</p>
+<p>如果<strong>云函数调用失败</strong>，就在那个云函数下面打开终端：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>npm install wx-server-sdk@latest</span></span></code></pre>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

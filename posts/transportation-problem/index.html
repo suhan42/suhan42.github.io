@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>运输问题 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">运输问题</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%AC%AC%E5%85%AD%E7%AB%A0-%E8%BF%90%E8%BE%93%E9%97%AE%E9%A2%98">第六章 运输问题</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%80%E8%BF%90%E8%BE%93%E9%97%AE%E9%A2%98">一、运输问题</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%8C%E8%BF%90%E8%BE%93%E9%97%AE%E9%A2%98%E5%8F%8A%E7%89%B9%E6%AE%8A%E7%BB%93%E6%9E%84">二、运输问题及特殊结构</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%89%E8%A1%A8%E4%B8%8A%E4%BD%9C%E4%B8%9A%E6%B3%95">三、表上作业法</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9B%9B%E9%9C%80%E8%A6%81%E9%87%8F%E7%AD%89%E4%BA%8E%E4%BE%9B%E5%BA%94%E9%87%8F%E7%9A%84%E8%BF%90%E8%BE%93%E9%97%AE%E9%A2%98">四、需要量等于供应量的运输问题</a></li>
+<li class="toc-item toc-level-4"><a href="#%E9%98%B6%E7%9F%B3%E6%B3%95">阶石法</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%BB%BA%E7%AB%8B%E6%94%B9%E8%BF%9B%E6%96%B9%E6%A1%88%E7%9A%84%E6%96%B9%E6%B3%95">建立改进方案的方法</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%94%E9%9C%80%E8%A6%81%E9%87%8F%E4%B8%8D%E7%AD%89%E4%BA%8E%E4%BE%9B%E5%BA%94%E9%87%8F%E7%9A%84%E8%BF%90%E8%BE%93%E9%97%AE%E9%A2%98">五、需要量不等于供应量的运输问题</a></li>
+<li class="toc-item toc-level-4"><a href="#51%E9%9C%80%E8%A6%81%E9%87%8F%E5%B0%8F%E4%BA%8E%E4%BE%9B%E5%BA%94%E9%87%8F%E7%9A%84%E8%BF%90%E8%BE%93%E9%97%AE%E9%A2%98">5.1需要量小于供应量的运输问题</a></li>
+<li class="toc-item toc-level-4"><a href="#52%E9%9C%80%E8%A6%81%E9%87%8F%E5%A4%A7%E4%BA%8E%E4%BE%9B%E5%BA%94%E9%87%8F%E7%9A%84%E8%BF%90%E8%BE%93%E9%97%AE%E9%A2%98">5.2需要量大于供应量的运输问题</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%80%80%E5%8C%96%E7%8E%B0%E8%B1%A1">退化现象</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/operations-research/" class="post-category">
+        it / 运筹学      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/operations-research/">#operations-research</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">运输问题</h1>
+
+    <div class="post-body">
+<h1 id="第六章-运输问题">第六章 运输问题</h1>
+<h3 id="一运输问题">一、运输问题</h3>
+<p>运输问题的内容实在供应点与几个需求点之间，运输品种、规格、质量等相同的货物时，选择最佳的运输方案，以达到总的运输费用最低或所获得的利润最大等目标。</p>
+<h3 id="二运输问题及特殊结构">二、运输问题及特殊结构</h3>
+<p>若每一格具体的运输数量不确定，就可以设为Xij ,代表从第 i 个产地运往第 j 个销售地点的运输数量，对于不同的运输数量，会产生不同的总运费，目的就是找出所有满足要求限制的可能的运输数量的分配方案，然后从这些运输方案中选择最优的即总运费最低的方案。</p>
+<p>运输问题的解：使得总运费最低的具体运输数量。</p>
+<p>单位运价表中每一个数据代表从不同产地运输一单位产品到不同销售地点所产生的运费，用Cij表示</p>
+<p><strong>产销平衡表</strong>和<strong>单位运价表</strong>一 一相对，可以把两个表合为一个表称为<strong>平衡表</strong>。</p>
+<h3 id="三表上作业法">三、表上作业法</h3>
+<p>该方法可分为下列三个步骤：</p>
+<ol>
+<li>找到一个初始方案。</li>
+<li>根据判定标准判断是否最优。</li>
+<li>若不是最优，对该方案进行改进，然后重复第（2）（3）步直到求出最优解为止。</li>
+</ol>
+<p><img src="/assets/images/transportation-problem/6%E8%BF%90%E4%BB%B7%E8%A1%A8.png" alt="6运价表"></p>
+<p>产销平衡结合运价表==平衡表</p>
+<p><img src="/assets/images/transportation-problem/6%E5%B9%B3%E8%A1%A1%E8%A1%A8.png" alt=""></p>
+<h3 id="四需要量等于供应量的运输问题">四、需要量等于供应量的运输问题</h3>
+<ol>
+<li>
+<p>建立运输图</p>
+</li>
+<li>
+<p>使用<strong>西北角法</strong>求得一个最初的运输方案p109</p>
+<p>有数字的方格叫做数字格，或石子格，数目是m+n-1 ，变量为0的方格叫空格或无石方格</p>
+</li>
+</ol>
+<p><img src="/assets/images/transportation-problem/6%E8%BF%90%E8%BE%93%E6%96%B9%E6%A1%88.png" alt="6运输方案"></p>
+<ol start="3">
+<li>寻求改进方案</li>
+</ol>
+<h4 id="阶石法">阶石法</h4>
+<ol>
+<li>
+<p>计算每一个空格求改进路线和改进指数。改进路线就是从某一个空格开始，寻求那一条企图改变原来的运输方案的路线。改进指数是指循着改进路线，当货物的运输量做一个单位的变化时，会引起总运费的该变量。</p>
+</li>
+<li>
+<p>将改进路线画在运输图上（闭合回路法）</p>
+</li>
+<li>
+<p>求其他各个方块的改进路线和改进指数</p>
+</li>
+<li>
+<p>建立改进方案</p>
+</li>
+</ol>
+<h4 id="建立改进方案的方法">建立改进方案的方法</h4>
+<p>寻求改进方案的方法主要有闭合回路法和修正分配法。</p>
+<ol>
+<li>
+<p><strong>闭合回路法</strong></p>
+<p>在所有空格中，挑选绝对值最大的负改进指数所在的空格作为调整格，沿着该空格的改进路线，挑选是负号的最小运量为调整运量</p>
+</li>
+<li>
+<p><strong>修正分配法</strong></p>
+<p>修正分配法也叫<strong>位势法</strong>。把原来的运输途进行一些改进，在图顶上加上一行，在图的左侧加上一列</p>
+</li>
+</ol>
+<p>修正分配法和闭合回路法的<strong>关系</strong>：</p>
+<ul>
+<li>闭合回路法是修正分配法的基础</li>
+<li>闭合回路法先求改进路线，再求改进指数，修正分配法则相反</li>
+</ul>
+<h3 id="五需要量不等于供应量的运输问题">五、需要量不等于供应量的运输问题</h3>
+<p>虚设一个产地或者销地使其转化为<strong>平衡运输问题</strong>。</p>
+<p><strong>谁少就虚设谁</strong></p>
+<h4 id="51需要量小于供应量的运输问题">5.1需要量小于供应量的运输问题</h4>
+<p>虚设一个需求点</p>
+<p>虚设的供应点的供应量 = 总供应量 - 总需求量</p>
+<p>任何一个供应点到虚设的需求点的单位运费都为0</p>
+<h4 id="52需要量大于供应量的运输问题">5.2需要量大于供应量的运输问题</h4>
+<p>虚设一个供应点</p>
+<p>虚设的供应点的供应量 = 总需求量 - 总供应量</p>
+<p>虚设的供应点到任何一个需求点的单位运费都为0。即该项运量根本不能运出，是短缺的运量。</p>
+<h3 id="退化现象">退化现象</h3>
+<p><strong>数字格子数 &lt; 行数 + 列数 - 1</strong></p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

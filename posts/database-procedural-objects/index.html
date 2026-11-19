@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>过程式数据库对象 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">过程式数据库对象</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%BA%94mysql%E8%BF%87%E7%A8%8B%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AF%B9%E8%B1%A1">五、MySQL过程式数据库对象</a></li>
+<li class="toc-item toc-level-2"><a href="#1%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0function">1.自定义函数function</a></li>
+<li class="toc-item toc-level-3"><a href="#11%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0">1.1定义函数</a></li>
+<li class="toc-item toc-level-3"><a href="#12%E8%B0%83%E7%94%A8%E5%87%BD%E6%95%B0">1.2调用函数</a></li>
+<li class="toc-item toc-level-3"><a href="#13%E7%BB%B4%E6%8A%A4%E5%87%BD%E6%95%B0">1.3维护函数</a></li>
+<li class="toc-item toc-level-4"><a href="#131%E6%9F%A5%E7%9C%8B%E5%87%BD%E6%95%B0%E7%9A%84%E5%AE%9A%E4%B9%89">1.3.1查看函数的定义</a></li>
+<li class="toc-item toc-level-4"><a href="#132%E5%88%A0%E9%99%A4%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89">1.3.2删除函数定义</a></li>
+<li class="toc-item toc-level-4"><a href="#133%E4%BF%AE%E6%94%B9">1.3.3修改</a></li>
+<li class="toc-item toc-level-2"><a href="#2%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8Bprocedure">2.存储过程procedure</a></li>
+<li class="toc-item toc-level-3"><a href="#21%E5%88%9B%E5%BB%BA">2.1创建</a></li>
+<li class="toc-item toc-level-3"><a href="#22%E8%B0%83%E7%94%A8">2.2调用</a></li>
+<li class="toc-item toc-level-4"><a href="#221%E4%B8%8D%E5%B8%A6%E8%BE%93%E5%85%A5%E5%8F%82%E6%95%B0%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E7%9A%84%E8%B0%83%E7%94%A8">2.2.1不带输入参数存储过程的调用</a></li>
+<li class="toc-item toc-level-4"><a href="#222%E5%B8%A6%E8%BE%93%E5%85%A5%E5%8F%82%E6%95%B0%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E7%9A%84%E8%B0%83%E7%94%A8">2.2.2带输入参数存储过程的调用</a></li>
+<li class="toc-item toc-level-4"><a href="#223%E5%B8%A6%E8%BE%93%E5%87%BA%E5%8F%82%E6%95%B0%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E7%9A%84%E8%B0%83%E7%94%A8">2.2.3带输出参数存储过程的调用</a></li>
+<li class="toc-item toc-level-3"><a href="#23%E6%9F%A5%E7%9C%8B%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E7%9A%84%E5%AE%9A%E4%B9%89">2.3查看存储过程的定义</a></li>
+<li class="toc-item toc-level-3"><a href="#24%E5%88%A0%E9%99%A4%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B">2.4删除存储过程</a></li>
+<li class="toc-item toc-level-3"><a href="#25%E4%BF%AE%E6%94%B9%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B">2.5修改存储过程</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E4%B8%8E%E5%87%BD%E6%95%B0%E7%9A%84%E6%AF%94%E8%BE%83">🙌存储过程与函数的比较</a></li>
+<li class="toc-item toc-level-2"><a href="#3%E6%B8%B8%E6%A0%87cursor">3.游标Cursor</a></li>
+<li class="toc-item toc-level-3"><a href="#31%E5%A3%B0%E6%98%8E%E6%B8%B8%E6%A0%87">3.1声明游标</a></li>
+<li class="toc-item toc-level-3"><a href="#32%E6%89%93%E5%BC%80%E6%B8%B8%E6%A0%87">3.2打开游标</a></li>
+<li class="toc-item toc-level-3"><a href="#33%E8%AF%BB%E5%8F%96%E6%B8%B8%E6%A0%87">3.3读取游标</a></li>
+<li class="toc-item toc-level-3"><a href="#34%E5%85%B3%E9%97%AD%E6%B8%B8%E6%A0%87">3.4关闭游标</a></li>
+<li class="toc-item toc-level-2"><a href="#4%E8%A7%A6%E5%8F%91%E5%99%A8trigger">4.触发器Trigger</a></li>
+<li class="toc-item toc-level-3"><a href="#41%E5%88%9B%E5%BB%BA">4.1创建</a></li>
+<li class="toc-item toc-level-3"><a href="#42%E4%BD%BF%E7%94%A8%E8%A7%A6%E5%8F%91%E5%99%A8%E5%AE%9E%E7%8E%B0%E6%A3%80%E6%9F%A5%E7%BA%A6%E6%9D%9F">4.2使用触发器实现检查约束</a></li>
+<li class="toc-item toc-level-3"><a href="#43%E4%BD%BF%E7%94%A8%E8%A7%A6%E5%8F%91%E5%99%A8%E5%AE%9E%E7%8E%B0%E5%A4%96%E9%94%AE%E7%BA%A7%E8%81%94%E9%80%89%E9%A1%B9">4.3使用触发器实现外键级联选项</a></li>
+<li class="toc-item toc-level-3"><a href="#44%E6%9F%A5%E7%9C%8B">4.4查看</a></li>
+<li class="toc-item toc-level-3"><a href="#45%E5%88%A0%E9%99%A4">4.5删除</a></li>
+<li class="toc-item toc-level-3"><a href="#46%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">4.6注意事项</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/database/" class="post-category">
+        it / 数据库      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/database/">#database</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">过程式数据库对象</h1>
+
+    <div class="post-body">
+<h1 id="五mysql过程式数据库对象">五、MySQL过程式数据库对象</h1>
+<p>[toc]</p>
+<hr>
+<p>MySQL中的编程语言是一种<strong>非过程化</strong>的语言，用户或应用程序都是通过它来操作数据库的。当要执行的任务不能由单个SQL语句来完成时，可以通过某种方法将多条SQL语句组织到一起，来共同完成一项任务。</p>
+<p>数据库开发人员在进行数据库开发时，为了实现一定的功能，经常会将负责不同功能的语句集中起来而且按照用途分别独立放置，以便能够反复调用，而这些独立放置且拥有不同功能的语句块，称之为“<strong>存储程序</strong>”。</p>
+<p>本章主要介绍<strong>函数、存储过程、触发器</strong>的实现。</p>
+<p>MySQL的<strong>存储程序</strong>可分以下四大类：</p>
+<ol>
+<li><strong>存储函数</strong>(stored function)。返回一个计算结果，该结果可以用在表达式里。</li>
+<li><strong>存储过程</strong>(stored procedure)。不直接返回一个结果，但可以用来完成一般的运算或是生成一个结果集并传递回客户。</li>
+<li><strong>触发器</strong>(trigger)。与数据表相关联，当那个数据表被INSERT、DELETE、UPDATE语句修改时，触发器将自动执行。</li>
+<li><strong>事件</strong>(event)。根据时间表在预订时刻自动执行。</li>
+</ol>
+<h2 id="1自定义函数function">1.自定义函数function</h2>
+<ul>
+<li>自定义函数的创建及调用方法</li>
+</ul>
+<h3 id="11定义函数">1.1定义函数</h3>
+<p>MySQL允许数据库开发人员根据实际业务需要创建自定义函数。
+创建自定义函数的语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> FUNCTION</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 函数名</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(参数1,参数2,…) </span><span style="color:#D73A49;--shiki-dark:#F97583">RETURNS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 返回值的数据类型</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[函数选项]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	[函数体]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">	RETURN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 语句</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p><strong>函数选项</strong>是由以下一种或几种选项组合而成的：</p>
+<ul>
+<li>
+<p><code>language sql</code>：默认选项，用于说明函数体使用SQL语言编写。</p>
+</li>
+<li>
+<p>|<code>[not] deterministic</code>：确定性</p>
+<p>当函数返回不确定值时，该选项是为了防止“复制”时的不一致性。如果函数总是对同样的输入参数产生同样的结果，则它被认为是“确定的”，否则就是“不确定”的。</p>
+<p>例如，函数返回系统当前的时间，返回值是不确定的。如果既没有给定deterministic，也没有给定not deterministic，默认就是不确定的。</p>
+</li>
+<li>
+<p>|<code>{contains sql|no sql|reads sql data|modifies sql data}</code>：</p>
+<ul>
+<li><code>contains sql</code>：表示函数体中包含SQL语句，但不包含读或写数据的语句。</li>
+<li><code>no sql</code>：表示函数体中不包含SQL语句。</li>
+<li><code>reads sql data</code>：表示函数体中包含SELECT查询语句，但不包含更新语句。</li>
+<li><code>modifies sql data</code>：表示函数体中包含更新语句。如果上述选项没有明确指定，默认是contains sql。</li>
+</ul>
+</li>
+<li>
+<p>|<code>sql security {definer|invoker}</code>：用于指定函数的执行许可。</p>
+<ul>
+<li><code>Definer</code>：表示该函数只能由创建者调用。</li>
+<li><code>Invoker</code>：表示该函数可以被其他数据库用户调用，默认是definer。</li>
+</ul>
+</li>
+<li>
+<p>|<code>comment '注释'</code>：为函数添加功能说明等注释信息。</p>
+</li>
+</ul>
+<p>例子：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例10-1】在jwgl数据库中，创建一个计算学生年龄的函数。该函数接收学生的学号，通过查询student表返回该学生的年龄。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">USE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> jwgl;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> fn_age</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(XH </span><span style="color:#D73A49;--shiki-dark:#F97583">CHAR</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">))  </span><span style="color:#D73A49;--shiki-dark:#F97583">RETURNS</span><span style="color:#D73A49;--shiki-dark:#F97583"> INT</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Reads </span><span style="color:#D73A49;--shiki-dark:#F97583">sql</span><span style="color:#D73A49;--shiki-dark:#F97583"> data</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">	BEGIN</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">		DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> age </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">		SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> YEAR</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">now</span><span style="color:#24292E;--shiki-dark:#E1E4E8">())</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">YEAR</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(stu_birth) </span><span style="color:#D73A49;--shiki-dark:#F97583">INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> age </span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">		FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">XH;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">		RETURN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> age;</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">	END</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $$</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span></code></pre>
+<p>此处函数选项设置为<code>Reads sql data</code>，是因为在函数中使用了一条SELECT语句。</p>
+<p>由于MySQL局部变量前面没有<code>@</code>符号，在命令局部变量时注意要与字段名称区别开。</p>
+<p>另外，自定义函数的函数体使用SELECT语句不能产生结果集，否则将产生错误。</p>
+<hr>
+<ul>
+<li><strong>创建函数需要注意以下几点：</strong></li>
+</ul>
+<ol>
+<li>自定义函数是数据库的对象，因此，创建自定义函数时，需要指定该自定义函数<strong>隶属于哪个数据库</strong>。</li>
+<li>同一个数据库内，<strong>自定义函数名不能与已有的函数名</strong>（包括系统函数名）重名。建议在自定义函数名中统一添加“<code>fn_</code>”前缀或“<code>_fn</code>”后缀。</li>
+<li>函数的参数无需使用DECLARE命令定义，但它仍然是<strong>局部变量</strong>，且必须提供参数的数据类型。自定义函数如果没有参数，则使用空参数“( )”即可。</li>
+<li>函数<strong>必须指定返回值数据类型</strong>，且须与RETURN语句中的返回值数据类型相近（长度可以不同）。</li>
+</ol>
+<h3 id="12调用函数">1.2调用函数</h3>
+<p>调用存储函数的方法就和使用系统的内置函数一样，使用SELECT语句就可以查看函数的返回值。</p>
+<p>使用下面命令调用上面函数：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fn_age(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'1801010101'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 年龄;</span></span></code></pre>
+<p>例子1：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例10-2】定义一个函数getAverScore，可以根据学生的姓名计算出学生的平均成绩。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> FUNCTION</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> getAverScore</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(s_name </span><span style="color:#D73A49;--shiki-dark:#F97583">varchar</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)) </span><span style="color:#D73A49;--shiki-dark:#F97583">RETURNS</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Reads </span><span style="color:#D73A49;--shiki-dark:#F97583">sql</span><span style="color:#D73A49;--shiki-dark:#F97583"> data</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583"> DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> averScore </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583"> SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> avg</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(score) </span><span style="color:#D73A49;--shiki-dark:#F97583">INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> averScore </span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583"> GROUP BY</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583"> HAVING</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">   (</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no </span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">     WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  stu_name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">s_name);</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">RETURN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> averScore;</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $$</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span></code></pre>
+<p>使用下面命令调用上面函数：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> getAverScore(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'秦建兴'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '秦建兴同学平均成绩'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p>例子2：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】创建存储函数返回两个数相加之和。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 创建存储函数，代码如下：</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> FUNCTION</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> addTwoNumber</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(x </span><span style="color:#D73A49;--shiki-dark:#F97583">SMALLINT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> UNSIGNED, y </span><span style="color:#D73A49;--shiki-dark:#F97583">SMALLINT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> UNSIGNED) </span><span style="color:#D73A49;--shiki-dark:#F97583">RETURNS</span><span style="color:#D73A49;--shiki-dark:#F97583"> SMALLINT</span><span style="color:#D73A49;--shiki-dark:#F97583"> no</span><span style="color:#D73A49;--shiki-dark:#F97583"> sql</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">	DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a, b </span><span style="color:#D73A49;--shiki-dark:#F97583">SMALLINT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> UNSIGNED </span><span style="color:#D73A49;--shiki-dark:#F97583">DEFAULT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">	SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> x, b </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> y;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">	RETURN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">b;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 建立查询语句调用该自定义函数的语句如下：</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @num1</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @num2</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @result</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">addTwoNumber(@num1,@num2);</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">select</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @result;</span></span></code></pre>
+<h3 id="13维护函数">1.3维护函数</h3>
+<h4 id="131查看函数的定义">1.3.1查看函数的定义</h4>
+<ol>
+<li>查看当前数据库中所有的自定义函数的信息：</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#D73A49;--shiki-dark:#F97583"> status</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 或</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show  </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  satus  </span><span style="color:#D73A49;--shiki-dark:#F97583">like</span><span style="color:#24292E;--shiki-dark:#E1E4E8">…</span></span>
+<span class="line"><span class="line-number">4</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 例如：</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show </span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#D73A49;--shiki-dark:#F97583"> status</span><span style="color:#D73A49;--shiki-dark:#F97583"> like</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'fn_%'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<ol start="2">
+<li>使用命令<code>show create function 函数名;</code>可以查看指定函数的<strong>详细信息</strong>。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show </span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#D73A49;--shiki-dark:#F97583"> function</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fn_age;</span></span></code></pre>
+<ol start="3">
+<li>函数的信息都保存在<code>information_schema数据库</code>中的<code>routines表</code>中，可以使用SELECT语句检索routines表，查询函数的相关信息。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> information_schema</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Routines</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ROUTINE_NAME </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'getAverScore'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<h4 id="132删除函数定义">1.3.2删除函数定义</h4>
+<p>使用MySQL命令DROP FUNCTION删除函数的定义，其语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> FUNCTION</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 函数名, …;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 例：</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> FUNCTION</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> fn_age;</span></span></code></pre>
+<h4 id="133修改">1.3.3修改</h4>
+<p>可以使用drop function语句暂时将函数的定义删除，然后再使用create function语句重新创建相同名字的函数即可。</p>
+<p>这种方法对于存储过程、视图、触发器的修改同样适用。</p>
+<h2 id="2存储过程procedure">2.存储过程procedure</h2>
+<ul>
+<li>存储过程的创建及调用方法</li>
+</ul>
+<p>在MySQL中，可以定义一段程序存放在数据库中，这样的程序称为<strong>存储过程</strong>，它是最重要的数据库对象之一。存储过程实质上就是一段代码，它可以由声明式SQL语句和过程式SQL语句组成。存储过程可以由程序、触发器或者另一个存储过程调用，从而激活它</p>
+<p><strong>它书写更简单，使用频率更高。一个数据库中，可能函数不多，但是存储过程很多。</strong></p>
+<h3 id="21创建">2.1创建</h3>
+<p>创建存储过程命令格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> PROCEDURE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 存储过程名(参数1, 参数2, …)</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[存储过程选项]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	存储过程语句块;</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p>存储过程的<strong>参数</strong>，格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[ IN | OUT | INOUT ] 参数名 类型</span></span></code></pre>
+<p>当有多个参数的时候中间用逗号隔开，存储过程可以有0个、1个或多个参数。</p>
+<p>关键字分别是<code>IN</code>、<code>OUT</code>和<code>INOUT</code> 分别为<strong>输入参数</strong>、<strong>输出参数</strong>和<strong>输入/输出参数</strong>。<strong>输入参数使数据可以传递给一个存储过程。当需要返回一个答案或结果的时候，存储过程使用输出参数。输入/输出参数既可以充当输入参数，也可以充当输出参数。</strong></p>
+<p>存储过程也可以不加参数，但是名称后面的括号是不可省略的。</p>
+<p>参数的名字不要等于列的名字。</p>
+<hr>
+<p><strong>存储过程选项</strong>可能由以下一种或几种存储过程选项组合而成：</p>
+<ul>
+<li>language sql</li>
+<li>|[not] deterministic</li>
+<li>|{contains sql|no sql|reads sql data|modifies sql data}</li>
+<li>|sql security {definer|invoker}</li>
+<li>|comment '注释'</li>
+</ul>
+<h3 id="22调用">2.2调用</h3>
+<p>调用存储过程需使用<code>CALL</code>命令。另外，还要向存储过程传递IN参数、OUT参数或者INOUT参数。</p>
+<h4 id="221不带输入参数存储过程的调用">2.2.1不带输入参数存储过程的调用</h4>
+<p>例子1：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例10-3】创建不带参数存储过程，从jwgl数据库的student、course、score三个表中查询，返回学生的学号、姓名、课程名和成绩。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583">  PROCEDURE</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  stu_cj()</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Reads </span><span style="color:#D73A49;--shiki-dark:#F97583">sql</span><span style="color:#D73A49;--shiki-dark:#F97583"> data</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">	SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  student</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583"> AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 学号,stu_name </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 姓名, course_name </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 课程名,score </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 成绩</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">	FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  student </span><span style="color:#D73A49;--shiki-dark:#F97583">INNER  JOIN</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  score  </span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">	ON</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  student</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">score</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583"> INNER  JOIN</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  course</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">	ON</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  score</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course_no</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $$</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span>
+<span class="line"><span class="line-number">12</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 调用：</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">call</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_cj();</span></span></code></pre>
+<p>例子2：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">【例10</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">】创建带输入参数的存储过程。从jwgl数据库的student、course、score三个表中查询任一同学指定课程的成绩。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583">  PROCEDURE</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  proc_stu_cj(</span><span style="color:#D73A49;--shiki-dark:#F97583">IN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sname </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">),</span><span style="color:#D73A49;--shiki-dark:#F97583">IN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> cname </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">))</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Reads </span><span style="color:#D73A49;--shiki-dark:#F97583">sql</span><span style="color:#D73A49;--shiki-dark:#F97583"> data</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">	SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> student</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,stu_name,course_name,score</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">	FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  student </span><span style="color:#D73A49;--shiki-dark:#F97583">INNER  JOIN</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  score </span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  student</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">score</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">	INNER  JOIN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course </span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> score</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course_no</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">	WHERE</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> student</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">sname </span><span style="color:#D73A49;--shiki-dark:#F97583">AND</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> course</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course_name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">cname;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $$</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span></code></pre>
+<h4 id="222带输入参数存储过程的调用">2.2.2带输入参数存储过程的调用</h4>
+<p>调用proc_stu_cj存储过程的命令如下：</p>
+<p>方法一：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @sname</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'秦建兴'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @cname</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'数据结构'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CALL</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> proc_stu_cj(@sname,@cname);</span></span></code></pre>
+<p>方法二：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CALL</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> proc_stu_cj(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'秦建兴'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'数据结构'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
+<p>例子：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">【例10</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">】创建带输出参数的存储过程。在jwgl数据库中创建一个存储过程用于计算指定学生（姓名）各科成绩的平均分，存储过程中使用了一个输入参数和一个输出参数。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> PROCEDURE</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  proc_avg_score(</span><span style="color:#D73A49;--shiki-dark:#F97583">IN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sname </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">),</span><span style="color:#D73A49;--shiki-dark:#F97583">OUT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> avg_cj </span><span style="color:#D73A49;--shiki-dark:#F97583">float</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Reads </span><span style="color:#D73A49;--shiki-dark:#F97583">sql</span><span style="color:#D73A49;--shiki-dark:#F97583"> data</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">	SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> avg</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(score) </span><span style="color:#D73A49;--shiki-dark:#F97583">INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> avg_cj </span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student,score</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">	WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">sname </span><span style="color:#D73A49;--shiki-dark:#F97583">AND</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> student</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">score</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $$</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span></code></pre>
+<h4 id="223带输出参数存储过程的调用">2.2.3带输出参数存储过程的调用</h4>
+<p>调用proc_avg_score存储过程的命令如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @sname</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'秦建兴'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> @avg_cj</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CALL</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> proc_avg_score(@sname,@avg_cj);</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> round</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(@avg_cj,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
+<p>创建存储过程需要注意以下几点：</p>
+<ol>
+<li>存储过程是数据库的对象。在创建存储过程时，需要指定该存储过程隶属于哪个数据库。同一个数据库内，<strong>存储过程名不能与已经存在的存储过程重名</strong>，建议在存储过程名中统一添加前缀“<code>proc_</code>”或后缀“<code>_proc</code>”。</li>
+<li>与函数相同之处在于，存储过程的参数也是<strong>局部变量</strong>，也需要提供参数的数据类型。与函数不同的是，存储过程有3种类型的参数IN参数、OUT参数以及INOUT参数：
+<ol>
+<li><strong>IN</strong> 代表输入参数（默认情况下为IN参数），表示该参数的值必须由调用程序指定；</li>
+<li><strong>OUT</strong> 代表输出参数，表示该参数的值经存储过程计算后，将OUT参数的计算结果返回给调用程序；</li>
+<li><strong>INOUT</strong> 参数代表既是输入参数，又是输出参数，表示该参数可以由调用程序指定，又可以将参数的计算结果返回给调用程序。</li>
+</ol>
+</li>
+<li>参数的名字不要等于列的名字。</li>
+<li>存储过程如果没有参数，使用空参数“( )”即可。</li>
+</ol>
+<h3 id="23查看存储过程的定义">2.3查看存储过程的定义</h3>
+<ol>
+<li>查看当前数据库中所有的自定义函数的信息：</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show </span><span style="color:#D73A49;--shiki-dark:#F97583">procedure</span><span style="color:#D73A49;--shiki-dark:#F97583"> status</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 或</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show </span><span style="color:#D73A49;--shiki-dark:#F97583">procedure</span><span style="color:#D73A49;--shiki-dark:#F97583"> status</span><span style="color:#D73A49;--shiki-dark:#F97583"> like</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ...;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 例：</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show </span><span style="color:#D73A49;--shiki-dark:#F97583">procedure</span><span style="color:#D73A49;--shiki-dark:#F97583"> status</span><span style="color:#D73A49;--shiki-dark:#F97583"> like</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'proc_%'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<ol start="2">
+<li>使用命令“<code>SHOW CREATE PROCEDURE 存储过程名;</code>”可以查看指定函数的详细信息。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】查看stu_cj存储过程的详细信息。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">SHOW </span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> PROCEDURE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_cj;</span></span></code></pre>
+<ol start="3">
+<li>存储过程的信息保存在<code>information_schema数据库</code>中的<code>routines表</code>中，可以使用select语句查询存储过程的相关信息。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】查看proc_avg_score存储过程信息。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> information_schema</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">routines</span><span style="color:#D73A49;--shiki-dark:#F97583"> WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> routine_name</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'proc_avg_score'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<h3 id="24删除存储过程">2.4删除存储过程</h3>
+<p>如果某个存储过程不再使用，可以使用<code>drop procedure</code>语句将其删除，其语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> PROCEDURE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 存储过程名;</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】删除存储过程stu_cj。</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> PROCEDURE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_cj;</span></span></code></pre>
+<h3 id="25修改存储过程">2.5修改存储过程</h3>
+<p>需要说明的是，由于存储过程保存的是一段存储程序，没有保存表数据。</p>
+<p>因此，当需要修改存储过程的定义时，可以使用DROP PROCEDURE语句将存储过程删除，然后再使用CREATE PROCEDURE语句重新创建相同名字的存储过程即可。</p>
+<h2 id="存储过程与函数的比较">🙌存储过程与函数的比较</h2>
+<p>MySQL的<strong>存储过程和函数统称为stored routines</strong>，它们都可以看作是一个“加工作坊”。什么时候需要定义函数，什么时候需要定义为存储过程，事实上没有严格的区分，不过一般而言，<strong>存储过程实现的功能要复杂一点，而函数实现的功能针对性更强一点</strong>。</p>
+<hr>
+<p>存储过程和函数之间的<strong>共同</strong>特点有如下几点：</p>
+<p>（1）应用程序调用存储过程或函数时，只需要提供存储过程名或者函数名，以及参数信息，无需将若干条MySQL语句发送到MySQL服务器上，从而节省了网络开销。</p>
+<p>（2）存储过程或者函数可以<strong>重复使用</strong>，从而可以减少数据库开发人员，尤其是应用程序开发人员的工作量。</p>
+<p>（3）使用存储过程或者函数可以<strong>增强数据的安全访问控制</strong>。可以设定只有某些数据库用户才具有某些存储过程或者函数的执行权。</p>
+<hr>
+<p>存储过程和函数的<strong>不同</strong>之处，主要有以下几方面：</p>
+<p>（1）<strong>函数必须有且仅有一个返回值</strong>，且必须指定返回值的数据类型。<strong>存储过程可以没有返回值，也可以有返回值，甚至可以有多个返回值，所有的返回值需要使用OUT或者INOUT参数定义</strong>。</p>
+<p>（2）在函数体内可以使用SELECT…INTO语句为某个变量赋值，但不能使用SELECT语句返回结果或者结果集；存储过程则没有这方面的限制。</p>
+<p>（3）<strong>函数可以直接嵌入到SQL语句或者MySQL表达式中</strong>，最重要的是<strong>函数可以用于扩展标准的SQL语句。存储过程一般需要单独调用</strong>，并不会嵌入到SQL语句中使用，调用时需要使用<code>CALL</code>关键字。</p>
+<p>（4）函数中的函数体限制比较多，比如函数体内不能使用以显式或隐式方式打开、开始或结束事务的语句，不能在函数体内使用预处理SQL语句。存储过程的限制相对比较少，基本上所有的SQL语句或者MySQL命令都可以在存储过程中使用。</p>
+<p>（5）应用程序（例如Java、PHP等）调用函数时，通常<strong>将函数封装到SQL字符串中进行调用</strong>；应用程序<strong>调用存储过程时，必须使用CALL关键字进行调用</strong>。如果应用程序希望获取存储过程的返回值，必须给存储过程的OUT参数或者INOUT参数传递MySQL会话变量，这样应用程序才能通过该会话变量获取存储过程的返回值。</p>
+<h2 id="3游标cursor">3.游标Cursor</h2>
+<p>数据库开发人员在编写存储过程（或者函数）等存储程序时，有时需要存储程序中的MySQL代码扫描SELECT结果集中的数据，并对结果集中的每条记录进行简单处理，通过MySQL的<strong>游标</strong>机制可以解决此类问题。</p>
+<p>游标本质上是一种<strong>能从SELECT结果集中每次提取一条记录的机制</strong>，因此游标与SELECT息息相关。MySQL支持简单的游标。<strong>游标一定要在存储过程或函数中使用，不能单独在查询中使用</strong>。</p>
+<p>使用一个游标需要用到4条特殊语句：</p>
+<ol>
+<li><strong>DECLARE CURSOR（声明游标）</strong></li>
+<li><strong>OPEN CURSOR（打开游标）</strong></li>
+<li><strong>FETCH CURSOR（读取游标）</strong></li>
+<li><strong>CLOSE CURSOR（关闭游标）</strong></li>
+</ol>
+<h3 id="31声明游标">3.1声明游标</h3>
+<p>声明游标的语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 游标名 </span><span style="color:#D73A49;--shiki-dark:#F97583">CURSOR</span><span style="color:#D73A49;--shiki-dark:#F97583"> FOR</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> select语句</span></span></code></pre>
+<p>这个语句声明一个游标，也可以在存储过程中定义多个游标。但是一个块中的每个游标必须有唯一的名字。这里的SELECT语句不能有INTO子句。</p>
+<h3 id="32打开游标">3.2打开游标</h3>
+<p>声明游标后，要使用游标从中提取数据，就必须先打开游标。其语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">OPEN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 游标名</span></span></code></pre>
+<h3 id="33读取游标">3.3读取游标</h3>
+<p>游标打开后，就可以使用FETCH CURSOR语句从中读取数据，其语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">FETCH</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 游标名 </span><span style="color:#D73A49;--shiki-dark:#F97583">INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 变量名…  </span></span></code></pre>
+<p>FETCH…INTO语句与SELECT…INTO语句具有相同的意义，<strong>FETCH语句是将游标指向的一行数据赋给一些变量，子句中变量的数目必须等于声明游标时SELECT子句中列的数目</strong>。变量名指定是存放数据的变量。</p>
+<p>第一次执行FETCH语句时，从结果集中提取第一条记录，再次执行FETCH语句时，从结果集中提取第二条记录，…，依此类推。<strong>FETCH语句每次从结果集中仅提取一条记录，因此，FETCH语句需要循环语句配合</strong>，这样才能实现对整个结果集的遍历。 　</p>
+<p>当使用FETCH语句从游标中提取最后一条记录后，再次执行FETCH语句时，将产生“<code>error 1329:NO data to FETCH</code>”错误信息，数据库开发人员可以针对MySQL错误代码1329自定义错误处理程序，以便结束游标对结果集的遍历。
+游标的自定义错误处理程序应该放在<strong>声明游标语句之后</strong>。游标通常结合自定义错误处理程序一起使用。　</p>
+<h3 id="34关闭游标">3.4关闭游标</h3>
+<p>游标使用完后，要及时关闭游标。其语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CLOSE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 游标名</span></span></code></pre>
+<p>例子：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">【例10</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">】创建存储过程，使用游标在score表逐行检查某门课程的成绩，如果成绩在55~59之间，自动将成绩修改为60。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> PROCEDURE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> proc_update_score(</span><span style="color:#D73A49;--shiki-dark:#F97583">IN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> kch </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">))</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Modifies </span><span style="color:#D73A49;--shiki-dark:#F97583">sql</span><span style="color:#D73A49;--shiki-dark:#F97583"> data</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">	DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> xh </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">	DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> cj </span><span style="color:#D73A49;--shiki-dark:#F97583">float</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">	DECLARE</span><span style="color:#D73A49;--shiki-dark:#F97583"> state</span><span style="color:#D73A49;--shiki-dark:#F97583"> char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">	DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> update_cj_cursor </span><span style="color:#D73A49;--shiki-dark:#F97583">CURSOR</span><span style="color:#D73A49;--shiki-dark:#F97583"> FOR</span><span style="color:#D73A49;--shiki-dark:#F97583"> SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no,score </span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">kch;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">	DECLARE</span><span style="color:#D73A49;--shiki-dark:#F97583"> continue</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> HANDLER </span><span style="color:#D73A49;--shiki-dark:#F97583">FOR</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1329</span><span style="color:#D73A49;--shiki-dark:#F97583"> SET</span><span style="color:#D73A49;--shiki-dark:#F97583"> state=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'遍历完成'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">	OPEN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> update_cj_cursor;</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">	REPEAT</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">    	FETCH</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> update_cj_cursor </span><span style="color:#D73A49;--shiki-dark:#F97583">INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> xh,cj;</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">    	IF</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (cj</span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">55</span><span style="color:#D73A49;--shiki-dark:#F97583"> AND</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> cj</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">60</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">THEN</span><span style="color:#D73A49;--shiki-dark:#F97583"> SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> cj</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">60</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#D73A49;--shiki-dark:#F97583">    	END</span><span style="color:#D73A49;--shiki-dark:#F97583"> IF</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">    	UPDATE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">cj </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">xh </span><span style="color:#D73A49;--shiki-dark:#F97583">AND</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">kch;</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    	UNTIL </span><span style="color:#D73A49;--shiki-dark:#F97583">state=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'遍历完成'</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">	END</span><span style="color:#D73A49;--shiki-dark:#F97583"> REPEAT</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">  CLOSE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> update_cj_cursor;</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $$</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span></code></pre>
+<h2 id="4触发器trigger">4.触发器Trigger</h2>
+<p><strong>触发器（Trigger）<strong>是一种特殊的存储过程，它也是嵌入到MySQL中的一段程序。和存储过程不同的是，触发器不需要使用CALL语句来调用，也不需要手工启动。触发器是</strong>由事件来触发某个操作过程</strong>，事件包括INSERT、UPDATE和DELETE语句。<strong>只要当一个预定义的事件发生时，触发器将会自动执行</strong>。</p>
+<p>触发器是用来保护表中数据的。触发器基于一个表创建，但是可以针对多个表进行操作，所以触发器可以用来<strong>对表实施复杂的完整性约束</strong>。　</p>
+<p>触发器是通过<strong>事件</strong>触发而由系统自动执行的。</p>
+<p>当对某一表进行插入(Insert)、修改(Update)、删除(Delete)操作时，MySQL会自动执行触发器所定义的SQL语句，从而实现业务规则和数据完整性。</p>
+<p>触发器是一种与表操作（INSERT、UPDATE、DELETE）有关的数据库对象。触发器定义了一系列操作，这一系列操作称为<strong>触发程序</strong>。当触发器所在表上出现INSERT、UPDATE以及DETETE操作时，将激活触发器，即<strong>表的操作事件触发表上的触发程序的执行</strong>。</p>
+<hr>
+<p>触发器具有以下<strong>优点</strong>：</p>
+<ol>
+<li>触发器自动执行。当对表进行INSERT、 UPDATE以及DETETE操作，试图修改表中的数据时，相应操作的触发器立即自动执行。</li>
+<li>触发器可以通过数据库中相关表进行层叠更改。这比直接把代码写在前台的做法更安全合理。</li>
+<li>触发器可以实现用CHECK约束实现不了的复杂约束。与CHECK约束相比，触发器可以引用其他表中的列。</li>
+<li>触发器可以维护冗余数据，实现外键级联选项等。</li>
+</ol>
+<h3 id="41创建">4.1创建</h3>
+<p>CREATE TRIGGER语句语法格式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 触发器名</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">AFTER/BEFORE</span><span style="color:#D73A49;--shiki-dark:#F97583"> INSERT/UPDATE/DELETE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 表名</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">FOR</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> EACH </span><span style="color:#D73A49;--shiki-dark:#F97583">ROW</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">	SQL语句;  #触发程序</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p>说明：</p>
+<ol>
+<li>
+<p>触发器是数据库对象，因此创建触发器时，需要指定该触发器属于哪一个数据库。</p>
+</li>
+<li>
+<p>触发器是在表上创建的。这个表<strong>必须是基表</strong>，不能是临时表，也不能是视图。</p>
+</li>
+<li>
+<p>MySQL的触发事件有三种：INSERT、UPDATE及DELETE。</p>
+<ul>
+<li>
+<p><code>INSERT</code>：将新记录插入表时激活触发程序。</p>
+</li>
+<li>
+<p><code>UPDATE</code>：更改表中的记录时激活触发程序。</p>
+</li>
+<li>
+<p><code>DELETE</code>：从表中删除记录叶激活触发程序。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>触发器的<strong>触发时间</strong>有两种：BEFORE和AFTER。</p>
+<ul>
+<li><code>BEFORE</code>表示在触发事件发生之前执行触发程序。</li>
+<li><code>AFTER</code>表示在触发事件发生之后执行触发程序。</li>
+</ul>
+</li>
+<li>
+<p><code>FOR EACH ROW</code>表示行级触发器。
+目前，MySQL仅支持行级触发器，不支持语句级别的触发器。FOR EACH ROW表示INSERT、UPDATE及DELETE操作<strong>影响的每一条记录都会执行一次触发程序</strong>。</p>
+</li>
+<li>
+<p>触发程序中的SELECT语句不能产生结果集。</p>
+</li>
+<li>
+<p>触发程序中可以使用<code>old</code>关键字与<code>new</code>关键字。</p>
+<ul>
+<li>①当向表中<strong>插入</strong>新记录时，在触发程序中可以使用<strong>new关键字表示新记录</strong>。当需要访问新记录中的某个字段时，可以使用“<strong>new.字段名</strong>”进行访问。</li>
+<li>②当从表中<strong>删除</strong>某条旧记录时，在触发程序中可以使用<strong>old关键字表示旧记录</strong>。当需要访问旧记录中的某个字段时，可以使用“<strong>old.字段名</strong>”进行访问。</li>
+<li>③当<strong>修改</strong>表中的某条记录时，在触发程序中可以使用new关键字表示修改后的记录。使用old关键字表示修改前的记录。当需要访问修改后的记录中的某个字段时，可以使用“<strong>new.字段名</strong>”进行访问。当需要访问旧记录中的某个字段时，可以使用**“old.字段名**”进行访问。</li>
+<li>④old记录是只读的，在触发程序中只能引用它，但不能更改它。在BEFORE触发程序中，可使用“SET new.字段名=值”更改new记录的值。但在AFTER触发程序中，不能使用“SET new.字段名=值”更改new记录的值。</li>
+<li>⑤对于<strong>INSERT</strong>操作，只有new是合法的。</li>
+<li>对于D<strong>ELETE</strong>操作，只有old是合法的。</li>
+<li>对于<strong>UPDATE</strong>操作，new和old都是合法的。</li>
+</ul>
+</li>
+</ol>
+<h3 id="42使用触发器实现检查约束">4.2使用触发器实现检查约束</h3>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例10-9】创建触发器实现向score表插入学生成绩值时，要求成绩在0~100之间（包括0和100）。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> score_insert_before</span><span style="color:#D73A49;--shiki-dark:#F97583"> BEFORE</span><span style="color:#D73A49;--shiki-dark:#F97583"> insert</span><span style="color:#D73A49;--shiki-dark:#F97583"> ON</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> each </span><span style="color:#D73A49;--shiki-dark:#F97583">row</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">  IF</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> new</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">score</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#D73A49;--shiki-dark:#F97583"> OR</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> new</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">score</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#005CC5;--shiki-dark:#79B8FF">100</span><span style="color:#D73A49;--shiki-dark:#F97583"> THEN</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">    INSERT INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mytable </span><span style="color:#D73A49;--shiki-dark:#F97583">values</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">  END</span><span style="color:#D73A49;--shiki-dark:#F97583"> IF</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $$</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span></code></pre>
+<p>与其他数据库管理系统不同，使用触发器实现检查约束时，MySQL触发器暂<strong>不支持撤销undo</strong>、<strong>退出exit</strong>等操作，触发程序正常运行期间无法中断其正常执行。为了阻止触发程序继续执行，可以在触发程序中定义一条出错的语句或者不可能完成的SQL语句。</p>
+<p>上述例题仅仅实现了“插入”检查，也可以参照上述例题创建针对“修改”操作的触发器，负责对score表的update操作进行检查。</p>
+<h3 id="43使用触发器实现外键级联选项">4.3使用触发器实现外键级联选项</h3>
+<p>对于InnoDB存储引擎的表而言，由于支持外键约束，在定义外键约束时，通过设置外键的级联选项cascade、set null或者no action，外键约束关系可以交由InnoDB存储引擎自动维护。</p>
+<p>例如，如果由于某原因删除student表中的某个学生记录，那么由于student表对于score表而言是外键约束的被参照表，为了保证数据的一致性，应该同时将score表中该学生的成绩数据一并删除。</p>
+<p>这种操作可以通过创建外键时的级联删除选项实现，如果在外键约束中没有级联删除选项，也可以通过触发器实现。通常通过触发器实现级联删除操作。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例10-10】创建一个触发器，当从student表删除学生记录时，同时删除该学生在score表中的所有成绩记录。（为了实现这一操作，需要删除score表对于student的外键约束）</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> student_delete_after</span><span style="color:#D73A49;--shiki-dark:#F97583"> AFTER</span><span style="color:#D73A49;--shiki-dark:#F97583"> delete</span><span style="color:#D73A49;--shiki-dark:#F97583"> ON</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> each </span><span style="color:#D73A49;--shiki-dark:#F97583">row</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">  DELETE</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">old</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $$</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span></code></pre>
+<p>接下来，执行下面命令从student表中删除学号为'1801010101'的学生信息，观察score表中该学生的成绩信息是否同时被删除。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> FOREIGN_KEY_CHECKS </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;  </span><span style="color:#6A737D;--shiki-dark:#6A737D">/*关闭外键检查*/</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">DELETE</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'1801010101'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'1801010101'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> FOREIGN_KEY_CHECKS </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;  </span><span style="color:#6A737D;--shiki-dark:#6A737D">/*打开外键检查*/</span></span></code></pre>
+<p>从执行情况可以看到，当从student表中删除'1801010101'同学后，score表中该同学的成绩记录也同时被删除，这样就保证了score表中学生对student表中学生数据的参照完整性。</p>
+<hr>
+<p>触发器除了可以实现<strong>检查约束</strong>和<strong>级联删除</strong>操作外，很多的时候还用来实现数据的<strong>级联修改</strong>操作。例如，在向score表中输入一条学生成绩记录后，如果学生的成绩在及格线以上，同时应当将该课程的学分累加到该学生的总学分字段上；再比如，对于一个销售管理系统，如果产生一个订单，那么首先应该检查商品的库存量是否满足订单需求，如果满足，订单可以生成，并应从库存信息中将该商品的库存量进行相应的减扣。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 例：创建触发器实现当修改course表中的课程号时，score表中的课程号自动修改。</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> course_update_after</span><span style="color:#D73A49;--shiki-dark:#F97583"> AFTER</span><span style="color:#D73A49;--shiki-dark:#F97583"> update</span><span style="color:#D73A49;--shiki-dark:#F97583"> ON</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course </span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> each </span><span style="color:#D73A49;--shiki-dark:#F97583">row</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">  UPDATE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">new</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course_no</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">  WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">old</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course_no</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$$</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span></code></pre>
+<p>测试触发器功能</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'010002'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'010002'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> FOREIGN_KEY_CHECKS </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">UPDATE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course </span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'1111'</span><span style="color:#D73A49;--shiki-dark:#F97583"> WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'010002'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> FOREIGN_KEY_CHECKS </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'1111'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'1111'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例10-11】创建触发器实现当向score表中插入一条成绩记录时，如果成绩及 格，则在student表中该学生总学分字段credit上累加该成绩记录对应课程的学分数。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER $$</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> score_insert_after</span><span style="color:#D73A49;--shiki-dark:#F97583"> AFTER</span><span style="color:#D73A49;--shiki-dark:#F97583"> insert</span><span style="color:#D73A49;--shiki-dark:#F97583"> ON</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> each </span><span style="color:#D73A49;--shiki-dark:#F97583">row</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">BEGIN</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">  DECLARE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> xf </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">  SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_credit </span><span style="color:#D73A49;--shiki-dark:#F97583">INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> xf </span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> course_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">new</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">course_no</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">  IF</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> new</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">score</span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">60</span><span style="color:#D73A49;--shiki-dark:#F97583"> THEN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">    UPDATE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student </span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> credit</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">credit</span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8">xf </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stu_no</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">new</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">stu_no</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">  END</span><span style="color:#D73A49;--shiki-dark:#F97583"> IF</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">END</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$$</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">DELIMITER ;</span></span></code></pre>
+<p>执行下面命令，向score表插入一条成绩数据后，再检查学生'1902030101'的学分值。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">INSERT INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score </span><span style="color:#D73A49;--shiki-dark:#F97583">VALUES</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'1902030101'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'010003'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">99</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
+<p>从执行插入操作后的查询结果可以看到，向score表插入学生成绩数据后，相应地该学生的student表中的总学分credit值同时得到了修改，将课程的学分值累加到了学生的学分字段上。</p>
+<h3 id="44查看">4.4查看</h3>
+<ol>
+<li>通过<code>SHOW TRIGGERS</code>命令查看触发器。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show triggers;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 或</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show triggers </span><span style="color:#D73A49;--shiki-dark:#F97583">like</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 模式;</span></span></code></pre>
+<ol start="2">
+<li>MySQL中所有触发器的定义都存放在<code>information_schema</code>数据库的<code>triggers</code>表中，可以通过SELECT命令来查看当前数据库中某个指定触发器的具体信息。</li>
+</ol>
+<p>例如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> information_schema</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">triggers</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<ol start="3">
+<li>使用命令<code>show create trigger 触发器名;</code>可以查看指定数据库中指定触发器的详细信息</li>
+</ol>
+<p>例如，查看score_insert_before触发器的详细信息可以使用：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">show </span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> trigger score_insert_before; </span></span></code></pre>
+<h3 id="45删除">4.5删除</h3>
+<p>和其他数据库对象一样，可以使用DROP语句来删除触发器。其基本语法格式如下:</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [IF EXISTS] [数据库名.]触发器名</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 例</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> TRIGGER</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> score_insert_after; </span></span></code></pre>
+<p>由于触发器保存的是一段触发程序，没有保存用户数据，当触发器的触发程序需要修改时，可以使用drop trigger语句暂时将该触发器删除，然后再使用create trigger语句重新创建触发器即可。</p>
+<h3 id="46注意事项">4.6注意事项</h3>
+<p>在MySQL中使用触发器有一些注意事项：</p>
+<ol>
+<li>如果触发程序中包含SELECT语句，则该SELECT语句不能返回结果集。</li>
+<li>同一个表不能创建两个相同触发时间、触发事件的触发器。</li>
+<li>触发程序中不能使用以显式或隐式方式打开、开始或结束事务的语句。</li>
+<li>MySQL触发器针对记录进行操作，当批量更新数据时，引入触发器会导致批量更新操作的性能降低。</li>
+<li>在MyISAM存储引擎中，触发器不能保证原子性。例如，当使用一个更新语句更新一个表后，触发程序实现另一个表的更新，若触发程序执行失败，则不会回滚第一个表的更新。</li>
+</ol>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

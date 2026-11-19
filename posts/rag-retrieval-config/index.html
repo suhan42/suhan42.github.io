@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>RAG 检索配置 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">RAG 检索配置</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%80%E5%9F%BA%E7%A1%80%E6%A3%80%E7%B4%A2%E6%A8%A1%E5%BC%8F">一、基础检索模式</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BA%8C%E7%9B%B8%E4%BC%BC%E5%BA%A6%E8%BF%87%E6%BB%A4">二、相似度过滤</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%89bm25-%E5%85%A8%E6%96%87%E6%A3%80%E7%B4%A2%E5%8F%82%E6%95%B0">三、BM25 全文检索参数</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%9B%9B%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E5%8F%82%E6%95%B0">四、向量检索参数</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BA%94%E5%9B%BE%E6%A3%80%E7%B4%A2%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E5%A2%9E%E5%BC%BA">五、图检索（知识图谱增强）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%85%AD%E9%87%8D%E6%8E%92%E5%BA%8F%E7%B2%BE%E6%8E%92">六、重排序（精排）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%83%E5%8F%82%E6%95%B0%E8%81%94%E5%8A%A8%E5%85%B3%E7%B3%BB">七、参数联动关系</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%85%AB%E5%85%B8%E5%9E%8B%E5%9C%BA%E6%99%AF%E9%85%8D%E7%BD%AE%E5%8F%82%E8%80%83">八、典型场景配置参考</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/rag/" class="post-category">
+        it / RAG      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/rag/">#rag</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">RAG 检索配置</h1>
+
+    <div class="post-body">
+<p>这些参数是 <strong>RAG（检索增强生成）知识库系统</strong> 的核心检索配置，涵盖了从召回、排序到融合的完整检索链路。下面按模块逐一解释：</p>
+<h2 id="一基础检索模式">一、基础检索模式</h2>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+<th>使用建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>检索模式</strong></td>
+<td>选择检索方式：向量检索（语义）、BM25（关键词）、混合检索、图检索等</td>
+<td>通用场景选「混合检索」；专业术语密集选「BM25」；需要语义理解选「向量」</td>
+</tr>
+<tr>
+<td><strong>最终返回 Chunk 数</strong></td>
+<td>经过所有流程后，实际返回给前端的文档片段数量</td>
+<td>一般设为 <strong>5-10</strong>，过多会增加大模型上下文压力，过少可能遗漏信息</td>
+</tr>
+</tbody>
+</table>
+<h2 id="二相似度过滤">二、相似度过滤</h2>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+<th>使用建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>相似度阈值（0-1）</strong></td>
+<td>过滤掉相似度低于此值的结果，0 表示不过滤</td>
+<td>向量检索建议 <strong>0.5-0.7</strong>；BM25 建议 <strong>0.3-0.5</strong>；设为 0 时保留所有结果</td>
+</tr>
+</tbody>
+</table>
+<h2 id="三bm25-全文检索参数">三、BM25 全文检索参数</h2>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+<th>使用建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BM25 召回数量</strong></td>
+<td>BM25 检索时从全文中捞取的候选文档数</td>
+<td>建议 <strong>50-100</strong>，值越大召回越全，但后续排序压力越大</td>
+</tr>
+<tr>
+<td><strong>BM25 稀疏项丢弃比例</strong></td>
+<td>丢弃得分过低的稀疏词项，加速检索</td>
+<td><strong>0.0</strong> 表示不丢弃（保证召回）；追求速度可设 <strong>0.1-0.3</strong>，但可能漏召回</td>
+</tr>
+<tr>
+<td><strong>BM25 权重</strong></td>
+<td>混合检索中，BM25 结果的融合权重（与向量权重之和通常为 1）</td>
+<td>关键词敏感场景（如法律、医学）可提高至 <strong>0.5-0.6</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="四向量检索参数">四、向量检索参数</h2>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+<th>使用建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>向量检索权重</strong></td>
+<td>混合检索中，向量（语义）召回结果的融合权重</td>
+<td>语义理解场景可提高至 <strong>0.7-0.8</strong>；与 BM25 权重互补，两者之和通常 = 1</td>
+</tr>
+<tr>
+<td><strong>召回数量</strong></td>
+<td>向量检索或混合检索后，保留进入重排序的候选数量</td>
+<td>启用重排序时建议 <strong>50-100</strong>，给精排模型足够候选</td>
+</tr>
+</tbody>
+</table>
+<h2 id="五图检索知识图谱增强">五、图检索（知识图谱增强）</h2>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+<th>使用建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>启用图检索</strong></td>
+<td>是否基于知识图谱进行实体/关系扩散检索</td>
+<td>知识结构化程度高（如百科、企业知识）时建议开启</td>
+</tr>
+<tr>
+<td><strong>图实体召回数量</strong></td>
+<td>从用户 Query 中识别并召回的相关实体数量</td>
+<td>建议 <strong>10-20</strong>，影响图谱入口的丰富度</td>
+</tr>
+<tr>
+<td><strong>图三元组召回数量</strong></td>
+<td>从 Query 中召回的「实体-关系-实体」三元组数量</td>
+<td>建议 <strong>10-20</strong>，决定图谱推理的细粒度</td>
+</tr>
+<tr>
+<td><strong>图检索最大节点数</strong></td>
+<td>2-hop 扩散子图最多读取的节点数，防止图谱过大</td>
+<td>建议 <strong>5000-10000</strong>，根据图谱规模调整</td>
+</tr>
+<tr>
+<td><strong>图召回 Chunk 数</strong></td>
+<td>通过 PPR（个性化 PageRank）从图谱路径召回的文本块数</td>
+<td>建议 <strong>10-20</strong>，与向量/BM25 结果互补</td>
+</tr>
+<tr>
+<td><strong>图检索融合权重</strong></td>
+<td>最终排序时，图检索结果的加权系数</td>
+<td><strong>1.0</strong> 表示图结果与文本结果同等权重；若图质量高可维持，否则降低</td>
+</tr>
+<tr>
+<td><strong>PPR 阻尼系数</strong></td>
+<td>控制 PageRank 随机跳转概率，<strong>0.85</strong> 是经典值</td>
+<td>一般保持 <strong>0.85</strong>；增大更关注局部结构，减小更关注全局</td>
+</tr>
+</tbody>
+</table>
+<h2 id="六重排序精排">六、重排序（精排）</h2>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+<th>使用建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>启用重排序</strong></td>
+<td>是否使用专门的精排模型（如 BGE-Reranker、Cohere Rerank）对召回结果二次排序</td>
+<td><strong>强烈建议开启</strong>，能显著提升相关性</td>
+</tr>
+<tr>
+<td><strong>重排序模型</strong></td>
+<td>选择具体的重排序模型</td>
+<td>根据部署情况选择，如 <code>bge-reranker-v2-m3</code>、<code>cohere-rerank-v3</code> 等</td>
+</tr>
+<tr>
+<td><strong>重排序后返回给前端的文档数量</strong></td>
+<td>经精排模型排序后，实际展示/传给 LLM 的文档数</td>
+<td>建议 <strong>5-10</strong>，通常 ≤ 最终返回 Chunk 数</td>
+</tr>
+</tbody>
+</table>
+<h2 id="七参数联动关系">七、参数联动关系</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>用户 Query</span></span>
+<span class="line"><span class="line-number">2</span><span>    │</span></span>
+<span class="line"><span class="line-number">3</span><span>    ├──→ 向量检索 ──→ 召回 50 个候选 ──┐</span></span>
+<span class="line"><span class="line-number">4</span><span>    │                                  ├──→ 融合排序 ──→ 重排序模型 ──→ 取 Top 10 ──→ 前端/LLM</span></span>
+<span class="line"><span class="line-number">5</span><span>    ├──→ BM25 检索 ──→ 召回 50 个候选 ──┤    (权重 0.7 vs 0.3)</span></span>
+<span class="line"><span class="line-number">6</span><span>    │</span></span>
+<span class="line"><span class="line-number">7</span><span>    └──→ 图检索（如启用）──→ 召回 20 个 Chunk ──→ 融合（权重 1.0）</span></span>
+<span class="line"><span class="line-number">8</span><span>              │</span></span>
+<span class="line"><span class="line-number">9</span><span>              └── 实体召回 10 + 三元组召回 10 ──→ PPR 扩散（最大 10000 节点）</span></span></code></pre>
+<h2 id="八典型场景配置参考">八、典型场景配置参考</h2>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>检索模式</th>
+<th>向量权重</th>
+<th>BM25 权重</th>
+<th>相似度阈值</th>
+<th>重排序</th>
+<th>图检索</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>通用问答</td>
+<td>混合检索</td>
+<td>0.7</td>
+<td>0.3</td>
+<td>0.5</td>
+<td>开</td>
+<td>关</td>
+</tr>
+<tr>
+<td>法律/医学文档</td>
+<td>混合检索</td>
+<td>0.4</td>
+<td>0.6</td>
+<td>0.6</td>
+<td>开</td>
+<td><strong>开</strong></td>
+</tr>
+<tr>
+<td>产品说明书</td>
+<td>BM25</td>
+<td>-</td>
+<td>1.0</td>
+<td>0.4</td>
+<td>开</td>
+<td>关</td>
+</tr>
+<tr>
+<td>企业内部知识库</td>
+<td>混合+图检索</td>
+<td>0.6</td>
+<td>0.4</td>
+<td>0.5</td>
+<td>开</td>
+<td><strong>开</strong></td>
+</tr>
+<tr>
+<td>开放式语义搜索</td>
+<td>向量检索</td>
+<td>1.0</td>
+<td>0</td>
+<td>0.3</td>
+<td>开</td>
+<td>关</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><strong>核心原则</strong>：召回阶段求「全」，排序阶段求「准」，过滤阶段求「净」。如果检索结果经常漏掉关键信息，优先调大<strong>召回数量</strong>和降低<strong>稀疏项丢弃比例</strong>；如果结果相关性差，优先调整<strong>重排序模型</strong>和<strong>相似度阈值</strong>。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

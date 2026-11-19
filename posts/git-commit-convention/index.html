@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Git Commit 规范 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Git Commit 规范</a></li>
+<li class="toc-item toc-level-2"><a href="#git-commit-%E8%A7%84%E8%8C%83">Git Commit 规范</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%A0%B8%E5%BF%83%E5%88%86%E6%94%AF">核心分支</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%88%86%E6%94%AF%E5%91%BD%E5%90%8D">分支命名：</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/git/" class="post-category">
+        it / Git      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/git/">#git</a>
+      <a href="/tags/workflow/">#workflow</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Git Commit 规范</h1>
+
+    <div class="post-body">
+<h2 id="git-commit-规范">Git Commit 规范</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>&#x3C;type>[optional scope]: &#x3C;description></span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>[optional body]</span></span>
+<span class="line"><span class="line-number">4</span><span></span></span>
+<span class="line"><span class="line-number">5</span><span>[optional footer(s)]</span></span>
+<span class="line"><span class="line-number">6</span><span></span></span>
+<span class="line"><span class="line-number">7</span><span></span></span>
+<span class="line"><span class="line-number">8</span><span>#译文：</span></span>
+<span class="line"><span class="line-number">9</span><span></span></span>
+<span class="line"><span class="line-number">10</span><span>&#x3C;类型>[可选 范围]: &#x3C;描述></span></span>
+<span class="line"><span class="line-number">11</span><span></span></span>
+<span class="line"><span class="line-number">12</span><span>[可选 正文]</span></span>
+<span class="line"><span class="line-number">13</span><span></span></span>
+<span class="line"><span class="line-number">14</span><span>[可选 脚注]</span></span></code></pre>
+<ul>
+<li><code>fix</code>：表示<strong>修 bug</strong>，这和语义化版本中的 <a href="https://semver.org/lang/zh-CN/#%E6%91%98%E8%A6%81"><code>PATCH</code></a> 相对应。</li>
+<li><code>feat</code>：表示<strong>新增了一个功能</strong>，这和语义化版本中的 <a href="https://semver.org/lang/zh-CN/#%E6%91%98%E8%A6%81"><code>MINOR</code></a> 相对应。</li>
+<li><code>docs</code>：用于<strong>修改文档</strong>，例如修改 README 文件、API 文档等。</li>
+<li><code>style</code>：改了<strong>代码格式</strong>但逻辑没变，例如调整缩进、空格、空行等。</li>
+<li><code>refactor</code>：是<strong>代码重构</strong>，例如修改代码结构、变量名、函数名等但不修改功能逻辑。</li>
+<li><code>chore</code>：用于对<strong>非业务性代码</strong>进行修改，例如修改构建流程、工具配置、构建工具、升级依赖这种“杂务”。</li>
+<li><code>build</code>: 用于<strong>修改项目构建系统</strong>，例如修改依赖库、外部接口或者升级 Node 版本等。</li>
+<li><code>ci</code>: 用于<strong>修改持续集成流程</strong>，例如修改 Travis、Jenkins 等工作流配置。</li>
+<li><code>perf</code>: 用于<strong>优化性能</strong>，例如提升代码的性能、减少内存占用等。</li>
+<li><code>test:</code> 用于<strong>修改测试用例</strong>，例如添加、删除、修改代码的测试用例等。</li>
+</ul>
+<p>例如：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>feat(order): 添加订单模块的退款功能</span></span></code></pre>
+<p><code>feat</code> 表示你加了个功能，<code>order</code> 是模块，后面是这个提交大概干了啥。</p>
+<hr>
+<h2 id="核心分支">核心分支</h2>
+<p><strong>develop → test → release → master</strong></p>
+<ol>
+<li><code>master</code>：代表线上环境，对应 PRO 环境。谁也不许直接在上面动手，所有改动都得从别的分支合并上来。</li>
+<li><code>develop</code>：开发的大本营，对应的是 DEV 环境。所有新功能和日常 bugfix 都在这儿处理，开发自测用。</li>
+<li><code>feature/xxx</code>：是“支线剧情”，只要你要做一个新功能，必须从 develop 拉出一个新分支来开发。</li>
+<li><code>test</code>：是“测试战场”，对应的是 FAT 环境。开发完成后得合并进 test 给 QA 验收。</li>
+<li><code>release</code>：是“上线候场厅”，对应 UAT 环境，客户提意见的地方。UAT 环境用的代码基本都来自于这个分支。</li>
+<li><code>hotfix/xxx</code>：是“救火队”，线上崩了临时修 bug 用的，修完要合并回 master 和 develop，防止 patch 丢失。</li>
+</ol>
+<p>流程：</p>
+<ul>
+<li>develop 代码写完，合并到 test，让 QA 测。</li>
+<li>QA 测完 OK，合并到 release，客户测。</li>
+<li>客户点头说好，合到 master，上线。</li>
+<li>如果线上出了问题，就从 master 拉 hotfix，修完再合回 master 和 develop。</li>
+</ul>
+<h2 id="分支命名">分支命名：</h2>
+<p>为了区分不同的开发任务，我们通常会为相关的改动创建新的分支。 以下是一些常见的分支命名约定：</p>
+<ol>
+<li>
+<p>功能分支：以<code>feature/</code>为前缀，后接描述性名称。</p>
+<p>示例：<code>feature/add-login</code></p>
+</li>
+<li>
+<p>修复bug分支：以<code>fix/</code>为前缀，后接JIRA ticket或者描述性名称。</p>
+<p>示例：<code>fix/login-error</code></p>
+</li>
+<li>
+<p>优化分支：以<code>refactor/</code>为前缀，后接描述性名称。</p>
+<p>示例：<code>refactor/speed-up-homepage</code></p>
+</li>
+<li>
+<p>重构分支：以<code>rework/</code>为前缀，后接描述性名称。</p>
+<p>示例：<code>rework/header-styles</code></p>
+</li>
+<li>
+<p>测试分支：以<code>test/</code>为前缀，后接描述性名称。</p>
+<p>示例：<code>test/e2e-login-flow</code></p>
+</li>
+<li>
+<p>发布分支：以<code>release/</code>为前缀，后接版本号。</p>
+<p>示例：<code>release/1.0.0</code></p>
+</li>
+<li>
+<p>热修复分支：以<code>hotfix/</code>为前缀，后接描述性名称。</p>
+<p>示例：<code>hotfix/crash-on-start</code></p>
+</li>
+<li>
+<p>文档分支：以<code>docs/</code>为前缀，后接描述性名称。</p>
+<p>示例：<code>docs/update-readme</code></p>
+</li>
+<li>
+<p>配置分支：以<code>config/</code>为前缀，后接描述性名称。</p>
+<p>示例：<code>config/add-sonar-quality-gate</code></p>
+</li>
+<li>
+<p>主题分支：以<code>theme/</code>为前缀，后接描述性名称。</p>
+<p>示例：<code>theme/dark-mode</code></p>
+</li>
+</ol>
+<p>在实际开发中，选择合适的分支名可以提高团队协作效率，使得项目的维护和更新变得更加清晰和有序。</p>
+<p>命名格式: <code>类别 + / + 日期/迭代版本号/功能名称</code></p>
+<p>例： <code>feat/2.1.1</code>、<code>fix/20201214</code></p>
+<p>一些比较复杂的系统，需要子系统迭代的，就会用到功能名称，例：</p>
+<p><code>feat/user_manage_1.1.1</code>、<code>fix/user_manage_20201214</code></p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

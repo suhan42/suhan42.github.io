@@ -7,6 +7,382 @@
     <description>Suhan 的个人博客</description>
     <language>zh-CN</language>
     <item>
+      <title>数据库基础</title>
+      <link>https://suhan42.github.io/posts/database-basics/</link>
+      <guid>https://suhan42.github.io/posts/database-basics/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍数据库系统的基本概念、关系数据库、NoSQL 和三级模式结构。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>数据库设计</title>
+      <link>https://suhan42.github.io/posts/database-design/</link>
+      <guid>https://suhan42.github.io/posts/database-design/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>梳理数据库设计方法、基本步骤、需求分析和概念结构设计。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>MySQL 命令</title>
+      <link>https://suhan42.github.io/posts/mysql-commands/</link>
+      <guid>https://suhan42.github.io/posts/mysql-commands/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>汇总 MySQL 安装、SQL 语言、数据库与表操作以及常用命令。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>数据库编程</title>
+      <link>https://suhan42.github.io/posts/database-programming/</link>
+      <guid>https://suhan42.github.io/posts/database-programming/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理 SQL 编程基础、常量、变量、运算符、表达式和程序控制结构。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>过程式数据库对象</title>
+      <link>https://suhan42.github.io/posts/database-procedural-objects/</link>
+      <guid>https://suhan42.github.io/posts/database-procedural-objects/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍 MySQL 自定义函数、存储过程和触发器等过程式数据库对象。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>事务与并发控制</title>
+      <link>https://suhan42.github.io/posts/transactions-and-concurrency/</link>
+      <guid>https://suhan42.github.io/posts/transactions-and-concurrency/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>讲解事务的 ACID 特性、MySQL 事务控制语句和并发控制机制。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>数据库安全与保护</title>
+      <link>https://suhan42.github.io/posts/database-security/</link>
+      <guid>https://suhan42.github.io/posts/database-security/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>梳理数据库安全性、访问控制、用户鉴别和安全性控制等保护机制。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Redis 入门</title>
+      <link>https://suhan42.github.io/posts/redis-basics/</link>
+      <guid>https://suhan42.github.io/posts/redis-basics/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>记录 Redis 的安装部署、服务启动、客户端连接和密码配置。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Git Commit 规范</title>
+      <link>https://suhan42.github.io/posts/git-commit-convention/</link>
+      <guid>https://suhan42.github.io/posts/git-commit-convention/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理 Git Commit 规范、核心分支和分支命名约定。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Git 使用</title>
+      <link>https://suhan42.github.io/posts/git-usage/</link>
+      <guid>https://suhan42.github.io/posts/git-usage/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>覆盖 Git 工作原理、常用操作、初始配置、远程仓库和分支协作的使用笔记。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>WSL2 配置 Ubuntu</title>
+      <link>https://suhan42.github.io/posts/wsl2-ubuntu-setup/</link>
+      <guid>https://suhan42.github.io/posts/wsl2-ubuntu-setup/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>记录在 Windows 上清理旧环境、启用 WSL2 并把 Ubuntu 安装到 D 盘的完整流程。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Shell 脚本</title>
+      <link>https://suhan42.github.io/posts/shell-script/</link>
+      <guid>https://suhan42.github.io/posts/shell-script/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理 shell 与 bash 基础、脚本文件结构、变量、引用和流程控制等语法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>vi 与 vim</title>
+      <link>https://suhan42.github.io/posts/vi-and-vim/</link>
+      <guid>https://suhan42.github.io/posts/vi-and-vim/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理 vi/vim 的命令模式、输入模式和底线命令模式及常用操作。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Linux 破解 WiFi</title>
+      <link>https://suhan42.github.io/posts/linux-wifi-cracking/</link>
+      <guid>https://suhan42.github.io/posts/linux-wifi-cracking/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>记录在 Kali Linux 下使用常见工具进行 WiFi 安全测试的准备和操作步骤。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Linux 网卡驱动安装</title>
+      <link>https://suhan42.github.io/posts/linux-nic-install/</link>
+      <guid>https://suhan42.github.io/posts/linux-nic-install/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>记录 Linux 更换国内源、更新软件、安装内核头和网卡驱动的步骤。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Agent 架构</title>
+      <link>https://suhan42.github.io/posts/agent-architecture/</link>
+      <guid>https://suhan42.github.io/posts/agent-architecture/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>梳理 AI Agent 的推理规划、CoT、ReAct、记忆与工具调用等核心架构。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Dify 工作流</title>
+      <link>https://suhan42.github.io/posts/dify-workflow/</link>
+      <guid>https://suhan42.github.io/posts/dify-workflow/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍 Dify 的 Workflow、Chatflow、节点编排和应用发布方式。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Function Calling 与工具调用</title>
+      <link>https://suhan42.github.io/posts/function-calling/</link>
+      <guid>https://suhan42.github.io/posts/function-calling/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>讲解 Function Calling 的原理、工具 Schema、Agentic Loop 和工具调用实践。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Harness Engineering（驾驭工程）</title>
+      <link>https://suhan42.github.io/posts/harness-engineering/</link>
+      <guid>https://suhan42.github.io/posts/harness-engineering/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍 Harness Engineering 的概念、案例和约束代理行为的工程方法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Hermes Agent</title>
+      <link>https://suhan42.github.io/posts/hermes-agent/</link>
+      <guid>https://suhan42.github.io/posts/hermes-agent/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理 Hermes Agent 的整体架构、上下文工程和机械式约束等特点。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>LLM API 调参</title>
+      <link>https://suhan42.github.io/posts/llm-api-tuning/</link>
+      <guid>https://suhan42.github.io/posts/llm-api-tuning/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>解释 temperature、top_p、top_k 等 LLM API 采样参数的作用和调参思路。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>LLM 基础</title>
+      <link>https://suhan42.github.io/posts/llm-basics/</link>
+      <guid>https://suhan42.github.io/posts/llm-basics/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍大语言模型、Transformer、vLLM 推理引擎和 MoE 架构的基础概念。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Prompt Engineering</title>
+      <link>https://suhan42.github.io/posts/prompt-engineering/</link>
+      <guid>https://suhan42.github.io/posts/prompt-engineering/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理 Prompt Engineering 中的 Token、上下文窗口、结构化提示和常用技巧。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>大模型 MoE 架构资料</title>
+      <link>https://suhan42.github.io/posts/moe-architecture/</link>
+      <guid>https://suhan42.github.io/posts/moe-architecture/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>汇总大模型 MoE 架构与 DeepSeek MoE 的两篇外部解析文章。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>模型量化、蒸馏和剪枝</title>
+      <link>https://suhan42.github.io/posts/model-compression/</link>
+      <guid>https://suhan42.github.io/posts/model-compression/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>汇总一篇关于模型量化、蒸馏和剪枝的外部文章。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Markdown 中数学公式编辑</title>
+      <link>https://suhan42.github.io/posts/markdown-math/</link>
+      <guid>https://suhan42.github.io/posts/markdown-math/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理 Markdown/LaTeX 数学公式的行内与块级写法、希腊字母、上下标和括号等语法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Mermaid 画图</title>
+      <link>https://suhan42.github.io/posts/mermaid-diagrams/</link>
+      <guid>https://suhan42.github.io/posts/mermaid-diagrams/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍 Mermaid 的节点、连线、子图和常见图表写法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Typora 授权与激活机制分析</title>
+      <link>https://suhan42.github.io/posts/typora-license-analysis/</link>
+      <guid>https://suhan42.github.io/posts/typora-license-analysis/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>分析 Typora 免费激活方案的凭证签发、机器绑定和校验机制。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>盈亏分析模型</title>
+      <link>https://suhan42.github.io/posts/break-even-analysis/</link>
+      <guid>https://suhan42.github.io/posts/break-even-analysis/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍盈亏分析、盈亏平衡分析、产品成本结构和成品销售分析。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>模拟的基本概念</title>
+      <link>https://suhan42.github.io/posts/simulation-basics/</link>
+      <guid>https://suhan42.github.io/posts/simulation-basics/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍模拟的概念、使用原因、系统模拟过程和模拟的不足。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>运筹学导论</title>
+      <link>https://suhan42.github.io/posts/operations-research-introduction/</link>
+      <guid>https://suhan42.github.io/posts/operations-research-introduction/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍运筹学的定义、分析程序和企业领导的主要职责。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>预测方法</title>
+      <link>https://suhan42.github.io/posts/forecasting-methods/</link>
+      <guid>https://suhan42.github.io/posts/forecasting-methods/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>梳理预测的定义、方法和分类、预测程序以及特尔斐法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>决策分析</title>
+      <link>https://suhan42.github.io/posts/decision-analysis/</link>
+      <guid>https://suhan42.github.io/posts/decision-analysis/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍决策的定义、分类、程序以及不同环境下的决策方法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>库存管理</title>
+      <link>https://suhan42.github.io/posts/inventory-management/</link>
+      <guid>https://suhan42.github.io/posts/inventory-management/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理工业企业的库存种类、库存管理、存货台套法和 ABC 分析法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>线性规划</title>
+      <link>https://suhan42.github.io/posts/linear-programming/</link>
+      <guid>https://suhan42.github.io/posts/linear-programming/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍线性规划的定义、模型结构、建模步骤和图解法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>运输问题</title>
+      <link>https://suhan42.github.io/posts/transportation-problem/</link>
+      <guid>https://suhan42.github.io/posts/transportation-problem/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>梳理运输问题的结构、表上作业法和供需平衡的求解方法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>网络计划技术</title>
+      <link>https://suhan42.github.io/posts/network-planning/</link>
+      <guid>https://suhan42.github.io/posts/network-planning/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍网络计划技术、箭线式网络图和网络时间的计算方法。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>图论方法</title>
+      <link>https://suhan42.github.io/posts/graph-theory/</link>
+      <guid>https://suhan42.github.io/posts/graph-theory/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理图的基本概念、树、逐步生成法和最小枝杈树。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>马尔科夫分析</title>
+      <link>https://suhan42.github.io/posts/markov-analysis/</link>
+      <guid>https://suhan42.github.io/posts/markov-analysis/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍马尔科夫分析的数学原理、计算步骤和主要结论。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Python 笔记</title>
+      <link>https://suhan42.github.io/posts/python-notes/</link>
+      <guid>https://suhan42.github.io/posts/python-notes/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>覆盖 Python 字符串、列表、异步、类型标注、日志、异常、装饰器和常用库的笔记。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Python 线程、进程与异步</title>
+      <link>https://suhan42.github.io/posts/python-concurrency/</link>
+      <guid>https://suhan42.github.io/posts/python-concurrency/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>对比 Python 线程、进程和异步的模型、GIL 限制与适用场景。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>RAG 基础</title>
+      <link>https://suhan42.github.io/posts/rag-basics/</link>
+      <guid>https://suhan42.github.io/posts/rag-basics/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>系统梳理 RAG 的文档处理、分块、Embedding、向量检索和生成流程。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>RAG 评估与回测</title>
+      <link>https://suhan42.github.io/posts/rag-evaluation/</link>
+      <guid>https://suhan42.github.io/posts/rag-evaluation/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍 RAG 的评估指标、评估方法和回测指标计算方式。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>RAG 检索配置</title>
+      <link>https://suhan42.github.io/posts/rag-retrieval-config/</link>
+      <guid>https://suhan42.github.io/posts/rag-retrieval-config/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>解释 RAG 知识库的基础检索、相似度过滤、BM25、向量检索和图检索参数。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>向量数据库</title>
+      <link>https://suhan42.github.io/posts/vector-database/</link>
+      <guid>https://suhan42.github.io/posts/vector-database/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>介绍向量数据库的定位、与传统数据库的差异以及向量与嵌入的基础概念。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>微信小程序开发</title>
+      <link>https://suhan42.github.io/posts/wechat-miniprogram/</link>
+      <guid>https://suhan42.github.io/posts/wechat-miniprogram/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>整理微信小程序的项目结构、页面组成、配置、渲染层与逻辑层及常用组件。</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>成本与成本分类</title>
+      <link>https://suhan42.github.io/posts/cost-classification/</link>
+      <guid>https://suhan42.github.io/posts/cost-classification/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>说明工业产品成本的六项构成，以及固定成本、可变成本、显性成本和隐性成本等分类。</description>
+      <category>it</category>
+    </item>
+    <item>
       <title>Docker 使用</title>
       <link>https://suhan42.github.io/posts/docker-usage/</link>
       <guid>https://suhan42.github.io/posts/docker-usage/</guid>
@@ -79,14 +455,6 @@
       <category>it</category>
     </item>
     <item>
-      <title>关于 Git 使用</title>
-      <link>https://suhan42.github.io/posts/about-git/</link>
-      <guid>https://suhan42.github.io/posts/about-git/</guid>
-      <pubDate>Mon, 23 Jan 2023 00:00:00 GMT</pubDate>
-      <description>这篇笔记介绍 Git 的分布式版本控制思想和工作原理，整理常用操作命令，适合作为个人协作与版本管理的参考。</description>
-      <category>it</category>
-    </item>
-    <item>
       <title>静态博客框架之 Hexo 与 Jekyll</title>
       <link>https://suhan42.github.io/posts/hexo-and-jekyll/</link>
       <guid>https://suhan42.github.io/posts/hexo-and-jekyll/</guid>
@@ -103,27 +471,19 @@
       <category>it</category>
     </item>
     <item>
-      <title>Linux 命令行</title>
-      <link>https://suhan42.github.io/posts/linux-command/</link>
-      <guid>https://suhan42.github.io/posts/linux-command/</guid>
-      <pubDate>Sun, 22 Jan 2023 00:00:00 GMT</pubDate>
-      <description>这是一份 Linux 命令行速查笔记，覆盖 shell 基础概念、常用操作、版本查询和日常维护中容易忘记的命令用法。</description>
-      <category>it</category>
-    </item>
-    <item>
-      <title>vi 与 vim</title>
-      <link>https://suhan42.github.io/posts/vi-and-vim/</link>
-      <guid>https://suhan42.github.io/posts/vi-and-vim/</guid>
-      <pubDate>Sun, 22 Jan 2023 00:00:00 GMT</pubDate>
-      <description>这篇笔记对比 vi 和 vim 的差异，整理三种编辑模式和常用命令，适合作为 Linux 文本编辑的快速参考。</description>
-      <category>it</category>
-    </item>
-    <item>
       <title>程序流程图</title>
       <link>https://suhan42.github.io/posts/lct/</link>
       <guid>https://suhan42.github.io/posts/lct/</guid>
       <pubDate>Sun, 22 Jan 2023 00:00:00 GMT</pubDate>
       <description>我们可以用一条公式来表示程序流程图，即：</description>
+      <category>it</category>
+    </item>
+    <item>
+      <title>Linux 命令行</title>
+      <link>https://suhan42.github.io/posts/linux-command/</link>
+      <guid>https://suhan42.github.io/posts/linux-command/</guid>
+      <pubDate>Sun, 22 Jan 2023 00:00:00 GMT</pubDate>
+      <description>这是一份 Linux 命令行速查笔记，覆盖 shell 基础概念、常用操作、版本查询和日常维护中容易忘记的命令用法。</description>
       <category>it</category>
     </item>
     <item>

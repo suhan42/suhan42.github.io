@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Typora 授权与激活机制分析 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Typora 授权与激活机制分析</a></li>
+<li class="toc-item toc-level-1"><a href="#typora%E5%85%8D%E8%B4%B9%E6%BF%80%E6%B4%BB%E7%9A%84%E8%83%8C%E5%90%8E%E5%8E%9F%E7%90%86">Typora免费激活的背后原理</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%B8%80%E6%A0%B8%E5%BF%83%E8%AE%BE%E8%AE%A1%E5%86%B3%E7%AD%96">一、核心设计决策</a></li>
+<li class="toc-item toc-level-3"><a href="#1-%E5%87%AD%E8%AF%81%E7%AD%BE%E5%8F%91%E9%9D%9E%E5%AF%B9%E7%A7%B0%E7%AD%BE%E5%90%8D%E4%B8%8D%E6%98%AF%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86">1. 凭证签发：非对称签名，不是对称加密</a></li>
+<li class="toc-item toc-level-3"><a href="#2-%E5%87%AD%E8%AF%81%E5%86%85%E5%AE%B9%E4%B8%8D%E6%98%AF%E6%98%AF%E5%90%A6%E8%80%8C%E6%98%AF%E4%B8%80%E6%AE%B5%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE">2. 凭证内容：不是「是/否」，而是一段结构化数据</a></li>
+<li class="toc-item toc-level-3"><a href="#3-%E6%9C%BA%E5%99%A8%E7%BB%91%E5%AE%9A%E9%98%B2%E4%B8%80%E4%B8%AA%E5%BA%8F%E5%88%97%E5%8F%B7%E5%88%B0%E5%A4%84%E7%94%A8">3. 机器绑定：防一个序列号到处用</a></li>
+<li class="toc-item toc-level-3"><a href="#4-%E8%AF%95%E7%94%A8%E6%9C%9F%E6%9C%AC%E5%9C%B0%E8%AE%B0%E5%AE%89%E8%A3%85%E6%97%A5%E6%9C%9F%E4%BD%86%E8%A6%81%E6%9C%89%E9%94%9A%E7%82%B9">4. 试用期：本地记安装日期，但要有锚点</a></li>
+<li class="toc-item toc-level-3"><a href="#5-%E7%BB%AD%E6%9C%9F-%E5%BF%83%E8%B7%B3%E6%8E%A7%E5%88%B6%E5%A4%B1%E6%95%88%E9%80%9F%E5%BA%A6">5. 续期 / 心跳：控制失效速度</a></li>
+<li class="toc-item toc-level-3"><a href="#6-%E9%98%B2%E7%AF%A1%E6%94%B9%E7%9A%84%E7%8E%B0%E5%AE%9E">6. 防篡改的现实</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%BA%8C%E6%B5%81%E4%BC%A0%E7%9A%84%E7%A0%B4%E8%A7%A3">二、流传的破解</a></li>
+<li class="toc-item toc-level-2"><a href="#1-hasactivatedtrueehasactivated-%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88">1. hasActivated=&quot;true&quot;==e.hasActivated 在做什么</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%99%E4%B8%80%E8%A1%8C%E6%98%AF%E6%98%BE%E7%A4%BA%E8%BF%98%E6%98%AF%E9%AA%8C%E8%AF%81">这一行是「显示」还是「验证」</a></li>
+<li class="toc-item toc-level-3"><a href="#typora-%E7%9A%84%E6%83%85%E5%86%B5%E6%9B%B4%E6%9E%81%E7%AB%AF%E4%B8%80%E7%82%B9">Typora 的情况更极端一点</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%80%E4%B8%AA%E5%AE%B9%E6%98%93%E6%B7%B7%E7%9A%84%E7%82%B9">一个容易混的点</a></li>
+<li class="toc-item toc-level-2"><a href="#2-windowclose-%E6%B3%A8%E5%85%A5%E8%83%BD%E5%81%9A%E4%BB%80%E4%B9%88">2. window.close() 注入能做什么</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%9C%9F%E5%AE%9E%E5%8A%9F%E8%83%BD%E8%BF%98%E6%98%AF%E5%8F%97%E9%99%90">为什么真实功能还是受限</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%99%E4%B8%AA%E5%88%86%E7%A6%BB%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E8%A6%81">这个分离为什么重要</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%80%E4%B8%AA%E5%AE%B9%E6%98%93%E5%BF%BD%E7%95%A5%E7%9A%84%E7%BB%86%E8%8A%82">一个容易忽略的细节</a></li>
+<li class="toc-item toc-level-2"><a href="#3-%E6%94%BB%E5%87%BB%E8%80%85%E5%A6%82%E4%BD%95%E6%95%B4%E4%B8%AA%E8%B7%B3%E8%BF%87%E6%8A%8A%E9%AA%8C%E7%AD%BE%E7%BB%93%E6%9E%9C%E7%A1%AC%E7%BC%96%E7%A0%81%E6%88%90-true%E6%B2%A1%E6%9C%89asar%E6%89%93%E5%8C%85">3. 攻击者如何整个跳过、把验签结果硬编码成 true（没有asar打包）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%B9%88%E5%AE%B9%E6%98%93">为什么这么容易</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%98%B2%E5%BE%A1%E6%80%9D%E8%B7%AF">防御思路</a></li>
+<li class="toc-item toc-level-2"><a href="#4-typora-%E7%9A%84%E7%BB%93%E6%9E%84">4. Typora 的结构</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%BB%93%E6%9E%84%E5%AF%B9%E7%85%A7">结构对照</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88-typora-%E7%9A%84%E9%97%A8%E6%A7%9B%E6%9B%B4%E9%AB%98">为什么 Typora 的门槛更高</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BD%86%E8%BF%99%E4%B8%8D%E6%98%AF%E7%BB%9D%E5%AF%B9%E5%AE%89%E5%85%A8">但这不是绝对安全</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%B1%95%E7%A4%BA%E5%B1%82-licenseindexjs-%E6%98%AF%E6%98%8E%E6%96%87">展示层 LicenseIndex.js 是明文</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%B8%89%E5%B0%9D%E8%AF%95%E7%A0%B4%E8%A7%A3-appasar">三、尝试破解 app.asar</a></li>
+<li class="toc-item toc-level-3"><a href="#electron-fuse-%E9%80%86%E5%90%91%E5%AE%9E%E6%B5%8B%E6%95%B0%E6%8D%AE">Electron Fuse 逆向实测数据</a></li>
+<li class="toc-item toc-level-2"><a href="#%E9%99%84electron-%E5%BA%94%E7%94%A8%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C">附：Electron 应用逆向实验</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%E5%8F%8D%E7%BC%96%E8%AF%91-v8-%E5%AD%97%E8%8A%82%E7%A0%81">第一步：反编译 V8 字节码</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%E4%BF%AE%E6%94%B9%E5%90%8E%E9%87%8D%E7%BC%96%E8%AF%91">第二步：修改后重编译</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%AC%AC%E4%B8%89%E6%AD%A5asar-%E5%93%88%E5%B8%8C%E8%87%AA%E4%B8%BE%E9%97%AE%E9%A2%98">第三步：asar 哈希自举问题</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%BB%93%E8%AE%BA%E7%9C%9F%E6%AD%A3%E6%8B%A6%E5%BE%97%E4%BD%8F%E7%9A%84%E6%98%AF%E4%BB%80%E4%B9%88">结论：真正拦得住的是什么</a></li>
+<li class="toc-item toc-level-2"><a href="#typora-1124-%E5%AE%9E%E6%B5%8B-appasar-381kb">Typora 1.12.4 实测（ app.asar 381KB）</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9E%B6%E6%9E%84">架构</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E9%87%8C%E6%8C%96%E5%87%BA%E7%9A%84%E5%AE%8C%E6%95%B4%E8%AE%B8%E5%8F%AF%E4%BD%93%E7%B3%BB">从字节码里挖出的完整许可体系</a></li>
+<li class="toc-item toc-level-3"><a href="#%E9%9A%BE%E7%82%B9">难点</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BD%86%E9%9A%BE%E7%82%B9%E6%8C%A1%E4%B8%8D%E4%BD%8F%E4%BB%80%E4%B9%88">但难点挡不住什么</a></li>
+<li class="toc-item toc-level-1"><a href="#%E5%9B%9B%E4%B8%8D%E4%BF%AE%E6%94%B9-appasar-%E7%9A%84%E5%85%B6%E4%BB%96%E6%94%BB%E5%87%BB%E9%9D%A2">四、不修改 app.asar 的其他攻击面</a></li>
+<li class="toc-item toc-level-3"><a href="#1-%E5%85%AD%E7%B1%BB%E4%B8%8D%E7%A2%B0-asar-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2">1. 六类不碰 asar 的攻击面</a></li>
+<li class="toc-item toc-level-3"><a href="#2-%E8%BF%99%E4%BA%9B%E6%94%BB%E5%87%BB%E5%9C%A8-typora-%E4%B8%8A%E5%88%86%E5%88%AB%E4%BC%9A%E9%81%87%E5%88%B0%E4%BB%80%E4%B9%88%E4%BB%A5%E5%8F%8A%E6%95%88%E6%9E%9C%E5%92%8C%E6%94%B9-asar-%E7%9A%84%E5%B7%AE%E5%BC%82">2. 这些攻击在 Typora 上分别会遇到什么，以及效果和改 asar 的差异</a></li>
+<li class="toc-item toc-level-3"><a href="#3-%E6%80%BB%E7%BB%93%E8%A1%A8%E6%95%88%E6%9E%9C%E7%AD%89%E4%BB%B7%E6%80%A7">3. 总结表：效果等价性</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/markdown/" class="post-category">
+        it / Markdown      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/markdown/">#markdown</a>
+      <a href="/tags/security/">#security</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Typora 授权与激活机制分析</h1>
+
+    <div class="post-body">
+<h1 id="typora免费激活的背后原理">Typora免费激活的背后原理</h1>
+<p>用过 Markdown 的人，让他说一个最爱用的相关软件，基本都是 Typora。但从 2021 年 1.0 正式版开始收费之后催生了大量「永久免费版下载」「2026 最新激活工具」「无限重置试用期」之类的资源：改 hosts、断网激活、注册机轮番上阵，背后是一门实打实的 SEO 流量生意。这些工具真的能「永久激活」吗？实际上，绝大多数只做了两件事——要么改掉渲染层的一个布尔标志让 UI 显示「已激活」，要么重置注册表里的安装日期骗过 14 天试用倒计时，主进程的验签逻辑一行都没碰。</p>
+<p>而 Typora 的真实防护远比这复杂：它把整个主进程编译成 379KB 的 V8 字节码（不是普通 JavaScript，是给 V8 引擎执行的中间表示），塞进 <code>app.asar</code> 归档里，用自研 loader 加载；激活凭据走 <code>publicDecrypt</code> + SHA-256 非对称签名，服务端私钥签发、客户端内置公钥验签；机器绑定拼的是 <code>uuid + username + hostname + platform</code>；注册表 <code>HKCU\Software\Typora</code> 里存的 <code>SLicense</code> 只是缓存快照，真正的决策在 12 小时一次的续期请求和服务器端。</p>
+<p>这篇文章就从「为什么全网都在搜 Typora 激活」这个现象入手，把收费模式、用户心理、流传破解的真实原理、V8 字节码和 Electron 架构背后的加密体系逐层拆开。</p>
+<h1 id="一核心设计决策">一、核心设计决策</h1>
+<p>Typora 的方案是「离线凭证 + 在线签名 + 周期续期」，这是商业桌面软件最常用的三层结构。以下每一条结论都标注了对应的实测证据（字节码偏移量、注册表键名、运行时日志），证据来自对 Typora 1.12.4（<code>app.asar</code> 381KB）的字符串池扫描和本机运行时观察。逐层拆开：</p>
+<h3 id="1-凭证签发非对称签名不是对称加密">1. 凭证签发：非对称签名，不是对称加密</h3>
+<p>Typora 用的是 <code>publicDecrypt</code> + SHA-256，说明服务端用<strong>私钥签名</strong>，客户端用内置<strong>公钥验签</strong>。实测证据：<code>.jsc</code> 字符串池偏移 85996 处找到 <code>publicDecrypt</code> 字面量，偏移 85625 处找到 <code>sha256</code> 字面量，紧挨着的还有 <code>createHash</code>、<code>update</code>、<code>readFile</code>、<code>digest</code> 这些 Node crypto API 的字符串。这是行业标准做法，原因：</p>
+<ul>
+<li>客户端只需要公钥，公钥泄露不影响安全性（私钥永远在服务器）</li>
+<li>对称加密的话，客户端和服务器共享同一个密钥，客户端被逆向一次整个体系就崩了</li>
+<li>算法推荐 Ed25519（签名短、验签快）或 RSA-2048/3072（生态最成熟）。Node.js 的 <code>crypto.sign</code> / <code>crypto.verify</code> 原生支持，不需要第三方库</li>
+</ul>
+<h3 id="2-凭证内容不是是否而是一段结构化数据">2. 凭证内容：不是「是/否」，而是一段结构化数据</h3>
+<p>签名包裹的 payload 里应该放：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "email"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"user@example.com"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "license_key"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ABCDE-FGHIJ-KLMNO-PQRST"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "machine_id"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"uuid+硬件指纹哈希"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "issued_at"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">1728900000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "expires_at"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">1760436000</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "seats"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#005CC5;--shiki-dark:#79B8FF">  "features"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"export-pdf"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"sync"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>这样客户端验签后能本地判断「这个凭证有没有过期」「是不是这台机器」「有没有某功能权限」，不需要每次启动都联网。</p>
+<h3 id="3-机器绑定防一个序列号到处用">3. 机器绑定：防一个序列号到处用</h3>
+<p>Typora 拼的是 <code>uuid + username + hostname + platform</code>。实测证据：<code>.jsc</code> 字符串池偏移 111597 处有 <code>username</code>，偏移 111626 处有 <code>COMPUTERNAME</code>，偏移 111650 处有拼接符 <code>&quot; | &quot;</code>，偏移 112022 处有 <code>&quot;hostname~ &quot;</code>，偏移 111998 处有 <code>&quot; | darwin&quot;</code>（对应 macOS 分支），偏移 111666 处有 <code>&quot; | Windows&quot;</code>（对应 Windows 分支）。另外偏移 83310 处有 <code>native-reg</code>、偏移 83334 处有 <code>Software\Typora</code>，说明 Windows 下是通过原生模块读写注册表。这个粒度偏弱（UUID 存在 <code>profile.data</code>，删了就变），但桌面软件一般也不需要太强。常见做法分几档：</p>
+<ul>
+<li>弱：<code>uuid + hostname</code>（重装系统就变，用户体验好）</li>
+<li>中：<code>主板序列号 + CPU ID</code> 哈希（换硬件才变）</li>
+<li>强：TPM / 硬件密钥（太麻烦，商业软件很少用）</li>
+</ul>
+<p>配合服务端的 <code>seats</code> 数量限制（「最多激活 3 台设备，超出自动踢最早那台」——Typora 的错误信息里有这个逻辑）。</p>
+<h3 id="4-试用期本地记安装日期但要有锚点">4. 试用期：本地记安装日期，但要有锚点</h3>
+<p>Typora 用注册表 <code>IDate</code> + <code>profile.data</code> 的 birthtime 双份存储。实测证据：本机注册表 <code>HKCU\Software\Typora</code> 里有两个值——<code>IDate = &quot;10/14/2026&quot;</code>（字符串类型）和 <code>SLicense = &quot;&quot;</code>（字符串类型，空值代表未激活）。运行时日志 <code>typora.log</code> 里每次启动都有这些行：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>[WindowsLicenseLocalStore] SLicense : </span></span>
+<span class="line"><span class="line-number">2</span><span>onUnfillLicense</span></span>
+<span class="line"><span class="line-number">3</span><span>[WindowsLicenseLocalStore] IDate : 10/14/2026</span></span>
+<span class="line"><span class="line-number">4</span><span>trailRemains is 14</span></span>
+<span class="line"><span class="line-number">5</span><span>[L] installDate is 10/14/2026, trail remains: 14 days</span></span></code></pre>
+<p>对应的字节码字符串池偏移：<code>WindowsLicenseLocalStore</code> 在 83568，<code>trailRemains is </code> 在 103897，<code>[L] installDate is </code> 在 103991。这是「不联网也能试用」的代价：本地日期可以被改，把注册表里的 <code>IDate</code> 改成明天的日期，trial 就重置了——所以需要服务器锚点兜底。</p>
+<h3 id="5-续期-心跳控制失效速度">5. 续期 / 心跳：控制失效速度</h3>
+<p>Typora 是 12 小时续期一次。实测证据：<code>.jsc</code> 字符串池偏移 100171 处有 <code>&quot;[renewLicense] license renewed in 12h&quot;</code>，偏移 100356 处有 <code>&quot;[renewLicense]: &quot;</code>（日志前缀），偏移 100919 处有 <code>&quot;[renewL]: unfill due to renew fail&quot;</code>（续期失败降级的日志前缀）。这个周期是个权衡：</p>
+<ul>
+<li>间隔短 → 盗版/失效凭证能很快被切掉，但对断网用户不友好</li>
+<li>间隔长 → 离线容忍度高，但作弊窗口也长</li>
+</ul>
+<p>常见值是 24h～7d，配合「连续 N 次续期失败才降级到未激活」，避免临时断网把付费用户踢出去。</p>
+<h3 id="6-防篡改的现实">6. 防篡改的现实</h3>
+<p>Typora 把主进程编译成 V8 字节码（<code>atom.compiled.dist.jsc</code>，379KB，webpack 打包后整体编译）。关于 asar 完整性校验，实测结论和直觉相反：用 <code>@electron/fuses</code> 工具读取 <code>Typora.exe</code> 的 Electron Fuse 配置，<code>EnableEmbeddedAsarIntegrityValidation</code> 是 <strong>Disabled</strong>，说明 Typora 没有启用 Electron 原生的 asar 内嵌哈希校验。这是「提高门槛」而不是「绝对防护」——字节码可以被针对特定 V8 版本的反编译器还原，Electron Fuse 里没开的防御就等于不存在。真正让破解不划算的往往不是代码混淆，而是<strong>把关键判断放在服务端</strong>（比如导出 PDF、云同步这类必须联网的功能，服务端验证了凭证才响应）。</p>
+<hr>
+<h1 id="二流传的破解">二、流传的破解</h1>
+<blockquote>
+<p>有的人说：Typora 是 Electron 应用，激活验证逻辑写在前端 JS 文件里。它在<code>Typora\resources\page-dist\static\js</code>的<code>LicenseIndex.*.js</code>文件有一行代码<code>hasActivated=&quot;true&quot;==e.hasActivated</code>，这行代码会去检查你的激活状态。脚本做的事情就是把 <code>e.hasActivated</code> 改成 <code>&quot;true&quot;</code>，让这个判断永远返回 true，变成 <code>hasActivated=&quot;true&quot;==&quot;true&quot;</code>。</p>
+</blockquote>
+<p>这个机制就是「URL 参数 → 布尔值 → UI 状态」这条链路，但这里有几个细节值得拆开说清楚，因为它们决定了「改 URL 参数能不能真正破解」这个问题。</p>
+<h2 id="1-hasactivatedtrueehasactivated-在做什么">1. <code>hasActivated=&quot;true&quot;==e.hasActivated</code> 在做什么</h2>
+<p>这一行确实在 Typora 安装目录 <code>resources\page-dist\static\js\LicenseIndex.180dd4c7.5789633d.js</code> 里，具体位置是 <code>T</code> 函数（以下代码摘自该文件）：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">T</span><span style="color:#D73A49;--shiki-dark:#F97583">=function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(){</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">  var</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> e</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">{};</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">  return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> window.location.search.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">substr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">).</span><span style="color:#6F42C1;--shiki-dark:#B392F0">split</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"&#x26;"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">).</span><span style="color:#6F42C1;--shiki-dark:#B392F0">forEach</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">function</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#E36209;--shiki-dark:#FFAB70">t</span><span style="color:#24292E;--shiki-dark:#E1E4E8">){</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    e[t.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">split</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"="</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)[</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]]</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">t.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">split</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"="</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)[</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  }),</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  e.hasActivated</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"true"</span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8">e.hasActivated,   </span><span style="color:#6A737D;--shiki-dark:#6A737D">// 这一行</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  e.index</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0">isNaN</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(e.index</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span><span style="color:#D73A49;--shiki-dark:#F97583">?</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#24292E;--shiki-dark:#E1E4E8">e.index</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  e.needLicense</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"false"</span><span style="color:#D73A49;--shiki-dark:#F97583">!=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">e.needLicense,</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  e.dayRemains</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">e.dayRemains</span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">  e</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}()</span></span></code></pre>
+<p>它做的事：解析 <code>license.html?ecp=...&amp;hasActivated=...&amp;dayRemains=...</code> 这串 URL 查询字符串，把字符串转成布尔值。<code>&quot;true&quot;==e.hasActivated</code> 是 JS 里一种防御性写法：URL 传过来的永远是字符串，写 <code>&quot;true&quot;==x</code> 比直接 <code>Boolean(x)</code> 更严格，能挡住 <code>hasActivated=1</code> 或 <code>hasActivated=yes</code> 这类误传。</p>
+<p>这里要先分清两个容易混的字段名，它们属于不同的链路：</p>
+<ul>
+<li><strong><code>hasActivated</code></strong>：URL 查询参数。主进程打开 <code>license.html</code> 时通过 <code>loadURL</code> 把当前激活状态作为 URL 参数传进来，渲染端的 <code>T</code> 函数解析它。这条链路只影响许可面板这个窗口的 UI。</li>
+<li><strong><code>hasLicense</code></strong>：渲染进程里的运行时变量，位于 <code>window.File.option.hasLicense</code>。主进程通过一段内嵌 JS 注入到主窗口的页面里（见本文第三章「内嵌 JavaScript 注入片段」），用来控制主窗口的「UNREGISTERED」水印显示。这条链路影响主编辑器窗口的 UI。</li>
+</ul>
+<p>两条链路都是「主进程 → 渲染端」单向传递的<strong>展示层数据</strong>，不参与真正的验证决策。</p>
+<h3 id="这一行是显示还是验证">这一行是「显示」还是「验证」</h3>
+<p>关键区别在这里。<code>hasActivated</code> 决定的是许可面板 UI 显示「已激活」还是「未激活」，<code>hasLicense</code> 决定主窗口是否显示「UNREGISTERED」水印，两者本身都<strong>不是</strong>验证逻辑，是验证<strong>结果的展示层</strong>。真实的验证发生在主进程：</p>
+<ol>
+<li>主进程（V8 字节码里的许可模块）做公钥验签 + 设备绑定 + 过期检查</li>
+<li><code>evaluateCurrentState</code> 把结果返回给 <code>getState</code></li>
+<li><code>startRenewalLoop</code> 每 12 小时找服务器续期</li>
+<li>状态通过 IPC 传给渲染端（许可面板走 URL 参数，主编辑器窗口走 <code>File.option.hasLicense</code> 注入）</li>
+<li>渲染端把这个结果渲染成 <code>Typora Activated</code> / <code>Activate Typora</code> 按钮文案，或者显示 / 隐藏水印</li>
+</ol>
+<p>所以攻击者如果只改 <code>hasActivated=&quot;true&quot;==e.hasActivated</code> 这一行，让许可面板显示「已激活」，但主进程的验证逻辑（V8 字节码里）每次刷新状态时依然走真实的验签流程，结果还是「未激活」，主编辑器窗口的水印也不会消失——因为水印走的是 <code>File.option.hasLicense</code> 那条注入链路，和许可面板的 URL 参数是两条独立的线。真实功能还是受限。</p>
+<h3 id="typora-的情况更极端一点">Typora 的情况更极端一点</h3>
+<p>Typora 的主进程是 V8 字节码（<code>atom.compiled.dist.jsc</code>），不是明文 JS。攻击者要改主进程的验证逻辑，得先把 <code>.jsc</code> 反编译回可读代码，改完再重新编译成 <code>.jsc</code> 塞回去。比改明文 JS 麻烦得多，但不是不可能。</p>
+<p>但 Typora 的 <code>LicenseIndex.js</code> 是明文。所以对 Typora 的一种攻击路径是：<strong>不改主进程，只改渲染端</strong>，把 <code>hasActivated</code> 参数硬编码成 <code>true</code>，让 UI 显示已激活，然后通过 <code>Setting.invokeWithCallback</code> 走主进程的 <code>addLicense</code> IPC 时绕过实际服务器请求——但这条路径依然需要主进程配合返回成功，而主进程的验证逻辑在字节码里，不容易改。</p>
+<h3 id="一个容易混的点">一个容易混的点</h3>
+<p>把 e.hasActivated 改成 &quot;true&quot; 有两种理解方式：</p>
+<ul>
+<li><strong>改 URL 生成逻辑</strong>：主进程打开 <code>license.html?hasActivated=false</code> 时不改，而是在主进程侧 <code>loadURL</code> 之前把参数改成 <code>hasActivated=true</code>。这是攻击点在主进程。</li>
+<li><strong>改渲染端解析逻辑</strong>：让渲染端无论 URL 里传什么，都把 <code>hasActivated</code> 判定为 <code>true</code>。这是上面那种改法，攻击点在渲染端。</li>
+</ul>
+<p>这两种改法都能让 UI 显示已激活，但都不改变主进程的真实验证结果。完整破解必须同时改主进程的 <code>verifyCredential</code>，或者让主进程的 <code>getState</code> 直接返回 <code>activated:true</code>。</p>
+<blockquote>
+<p>在 license.html 里注入一行 window.close()，把激活弹窗直接关掉，但是主进程在每次打开文件、保存文件时还是会走 license:state → verifyCredential → 返回 false，真实功能还是受限。</p>
+</blockquote>
+<p>这正是「UI 层 ≠ 业务逻辑层」的教科书例子。</p>
+<h2 id="2-windowclose-注入能做什么">2. <code>window.close()</code> 注入能做什么</h2>
+<p><code>license.html</code> 是渲染进程加载的 HTML。在里面加一行 <code>window.close()</code>（比如塞到 <code>&lt;script&gt;</code> 标签开头），效果是：</p>
+<ul>
+<li>页面加载后立即尝试关闭这个窗口</li>
+<li>用户看到的效果就是「激活弹窗闪一下就消失」，或者根本没弹出来</li>
+<li>UI 上看起来「激活检查被绕过了」</li>
+</ul>
+<p>但它只是关掉了那个窗口。这个窗口的所有职责——显示激活状态、收集邮箱和许可证、调用 <code>Setting.invokeWithCallback(&quot;addLicense&quot;, ...)</code>——都随着窗口关闭而消失，但<strong>没有替代它们</strong>。</p>
+<h3 id="为什么真实功能还是受限">为什么真实功能还是受限</h3>
+<p>主进程这边没有任何变化：</p>
+<ol>
+<li><code>verifyCredential</code> 还是那套 RSA 验签 + 设备绑定 + 过期检查</li>
+<li><code>startRenewalLoop</code> 还是每 12 小时找服务器续期</li>
+<li>渲染端每次调用 <code>window.editorAPI.licenseState()</code>，主进程都返回真实的 <code>activated: false</code></li>
+<li>如果应用在文件打开/保存时再查一次 <code>license.getState()</code>，还是会拿到 <code>false</code></li>
+</ol>
+<p>所以攻击者关掉 UI 只是让「未激活」这个提示不再显示，应用该受限还是受限。这和前面说的「改 <code>hasActivated</code> 参数让 UI 显示已激活」是同一类攻击——都是<strong>改变显示层</strong>，不改变<strong>决策层</strong>。</p>
+<h3 id="这个分离为什么重要">这个分离为什么重要</h3>
+<p>在架构上，这是一个基本原则：<strong>安全决策必须放在不能被 UI 层欺骗的位置</strong>。项目把 <code>verifyCredential</code> 放在主进程，渲染进程只能通过 IPC 问主进程「状态是什么」，不能自己决定「状态是什么」。就算渲染进程被完全替换成空文件，主进程的判断不受影响。</p>
+<p>Typora 做得更进一步：主进程是 V8 字节码，所以连主进程的判断逻辑都不容易被改。这是「UI 层（明文 JS）→ 主进程层（字节码）→ 服务器层（私钥）」的三级防御，每一层都要求攻击者付出不同的成本。</p>
+<h3 id="一个容易忽略的细节">一个容易忽略的细节</h3>
+<p><code>window.close()</code> 在 Electron 里有个限制：默认只有脚本自己打开的窗口才能被脚本关闭。如果激活弹窗是主进程用 <code>BrowserWindow</code> 创建的独立窗口，渲染进程里调 <code>window.close()</code> 能不能关掉，取决于主进程有没有给它 <code> closable</code> 权限或者是不是同一个 window 对象。不过这是 Electron 的安全细节，不影响上面那个「关掉 UI 不影响真实功能」的结论。</p>
+<h2 id="3-攻击者如何整个跳过把验签结果硬编码成-true没有asar打包">3. 攻击者如何整个跳过、把验签结果硬编码成 true（没有asar打包）</h2>
+<p>对打包产物里的 <code>resources\app\src\license\license.js</code> 做了两处改动：</p>
+<ol>
+<li><strong><code>verifyCredential</code> 硬编码返回 true</strong>：函数开头直接 <code>return { valid: true, payload: {...} }</code>，伪造了一年有效期的凭据，后面真实的 RSA 验签、设备绑定、过期检查永远不执行。这一改动让 <code>requireActivation()</code> 每次都返回 <code>allowed: true</code>，闸门失效。</li>
+<li><strong><code>startRenewalLoop</code> 变成空操作</strong>：函数开头 <code>return</code>，12 小时定时器不启动，客户端永远不会向服务器发起续期请求。伪造的本地凭据不会被真实凭据覆盖，也不会被服务器撤销。</li>
+</ol>
+<p>两个改动配合起来：闸门被打开 + 定期刷新被切断 = 永久激活。</p>
+<h3 id="为什么这么容易">为什么这么容易</h3>
+<p>打包产物里 <code>resources\app\</code> 是明文 JS 目录，用记事本就能改。就算加了 <code>--asar</code> 打包，<code>npx asar extract</code> 一条命令也能解开。改完保存，直接重启 exe 就生效，Electron 运行时会加载被篡改的 JS。</p>
+<h3 id="防御思路">防御思路</h3>
+<p>既然攻击点集中在「明文 JS 被替换」，对应的防御方向就是把明文 JS 变成不容易被改的东西。业界常用做法是：</p>
+<ul>
+<li><strong><code>bytenode</code></strong> 把 <code>license.js</code> 编译成 V8 字节码 <code>.jsc</code>，用记事本就改不动了。攻击者要反编译才能理解逻辑，改完还要能重新编译回 <code>.jsc</code> 才能替换。攻击成本从 30 秒变成几小时到几天。</li>
+<li><strong>asar 打包 + 完整性校验</strong>：主进程启动时读取 <code>app.asar</code> 的哈希，和自己内嵌的期望值对比，不匹配就退出。攻击者就算改了 asar，校验也会失败（除非攻击者也改掉校验逻辑，这就回到「改主进程字节码」的老问题）。</li>
+<li><strong>多处校验</strong>：把 <code>requireActivation</code> 分别在主进程、渲染进程、文件读写的关键路径上都调一次，攻击者要找到并修改所有校验点。</li>
+</ul>
+<h2 id="4-typora-的结构">4. Typora 的结构</h2>
+<p>Typora 的结构里，上面改的 <code>resources\app\src\license\license.js</code> 那条攻击路径，在 Typora 里对应的是 <code>resources\app.asar\atom.compiled.dist.jsc</code>——同一个位置，但保护方式升级了。</p>
+<h3 id="结构对照">结构对照</h3>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>示例项目</th>
+<th>Typora</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>客户端逻辑入口</td>
+<td><code>resources\app\src\main.js</code>（明文）</td>
+<td><code>resources\app.asar</code>（打包）</td>
+</tr>
+<tr>
+<td>核心业务/验证逻辑</td>
+<td><code>resources\app\src\license\license.js</code>（明文）</td>
+<td><code>resources\app.asar\atom.compiled.dist.jsc</code>（V8 字节码）</td>
+</tr>
+<tr>
+<td>渲染端 UI</td>
+<td><code>resources\app\renderer\renderer.js</code>（明文）</td>
+<td><code>resources\page-dist\static\js\LicenseIndex.js</code>（明文）</td>
+</tr>
+<tr>
+<td>本地状态</td>
+<td><code>%APPDATA%\my-markdown-editor\license\license.json</code></td>
+<td><code>HKCU\Software\Typora</code>（注册表）</td>
+</tr>
+<tr>
+<td>服务器通信</td>
+<td><code>api/client/activate / renew / deactivate</code></td>
+<td><code>api/client/activate / renew / deactivate</code>（相同）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="为什么-typora-的门槛更高">为什么 Typora 的门槛更高</h3>
+<p>Typora：攻击者要先 <code>asar extract app.asar</code>，拿到一个 379KB 的 <code>atom.compiled.dist.jsc</code> 文件。这不是 JS，是 V8 字节码——是 Node/V8 把源码编译成字节码后序列化的结果。用记事本打开会看到一堆二进制。要读懂它，攻击者得：</p>
+<ol>
+<li>用 <code>view-source:0</code> 或专门工具（比如 <code>view8</code>）把字节码反编译回类 JS 源码</li>
+<li>理解验证逻辑在哪个函数</li>
+<li>修改后重新用 <code>bytenode</code> 编译成 <code>.jsc</code></li>
+<li>把新的 <code>.jsc</code> 塞回 asar</li>
+<li>处理 asar 内部文件的哈希校验（如果 Typora 内部校验了哈希）</li>
+</ol>
+<h3 id="但这不是绝对安全">但这不是绝对安全</h3>
+<p>V8 字节码能被反编译。工具链已经存在（<code>view8</code>、<code>jsc2js</code> 等），Typora 的主进程字节码我们前面做字符串扫描时，直接从里面扫出了 <code>[renewLicense] license renewed in 12h</code>、<code>WindowsLicenseLocalStore</code>、<code>api/client/activate</code> 这些明文字符串——说明字符串常量根本没加密。也就是说，攻击者不用完整反编译，光靠字符串常量就能猜出大概结构，再定点反编译关键函数就行。</p>
+<p>所以 Typora 的保护是「显著提高攻击成本」，不是「无法破解」。真正难绕过的部分是<strong>服务器端</strong>：续期接口认机器码 + 签名凭据，攻击者本地改得再欢，服务器不认就没辙。所以破解者常见的最后一步是「把续期请求整个跳过」——就是前面提到的那个方向。</p>
+<h3 id="展示层-licenseindexjs-是明文">展示层 <code>LicenseIndex.js</code> 是明文</h3>
+<p>我们扫描 Typora 字节码时发现的另一个线索：<code>page-dist/static/js/LicenseIndex.js</code> 是明文，而且它负责「显示」激活状态。这意味着 Typora 的分层其实是：</p>
+<ol>
+<li>主进程字节码（决策层，难改）</li>
+<li>渲染端明文（展示层，易改）</li>
+<li>服务器（信任锚，改不了）</li>
+</ol>
+<p>攻击者最容易得手的就是展示层，但展示层改了也不影响决策层，这就是为什么 UI 层攻击在 Typora 上不构成完整破解。</p>
+<p><strong>所以，这也是网上流传的所谓“破解”方法简单但是不彻底的原因。</strong></p>
+<hr>
+<h1 id="三尝试破解-appasar">三、尝试破解 app.asar</h1>
+<ol>
+<li><strong><code>atom.compiled.dist.jsc</code> 是 V8 字节码，不是源码。</strong></li>
+</ol>
+<p>V8 字节码不是设计来反编译回源码的，它是给 V8 引擎执行的中间表示。字节码反编译是「启发式 + 大量猜测」，还原出来的不是原代码，是等价或近似等价的伪代码。可以想象成把编译后的 <code>.exe</code> 反编译回 C 语言的难度——能做到，但还原出来的东西和原代码在细节上偏差很大。</p>
+<p>V8 字节码依赖引擎版本和运行时环境。Typora 用的是 Electron 内嵌的 Node.js 版本，字节码只有在匹配的 V8 版本下才能反编译/重编译。版本不匹配，反编译工具直接拒绝或输出乱码。前面扫字符串时看到大量 ASN.1/RSA 错误字符串，这些常量确实能读，但<strong>控制流</strong>（if/else 分支、函数边界、调用图）在字节码层面已经被打散，不是读常量就能还原的。</p>
+<ol start="2">
+<li><strong>修改后要重编译成 <code>.jsc</code>，需要 <code>bytenode</code> 或类似工具，而 <code>bytenode</code> 编译时要求源码是完整的、可运行的 JS 源码。</strong></li>
+</ol>
+<p>反编译出来的「近似源码」，它可能缺 import 声明、缺内嵌公钥、缺闭包引用。直接用近似源码编译出来的 <code>.jsc</code> 和原始 <code>.jsc</code> 的行为不一样，Typora 可能直接崩溃。要修补这些差异，需要非常熟悉 Typora 的内部实现，做这件事本质上是在逆向重建 Typora，工作量是「重新实现一个 Typora code」级别的。</p>
+<ol start="3">
+<li><strong>「<code>app.asar</code> 内部文件哈希」这层防御实际不存在。</strong></li>
+</ol>
+<p>这里要修正一个之前的误判。用 <code>@electron/fuses</code> 实测 <code>Typora.exe</code>，<code>EnableEmbeddedAsarIntegrityValidation</code> 是 <strong>Disabled</strong>——Typora 没有启用 Electron 原生的 asar 内嵌哈希校验。asar 格式本身确实在每个文件的元数据里带了 <code>integrity</code> 字段（<code>algorithm</code> / <code>hash</code> / <code>blocks</code>，见 <code>@electron/asar</code> 文档），但这只是格式预留，要真正生效需要主进程（或 Electron 运行时）主动校验，Typora 没开这个 fuse。也就是说，Typora 的「asar 改了会被发现」这层防御<strong>实际上不存在</strong>，攻击者改完 asar 打包回去，应用不会拒绝启动。</p>
+<p>那「自举困境」呢？它依然是 Electron 应用做完整性校验时绕不开的问题，只是 Typora 没有走到这一步。如果 Typora 开了 <code>EnableEmbeddedAsarIntegrityValidation</code>，校验逻辑就在 Electron 二进制里（操作系统层面），而不是 asar 里的 JavaScript，那才是真正的「校验方在被校验对象之外」。Typora 依赖的是其他防线：主进程 V8 字节码、服务器端验证、以及（从 fuse 列表推断）<code>OnlyLoadAppFromAsar: Enabled</code> 这种限制加载来源的设置。</p>
+<h3 id="electron-fuse-逆向实测数据">Electron Fuse 逆向实测数据</h3>
+<p>用 <code>npx @electron/fuses read --app &quot;D:\Software\Typora\Typora.exe&quot;</code> 读出的完整 fuse 配置：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>RunAsNode: Disabled                              ← 堵死 ELECTRON_RUN_AS_NODE 环境变量攻击</span></span>
+<span class="line"><span class="line-number">2</span><span>EnableCookieEncryption: Disabled</span></span>
+<span class="line"><span class="line-number">3</span><span>EnableNodeOptionsEnvironmentVariable: Enabled    ← NODE_OPTIONS 注入路径还开着</span></span>
+<span class="line"><span class="line-number">4</span><span>EnableNodeCliInspectArguments: Disabled          ← 堵死 --inspect 调试攻击</span></span>
+<span class="line"><span class="line-number">5</span><span>EnableEmbeddedAsarIntegrityValidation: Disabled  ← asar 哈希校验没开</span></span>
+<span class="line"><span class="line-number">6</span><span>OnlyLoadAppFromAsar: Enabled                     ← 只允许从 asar 加载应用</span></span>
+<span class="line"><span class="line-number">7</span><span>LoadBrowserProcessSpecificV8Snapshot: Disabled</span></span>
+<span class="line"><span class="line-number">8</span><span>GrantFileProtocolExtraPrivileges: Enabled</span></span></code></pre>
+<p>这组数据说明：Typora 精准关掉了「让 Electron 退化成 Node」和「让攻击者附加调试器」这两条路（对应本文第四章的环境变量和运行时 Hook 两类），但<strong>没开</strong> asar 完整性校验，也<strong>没关</strong> <code>NODE_OPTIONS</code> 注入。这和本文第四章的结论一致——每一层防线都有明确的取舍，没有「全开」的商业软件。</p>
+<h2 id="附electron-应用逆向实验">附：Electron 应用逆向实验</h2>
+<p>完整链路：打包 → 反编译 → 修改 → 重编译 → 完整性校验 → 绕过</p>
+<h3 id="第一步反编译-v8-字节码">第一步：反编译 V8 字节码</h3>
+<p><strong>做什么</strong></p>
+<ol>
+<li>先把自己的 <code>license.js</code> 编译成 <code>.jsc</code>（用项目里现成的 <code>npm run compile:license</code>）。</li>
+<li>用工具反编译回来：
+<ul>
+<li><code>view8</code>（GitHub 上的开源工具，能把 <code>.jsc</code> 反汇编成可读的伪代码）</li>
+<li><code>view-source:0</code>（Chrome DevTools 的 trick，某些场景能看到字符串池）</li>
+<li>直接 <code>strings</code> / 十六进制编辑器翻字符串常量</li>
+</ul>
+</li>
+</ol>
+<p><strong>会看到什么</strong></p>
+<table>
+<thead>
+<tr>
+<th>保留的</th>
+<th>丢失的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>所有字符串常量（明文，包括中文提示、API 路径、公钥内容）</td>
+<td>变量名、函数参数名</td>
+</tr>
+<tr>
+<td>控制流骨架（条件判断、循环、函数边界）</td>
+<td>全部注释</td>
+</tr>
+<tr>
+<td>导出符号表（<code>activateLicense</code>、<code>requireActivation</code> 这些名字还在）</td>
+<td>原始代码格式和空行</td>
+</tr>
+<tr>
+<td>常量表（数字、正则、模板字符串）</td>
+<td>部分 V8 优化时合并或裁掉的分支细节</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键认知</strong></p>
+<p><code>.jsc</code> 不是加密，是「编译」。防护等级等同于把源码读起来更费劲，不等于读不了。一个熟悉 V8 字节码结构的人，花半天就能看懂激活逻辑在干什么、哪个分支是拦截入口。</p>
+<h3 id="第二步修改后重编译">第二步：修改后重编译</h3>
+<p><strong>做什么</strong></p>
+<ol>
+<li>从反编译产物里挑一个目标改掉（最简单：把 <code>&quot;请先激活后再使用保存功能&quot;</code> 改成 <code>&quot;已授权&quot;</code>，或者把 <code>requireActivation</code> 里那个 <code>if (state.activated)</code> 的判断条件反转）。</li>
+<li>用与目标 Electron 版本<strong>完全一致</strong>的 V8 重新编译成 <code>.jsc</code>。</li>
+<li>替换回去，跑应用，看行为是否变化。</li>
+</ol>
+<p><strong>会碰到的真实问题</strong></p>
+<ol>
+<li><strong>V8 版本强绑定</strong>：<code>.jsc</code> 文件头里记录了生成它的 V8 版本哈希、flag hash、只读快照校验和。目标应用用 Electron 44（V8 14.8+），就必须用 Electron 44 的 V8 编译。差一个版本，加载时直接 <code>cachedDataRejected</code> 或者进程崩溃（不是优雅报错，是 SIGTRAP 级别的硬崩）。
+<ul>
+<li>实操：从应用的 <code>node_modules/electron/dist/electron.exe</code> 直接拿来当编译器，用 <code>ELECTRON_RUN_AS_NODE=1</code> 去跑 bytenode 的编译流程。</li>
+<li>注意 Electron 44+ 还有更细的坑：<code>ELECTRON_RUN_AS_NODE</code> 编译出来的字节码和 Electron 主进程里编译出来的<strong>只读快照校验和不一样</strong>，加载时也会崩。必须让编译脚本本身跑在 Electron 主进程里（不带 <code>ELECTRON_RUN_AS_NODE</code>），这也是我们项目里 <code>compile-license.js</code> 专门做的事。</li>
+</ul>
+</li>
+<li><strong>闭包和模块包装</strong>：<code>.jsc</code> 是对 <code>Module.wrap()</code> 之后整个模块代码的字节码快照，不是单个函数的快照。改反编译产物时，改动必须在同一个模块作用域内自洽——不能凭空引用一个外部不存在的变量，否则运行时 <code>ReferenceError</code>。</li>
+<li><strong>序列化格式不是文档化的稳定格式</strong>：<code>.jsc</code> 的二进制布局是 V8 内部序列化格式的快照，没有公开文档承诺向后兼容。V8 小版本升级都可能改变布局，这也是为什么 bytenode 某些版本要手动 patch 文件头（改 flag hash 那几个字节）。</li>
+</ol>
+<p><strong>省事路径（攻击者视角）</strong></p>
+<p>比逆向 <code>.jsc</code> 快十倍的做法：直接改 asar 里明文的 <code>main.js</code>，把 <code>require(&quot;./license/license.jsc&quot;)</code> 改成 <code>require(&quot;./license/license&quot;)</code>，塞一个假的 <code>license.js</code> 进去，永远返回 <code>{ allowed: true }</code>。这不需要碰字节码，三分钟搞定。</p>
+<h3 id="第三步asar-哈希自举问题">第三步：asar 哈希自举问题</h3>
+<p><strong>做什么</strong></p>
+<ol>
+<li>在 <code>main.js</code> 开头加一段「启动时读 <code>app.asar</code> 自身，算 SHA-256，和硬编码的期望值比对，不一致就 <code>app.exit(1)</code>」。</li>
+<li>重新打包，拿到新 asar 的哈希，写回校验代码里，再打包一次。</li>
+<li>解包 asar，改一个文件，重新打包，跑起来看哈希校验怎么拦截。</li>
+</ol>
+<p><strong>会看到</strong></p>
+<p>校验生效了，篡改后的 asar 无法通过启动检查，应用拒绝运行。看起来防住了。</p>
+<p><strong>然后再想一步</strong></p>
+<p>那段校验代码<strong>也在这个 asar 里，而且是明文 JavaScript</strong>。攻击者解包 asar，看到校验逻辑，做两件事中的任何一件：</p>
+<ul>
+<li>把哈希比对那行改成 <code>if (false) app.exit(1)</code>；</li>
+<li>直接删掉整段校验代码。</li>
+</ul>
+<p>重新打包，校验就没了。<strong>校验逻辑和被校验的数据住在同一个可写文件里，这个校验就是装饰品。</strong></p>
+<p>这就是「自举困境」：你不能用被保护的东西自己去保护自己。</p>
+<h3 id="结论真正拦得住的是什么">结论：真正拦得住的是什么</h3>
+<p>只有一种东西能拦住这条链路：<strong>签名验证发生在你能修改的范围之外</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>防线</th>
+<th>拦谁</th>
+<th>放过谁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.jsc</code> 字节码</td>
+<td>脚本小子（不熟悉 V8 结构的人）</td>
+<td>懂逆向的人（半天看懂）</td>
+</tr>
+<tr>
+<td>asar 归档</td>
+<td>随手翻目录的人</td>
+<td>会用 <code>npx asar extract</code> 的人</td>
+</tr>
+<tr>
+<td>asar 内哈希校验</td>
+<td>不改代码的人</td>
+<td>会删校验代码的人</td>
+</tr>
+<tr>
+<td>Electron 代码签名（Authenticode / notarization）</td>
+<td>改了 asar 但没有你的私钥的人</td>
+<td>有用户证书信任链的人（极少）</td>
+</tr>
+<tr>
+<td>服务器端校验（关键判断放远端）</td>
+<td>所有本地篡改，因为判断不在客户端</td>
+<td>能伪造网络响应的人（需要额外做中间人）</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="typora-1124-实测-appasar-381kb">Typora 1.12.4 实测（<code>app.asar</code> 381KB）</h2>
+<h3 id="架构">架构</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Typora</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.jsc</code> 生成工具</td>
+<td>自研 loader <code>launch.dist.js</code>（内嵌，无 bytenode 依赖）</td>
+</tr>
+<tr>
+<td><code>.jsc</code> 数量</td>
+<td>1 个（atom.compiled.dist.jsc，379KB，webpack 打包后整体编译）</td>
+</tr>
+<tr>
+<td>webpack 打包</td>
+<td>有（<code>__webpack_modules__</code> / <code>__webpack_require__</code> 在字符串池里）</td>
+</tr>
+<tr>
+<td>源码规模</td>
+<td>约 23 万字节的字节码 / 数百个 webpack 模块</td>
+</tr>
+<tr>
+<td>许可状态存储</td>
+<td><strong>Windows 注册表</strong> <code>HKCU\Software\Typora</code>（<code>IDate</code> + <code>SLicense</code>）</td>
+</tr>
+<tr>
+<td>试算逻辑</td>
+<td>注册表 <code>IDate</code> + 14 天 trial 倒计时</td>
+</tr>
+</tbody>
+</table>
+<h3 id="从字节码里挖出的完整许可体系">从字节码里挖出的完整许可体系</h3>
+<p>通过 <code>strings</code> + 十六进制偏移定位 + 配合运行时日志比对，确认了整个许可流程：</p>
+<p><strong>存储层（注册表）：</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>HKCU\Software\Typora</span></span>
+<span class="line"><span class="line-number">2</span><span>  IDate     = "10/14/2026"   ← 安装日期，用于 trial 倒计时</span></span>
+<span class="line"><span class="line-number">3</span><span>  SLicense  = ""              ← 激活凭据（当前为空 = 未激活）</span></span></code></pre>
+<p><strong>日志痕迹（<code>typora.log</code>）：</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>[WindowsLicenseLocalStore] SLicense : </span></span>
+<span class="line"><span class="line-number">2</span><span>onUnfillLicense</span></span>
+<span class="line"><span class="line-number">3</span><span>[WindowsLicenseLocalStore] IDate : 10/14/2026</span></span>
+<span class="line"><span class="line-number">4</span><span>trailRemains is 14</span></span>
+<span class="line"><span class="line-number">5</span><span>[L] installDate is 10/14/2026, trail remains: 14 days</span></span></code></pre>
+<p><strong>字节码里的关键字符串池（对应模块和功能）：</strong></p>
+<table>
+<thead>
+<tr>
+<th>偏移</th>
+<th>内容</th>
+<th>推断的模块功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>83310</td>
+<td><code>&quot;native-reg&quot;</code></td>
+<td>调用 Windows 注册表读写（原生模块）</td>
+</tr>
+<tr>
+<td>83334</td>
+<td><code>&quot;Software\\Typora&quot;</code></td>
+<td>注册表键路径</td>
+</tr>
+<tr>
+<td>83567</td>
+<td><code>&quot;[WindowsLicenseLocalStore] &quot;</code></td>
+<td>许可本地存储的日志前缀</td>
+</tr>
+<tr>
+<td>100139</td>
+<td><code>&quot;deviceId&quot;</code></td>
+<td>设备标识</td>
+</tr>
+<tr>
+<td>100171</td>
+<td><code>&quot;[renewLicense] license renewed in 12h&quot;</code></td>
+<td>12 小时续期（和我们项目一样的模式）</td>
+</tr>
+<tr>
+<td>100304</td>
+<td><code>&quot;generateUUID&quot;</code></td>
+<td>生成设备 UUID</td>
+</tr>
+<tr>
+<td>100338</td>
+<td><code>&quot;dev&quot;</code></td>
+<td><strong>开发版判断标志</strong></td>
+</tr>
+<tr>
+<td>103897</td>
+<td><code>&quot;trailRemains is &quot;</code></td>
+<td>试用剩余天数</td>
+</tr>
+<tr>
+<td>103991</td>
+<td><code>&quot;[L] installDate is &quot;</code></td>
+<td>安装日期日志</td>
+</tr>
+<tr>
+<td>105506</td>
+<td><code>&quot;page-dist/license.html?ecp=&quot;</code></td>
+<td>许可面板 URL</td>
+</tr>
+<tr>
+<td>114051</td>
+<td><code>&quot;api/client/activate&quot;</code></td>
+<td>激活 API 端点</td>
+</tr>
+<tr>
+<td>114233</td>
+<td><code>&quot;Your license has exceeded the max devices numbers.&quot;</code></td>
+<td>超设备上限提示</td>
+</tr>
+<tr>
+<td>117080</td>
+<td><code>&quot;license.machineCode&quot;</code></td>
+<td>IPC 通道名（主进程 ↔ 渲染进程）</td>
+</tr>
+<tr>
+<td>118782</td>
+<td><code>&quot;doDeactivation on unregistered device&quot;</code></td>
+<td>注销逻辑</td>
+</tr>
+<tr>
+<td>118845</td>
+<td><code>&quot;api/client/deactivate&quot;</code></td>
+<td>注销 API 端点</td>
+</tr>
+<tr>
+<td>126540</td>
+<td><code>&quot;File.option.hasLicense = false;&quot;</code></td>
+<td><strong>内嵌 JS 注入片段，设置渲染进程的许可标志</strong></td>
+</tr>
+<tr>
+<td>127068</td>
+<td><code>&quot;UNREGISTERED&quot;</code></td>
+<td>未激活水印 UI</td>
+</tr>
+</tbody>
+</table>
+<p><strong>最有意思的一条发现</strong>（偏移 126514-127270）：有一段完整的<strong>内嵌 JavaScript 源码字符串</strong>，是 Typora 往渲染进程页面里注入的脚本：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(window.File.option){</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    File.option.hasLicense </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; </span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    File.megaMenu </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;&#x26;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> File.megaMenu.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">forceReload</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">!</span><span style="color:#24292E;--shiki-dark:#E1E4E8">document.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">querySelector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">".&#x3C;className>"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)) {</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">        const</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> pos</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Math.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">round</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(Math.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">random</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> document.body.children.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">length</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">        const</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> dom</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> document.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">createElement</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"DIV"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        dom.style </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "position: fixed !important;bottom: 2px !important; ..."</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        dom.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">setAttribute</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"role"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"button"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        dom.innerText</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"UNREGISTERED x"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        dom.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">addEventListener</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"click"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, () </span><span style="color:#D73A49;--shiki-dark:#F97583">=></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            dom.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">remove</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6F42C1;--shiki-dark:#B392F0">            reqnode</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"electron"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">).ipcRenderer.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">invoke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                String.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">fromCharCode</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">108</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">105</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">99</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">101</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">110</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">115</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">101</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">46</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">115</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">104</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">111</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">119</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#6A737D;--shiki-dark:#6A737D">                // ^ "license.show"</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">            );</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        });</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        document.body.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">insertBefore</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(dom, document.body.children[pos]);</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span></code></pre>
+<p>这段代码做的事：如果 <code>hasLicense</code> 是 false，就在页面随机位置插入一个「UNREGISTERED」水印按钮，点击后弹出激活面板。</p>
+<h3 id="难点">难点</h3>
+<ol>
+<li><strong>没有源码可找</strong>：Typora 的源码不在安装目录，只有这一个编译后的 <code>.jsc</code>。</li>
+<li><strong>webpack 打包后的整体编译</strong>：不是「改一个函数重新编译」，是「整个应用的几百个模块被打包成一坨字节码」，想改一个条件判断必须先理解 webpack 模块边界在字节码里的样子。</li>
+<li><strong>自研 loader</strong>：<code>launch.dist.js</code> 不是 bytenode，是自己写的一小段 <code>.jsc</code> 加载器。它 patch 的字段和 bytenode 类似（flag hash、source hash），但代码结构不同，需要单独分析。</li>
+<li><strong>状态存储在注册表</strong>：不在文件系统里随便改 JSON，得操作 <code>HKCU\Software\Typora</code>。这不是「难」，是「位置不一样」。</li>
+</ol>
+<h3 id="但难点挡不住什么">但难点挡不住什么</h3>
+<p>即使加了这些层，<strong>关键信息全部还在字符串池里</strong>：</p>
+<ul>
+<li>API 端点（<code>/api/client/activate</code>、<code>/api/client/deactivate</code>）直接可读</li>
+<li>IPC 通道名（<code>license.machineCode</code>、<code>license.show</code>）直接可读</li>
+<li>注册表路径（<code>Software\Typora</code>）直接可读</li>
+<li>水印注入的完整 JS 源码（上面那段）直接可读</li>
+<li><code>File.option.hasLicense</code> 这个标志名直接可读</li>
+</ul>
+<p>攻击者不需要反汇编字节码指令流，<strong>光看字符串池就能推断出整个架构</strong>，然后选择性价比最高的攻击点：</p>
+<table>
+<thead>
+<tr>
+<th>攻击点</th>
+<th>需要逆向字节码？</th>
+<th>预估门槛</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>改渲染进程的 <code>File.option.hasLicense = true</code>（用 DevTools 或劫持 preload）</td>
+<td>不需要</td>
+<td>低</td>
+</tr>
+<tr>
+<td>劫持 <code>license.machineCode</code> IPC 返回值</td>
+<td>轻度</td>
+<td>中</td>
+</tr>
+<tr>
+<td>写一个假的 license 服务器 + 改 hosts</td>
+<td>不需要</td>
+<td>低</td>
+</tr>
+<tr>
+<td>patch 字节码里的条件跳转</td>
+<td>需要（view8 级别）</td>
+<td>高</td>
+</tr>
+<tr>
+<td>完整重编译 <code>.jsc</code></td>
+<td>需要且版本必须精确匹配</td>
+<td>最高</td>
+</tr>
+</tbody>
+</table>
+<p>实际上，<strong>对这个版本的 Typora，网上公开的破解几乎都走的是「劫持 IPC + 伪造服务器响应」或「DevTools 改运行时状态」这两条路</strong>，没人去硬啃字节码——因为字符串已经把攻击面全暴露了。</p>
+<h1 id="四不修改-appasar-的其他攻击面">四、不修改 <code>app.asar</code> 的其他攻击面</h1>
+<p>按攻击发生的位置，可以分成六类。改 asar 是「永久、离线、一次操作永久生效」的基准；六类里有的是「临时、每次都要做」，有的是「只能骗 UI 骗不了功能」，有的是「理论上可行但组合条件苛刻」。<strong>没有一个能像改 asar 那样，改一次就永久拥有完整功能。</strong></p>
+<h3 id="1-六类不碰-asar-的攻击面">1. 六类不碰 asar 的攻击面</h3>
+<table>
+<thead>
+<tr>
+<th>攻击面</th>
+<th>原理</th>
+<th>对应层</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>本地状态篡改</td>
+<td>直接改注册表 / <code>license.json</code>，伪造「上次验证的结果」</td>
+<td>存储层</td>
+</tr>
+<tr>
+<td>公钥替换</td>
+<td>换掉客户端验签用的公钥，改成攻击者自己的公钥，然后自己签凭据</td>
+<td>信任锚</td>
+</tr>
+<tr>
+<td>渲染进程注入</td>
+<td>改 <code>page-dist</code> 里的明文 JS，或通过 DevTools 协议往运行中的进程里塞代码</td>
+<td>UI 层</td>
+</tr>
+<tr>
+<td>运行时 Hook</td>
+<td>用 Frida / DLL 注入，在函数被调用的瞬间替换它的返回值</td>
+<td>内存层</td>
+</tr>
+<tr>
+<td>网络劫持</td>
+<td>代理 / hosts 劫持续期请求，返回攻击者准备好的响应</td>
+<td>网络层</td>
+</tr>
+<tr>
+<td>环境变量</td>
+<td><code>ELECTRON_RUN_AS_NODE</code>、<code>NODE_OPTIONS</code> 这类，改变 Electron 运行时行为</td>
+<td>运行时层</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-这些攻击在-typora-上分别会遇到什么以及效果和改-asar-的差异">2. 这些攻击在 Typora 上分别会遇到什么，以及效果和改 asar 的差异</h3>
+<ol>
+<li>
+<p><strong>本地状态篡改（注册表 / license.json）</strong></p>
+<p>对比改 asar：</p>
+<ul>
+<li>改 asar：改一次，永久激活。主进程代码直接被换掉，没有「续期」这个概念来打脸。</li>
+<li>改注册表：Typora 的场景下，改 <code>SLicense</code> 只能骗过一次启动检查。12 小时后 <code>renewLicense</code> 会带着 <code>deviceId</code> 去服务器换新凭据，服务器不认伪造值，返回失败 → <code>onUnfillLicense</code> → 降级。</li>
+</ul>
+<p><strong>我们项目里对应的</strong>：<code>src/license/license.json</code> 存在 userData 下，<code>writeStoredLicense()</code> 把服务器签的凭据存进去。你直接改这个 JSON 不行，因为 <code>verifyCredential()</code> 会用内嵌公钥验签，签名不对直接判 <code>signature-mismatch</code>。</p>
+<p><strong>效果对比结论</strong>：改 asar 能骗过一切，改状态只能骗过「读取状态」这一个环节。差距在于「是否绕过了验证逻辑本身」。</p>
+</li>
+<li>
+<p><strong>公钥替换</strong></p>
+<p>对比改 asar：</p>
+<ul>
+<li>
+<p>改 asar 的时候公钥跟着你重编译一起换，这是「顺手的事」。</p>
+</li>
+<li>
+<p>单独做公钥替换（不改 asar）需要公钥存在独立文件里。我们项目的 <code>server-public-key.pem</code> 就是独立文件！攻击者可以：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>Copy-Item attacker-public-key.pem src/license/server-public-key.pem</span></span></code></pre>
+<p>然后攻击者用自己的私钥签凭据，本地验签就会通过——</p>
+<p>但前提是他还得把伪造的凭据写进 <code>license.json</code>，而且要绕过 12 小时续期</p>
+<p>。这在我们项目里是可行的，因为没有额外校验公钥文件本身。</p>
+</li>
+</ul>
+<p><strong>Typora 的情况</strong>：公钥嵌在 <code>.jsc</code> 里，这个攻击面被堵死，必须回改字节码。</p>
+<p><strong>效果对比</strong>：如果我们项目被这条路打穿，效果<strong>等同改 asar</strong>——功能全部可用。这是六类里唯一能到「等同改 asar」效果的单点攻击。但也只在「公钥独立存放」的场景成立。</p>
+</li>
+<li>
+<p><strong>渲染进程注入</strong></p>
+<p>对比改 asar：</p>
+<ul>
+<li>改 asar：主进程逻辑彻底换掉，功能真实可用。</li>
+<li>渲染进程注入：只骗 UI。比如我们项目 <code>renderer/renderer.js</code> 里如果有个 <code>licenseStatus</code> 显示区，攻击者往浏览器 DevTools 里执行 <code>document.querySelector('.status').innerText = '已激活'</code>，界面显示激活了，但点「保存」按钮，IPC 发到主进程，主进程的 <code>requireActivation()</code> 一查缓存还是没激活，照样拦截。</li>
+</ul>
+<p><strong>我们项目实际有这个入口吗？</strong> 没有——<code>renderer.js</code> 只是通过 <code>preload.js</code> 调 <code>licenseState()</code> 拿状态，没有判断逻辑。所以这条路在我们项目上是「只能骗显示」，主进程的闸门还是真实的。</p>
+<p><strong>效果对比结论</strong>：效果是「看起来像激活了」和「真的能保存文件」之间的差距。<strong>视觉上骗人，功能上骗不了。</strong></p>
+</li>
+<li>
+<p><strong>运行时 Hook（Frida）</strong></p>
+<p>对比改 asar：</p>
+<ul>
+<li>改 asar：文件被换掉，进程启动时加载的就是攻击者代码。</li>
+<li>Frida：文件没动，进程启动后攻击者动态修改内存里的函数返回值。</li>
+</ul>
+<p><strong>在我们项目里具体对应</strong>：<code>requireActivation()</code> 返回 <code>{ allowed: true }</code> 那个函数，Frida 脚本找到它的入口地址，把返回值改掉。效果和改 asar 的第二步<strong>完全一样</strong>——保存功能解锁。</p>
+<p><strong>但有个本质区别</strong>：</p>
+<ul>
+<li>改 asar：持久。下次启动还是激活状态。</li>
+<li>Frida：<strong>每次启动都得重新注入</strong>。进程重启后内存里的修改就没了。</li>
+</ul>
+<p>所以 Frida 适合「我要用一次，用完关掉」的场景，不适合「我要长期免费使用」。商业软件对抗 Frida 靠的是运行时检测（反调试、完整性检查）+ 硬件加密狗，这些 Typora 都没有。</p>
+<p><strong>效果对比</strong>：<strong>功能上等同改 asar，持久性上不如改 asar</strong>。</p>
+</li>
+<li>
+<p><strong>网络劫持</strong></p>
+<p>对比改 asar：</p>
+<ul>
+<li>改 asar：不联网也能用（把验证逻辑换掉了）。</li>
+<li>网络劫持：必须联网，还得让客户端「信」一个假服务器。</li>
+</ul>
+<p><strong>我们项目里的具体路径</strong>：</p>
+<ul>
+<li>客户端 <code>renewLicense()</code> POST 到 <code>/api/client/renew</code>，期望拿到签名的凭据 JSON</li>
+<li><code>verifyCredential()</code> 用 <code>server-public-key.pem</code> 里的公钥验签</li>
+<li>攻击者要做的：拦截 HTTPS / hosts 劫持 + 准备一个自签证书 + 用自己的私钥签凭据 + <strong>把公钥文件换成自己的公钥</strong></li>
+</ul>
+<p>看到了吗？<strong>这条路必须和「公钥替换」组合</strong>。单独做网络劫持，<code>verifyCredential()</code> 一验签就 <code>signature-mismatch</code>，拦截成功。</p>
+<p><strong>Typora 的情况</strong>：公钥在字节码里，这个组合打不通，所以网络劫持也被堵死。</p>
+<p><strong>效果对比</strong>：<strong>单独用效果为零</strong>，和公钥替换组合后等同改 asar。而且因为要维持劫持状态，持久性不如改 asar。</p>
+</li>
+<li>
+<p><strong>环境变量</strong></p>
+<p>对比改 asar：</p>
+<ul>
+<li>改 asar：改的是「代码」。</li>
+<li>环境变量：改的是「运行时行为」。</li>
+</ul>
+<p><strong><code>ELECTRON_RUN_AS_NODE=1</code> 在我们项目上的实际效果</strong>：前面你亲眼见过——应用直接崩，<code>require('electron')</code> 拿到的是字符串不是 API。这不是「绕过激活」，是「把应用弄挂」。<strong>没有攻击价值。</strong></p>
+<p><strong>但其他环境变量可能有价值</strong>：比如 <code>NODE_OPTIONS=--require=attacker.js</code>（Node 的预加载钩子），可以在主进程启动前注入代码。这个是真实的攻击面，Electron 的高版本里有 patch 过，但不是所有版本都堵死。实测：Typora 的 fuse 配置里 <code>EnableNodeOptionsEnvironmentVariable: Enabled</code>，说明这条注入路径在 Typora 1.12.4 上是开着的。</p>
+<p><strong>效果对比</strong>：大多数环境变量是「把应用弄坏」，少数（<code>NODE_OPTIONS</code>）可以「注入代码」，后者等同改 asar。</p>
+</li>
+</ol>
+<h3 id="3-总结表效果等价性">3. 总结表：效果等价性</h3>
+<table>
+<thead>
+<tr>
+<th>攻击方式</th>
+<th>能否解锁保存功能</th>
+<th>持久性</th>
+<th>是否需要组合</th>
+<th>和改 asar 的效果差距</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>改 asar</td>
+<td>✅</td>
+<td>✅ 永久</td>
+<td>不需要</td>
+<td>基准</td>
+</tr>
+<tr>
+<td>改注册表 / license.json</td>
+<td>❌</td>
+<td>-</td>
+<td>需要配合其他</td>
+<td>骗不过验签</td>
+</tr>
+<tr>
+<td>替换公钥（我们项目）</td>
+<td>✅</td>
+<td>✅ 永久</td>
+<td>不需要</td>
+<td><strong>等同改 asar</strong></td>
+</tr>
+<tr>
+<td>替换公钥（Typora）</td>
+<td>❌</td>
+<td>-</td>
+<td>绕回改字节码</td>
+<td>被堵死</td>
+</tr>
+<tr>
+<td>渲染进程注入</td>
+<td>❌</td>
+<td>-</td>
+<td>不需要</td>
+<td>只骗 UI</td>
+</tr>
+<tr>
+<td>Frida 运行时 Hook</td>
+<td>✅</td>
+<td>❌ 每次启动重新注入</td>
+<td>不需要</td>
+<td>功能等同，持久性差</td>
+</tr>
+<tr>
+<td>网络劫持单独</td>
+<td>❌</td>
+<td>-</td>
+<td>需配合公钥替换</td>
+<td>验签拦截</td>
+</tr>
+<tr>
+<td>网络劫持+公钥替换</td>
+<td>✅</td>
+<td>✅</td>
+<td>需要组合</td>
+<td>等同改 asar</td>
+</tr>
+<tr>
+<td><code>ELECTRON_RUN_AS_NODE</code></td>
+<td>❌（把应用弄坏）</td>
+<td>-</td>
+<td>-</td>
+<td>无攻击价值</td>
+</tr>
+<tr>
+<td><code>NODE_OPTIONS</code> 注入</td>
+<td>✅</td>
+<td>✅</td>
+<td>不需要</td>
+<td>等同改 asar</td>
+</tr>
+</tbody>
+</table>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

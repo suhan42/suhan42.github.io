@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>RAG 基础 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">RAG 基础</a></li>
+<li class="toc-item toc-level-1"><a href="#rag">RAG</a></li>
+<li class="toc-item toc-level-2"><a href="#1%E6%96%87%E6%A1%A3%E5%A4%84%E7%90%86">1.文档处理</a></li>
+<li class="toc-item toc-level-2"><a href="#2%E5%88%86%E5%9D%97%E7%AD%96%E7%95%A5chunk">2.分块策略（Chunk）</a></li>
+<li class="toc-item toc-level-2"><a href="#3%E5%90%91%E9%87%8F%E5%8C%96embedding%E5%90%91%E9%87%8F%E5%BA%93">3.向量化（Embedding）、向量库</a></li>
+<li class="toc-item toc-level-3"><a href="#embedding">Embedding</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%90%91%E9%87%8F%E5%BA%93">向量库</a></li>
+<li class="toc-item toc-level-2"><a href="#4%E6%A3%80%E7%B4%A2">4.检索</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%9B%B8%E4%BC%BC%E5%BA%A6%E8%AE%A1%E7%AE%97%E4%B8%8E-ann-%E7%AE%97%E6%B3%95">相似度计算与 ANN 算法</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%AF%AD%E4%B9%89%E8%BF%91%E5%88%99%E5%90%91%E9%87%8F%E8%BF%91">语义近则向量近</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%9B%B8%E4%BC%BC%E5%BA%A6%E8%AE%A1%E7%AE%97%E6%96%B9%E6%B3%95">相似度计算方法</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BD%99%E5%BC%A6%E7%9B%B8%E4%BC%BC%E5%BA%A6cosine-similarity">余弦相似度（Cosine Similarity）</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%AC%A7%E6%B0%8F%E8%B7%9D%E7%A6%BBeuclidean-distance">欧氏距离（Euclidean Distance）</a></li>
+<li class="toc-item toc-level-4"><a href="#%E7%82%B9%E7%A7%AFdot-product">点积（Dot Product）</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%B8%89%E7%A7%8D%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94">三种方法对比</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%90%91%E9%87%8F%E7%B4%A2%E5%BC%95%E7%AE%97%E6%B3%95">向量索引算法</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%9A%B4%E5%8A%9B%E6%A3%80%E7%B4%A2flat-brute-force">暴力检索（Flat / Brute-force）</a></li>
+<li class="toc-item toc-level-4"><a href="#ivf%E5%80%92%E6%8E%92%E6%96%87%E4%BB%B6%E7%B4%A2%E5%BC%95">IVF（倒排文件索引）</a></li>
+<li class="toc-item toc-level-4"><a href="#hnsw%E5%88%86%E5%B1%82%E5%AF%BC%E8%88%AA%E5%B0%8F%E4%B8%96%E7%95%8C%E5%9B%BE">HNSW（分层导航小世界图）</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%85%B6%E4%BB%96%E5%B8%B8%E7%94%A8%E7%B4%A2%E5%BC%95">其他常用索引</a></li>
+<li class="toc-item toc-level-2"><a href="#5%E7%94%9F%E6%88%90">5.生成</a></li>
+<li class="toc-item toc-level-2"><a href="#rag%E6%9E%B6%E6%9E%84">RAG架构</a></li>
+<li class="toc-item toc-level-3"><a href="#naive-rag-%E6%A1%86%E6%9E%B6">Naive RAG 框架</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86">工作原理</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%8A%80%E6%9C%AF%E7%89%B9%E7%82%B9">技术特点</a></li>
+<li class="toc-item toc-level-3"><a href="#advanced-rag-%E6%A1%86%E6%9E%B6">Advanced RAG 框架</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86-2">工作原理</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%8A%80%E6%9C%AF%E7%89%B9%E7%82%B9-2">技术特点</a></li>
+<li class="toc-item toc-level-3"><a href="#modular-rag-%E6%A1%86%E6%9E%B6">Modular RAG 框架</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86-3">工作原理</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%8A%80%E6%9C%AF%E7%89%B9%E7%82%B9-3">技术特点</a></li>
+<li class="toc-item toc-level-3"><a href="#agentic-rag">Agentic RAG</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86-4">工作原理</a></li>
+<li class="toc-item toc-level-2"><a href="#2026-%E5%B9%B4-rag-%E7%9A%84%E5%9B%9B%E4%B8%AA%E6%96%B0%E8%8C%83%E5%BC%8F">2026 年 RAG 的四个新范式</a></li>
+<li class="toc-item toc-level-3"><a href="#1-graph-rag%E4%BB%8E%E5%90%91%E9%87%8F%E7%9B%B8%E4%BC%BC%E5%BA%A6%E8%B5%B0%E5%90%91%E7%9F%A5%E8%AF%86%E5%85%B3%E7%B3%BB">1. Graph-RAG：从向量相似度走向知识关系</a></li>
+<li class="toc-item toc-level-3"><a href="#2-agentic-rag%E6%A3%80%E7%B4%A2%E6%88%90%E4%B8%BA%E8%A1%8C%E5%8A%A8%E7%9A%84%E4%B8%80%E9%83%A8%E5%88%86">2. Agentic RAG：检索成为行动的一部分</a></li>
+<li class="toc-item toc-level-3"><a href="#3-%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%E7%B3%BB%E7%BB%9Fmemory-augmented-ai">3. 长期记忆系统（Memory-Augmented AI）</a></li>
+<li class="toc-item toc-level-3"><a href="#4-%E6%97%A0%E6%A3%80%E7%B4%A2%E6%8E%A8%E7%90%86retrieval-free-reasoning">4. 无检索推理（Retrieval-free Reasoning）</a></li>
+<li class="toc-item toc-level-2"><a href="#graphrag%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1-%E6%A3%80%E7%B4%A2%E8%9E%8D%E5%90%88">GraphRAG：知识图谱 + 检索融合</a></li>
+<li class="toc-item toc-level-3"><a href="#graphrag-%E6%A0%B8%E5%BF%83%E6%AD%A5%E9%AA%A4">GraphRAG 核心步骤</a></li>
+<li class="toc-item toc-level-2"><a href="#ragas-%E6%A1%86%E6%9E%B6rag%E8%AF%84%E4%BC%B0%E6%8C%87%E6%A0%87">RAGAs 框架：RAG评估指标</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/rag/" class="post-category">
+        it / RAG      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/rag/">#rag</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">RAG 基础</h1>
+
+    <div class="post-body">
+<h1 id="rag">RAG</h1>
+<p>RAG（Retrieval-Augmented Generation，检索增强生成）</p>
+<p>RAG技术的基座是 [Vector Database（向量数据库）](Vector Database（向量数据库）.md) 。向量数据库不仅可以提供对向量化知识的存储，还支持高效的相似性检索，结合Prompt,可有效提升大模型回答的质量。</p>
+<p>RAG 的核心思想是：<strong>让 LLM 在回答问题时，先从外部知识库中检索相关内容，再基于检索结果生成回答</strong>，而不是仅依赖模型训练时记住的知识。</p>
+<p>这解决了 LLM 的两个核心痛点：知识截止日期（模型不知道训练后发生的事）和幻觉问题（模型在不确定时会编造答案）。</p>
+<hr>
+<p>一个完整的 RAG 系统由两条流水线组成：<strong>离线索引流水线</strong>（将文档预处理存入向量库）和<strong>在线查询流水线</strong>（接收用户问题、检索、生成）。</p>
+<p>离线阶段将原始文档切分成小块，通过 Embedding 模型转换为向量，存入向量数据库。</p>
+<p>在线阶段将用户问题同样转换为向量，从数据库中找到最相近的文档块，拼接成上下文交给 LLM 生成答案。</p>
+<p>下图展示了 RAG 的完整请求流程：</p>
+<p><img src="/assets/images/rag-basics/RAG%E6%B5%81%E7%A8%8B.png" alt="RAG流程"></p>
+<p>三个核心阶段：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 知识库</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">        VectorDB</span><span style="color:#D73A49;--shiki-dark:#F97583">[(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"向量数据库"</span><span style="color:#D73A49;--shiki-dark:#F97583">)]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">    UserQuestion</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"用户提问"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Retrieval</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"检索 Retrieval"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Augmentation</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"增强 Augmentation"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Generation</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"生成 Generation"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Answer</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"返回答案"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">11</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">    UserQuestion </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Retrieval</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Retrieval </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> VectorDB</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Retrieval </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Augmentation</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Augmentation </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Generation</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Generation </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Answer</span></span>
+<span class="line"><span class="line-number">17</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 知识库 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fef9c3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ca8a04</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style VectorDB fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">e0e7ff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">4f46e5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style UserQuestion fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Retrieval fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Augmentation fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Generation fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Answer fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span></code></pre>
+<p>文档清洗、切分、向量化、索引、召回、重排。</p>
+<p>上下文构造、答案生成、引用溯源。</p>
+<p>BM25、向量检索、Hybrid Search、reranker 的作用边界要清楚。</p>
+<h2 id="1文档处理">1.文档处理</h2>
+<blockquote>
+<p>PDF、Word、Excel、网页，各种格式的文档怎么解析，怎么处理解析结果里的噪声（比如 PDF里的页眉页脚、表格被拆散）。</p>
+</blockquote>
+<p>目前行业主流方案是引入 <strong>文档解析引擎</strong>（如 LlamaParse、Unstructured）或多模态大模型，将复杂图文转换为结构化的 Markdown，为后续高质量切分打下基础。</p>
+<h2 id="2分块策略chunk">2.分块策略（Chunk）</h2>
+<p>文档切分是 RAG 效果的基础，切分粒度直接影响检索质量。块太大检索精度下降、引入噪声，块太小上下文不完整、丢失。不同内容适合不同策略。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">切分策略</th>
+<th style="text-align:left">适用场景</th>
+<th style="text-align:left">优点</th>
+<th style="text-align:left">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>固定大小分割</strong></td>
+<td style="text-align:left">通用文本</td>
+<td style="text-align:left">实现简单，速度快</td>
+<td style="text-align:left">可能切断语义完整的句子</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>递归字符分割</strong></td>
+<td style="text-align:left">结构化文本（Markdown、代码）</td>
+<td style="text-align:left">优先按段落、句子等语义边界切分</td>
+<td style="text-align:left">实现略复杂，需设定合理的分隔符列表</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>语义分割 (Semantic)</strong></td>
+<td style="text-align:left">长文档、书籍</td>
+<td style="text-align:left">利用 Embedding 计算相邻句子的相似度，自动寻找语义转折点切分</td>
+<td style="text-align:left">计算成本高，预处理速度慢</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>父子文档检索 (Small-to-Big)</strong></td>
+<td style="text-align:left">全面覆盖场景</td>
+<td style="text-align:left">用&quot;小块&quot;进行高精度向量检索，命中后返回对应的&quot;大块&quot;（父文档）给 LLM，兼顾了检索精度和上下文完整性。</td>
+<td style="text-align:left">数据库设计和维护成本翻倍</td>
+</tr>
+<tr>
+<td style="text-align:left">按文档结构分割</td>
+<td style="text-align:left">长文档有结构</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<p>实践中常在切分时加入 <strong>重叠（overlap）</strong>，即相邻块之间共享若干字符，防止重要信息在边界处被截断。</p>
+<p>典型配置：块大小 512 tokens，重叠 50~100 tokens。</p>
+<h2 id="3向量化embedding向量库">3.向量化（Embedding）、向量库</h2>
+<blockquote>
+<p><a href="https://blog.aihubplus.com/post/embedding-model-guide-2026/">Embedding模型完全指南：2026年最佳文本向量化模型选型与RAG应用实践 - AI 助手</a></p>
+</blockquote>
+<blockquote>
+<p>Embedding模型的选择，中文场景下用哪个模型效果比较好（BGE系列值得关注）。向量库的选择，小项目用Chroma或者FAISS，大一点的项目用Milvust或者Weaviate。这几个的基本用法都要会。</p>
+</blockquote>
+<h3 id="embedding">Embedding</h3>
+<p><strong>Embedding</strong>（嵌入）是指把文本（也可能包括图像、视频等其他模态数据）转成能表达语义信息的<strong>稠密向量</strong>（通常是 768 或 1536 维的浮点数数组）。语义相近的文本在向量空间中距离更近，这正是相似度检索的数学基础。</p>
+<img src="https://i-blog.csdnimg.cn/direct/1d9dcdbd2c6b4040bb5d52b88d70c526.png" alt="在这里插入图片描述" style="zoom: 80%;" referrerpolicy="no-referrer" />
+<p>从核心上来说，嵌入（embedding）是一种映射，它将诸如单词、图像甚至整篇文档等离散对象映射到连续向量空间中的点。嵌入的主要目的是将非数值数据转换为神经网络能够处理的格式。</p>
+<p>虽然词嵌入（word embeddings）是最常见的文本嵌入形式，但还存在针对句子、段落或整篇文档的嵌入。句子或段落嵌入是检索增强生成（retrieval-augmented generation）的流行选择。检索增强生成将生成（如生成文本）与检索（如搜索外部知识库）相结合，以便在生成文本时提取相关信息。</p>
+<p>当选择的embeddings为二维的时候，就是将词汇投影到二维空间，这时可以进行可视化绘制，从而观测出最直观的现象：相似的术语会聚集在一起。</p>
+<img src="https://i-blog.csdnimg.cn/direct/1e7ea3a36e37466d913ebf56d475fa9e.png" alt="在这里插入图片描述" style="zoom: 50%;" referrerpolicy="no-referrer" />
+<p>常用 <strong>Embedding 模型</strong>对比：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Embedding 模型</th>
+<th style="text-align:left">维度</th>
+<th style="text-align:left">适用语言</th>
+<th style="text-align:left">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">text-embedding-3-small（OpenAI）</td>
+<td style="text-align:left">1536</td>
+<td style="text-align:left">多语言</td>
+<td style="text-align:left">性价比高，适合大规模索引</td>
+</tr>
+<tr>
+<td style="text-align:left">text-embedding-3-large（OpenAI）</td>
+<td style="text-align:left">3072</td>
+<td style="text-align:left">多语言</td>
+<td style="text-align:left">精度最高，成本较高</td>
+</tr>
+<tr>
+<td style="text-align:left">BAAI/bge-m3</td>
+<td style="text-align:left">1024</td>
+<td style="text-align:left">中英文</td>
+<td style="text-align:left">开源，中文效果优秀，支持多语言</td>
+</tr>
+<tr>
+<td style="text-align:left">BAAI/bge-large-en-v1.5</td>
+<td style="text-align:left">1024</td>
+<td style="text-align:left">英文</td>
+<td style="text-align:left">开源，英文 MTEB 得分 64.23，支持指令前缀优化检索</td>
+</tr>
+<tr>
+<td style="text-align:left">BAAI/bge-large-zh-v1.5</td>
+<td style="text-align:left">1024</td>
+<td style="text-align:left">中文</td>
+<td style="text-align:left">开源，中文 MTEB 得分 64.53，中文检索效果优</td>
+</tr>
+<tr>
+<td style="text-align:left">sentence-transformers/all-MiniLM-L6-v2</td>
+<td style="text-align:left">384</td>
+<td style="text-align:left">英文</td>
+<td style="text-align:left">体积小，速度快，适合本地极轻量部署</td>
+</tr>
+</tbody>
+</table>
+<h3 id="向量库">向量库</h3>
+<p>[Vector Database（向量数据库）.md](Vector Database（向量数据库）.md)</p>
+<p>向量数据库（Vector Database）是一种专门用于存储、索引和检索高维向量数据的数据库系统。</p>
+<p>你可以把它理解为：把意思相近的东西存在一起，并能快速找到和这个最像的那些东西。</p>
+<p>以下是当前最主流的向量数据库横向对比：</p>
+<table>
+<thead>
+<tr>
+<th>数据库</th>
+<th>类型</th>
+<th>部署方式</th>
+<th>特点</th>
+<th>适用场景</th>
+<th>难度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Chroma</strong>&lt;<br>开源免费</td>
+<td>纯向量DB</td>
+<td>本地 / 云端<br>嵌入式优先</td>
+<td>极简 API，Python 原生<br>集成 LangChain 最方便</td>
+<td>RAG 原型、AI 应用开发</td>
+<td>入门</td>
+</tr>
+<tr>
+<td><strong>Qdrant</strong>&lt;<br>开源免费</td>
+<td>纯向量DB</td>
+<td>本地 / Docker<br>云服务</td>
+<td>Rust 实现，性能强劲<br>支持过滤+向量混合检索</td>
+<td>生产级推荐，性能优先</td>
+<td>中级</td>
+</tr>
+<tr>
+<td><strong>Weaviate</strong>&lt;<br>开源免费</td>
+<td>多模态DB</td>
+<td>本地 / 云端<br>SaaS</td>
+<td>GraphQL API，内置向量化<br>多模态（文本+图像）</td>
+<td>多模态检索，知识图谱</td>
+<td>中级</td>
+</tr>
+<tr>
+<td><strong>Milvus</strong>&lt;<br>开源免费</td>
+<td>纯向量DB</td>
+<td>分布式部署<br>Kubernetes</td>
+<td>LF AI 基金会项目<br>大规模分布式，功能全面</td>
+<td>亿级数据，企业大规模</td>
+<td>进阶</td>
+</tr>
+<tr>
+<td><strong>Pinecone</strong>&lt;<br>商业 SaaS</td>
+<td>托管向量DB</td>
+<td>纯云端<br>全托管服务</td>
+<td>零运维，开箱即用<br>免费套餐可用</td>
+<td>快速上线，无运维能力团队</td>
+<td>入门</td>
+</tr>
+<tr>
+<td><strong>pgvector</strong>&lt;<br>开源插件</td>
+<td>PG 扩展</td>
+<td>已有 PostgreSQL<br>环境直接用</td>
+<td>复用已有 PG 基础设施<br>SQL 接口，上手最快</td>
+<td>已用 PG 的项目，轻量接入</td>
+<td>入门</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4检索">4.检索</h2>
+<blockquote>
+<p><a href="https://developer.aliyun.com/article/1597646">模块化RAG技术路线图：从基础Naive RAG 到Modular RAG全方位技术解读-阿里云开发者社区</a></p>
+</blockquote>
+<blockquote>
+<p>纯向量检索不够用，混合检索（向量+关键词）通常比单一向量检索效果好。</p>
+<p>Rerank重排序，为什么要做rerank，用什么模型做。加权排序、RRFRanker。</p>
+</blockquote>
+<p>简单来说，RAG 由检索（Retrieval） 与生成（Generation） 两大模块构成：</p>
+<ul>
+<li>
+<p>检索模块：从预设知识库中精准定位与用户问题相关的信息片段（如文档、段落、句子）；</p>
+</li>
+<li>
+<p>生成模块：基于检索到的信息，结合大语言模型 生成符合上下文、逻辑连贯的答案。</p>
+</li>
+</ul>
+<h3 id="相似度计算与-ann-算法">相似度计算与 ANN 算法</h3>
+<p>检索的核心是<strong>度量距离</strong>。最常用的是<strong>余弦相似度（Cosine Similarity）</strong>，它计算两个向量的夹角余弦值，值域 [-1, 1]，越接近 1 越相似。此外还有点积（Dot Product）和欧氏距离（L2 Distance）。</p>
+<p>为了在百万级向量中实现毫秒级检索，数据库通常采用<strong>近似最近邻（ANN）算法</strong>（如 <strong>HNSW</strong>、IVF）。HNSW 是目前最主流的算法，它通过构建多层跳跃图网络，牺牲极少的精度换取了数量级的搜索速度提升。</p>
+<hr>
+<h3 id="语义近则向量近">语义近则向量近</h3>
+<p>向量空间中距离近的两个向量，其原始内容在语义上也更相近。这是向量数据库所有能力的基础。</p>
+<p>用一个 2D 简化示例来理解（实际是几百至几千维）：</p>
+<img src="/assets/images/rag/向量空间中的语义聚类.png" alt="向量空间中的语义聚类" style="zoom: 50%;" />
+<h3 id="相似度计算方法">相似度计算方法</h3>
+<p>找到&quot;最相似的向量&quot;的核心是计算两个向量的距离或相似度。以下是三种最常用的方法。</p>
+<h4 id="余弦相似度cosine-similarity">余弦相似度（Cosine Similarity）</h4>
+<p>余弦相似度衡量两个向量的方向角，忽略长度。这是最常用的方法，尤其适合文本场景。</p>
+<p>公式：cosine_similarity(A, B) = (A · B) / (|A| · |B|)</p>
+<ul>
+<li>结果范围：-1 到 1，值越大越相似</li>
+<li>适用场景：文本语义搜索、文档相似度</li>
+</ul>
+<h4 id="欧氏距离euclidean-distance">欧氏距离（Euclidean Distance）</h4>
+<p>欧氏距离衡量两点之间的直线距离，距离越小越相似。</p>
+<p>公式：d(A, B) = sqrt(Σ(A_i - B_i)^2)</p>
+<ul>
+<li>结果范围：0 到 ∞，值越小越相似</li>
+<li>适用场景：图像检索、地理位置相关应用</li>
+</ul>
+<h4 id="点积dot-product">点积（Dot Product）</h4>
+<p>点积是向量相乘求和，结合了方向和长度信息。</p>
+<p>公式：A · B = Σ A_i × B_i</p>
+<ul>
+<li>适用场景：推荐系统（向量已归一化时等价于余弦相似度）</li>
+</ul>
+<h4 id="三种方法对比">三种方法对比</h4>
+<p>三种相似度计算方法对比</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>原理</th>
+<th>结果含义</th>
+<th>推荐场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>余弦相似度</strong></td>
+<td>计算两向量夹角的余弦值<br>关注方向，忽略大小</td>
+<td>[-1, 1]，越接近 1 越相似</td>
+<td>文本搜索、NLP 首选</td>
+</tr>
+<tr>
+<td><strong>欧氏距离</strong></td>
+<td>两点之间的直线距离<br>关注绝对位置差异</td>
+<td>[0, ∞)，越接近 0 越相似</td>
+<td>图像检索、坐标系数据</td>
+</tr>
+<tr>
+<td><strong>点积</strong></td>
+<td>向量各分量乘积之和<br>方向+长度综合考量</td>
+<td>值越大越相似（无固定范围）</td>
+<td>推荐系统、归一化场景</td>
+</tr>
+</tbody>
+</table>
+<h3 id="向量索引算法">向量索引算法</h3>
+<p>数据量大时（百万、亿级），对每一条数据做相似度计算（暴力检索）太慢。向量数据库使用专门的索引算法来加速查询。</p>
+<h4 id="暴力检索flat-brute-force">暴力检索（Flat / Brute-force）</h4>
+<p>暴力检索遍历所有向量，逐一计算相似度。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">维度</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">原理</td>
+<td style="text-align:left">遍历所有向量，逐一计算相似度</td>
+</tr>
+<tr>
+<td style="text-align:left">优点</td>
+<td style="text-align:left">结果 100% 精确</td>
+</tr>
+<tr>
+<td style="text-align:left">缺点</td>
+<td style="text-align:left">数据量大时极慢，O(n) 复杂度</td>
+</tr>
+<tr>
+<td style="text-align:left">适用</td>
+<td style="text-align:left">数据量小于 10 万，对精度要求极高</td>
+</tr>
+</tbody>
+</table>
+<h4 id="ivf倒排文件索引">IVF（倒排文件索引）</h4>
+<p>![IVF 索引原理：先聚类，再在桶内搜索](/assets/images/rag/IVF 索引原理：先聚类，再在桶内搜索.png)</p>
+<p>IVF 执行步骤：</p>
+<ol>
+<li>训练阶段：用 K-Means 将所有向量聚成 N 个簇，记录每个簇的中心</li>
+<li>查询阶段：先找出距离最近的几个簇的中心，再只在这些簇内做精确搜索</li>
+</ol>
+<h4 id="hnsw分层导航小世界图">HNSW（分层导航小世界图）</h4>
+<p>HNSW 是目前最主流的向量索引算法，兼顾速度和精度。</p>
+<p>![HNSW 分层结构示意](/assets/images/rag/HNSW 分层结构示意.png)</p>
+<p>HNSW 分层结构示意第 2 层（最稀疏，长程跳转）AB第 1 层（中等密度，中程跳转）CADBE第 0 层（最密集，精确搜索）FCAGDHBEI查询时从顶层大步跳转定位区域，再逐层细化精确找到最近邻</p>
+<p>HNSW 核心思路：</p>
+<ul>
+<li>构建多层图结构，顶层稀疏，底层密集</li>
+<li>查询时从顶层入口开始，做&quot;跳格游戏&quot;：每层贪心地往更近的节点跳，再下探到下一层</li>
+<li>大幅减少需要比较的节点数，时间复杂度近似 O(log n)</li>
+</ul>
+<h4 id="其他常用索引">其他常用索引</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">索引类型</th>
+<th style="text-align:left">特点</th>
+<th style="text-align:left">适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Flat（暴力）</td>
+<td style="text-align:left">精确但慢</td>
+<td style="text-align:left">小数据集、精度优先</td>
+</tr>
+<tr>
+<td style="text-align:left">IVF_Flat</td>
+<td style="text-align:left">聚类后精确搜索，速度快</td>
+<td style="text-align:left">中大规模，内存充足</td>
+</tr>
+<tr>
+<td style="text-align:left">IVF_PQ</td>
+<td style="text-align:left">量化压缩，节省内存</td>
+<td style="text-align:left">超大规模，内存受限</td>
+</tr>
+<tr>
+<td style="text-align:left">HNSW</td>
+<td style="text-align:left">速度快、精度高，内存占用高</td>
+<td style="text-align:left">最常用，推荐首选</td>
+</tr>
+<tr>
+<td style="text-align:left">ScaNN</td>
+<td style="text-align:left">Google 出品，优化吞吐量</td>
+<td style="text-align:left">高并发生产环境</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="5生成">5.生成</h2>
+<blockquote>
+<p>索回来的内容怎么组织进prompt，怎么让模型在回答里引用来源，怎么处理检索结果和问题不相关的情况。</p>
+</blockquote>
+<hr>
+<h2 id="rag架构">RAG架构</h2>
+<blockquote>
+<p><a href="https://www.smallyoung.cn/docs/006-RAG%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97">RAG 检索增强生成入门指南 | SmallYoung</a></p>
+</blockquote>
+<p>RAG 技术形成了一个<strong>多维度演进的技术体系</strong>，从基础架构到专项优化，每个方向都在解决特定的核心问题。下图展示了完整的技术演进脉络：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 基础架构层</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">        NaiveRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Naive RAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">        AdvancedRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Advanced RAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">        ModularRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Modular RAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 模态扩展</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">        MultiModalRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"多模态 RAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">        LongRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Long RAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">12</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 检索增强</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">        GraphRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"GraphRAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">        LightRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"LightRAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">17</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 生成优化</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">        SELFRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"SELF-RAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">        CRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"CRAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">        SpeculativeRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Speculative RAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">23</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 智能融合</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#E36209;--shiki-dark:#FFAB70">        AgenticRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Agentic RAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#E36209;--shiki-dark:#FFAB70">        RAGAsSubmodule</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"RAG as Agent Submodule"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">28</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 部署模式</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#E36209;--shiki-dark:#FFAB70">        RAGAsService</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"RAG as a Service"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#E36209;--shiki-dark:#FFAB70">        EdgeRAG</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Edge RAG"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">33</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 基础架构层内部流向</span></span>
+<span class="line"><span class="line-number">35</span><span style="color:#E36209;--shiki-dark:#FFAB70">    NaiveRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> AdvancedRAG</span></span>
+<span class="line"><span class="line-number">36</span><span style="color:#E36209;--shiki-dark:#FFAB70">    AdvancedRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> ModularRAG</span></span>
+<span class="line"><span class="line-number">37</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 基础架构层 → 各扩展方向</span></span>
+<span class="line"><span class="line-number">39</span><span style="color:#E36209;--shiki-dark:#FFAB70">    NaiveRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> MultiModalRAG</span></span>
+<span class="line"><span class="line-number">40</span><span style="color:#E36209;--shiki-dark:#FFAB70">    MultiModalRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> LongRAG</span></span>
+<span class="line"><span class="line-number">41</span></span>
+<span class="line"><span class="line-number">42</span><span style="color:#E36209;--shiki-dark:#FFAB70">    NaiveRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> GraphRAG</span></span>
+<span class="line"><span class="line-number">43</span><span style="color:#E36209;--shiki-dark:#FFAB70">    GraphRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> LightRAG</span></span>
+<span class="line"><span class="line-number">44</span></span>
+<span class="line"><span class="line-number">45</span><span style="color:#E36209;--shiki-dark:#FFAB70">    NaiveRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> SELFRAG</span></span>
+<span class="line"><span class="line-number">46</span><span style="color:#E36209;--shiki-dark:#FFAB70">    SELFRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> CRAG</span></span>
+<span class="line"><span class="line-number">47</span><span style="color:#E36209;--shiki-dark:#FFAB70">    CRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> SpeculativeRAG</span></span>
+<span class="line"><span class="line-number">48</span></span>
+<span class="line"><span class="line-number">49</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 智能融合</span></span>
+<span class="line"><span class="line-number">50</span><span style="color:#E36209;--shiki-dark:#FFAB70">    ModularRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> AgenticRAG</span></span>
+<span class="line"><span class="line-number">51</span><span style="color:#E36209;--shiki-dark:#FFAB70">    AgenticRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> RAGAsSubmodule</span></span>
+<span class="line"><span class="line-number">52</span></span>
+<span class="line"><span class="line-number">53</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 部署模式</span></span>
+<span class="line"><span class="line-number">54</span><span style="color:#E36209;--shiki-dark:#FFAB70">    ModularRAG </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> RAGAsService</span></span>
+<span class="line"><span class="line-number">55</span><span style="color:#E36209;--shiki-dark:#FFAB70">    RAGAsService </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> EdgeRAG</span></span>
+<span class="line"><span class="line-number">56</span></span>
+<span class="line"><span class="line-number">57</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 样式</span></span>
+<span class="line"><span class="line-number">58</span><span style="color:#D73A49;--shiki-dark:#F97583">    classDef</span><span style="color:#E36209;--shiki-dark:#FFAB70"> base</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> fill:#dbeafe,stroke:#2563eb,stroke-width:2px</span></span>
+<span class="line"><span class="line-number">59</span><span style="color:#D73A49;--shiki-dark:#F97583">    classDef</span><span style="color:#E36209;--shiki-dark:#FFAB70"> extend</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> fill:#ede9fe,stroke:#7c3aed,stroke-width:1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span></span>
+<span class="line"><span class="line-number">60</span><span style="color:#D73A49;--shiki-dark:#F97583">    classDef</span><span style="color:#E36209;--shiki-dark:#FFAB70"> group</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> fill:#fefce8,stroke:#ca8a04,stroke-width:1px</span></span>
+<span class="line"><span class="line-number">61</span></span>
+<span class="line"><span class="line-number">62</span><span style="color:#D73A49;--shiki-dark:#F97583">    class</span><span style="color:#E36209;--shiki-dark:#FFAB70"> NaiveRAG,AdvancedRAG,ModularRAG</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> base</span></span>
+<span class="line"><span class="line-number">63</span><span style="color:#D73A49;--shiki-dark:#F97583">    class</span><span style="color:#E36209;--shiki-dark:#FFAB70"> MultiModalRAG,LongRAG,GraphRAG,LightRAG,SELFRAG,CRAG,SpeculativeRAG,AgenticRAG,RAGAsSubmodule,RAGAsService,EdgeRAG</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> extend</span></span>
+<span class="line"><span class="line-number">64</span><span style="color:#D73A49;--shiki-dark:#F97583">    class</span><span style="color:#E36209;--shiki-dark:#FFAB70"> 基础架构层,模态扩展,检索增强,生成优化,智能融合,部署模式</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> group</span></span></code></pre>
+<h3 id="naive-rag-框架">Naive RAG 框架</h3>
+<blockquote>
+<p>简单直接的基础架构</p>
+</blockquote>
+<h4 id="工作原理">工作原理</h4>
+<p>Naive RAG 是 RAG 的原始形态，架构极简，<strong>线性流程</strong>的基础实现。核心流程为 “单轮检索 + 直接生成”：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 节点定义（带形状和图标）</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Documents</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"📄 Documents"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Query</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"🔍 Query"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">    EmbeddingsModel</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Embeddings Model"</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">    VectorDB</span><span style="color:#D73A49;--shiki-dark:#F97583">{</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Vector DB"</span><span style="color:#D73A49;--shiki-dark:#F97583">}</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">    SimilarDocs</span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Documents similar to query"</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Prompt</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Prompt = Query + Similar Documents"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">    LLM</span><span style="color:#D73A49;--shiki-dark:#F97583">((</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"LLM"</span><span style="color:#D73A49;--shiki-dark:#F97583">))</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Response</span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Generated response"</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span></span>
+<span class="line"><span class="line-number">11</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 知识库索引流程（蓝色箭头方向）</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Documents </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> EmbeddingsModel</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    EmbeddingsModel </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> VectorDB</span></span>
+<span class="line"><span class="line-number">15</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 查询检索与生成流程（绿色箭头方向）</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Query </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> EmbeddingsModel</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">    VectorDB </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> SimilarDocs</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Query </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Prompt</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">    SimilarDocs </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Prompt</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Prompt </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> LLM</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#E36209;--shiki-dark:#FFAB70">    LLM </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Response</span></span>
+<span class="line"><span class="line-number">23</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 样式定义：蓝色 = 知识库侧，绿色 = 查询侧</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#D73A49;--shiki-dark:#F97583">    classDef</span><span style="color:#E36209;--shiki-dark:#FFAB70"> blue</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> fill:#dbeafe,stroke:#2563eb,stroke-width:2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">1e3a8a</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#D73A49;--shiki-dark:#F97583">    classDef</span><span style="color:#E36209;--shiki-dark:#FFAB70"> green</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> fill:#dcfce7,stroke:#16a34a,stroke-width:2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">14532d</span></span>
+<span class="line"><span class="line-number">27</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#D73A49;--shiki-dark:#F97583">    class</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Documents,EmbeddingsModel,VectorDB</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> blue</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#D73A49;--shiki-dark:#F97583">    class</span><span style="color:#E36209;--shiki-dark:#FFAB70"> Query,SimilarDocs,Prompt,LLM,Response</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> green</span></span></code></pre>
+<p>执行顺序：</p>
+<ol>
+<li>
+<p>用户输入问题（如 “什么是 RAG 技术？”）；</p>
+</li>
+<li>
+<p>检索器（通常基于关键词匹配或基础向量检索）从知识库中筛选出少量相关文档（如 3-5 篇）；</p>
+</li>
+<li>
+<p>生成器（如 GPT-3.5）直接拼接检索到的文档片段与问题，输出答案。</p>
+</li>
+</ol>
+<p>其核心特点是无优化环节：检索器不做重排序，生成器不做上下文过滤，分块策略简单（如固定长度切割文档），整个流程是不可逆的。</p>
+<h4 id="技术特点">技术特点</h4>
+<p>简单易实现，局限显著</p>
+<ul>
+<li>
+<p>优点</p>
+<ul>
+<li>
+<p>架构简单，开发成本低，适合快速搭建原型；</p>
+</li>
+<li>
+<p>对硬件资源要求低，可在小规模知识库（如万级文档）上稳定运行。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>缺点</p>
+<ul>
+<li>
+<p>检索精度低：依赖关键词或基础向量匹配，易遗漏语义相关但表述不同的内容（如 “AI” 与 “人工智能”）；</p>
+</li>
+<li>
+<p>抗干扰差：若检索到无关文档，生成器会 “照单全收”，导致答案冗余或错误；</p>
+</li>
+<li>
+<p>长文档处理弱：固定分块可能切断语义完整的段落（如将一个事件的起因与结果分到不同块）。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>适用场景
+适合简单、标准化的问答场景，如企业官网 FAQ（常见问题解答）、产品说明书查询等。例如，电商平台的 “退货政策查询”，用户问题明确，知识库内容结构化强，Naive RAG 可快速响应。</p>
+</li>
+</ul>
+<h3 id="advanced-rag-框架">Advanced RAG 框架</h3>
+<blockquote>
+<p>精度升级，优化检索与生成的协同</p>
+</blockquote>
+<p>Advanced RAG 是 Naive RAG 的进阶版，核心目标是<strong>提升检索精度与生成质量</strong>，在基础 RAG 上增加<strong>检索前优化、检索中增强、检索后处理</strong>三个环节：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 检索前优化</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">        QueryRewrite</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"查询重写"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">        QueryExpand</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"查询扩展"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">        HyDE</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"HyDE假设文档生成"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">        QueryRewrite </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> QueryExpand</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">        QueryExpand </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> HyDE</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">10</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 检索阶段</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">        HybridSearch</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"混合检索"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">        MultiRecall</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"多路召回"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">        HybridSearch </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> MultiRecall</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">17</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 检索后优化</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Reranking</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"重排序 Reranking"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">        ContextCompress</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"上下文压缩"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">        ResultFilter</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"结果过滤"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Reranking </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> ContextCompress</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">        ContextCompress </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> ResultFilter</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">26</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#6A737D;--shiki-dark:#6A737D">    %% 跨阶段连接</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#E36209;--shiki-dark:#FFAB70">    HyDE </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> HybridSearch</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#E36209;--shiki-dark:#FFAB70">    MultiRecall </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Reranking</span></span>
+<span class="line"><span class="line-number">30</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 检索前优化 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fefce8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ca8a04</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 检索阶段 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fefce8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ca8a04</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span></span>
+<span class="line"><span class="line-number">33</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 检索后优化 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fefce8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ca8a04</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">35</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style QueryRewrite fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">36</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style QueryExpand fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">37</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style HyDE fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style HybridSearch fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">39</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style MultiRecall fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">40</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Reranking fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">41</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style ContextCompress fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">42</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style ResultFilter fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span></code></pre>
+<h4 id="工作原理-2">工作原理</h4>
+<p>在保留 “检索 - 生成” 核心流程的基础上，Advanced RAG 增加了<strong>多环节优化的检索增强</strong>：</p>
+<ul>
+<li>预检索：查询优化
+<ul>
+<li><strong>查询改写（Query Rewriting）</strong>：对模糊问题（如 “它的原理是什么？”）用 LLM 重新表述用户问题，进行补全或改写（如结合上下文推断 “它” 指 “RAG”），提升检索针对性。</li>
+<li><strong>HyDE（Hypothetical Document Embedding）</strong>：让 LLM 先&quot;盲猜&quot;一个假设性答案，由于生成的答案通常比原问题包含更多行业术语，用这个假设答案的向量去检索，往往能召回更高质量的文档。</li>
+</ul>
+</li>
+<li><strong>混合检索（Hybrid Search）</strong>
+<ul>
+<li>将<strong>向量检索</strong>（懂语义，容错率高）与<strong>关键词检索</strong>（BM25，匹配度高）的结果按权重融合。这在遇到专有名词、产品型号、代码片段时尤为重要，因为传统的向量检索容易在特定的专有名词上&quot;翻车&quot;。</li>
+</ul>
+</li>
+<li>后检索优化：<strong>重排序（Reranking）</strong>
+<ul>
+<li>这是一个<strong>粗排 → 精排</strong>的两阶段设计。向量检索虽然快，但打分不够精确。重排序（Reranking）会引入 <strong>Cross-Encoder 模型</strong>（如 <code>bge-reranker</code>），将&quot;问题&quot;和&quot;文档&quot;成对输入模型进行联合推理打分。它的运算量大，只负责精选 Top-20 到 Top-5。</li>
+</ul>
+</li>
+<li><strong>Self-RAG 与 CRAG（修正式 RAG）</strong>
+<ul>
+<li>加入自我反思机制。例如 CRAG（Corrective RAG）在拿到检索结果后，先由 LLM 充当&quot;评委&quot;打分。如果本地知识库查无此文或质量极低，系统会自动触发 Web Search（如 Google API）作为补充，大幅降低幻觉。</li>
+</ul>
+</li>
+</ul>
+<h4 id="技术特点-2">技术特点</h4>
+<p>精度优先，复杂度适中</p>
+<ul>
+<li>
+<p>优点</p>
+<ul>
+<li>
+<p>检索精度显著提升：语义检索 + 重排序可过滤 70% 以上的无关信息；</p>
+</li>
+<li>
+<p>长文档处理更合理：动态分块减少语义割裂，生成答案更连贯；</p>
+</li>
+<li>
+<p>支持中等规模知识库（如十万级文档）。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>缺点</p>
+<ul>
+<li>
+<p>架构复杂度增加：需维护检索、重排序等多模型，调试成本上升；</p>
+</li>
+<li>
+<p>未解决多轮推理问题：仍依赖单轮检索，无法处理 “多步推理” 类问题（如 “对比 RAG 与微调的优劣势，并举例说明”）。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>适用场景
+适合<strong>中等复杂度</strong>的知识查询场景，如企业内部 helpdesk 系统、在线教育平台的课程问答（需处理较长的课件文档）等。例如，当用户提问 “如何配置 Python 环境安装 RAG 相关库？” 时，Advanced RAG 可通过语义检索定位到具体安装步骤文档，并过滤无关的理论介绍。</p>
+</li>
+</ul>
+<h3 id="modular-rag-框架">Modular RAG 框架</h3>
+<blockquote>
+<p>模块化设计，灵活适配多场景</p>
+<p><a href="https://arxiv.org/html/2407.21059v1">Modular RAG: Transforming RAG Systems into LEGO-like Reconfigurable Frameworks</a></p>
+</blockquote>
+<h4 id="工作原理-3">工作原理</h4>
+<p>Modular RAG 的核心是 <strong>“组件解耦 + 标准化接口”</strong>，将系统拆分为多个独立模块，各模块通过标准化接口通信：</p>
+<p><img src="/assets/images/rag-basics/RAG_paradigm_compare.png" alt="RAG_paradigm_compare"></p>
+<p>核心模块包括：检索器（多模态支持）、重排序器、分块器、生成器、知识库管理器、监控器等；</p>
+<p>模块可独立升级或替换（如将检索器从稠密向量模型换成混合检索模型，无需改动其他模块）。</p>
+<blockquote>
+<p>例如，当需要接入表格数据时，仅需替换 “分块器” 为表格解析专用模块，其他模块保持不变。</p>
+</blockquote>
+<p>将系统拆分为独立模块，像&quot;乐高积木&quot;一样灵活组合：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 扩展模块</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Memory</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"记忆模块"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Routing</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"路由模块"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Search</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"搜索模块"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Fusion</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"融合模块"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">8</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 核心模块</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Retrieval</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"检索模块"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Reasoning</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"推理模块"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Generation</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"生成模块"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">14</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Memory </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Retrieval</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Routing </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Retrieval</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Search </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Retrieval</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Retrieval </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Fusion</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Fusion </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Reasoning</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Reasoning </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Generation</span></span>
+<span class="line"><span class="line-number">21</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 扩展模块 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fefce8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ca8a04</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 核心模块 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fefce8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ca8a04</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Memory fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Routing fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Search fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Fusion fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7c3aed</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Retrieval fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">dbeafe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">2563eb</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Reasoning fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">dbeafe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">2563eb</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Generation fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">dbeafe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">2563eb</span></span></code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">模块</th>
+<th style="text-align:left">功能</th>
+<th style="text-align:left">示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>路由模块</strong></td>
+<td style="text-align:left">决定查询走哪条路径</td>
+<td style="text-align:left">简单问题直接回答，复杂问题走检索</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>记忆模块</strong></td>
+<td style="text-align:left">存储对话历史和偏好</td>
+<td style="text-align:left">多轮对话上下文管理</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>融合模块</strong></td>
+<td style="text-align:left">整合多源检索结果</td>
+<td style="text-align:left">合并向量库、知识图谱、数据库结果</td>
+</tr>
+</tbody>
+</table>
+<h4 id="技术特点-3">技术特点</h4>
+<p>灵活性与可扩展性的平衡</p>
+<ul>
+<li>优点：
+<ul>
+<li>
+<p>多源数据：支持多源数据接入（文本、表格、图片、PDF 等），适配复杂业务场景；</p>
+</li>
+<li>
+<p>易于迭代：单个模块升级不影响整体系统，适合长期维护；</p>
+</li>
+<li>
+<p>可定制化：根据需求组合模块（如简化版可去掉重排序器，增强版可加入多语言处理模块）。</p>
+</li>
+<li>
+<p>灵活编排：除了最简单的线性编排之外，还可以采用条件编排、并行编排、循环编排、递归检索等多种编排方式，增加了处理的灵活性。</p>
+</li>
+</ul>
+</li>
+<li>缺点
+<ul>
+<li>设计门槛高：需定义清晰的模块接口与数据格式，初期架构设计成本高；</li>
+<li>模块协同复杂：多模块联动可能导致延迟增加（如多模态 检索需协调文本与图片处理模块）。</li>
+</ul>
+</li>
+<li>适用场景
+适合多源数据整合或需长期迭代的系统，如政务服务平台（需整合政策文档、办事指南、表格化流程）、科研文献管理系统（需处理 PDF 全文、图表、公式等多模态数据）。例如，某科研平台需同时检索论文全文、实验数据表格与作者信息，Modular RAG 可通过替换检索器模块支持多模态检索，且后续可独立升级生成器以支持公式生成。</li>
+</ul>
+<h3 id="agentic-rag">Agentic RAG</h3>
+<p>引入智能代理，实现自主决策与迭代</p>
+<h4 id="工作原理-4">工作原理</h4>
+<p>具备反思能力的闭环系统</p>
+<p>Agentic RAG 是当前最先进的 RAG 形态（2026），核心是在系统中引入<strong>智能体（Agent）</strong>，赋予 RAG 自主规划、反思与迭代的能力：</p>
+<ol>
+<li><strong>问题分析</strong>： Agent 接收用户问题后，判断是否需要检索（如 “地球周长是多少” 可能无需检索，模型已掌握）；</li>
+<li><strong>检索规划</strong>： 对复杂问题拆解为多步检索任务（如 “分析 2023 年新能源汽车销量数据，并预测 2024 年趋势” 需先检索 2023 年销量、政策变化、供应链情况等）；</li>
+<li><strong>检索执行</strong>： 多条检索任务的执行可以使用单智能体完成，也可以调用多个智能体来完成。</li>
+</ol>
+<p>单智能体方式主要是对多个数据源进行分别检索。</p>
+<p><img src="https://i-blog.csdnimg.cn/img_convert/7acbedd954e0c408f012f02f2660751c.png" alt="图片" referrerpolicy="no-referrer"></p>
+<p>多智能体方式下，主智能体负责检索路由，各个专用智能体负责处理不同的检索类型和工作流。</p>
+<p><img src="https://i-blog.csdnimg.cn/img_convert/ca926b8176c4fdedb01963125fe67f96.png" alt="图片" referrerpolicy="no-referrer"></p>
+<h2 id="2026-年-rag-的四个新范式">2026 年 RAG 的四个新范式</h2>
+<h3 id="1-graph-rag从向量相似度走向知识关系">1. Graph-RAG：从向量相似度走向知识关系</h3>
+<p>核心变化：构建<strong>实体-关系图</strong>，检索变成<strong>路径推理</strong>，支持<strong>多跳 reasoning</strong>。带来的能力跃迁：更强事实一致性、更好的复杂问题回答、更接近「真正知识系统」。</p>
+<hr>
+<h3 id="2-agentic-rag检索成为行动的一部分">2. Agentic RAG：检索成为行动的一部分</h3>
+<p>在 Agent 架构中，RAG 不再是单次流程，而是：<strong>思考 → 检索 → 再思考 → 再检索 → 行动</strong>。特征包括多轮工具调用、动态知识更新、与任务规划深度耦合。<strong>RAG 从「模块」变成「循环」。</strong></p>
+<hr>
+<h3 id="3-长期记忆系统memory-augmented-ai">3. 长期记忆系统（Memory-Augmented AI）</h3>
+<p>2026 年最重要的变化之一：<strong>AI 开始拥有持续记忆</strong>。不再是每次重新检索，而是形成用户画像、记录历史决策、持续更新知识状态。这使 RAG 从「外部知识补丁」变成**「AI 认知结构的一部分」**。</p>
+<hr>
+<h3 id="4-无检索推理retrieval-free-reasoning">4. 无检索推理（Retrieval-free Reasoning）</h3>
+<p>随着模型能力增强（小模型蒸馏专域知识、长上下文直接读取文档、推理模型内化结构信息），某些场景正在摆脱 RAG。这不是 RAG 失败，而是<strong>RAG 被更高层架构吸收</strong>。</p>
+<h2 id="graphrag知识图谱-检索融合">GraphRAG：知识图谱 + 检索融合</h2>
+<p>传统 RAG 将知识库当作独立的文本碎片，无法回答诸如&quot;找到所有同时由现任 CEO 创办且市值超千亿的公司&quot;这类需要<strong>跨文档、多跳推理</strong>的复杂问题。<strong>GraphRAG</strong> 引入知识图谱（Knowledge Graph），将实体和关系显式建模。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TD</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">    UserQuestion</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"用户问题"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">    VectorSearch</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"向量检索&#x3C;br/>相关文档块"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">    GraphSearch</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"图检索&#x3C;br/>实体关系子图"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Fusion</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"上下文融合&#x3C;br/>文档块 + 图路径"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">    UserQuestion </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> VectorSearch</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">    UserQuestion </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> GraphSearch</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">    VectorSearch </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Fusion</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">    GraphSearch </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Fusion</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Example</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"实体 A → 关系 → 实体 B&#x3C;br/>实体 B → 关系 → 实体 C"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    VectorSearch </span><span style="color:#24292E;--shiki-dark:#E1E4E8">~~~ </span><span style="color:#E36209;--shiki-dark:#FFAB70">Example</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style UserQuestion fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f9fafb</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">9ca3af</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">374151</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style VectorSearch fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ccfbf1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">14b8a6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">0f766e</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style GraphSearch fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ede9fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">8b5cf6</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">6d28d9</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Fusion fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">ffedd5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f97316</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#E36209;--shiki-dark:#FFAB70">5px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">c2410c</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Example fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">d1d5db</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-dasharray</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#E36209;--shiki-dark:#FFAB70">5 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">6b7280</span></span></code></pre>
+<h3 id="graphrag-核心步骤">GraphRAG 核心步骤</h3>
+<ol>
+<li><strong>知识构建</strong>：离线阶段使用 LLM 从文档提取三元组（主体、关系、客体），写入 Neo4j 等图数据库。</li>
+<li><strong>双路检索</strong>：针对提问中的实体，不仅做传统的向量检索，同时在图谱中触发图遍历（Graph Traversal），提取多跳关系链。</li>
+<li><strong>图文融合生成</strong>：将向量检索找回的&quot;片段&quot;与图检索找回的&quot;路径结构&quot;拼装进 Prompt，使得 LLM 既具备全局视野又掌握具体细节。</li>
+</ol>
+<h2 id="ragas-框架rag评估指标">RAGAs 框架：RAG评估指标</h2>
+<p>RAG 系统的评估不能仅凭直觉，主流使用 <strong>RAGAs</strong> 框架（检索增强生成评估框架），从&quot;检索&quot;和&quot;生成&quot;两个维度进行自动化量化测试：</p>
+<ul>
+<li><strong>Context Recall（检索召回率）</strong>：标准答案中的信息有多少比例能被检索到。</li>
+<li><strong>Context Precision（检索精确率）</strong>：检索到的文档中有多少比例是真正相关的。</li>
+<li><strong>Faithfulness（忠实度/幻觉指标）</strong>：生成的答案是否都有检索出的文档支撑。</li>
+<li><strong>Answer Relevance（答案相关性）</strong>：生成的答案是否真正回答了用户的问题，避免答非所问。</li>
+</ul>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>图论方法 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">图论方法</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%AC%AC%E5%85%AB%E7%AB%A0-%E5%9B%BE%E8%AE%BA%E6%96%B9%E6%B3%95">第八章 图论方法</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%80-%E5%9B%BE%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5">一、 图的基本概念</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%8C%E6%A0%91%E5%92%8C%E6%A0%91%E7%9A%84%E9%80%90%E6%AD%A5%E7%94%9F%E6%88%90%E6%B3%95">二、树和树的逐步生成法</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%89%E6%9C%80%E5%B0%8F%E6%9E%9D%E6%9D%88%E6%A0%91%E6%A6%82%E5%BF%B5">三、最小枝杈树概念</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9B%9B%E6%9C%80%E5%B0%8F%E6%9E%9D%E6%9D%88%E6%A0%91%E7%9A%84%E6%A6%82%E5%BF%B5">四、最小枝杈树的概念</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%94%E6%9C%80%E7%9F%AD%E8%B7%AF%E7%BA%BF%E9%97%AE%E9%A2%98">五、最短路线问题</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%85%AD%E6%9C%80%E5%A4%A7%E6%B5%81%E9%97%AE%E9%A2%98">六、最大流问题</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%83%E4%B8%89%E7%A7%8D%E6%B1%82%E8%A7%A3%E6%96%B9%E6%B3%95%E5%9C%A8%E5%AE%9E%E9%99%85%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8">七、三种求解方法在实际中的应用</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/operations-research/" class="post-category">
+        it / 运筹学      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/operations-research/">#operations-research</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">图论方法</h1>
+
+    <div class="post-body">
+<h1 id="第八章-图论方法">第八章 图论方法</h1>
+<h3 id="一-图的基本概念">一、 图的基本概念</h3>
+<ul>
+<li>图的基本要素：
+<ul>
+<li>结点 ：研究的对象</li>
+<li>边：对象之间的关系</li>
+</ul>
+</li>
+<li>有向图 ： 所有边都带方向</li>
+<li>无向图 ：所有边都没有方向</li>
+<li>连通图：所有的结点都连接起来，没有孤立点的图</li>
+<li>不连通图：有孤立结点的图</li>
+<li>权：赋给结点或边的信息</li>
+<li>回路（圈）：从一点出发，还能回到原点的一条路</li>
+</ul>
+<h3 id="二树和树的逐步生成法">二、树和树的逐步生成法</h3>
+<p>树：<strong>连通</strong>且**不含圈（回路）**的图称为树</p>
+<p>树的边数=节点数-1</p>
+<h3 id="三最小枝杈树概念">三、最小枝杈树概念</h3>
+<p><strong>最小生成树</strong></p>
+<p>最小枝杈树的问题是关于在一个网络中，从一个起点出发到所有的点，找出一个或几条路线，以使在这样一些线路中所采用的全部支线的总长度是最小的。</p>
+<h3 id="四最小枝杈树的概念">四、最小枝杈树的概念</h3>
+<p><strong>克鲁斯喀尔法</strong>（避圈法）</p>
+<ol>
+<li>
+<p>每次选择剩余所有边中长度最小的。（不管结点的位置，<strong>所有边</strong>）</p>
+</li>
+<li>
+<p>后选的边与已经选好的边不能构成回路，若构成则弃置</p>
+</li>
+<li>
+<p>重复1、2直到把所有边选完</p>
+</li>
+</ol>
+<p>只适用于较小的网络</p>
+<p><strong>普莱姆法</strong>：应用较广</p>
+<p>从起点开始算，最小的距离</p>
+<p><img src="/assets/images/graph-theory/8%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91.jpg" alt="8最小生成树"></p>
+<h3 id="五最短路线问题">五、最短路线问题</h3>
+<p>最短路线问题为当通过网络的各边所需要的时间、距离或费用已知时，寻求两点间的距离或费用最少的路线问题。</p>
+<p>最短路线问题的方法为逆向推算法</p>
+<h3 id="六最大流问题">六、最大流问题</h3>
+<p>当以物体、能力或信息等作为流量通过网络时，怎样使流过的网络的流量最大，或者流过的网络流量的费用或时间最小</p>
+<p>最大流量问题，就是在一定条件下，要求流过网络的流量为最大的问题</p>
+<h3 id="七三种求解方法在实际中的应用">七、三种求解方法在实际中的应用</h3>
+<ol>
+<li>最小枝杈树问题主要应用于通道、电话线、电线、网线等线路铺设中（总路线最短）</li>
+<li>短路线问题为当通过网络的各边所需要的时间、距离或费用已知时，寻求两点间的距离最短或费用最少的路线问题（两点间距离最短）</li>
+<li>最大流问题，就是在一定条件下，要求流过网络的流量为最大的问题。</li>
+</ol>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

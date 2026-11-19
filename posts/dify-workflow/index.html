@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Dify 工作流 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Dify 工作流</a></li>
+<li class="toc-item toc-level-1"><a href="#dify">Dify</a></li>
+<li class="toc-item toc-level-2"><a href="#workflow-%E4%B8%8E-chatflow">Workflow 与 Chatflow</a></li>
+<li class="toc-item toc-level-3"><a href="#workflow">Workflow</a></li>
+<li class="toc-item toc-level-3"><a href="#chatflow">Chatflow</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%BC%80%E5%A7%8B%E8%BF%9E%E7%BA%BF%E7%BB%93%E6%9D%9F">开始、连线、结束</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8F%82%E6%95%B0%E4%B8%8E%E5%8F%98%E9%87%8F">参数与变量</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E7%94%A8%E6%88%B7%E8%BE%93%E5%85%A5">文件上传与用户输入</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C">代码执行</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%B9%B6%E8%A1%8C%E4%B8%8E%E6%9D%A1%E4%BB%B6%E5%88%A4%E6%96%AD">并行与条件判断</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%BF%AD%E4%BB%A3%E4%B8%8E%E5%BE%AA%E7%8E%AF">迭代与循环</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8F%82%E6%95%B0%E6%8F%90%E5%8F%96%E4%B8%8E%E9%97%AE%E9%A2%98%E5%88%86%E7%B1%BB">参数提取与问题分类</a></li>
+<li class="toc-item toc-level-3"><a href="#llm-%E8%8A%82%E7%82%B9">LLM 节点</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%9E%84%E5%BB%BA%E6%8F%90%E7%A4%BA%E8%AF%8D">构建提示词</a></li>
+<li class="toc-item toc-level-4"><a href="#%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BA">结构化输出</a></li>
+<li class="toc-item toc-level-2"><a href="#dify-rag">Dify + RAG</a></li>
+<li class="toc-item toc-level-3"><a href="#1%E7%9F%A5%E8%AF%86%E5%BA%93">1.知识库</a></li>
+<li class="toc-item toc-level-3"><a href="#2%E5%88%86%E5%9D%97%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97">2.分块、数据清洗</a></li>
+<li class="toc-item toc-level-4"><a href="#%E7%88%B6%E5%AD%90%E5%88%86%E5%9D%97">父子分块</a></li>
+<li class="toc-item toc-level-3"><a href="#3%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%BC%8F">3.索引模式</a></li>
+<li class="toc-item toc-level-3"><a href="#4%E6%A3%80%E7%B4%A2%E8%AE%BE%E7%BD%AE">4.检索设置</a></li>
+<li class="toc-item toc-level-4"><a href="#%E9%AB%98%E8%B4%A8%E9%87%8F%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%BC%8F">高质量索引模式</a></li>
+<li class="toc-item toc-level-4"><a href="#%E7%BB%8F%E6%B5%8E%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%BC%8F">经济索引模式</a></li>
+<li class="toc-item toc-level-2"><a href="#dify-agent">Dify + Agent</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%85%A8%E9%83%A8%E8%8A%82%E7%82%B9%E4%BB%8B%E7%BB%8D">全部节点介绍</a></li>
+<li class="toc-item toc-level-3"><a href="#1-%E5%BC%80%E5%A7%8B%E8%8A%82%E7%82%B9">1. 开始节点</a></li>
+<li class="toc-item toc-level-3"><a href="#2-%E7%BB%93%E6%9D%9F%E8%8A%82%E7%82%B9">2. 结束节点</a></li>
+<li class="toc-item toc-level-3"><a href="#3-%E7%9B%B4%E6%8E%A5%E5%9B%9E%E5%A4%8D%E8%8A%82%E7%82%B9">3. 直接回复节点</a></li>
+<li class="toc-item toc-level-3"><a href="#4-llm-%E8%8A%82%E7%82%B9">4. LLM 节点</a></li>
+<li class="toc-item toc-level-3"><a href="#5-%E7%9F%A5%E8%AF%86%E6%A3%80%E7%B4%A2%E8%8A%82%E7%82%B9">5. 知识检索节点</a></li>
+<li class="toc-item toc-level-3"><a href="#6-%E9%97%AE%E9%A2%98%E5%88%86%E7%B1%BB%E8%8A%82%E7%82%B9">6. 问题分类节点</a></li>
+<li class="toc-item toc-level-3"><a href="#7-%E6%9D%A1%E4%BB%B6%E5%88%86%E6%94%AF%E8%8A%82%E7%82%B9">7. 条件分支节点</a></li>
+<li class="toc-item toc-level-3"><a href="#8-%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E8%8A%82%E7%82%B9">8. 代码执行节点</a></li>
+<li class="toc-item toc-level-3"><a href="#9-%E6%A8%A1%E6%9D%BF%E8%BD%AC%E6%8D%A2%E8%8A%82%E7%82%B9-template">9. 模板转换节点 (Template）</a></li>
+<li class="toc-item toc-level-3"><a href="#10-%E5%8F%98%E9%87%8F%E8%81%9A%E5%90%88%E8%8A%82%E7%82%B9variable-aggregator">10. 变量聚合节点（Variable Aggregator）</a></li>
+<li class="toc-item toc-level-3"><a href="#11-%E5%8F%98%E9%87%8F%E8%B5%8B%E5%80%BC%E8%8A%82%E7%82%B9variable-assigner">11. 变量赋值节点（Variable Assigner）</a></li>
+<li class="toc-item toc-level-3"><a href="#12-%E8%BF%AD%E4%BB%A3%E8%8A%82%E7%82%B9iteration">12. 迭代节点（Iteration）</a></li>
+<li class="toc-item toc-level-3"><a href="#13-%E5%8F%82%E6%95%B0%E6%8F%90%E5%8F%96%E8%8A%82%E7%82%B9parameter-extractor">13. 参数提取节点（Parameter Extractor）</a></li>
+<li class="toc-item toc-level-3"><a href="#14-http-%E8%AF%B7%E6%B1%82%E8%8A%82%E7%82%B9http-request">14. HTTP 请求节点（HTTP Request）</a></li>
+<li class="toc-item toc-level-3"><a href="#15-%E5%B7%A5%E5%85%B7%E8%8A%82%E7%82%B9">15. 工具节点</a></li>
+<li class="toc-item toc-level-3"><a href="#16-%E9%A2%84%E8%A7%88%E4%B8%8E%E8%B0%83%E8%AF%95%E8%8A%82%E7%82%B9">16. 预览与调试节点</a></li>
+<li class="toc-item toc-level-3"><a href="#17-%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E8%8A%82%E7%82%B9">17. 文件上传节点</a></li>
+<li class="toc-item toc-level-3"><a href="#18-%E9%99%84%E5%8A%A0%E5%8A%9F%E8%83%BD%E8%8A%82%E7%82%B9">18. 附加功能节点</a></li>
+<li class="toc-item toc-level-3"><a href="#19-%E8%BF%90%E8%A1%8C%E5%8E%86%E5%8F%B2%E8%8A%82%E7%82%B9">19. 运行历史节点</a></li>
+<li class="toc-item toc-level-3"><a href="#20-%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95%E8%8A%82%E7%82%B9">20. 检查清单节点</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/llm/">#llm</a>
+      <a href="/tags/agent/">#agent</a>
+      <a href="/tags/workflow/">#workflow</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Dify 工作流</h1>
+
+    <div class="post-body">
+<h1 id="dify">Dify</h1>
+<p>Dify 是一个用于构建 AI 应用程序的开源平台。Dify融合了后端即服务（Backend as Service）和LLMOps理念。</p>
+<h2 id="workflow-与-chatflow">Workflow 与 Chatflow</h2>
+<blockquote>
+<p><a href="https://sspai.com/post/102434">从零到一的 Dify AI 工作流搭建指南 - 少数派</a>
+<a href="https://www.ygxz.in/collect/4911">从零到一的 Dify AI 工作流搭建指南 - 一个小站</a></p>
+</blockquote>
+<p>部署好你的 Dify，新建一个应用，你会看到 Dify 的两大应用类型：<strong>工作流（Workflow）和对话工作流（Chatflow）</strong>。</p>
+<p>Workflow 和 Chatflow 的区别：</p>
+<ul>
+<li>
+<p><strong>Workflow</strong></p>
+<ul>
+<li>只能实现“一问一答”的单轮运行，适合用于翻译、总结等只需要一次输入一次输出，或多次调用之间无联系的场景；</li>
+<li>没有对话界面，开始节点的输入字段就是唯一的入口，外部调用时必须显式传入。</li>
+</ul>
+</li>
+<li>
+<p><strong>Chatflow</strong></p>
+<ul>
+<li>和 Chatbot 类似，节点具备跨轮次的记忆能力，可以实现连续的、多次的对话，适合用于多轮信息收集、需要上下文保持的对话机器人等场景；</li>
+<li>有对话界面，<code>sys.files</code> 是专门为对话场景设计的系统变量。</li>
+</ul>
+</li>
+</ul>
+<p><strong>Chatflow 可以嵌套 Workflow</strong>：Chatflow 中可以通过调用 API 或将 Workflow 发布为工具的方式对其他的 Workflow 进行调用，变相实现在 Chatflow 中「嵌套」Workflow。然而，Chatflow 由于其设计特点，是不支持发布为工具的。如果你有这一需求，不妨直接选择创建一个 Workflow。</p>
+<h3 id="workflow">Workflow</h3>
+<p><strong>系统预置变量（System Variables）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">变量</th>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong><code>sys.files</code></strong></td>
+<td style="text-align:left"><code>Array[File]</code></td>
+<td style="text-align:left">用户上传的<strong>文件列表</strong>（如图片、PDF、文档等）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>sys.user_id</code></strong></td>
+<td style="text-align:left"><code>String</code></td>
+<td style="text-align:left">当前调用者的<strong>用户唯一标识</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>sys.app_id</code></strong></td>
+<td style="text-align:left"><code>String</code></td>
+<td style="text-align:left">当前<strong>应用（App）的唯一 ID</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>sys.workflow_id</code></strong></td>
+<td style="text-align:left"><code>String</code></td>
+<td style="text-align:left">当前<strong>工作流（Workflow）的唯一 ID</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>sys.workflow_run_id</code></strong></td>
+<td style="text-align:left"><code>String</code></td>
+<td style="text-align:left">当前<strong>这次运行实例的唯一 ID</strong>（每次运行都不同）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="chatflow">Chatflow</h3>
+<p>除了这两种应用类型，Dify 还有几种简单应用类型，<strong>Chatbot</strong>、<strong>Agent</strong> 和 <strong>Text Generator</strong>。它们的功能相较上述二者都更为基础，本文不再单独展开。</p>
+<p>Dify 为 Workflow 和 Chatflow 提供了截然不同的 Web UI 和 API 端点，且两种应用类型之间并不能实现自动转换。</p>
+<h3 id="开始连线结束">开始、连线、结束</h3>
+<ul>
+<li>
+<p>在没有 if-else 节点的情况下，一个节点后所有连线的下游节点都会被同时执行。</p>
+</li>
+<li>
+<p>Dify 不允许孤立节点。</p>
+</li>
+<li>
+<p>必须存在的两个节点是「<strong>开始</strong>」和「<strong>结束</strong>」，而且仅能存在各一个。</p>
+<p>如果有多条路径：</p>
+<ul>
+<li>[「<strong>变量聚合</strong>」节点（Variable Aggregator）](#10. 变量聚合节点（Variable Aggregator）)
+<ul>
+<li>将 <strong>互斥</strong> 的工作流分支汇聚为单一输出，这样只需定义一次下游处理逻辑。</li>
+<li>例如：如果有多个分支分别输出用户的姓名、地址和联系方式，可以使用变量聚合节点将这些信息整合为一个用户信息对象。</li>
+</ul>
+</li>
+<li>[「<strong>模板转换</strong>」节点（Template）](#9. 模板转换节点 Template)
+<ul>
+<li>允许使用 Jinja2 的 Python 模板语言进行灵活的数据转换和文本处理。通过定义模板，可以将输入数据格式化为所需的输出格式。</li>
+<li>接受任意类型变量的输入，且会强制把所有输入变量转换为 string 类型输出。</li>
+<li>例如：假设你有一个用户信息的字典，你可以使用模板转换节点生成一封个性化的欢迎邮件。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>「<strong>输出变量</strong>」和「<strong>结束</strong>」节点的输出参数是不同的概念。</p>
+</li>
+<li>
+<p>Dify 的节点间的连接线只是指定了工作流的执行<strong>路径</strong>，并<strong>不指定变量的传递</strong>。</p>
+</li>
+</ul>
+<blockquote>
+<p>在一个工作流中，核心要素就是**「节点」和「连线」<strong>。「节点」是工作流中的最小执行单元，也是工作流中的最小调试单元。「连线」则指示了节点间的执行顺序。<strong>在没有 if-else 节点的情况下，一个节点后所有连线的下游节点都会被同时执行</strong>，这就是 Dify 提供的</strong>节点并行**能力。</p>
+<p>节点间的连线是可删除的，你可以通过点击键盘上的退格键删除一条现有的连线；连线内也可插入节点，将鼠标放在一条连线的正中心，点击出现的「+」图标，即可在两个节点之间快捷插入一个新的节点。</p>
+<p>需要注意的是，Dify 并<strong>不允许孤立节点</strong>。位于工作流编排界面右上角的 Checklist 会时刻提醒你，任何节点的左侧都必须要有连线与它相连。如果你有一个节点不愿意删除但暂时用不到，可以将其连接到一个永远不会被执行的 if-else 分支，并删除这一节点右侧的连线。</p>
+<p>工作流中，<strong>必须存在的两个节点是「开始」和「结束」</strong>。拿 API 接口来类比，这两个节点定义的就是 API 接口的入参和出参。一个工作流中，只允许一个「开始」节点和一个「结束」节点。因此，如果你在工作流中通过 if-else 或节点并行执行的方式定义了多条执行路径，需要通过「<strong>变量聚合</strong>」或「<strong>模板转换</strong>」节点将多条路径的执行汇总为一个变量，再将其传递到结束节点2。有关这些功能节点的用法，后文会有详细介绍。</p>
+<p>下文提及的节点的「<strong>输出变量</strong>」，和「结束」节点的输出参数是不同的概念。一个节点的「输出变量」如果不被其他节点引用，就永远不会起作用。「结束」节点也是一个节点，只有用户在「结束」节点里指定了需要输出的变量，这个变量才会作为工作流的运行结果。</p>
+<p>另外特别提醒初次接触 Dify 的朋友，<strong>Dify 的节点间的连接线只是指定了工作流的执行路径，并不指定变量的传递</strong>。使用连接线连接两个节点后，上一个节点的输出变量并不会自动传递到下游节点，你仍然需要手动在下游节点的输入变量中选择，或在文本内容中插入。</p>
+</blockquote>
+<h3 id="参数与变量">参数与变量</h3>
+<blockquote>
+<p>本文中提及的「参数」和「变量」的概念，实际上是我为了方便理解而定义的。<strong>在 Dify 官方文档中，它们被统称为「变量」</strong>。本文中为了方便理解，把来自「开始」节点的或一般来自用户输入的变量，统称为「参数」。</p>
+</blockquote>
+<p>「<strong>变量</strong>」是一个动态的<strong>数据容器</strong>。每一个节点的输出，都会被包装为一个或多个「变量」，你可以在任何类型符合的场景里引用这个变量，比如下游节点的输入、LLM 节点的 Prompt，甚至是外部工具的调用参数。</p>
+<p>【注意】Dify 中的所有变量，都是有类型的。</p>
+<p>Dify 的变量一共支持以下八种数据类型：</p>
+<ul>
+<li>String 字符串</li>
+<li>Number 数值</li>
+<li>Object 对象</li>
+<li>Boolean 布尔值</li>
+<li>Array [string] 字符串数组</li>
+<li>Array [number] 数值数组</li>
+<li>Array [object] 对象数组（包括 Array [file] 文件对象数组）</li>
+<li>Array [boolean] 布尔值数组</li>
+</ul>
+<p>每一个节点接受的输入，都有其严格的类型要求。每一个节点的输出，也有固定的类型规定。</p>
+<blockquote>
+<p>比如，经常有朋友问我，为什么在变量聚合器节点中，选择一个变量后，就看不到另一个需要选择的变量了。实际上，这正是由于类型不匹配导致的。变量聚合器节点虽然支持聚合任意类型的变量，但相同一个聚合组内，只能聚合一个类型的变量。因此，在选择了第一个要聚合的变量后，后续继续选择，Dify 就只会为你筛选出工作流中类型符合的变量。</p>
+</blockquote>
+<ul>
+<li>
+<p>构建特定类型的变量：</p>
+<ul>
+<li>使用「<strong>模板转换</strong>」节点：这一节点接受任意类型变量的输入，且会强制把所有输入变量转换为 string 类型输出。</li>
+</ul>
+</li>
+<li>
+<p>构建 string 以外的特定类型的变量：</p>
+<ul>
+<li>使用「<strong>代码执行</strong>」节点：删除所有输入变量后，直接在函数体中 return 你需要构建的变量，并在输出变量中选择你需要的类型即可。</li>
+</ul>
+</li>
+<li>
+<p>「<strong>环境变量</strong>」：配置好后，和程序中的环境变量类似地，可以在任意需要的地方引入。</p>
+</li>
+<li>
+<p>「<strong>对话变量</strong>」：对于 Chatflow，Dify 还提供了「<strong>对话变量</strong>」。对话变量可在多轮对话中保持，因此可作为跨多轮对话的控制变量或临时存储。</p>
+<ul>
+<li>例如：在 Chatflow 的末尾放置一个变量赋值节点，给某一个变量对话赋值，在 Chatflow 开头使用 if-else 节点检查该对话变量是否为空，即可判断当前对话是否为第一轮对话。结合多分支不同的赋值和更复杂的 if-else，还可以实现根据上轮对话的不同发展，导向不同的 Chatflow 分支。</li>
+</ul>
+</li>
+</ul>
+<h3 id="文件上传与用户输入">文件上传与用户输入</h3>
+<p>以 Workflow 为例，用户输入参数包括文本、文件、数字、下拉选单、复选框等。在选择输入参数时，参数选项右侧已经写明了这一参数的类型。相同类型的参数，日后可以互相转换，比如短文本和段落。</p>
+<p>这些输入参数也会体现在 Workflow 的 API 接口中。如果你需要使用 API 接入 Workflow，你可以使用 <code>/parameters</code> 接口快速得到一份结构化的入参文档。你可以在 API Access 页面通过 App Key 调用，也可以直接将 Workflow 发布后，在 Web UI 中直接通过 F12 找到这个请求。</p>
+<p>稍显遗憾的是，<code>/parameters</code> 接口目前并没有返回某一参数的「类型」。因此在开发对接逻辑时，需要你对 Dify 的用户输入参数的 type 了熟于心。</p>
+<p>Dify 也支持基础的表单校验能力。选择文件和文件列表时，可以自定义支持的文件后缀名；对于所有输入参数，都可以选择是否必选（Required）。</p>
+<h3 id="代码执行">代码执行</h3>
+<p>代码执行可能是 Dify Workflow 中最强大的节点。得益于 Dify 的沙盒环境，代码执行节点可以运行 Python 和 JavaScript 代码。通过在 sandbox 挂载的 volume 中修改 <code>requirements.txt</code> 文件，你还能提前往这个沙盒环境中安装你需要的任何第三方依赖。</p>
+<p>对于 Python 代码执行节点，需要遵循类似 <code>def main(arg1: type, arg2: type) -&gt; dict</code> 的格式。如果你懒得琢磨怎么写代码，不妨求助于 LLM。Dify 本身提供了 Code Generator 功能，点击代码输入框右上角的入口即可使用 LLM 辅助生成代码。如果你更愿意使用外部的 LLM，我也准备了一份提示词。这份提示词和 Dify 系统内预设给 Code Generator 的提示词并不相同，但它在 Claude 模型上的表现更加稳定，大多数情况下可以一次输出可用的代码。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>您是一位 **Dify 代码执行节点专家**，专门为 Dify 工作流代码执行节点创建 Python 代码。您了解 Dify 沙箱化 Python 环境的独特约束和要求。</span></span>
+<span class="line"><span class="line-number">2</span><span></span></span>
+<span class="line"><span class="line-number">3</span><span>### 核心职责 (Core Responsibilities)</span></span>
+<span class="line"><span class="line-number">4</span><span></span></span>
+<span class="line"><span class="line-number">5</span><span>1.  生成完全遵循 Dify 代码执行节点格式的 Python 代码。</span></span>
+<span class="line"><span class="line-number">6</span><span>2.  创建干净、功能性的代码，**不含任何注释**（以避免解析错误）。</span></span>
+<span class="line"><span class="line-number">7</span><span>3.  确保按照 Dify 文档规定，正确处理输入/输出变量。</span></span>
+<span class="line"><span class="line-number">8</span><span></span></span>
+<span class="line"><span class="line-number">9</span><span>### 关键约束 (Critical Constraints)</span></span>
+<span class="line"><span class="line-number">10</span><span></span></span>
+<span class="line"><span class="line-number">11</span><span>-   **绝不 (NEVER)** 在代码执行节点函数之外使用 `import` 语句。</span></span>
+<span class="line"><span class="line-number">12</span><span>-   **绝不 (NEVER)** 在生成的代码中包含注释（这会导致 Dify 解析错误）。</span></span>
+<span class="line"><span class="line-number">13</span><span>-   **绝不 (NEVER)** 在本地测试或执行代码——用户将直接在 Dify 中进行测试。</span></span>
+<span class="line"><span class="line-number">14</span><span>-   **始终 (ALWAYS)** 遵循确切的格式: `def main(arg1: type, arg2: type) -> dict:`</span></span>
+<span class="line"><span class="line-number">15</span><span>-   **始终 (ALWAYS)** 返回一个包含明确命名输出变量的字典。</span></span>
+<span class="line"><span class="line-number">16</span><span></span></span>
+<span class="line"><span class="line-number">17</span><span>### 代码结构要求 (Code Structure Requirements)</span></span>
+<span class="line"><span class="line-number">18</span><span></span></span>
+<span class="line"><span class="line-number">19</span><span>-   函数签名必须与 Dify 的格式完全匹配。</span></span>
+<span class="line"><span class="line-number">20</span><span>-   如果需要，所有导入都必须在函数体内进行。</span></span>
+<span class="line"><span class="line-number">21</span><span>-   返回的字典必须包含 Dify 输出配置中声明的所有输出变量。</span></span>
+<span class="line"><span class="line-number">22</span><span>-   必须在函数参数中明确指定变量类型。</span></span>
+<span class="line"><span class="line-number">23</span><span></span></span>
+<span class="line"><span class="line-number">24</span><span>### 工作流程 (Workflow Process)</span></span>
+<span class="line"><span class="line-number">25</span><span></span></span>
+<span class="line"><span class="line-number">26</span><span>1.  彻底分析用户的需求。</span></span>
+<span class="line"><span class="line-number">27</span><span>2.  确定合适的输入参数及其类型。</span></span>
+<span class="line"><span class="line-number">28</span><span>3.  在不使用注释的情况下设计逻辑。</span></span>
+<span class="line"><span class="line-number">29</span><span>4.  使用描述性的变量名构建返回字典。</span></span>
+<span class="line"><span class="line-number">30</span><span>5.  创建或修改单个包含完整函数的 Python 文件。</span></span>
+<span class="line"><span class="line-number">31</span><span>6.  向用户清楚地传达输出变量的名称和类型。</span></span>
+<span class="line"><span class="line-number">32</span><span></span></span>
+<span class="line"><span class="line-number">33</span><span>### 输出沟通 (Output Communication)</span></span>
+<span class="line"><span class="line-number">34</span><span></span></span>
+<span class="line"><span class="line-number">35</span><span>生成代码后，您必须明确告知用户：</span></span>
+<span class="line"><span class="line-number">36</span><span>-   返回字典中所有输出变量的名称。</span></span>
+<span class="line"><span class="line-number">37</span><span>-   每个输出变量的数据类型。</span></span>
+<span class="line"><span class="line-number">38</span><span>-   如何在 Dify 的输出变量设置中配置这些变量。</span></span>
+<span class="line"><span class="line-number">39</span><span></span></span>
+<span class="line"><span class="line-number">40</span><span>### 质量保证 (Quality Assurance)</span></span>
+<span class="line"><span class="line-number">41</span><span></span></span>
+<span class="line"><span class="line-number">42</span><span>-   验证代码是否遵循 Dify 沙箱环境的限制。</span></span>
+<span class="line"><span class="line-number">43</span><span>-   确保没有文件系统访问、网络请求或系统命令。</span></span>
+<span class="line"><span class="line-number">44</span><span>-   验证所有必需的功能都可以在 Dify 的约束内实现。</span></span>
+<span class="line"><span class="line-number">45</span><span>-   仔细检查返回字典的结构是否与预期的输出匹配。</span></span>
+<span class="line"><span class="line-number">46</span><span></span></span>
+<span class="line"><span class="line-number">47</span><span>### 请记住：</span></span>
+<span class="line"><span class="line-number">48</span><span></span></span>
+<span class="line"><span class="line-number">49</span><span>您的代码将在 Dify 的安全沙箱环境中运行。请专注于在这些约束内进行**数据转换、数学运算、JSON 处理和逻辑操作**。</span></span></code></pre>
+<p>代码执行节点同样也有许多「邪修」用法。</p>
+<p>构建用于迭代的数组。<strong>迭代器</strong>（下文会介绍）的输入变量只能是数组类型，这意味着你不能使用模板转换节点给迭代器提供迭代对象。这时候，你可以直接使用一个代码执行节点，不执行任何实际代码，只让函数返回你想要的数组。这样就能让迭代节点按照你想要的数组进行迭代了。</p>
+<p>发起网络请求调用外部 API。Dify 的 Sandbox 环境是可以开启联网功能的（可能需要手动调整配置），这意味着你可以在工作流中简单地使用任意外部 API，而不用将其封装为插件。不过考虑到代码的可维护性（鉴于代码执行节点没有独立于工作流的版本控制），<strong>对于较为复杂的代码执行逻辑，我还是建议你尝试将其封装为一个插件，并使用 Git 进行代码版本控制</strong>。</p>
+<h3 id="并行与条件判断">并行与条件判断</h3>
+<p>在 Dify 中，一个节点右侧可以拉出多条连接线，连接到多个下游节点，此时，这些下游节点会被同时执行。<code>if-else</code> 节点则可以通过条件判断，拉出若干条执行路径，但一次只会有一条路径被执行。</p>
+<p>请注意，在并行执行时，由于所有并行的路径都肯定会被执行，因此你可以在下游节点直接插入所有并行路径的输出变量。而在使用条件判断时，由于只有一条路径会被执行，如果你在下游节点插入了未被执行的路径的输出变量，会导致节点报错。此时你需要在条件判断的多条路径执行完成的位置，添加一个「<strong>变量聚合</strong>」节点，将多路分支路径的输出变量（注意只能是相同类型）聚合为一组变量，以供下游节点调用。</p>
+<h3 id="迭代与循环">迭代与循环</h3>
+<p>迭代与循环是 Dify 区别于 MaxKB 这类「重 RAG 轻 Workflow」的产品的一大特色。平心而论，Dify 在迭代与循环的功能设计上不如 n8n 直观和强大，但如果你理解了 Dify 的 Workflow 哲学，相信你一定会喜欢这个功能。</p>
+<p>迭代节点，和 Python 中的迭代概念类似，在一个数组中执行迭代，并为每一次迭代设计相同的逻辑，可以用于合并并行的重复节点。比如上文「代码执行」部分配图的一个五个字符串组成的数组，如果不使用迭代，就需要复制 5 个 LLM 节点并行执行，而使用构建数组 + 迭代的方式，只需要代码执行、迭代两个节点，且更方便维护。</p>
+<p>需要注意的是，迭代中的节点在默认情况下并不会知道自己位于哪一轮迭代，也不会知道当前正在迭代的 <code>item</code>。因此，你需要在迭代节点内部的节点中，显式地通过插入 <code>item</code> 变量，给节点传递当前的迭代内容。</p>
+<p>迭代节点必选输入和输出变量，但默认均为空。输入和输出变量都必须是 Array 类型，迭代时会根据数组中的元素逐个迭代。输出变量虽然必须设置，但如果你不需要，随便设置一个即可。</p>
+<p>迭代节点的另一大特性是每一轮次迭代互相独立，因此可以选择并行执行。并行执行开启后，输出的顺序是每一轮迭代的完成顺序而非输入变量的顺序，因此请特别注意，<strong>不要在对输出顺序敏感的场景里使用并行执行</strong>。</p>
+<p>另外，默认配置下，迭代的最大并行度为 10，单个迭代节点的最大迭代次数为 100。这些配置都可通过 Dify 的环境变量在部署时调整。</p>
+<p>循环节点用于执行依赖前一轮结果的重复任务，直到满足退出条件或达到最大循环次数。和 Python 里的 <code>for</code> 循环类似地，循环节点也可以设置循环变量，循环变量会在每一次循环中继承。</p>
+<h3 id="参数提取与问题分类">参数提取与问题分类</h3>
+<p>参数提取器和问题分类器，本质上都是 LLM 节点的上层包装。参数提取器需要解决的核心问题是，让大模型从给定的内容中，按照给定的参数类型和说明，提取出固定的字段；而问题分类器则像一个加入了 LLM 的 <code>if-else</code> 节点，将条件分支判断的条件从程序化语言进化为了自然语言。</p>
+<p>参数提取器的功能依赖 LLM 的 Function Calling（或 Tool Use）能力。Dify 提供了 Prompt 方案作为模型不支持 Function Call 时的备选。</p>
+<p>参数提取器和问题分类器都可以自定义指令。但是根据 Dify 的设计，用户在这两个节点的自定义指令会被拼接在 System Prompt 之后，后者将指导模型按照节点期望的格式输出。因此，在自定义指令中，只需要补充业务特定的逻辑就可以。</p>
+<p>另外有一个小 Tips：根据官方文档，变量聚合器除了可用于多条 if-else 分支，还可以用于多路问题分类器分支（这也能说明问题分类器就是一个智能的条件分支节点）。这一特性对于多路分支需要执行部分相同操作的情况很有用。</p>
+<h3 id="llm-节点">LLM 节点</h3>
+<p>作为一个 AI Workflow 构建平台，LLM 节点就是 Dify 中最「AI」的一块拼图。Dify 发展至今，LLM 节点已经支持了文字、图片、音频等多模态的输入输出，具备相当高的可用性。</p>
+<p>并且，足以与同类竞品拉开差距的一点是，<strong>Dify 官方通过 Plugin 的形式维护模型提供商及其模型列表</strong>。常见的模型提供商如 OpenAI，Dify 官方已经将提供商的所有可用模型及其参数写入 Plugin 中，用户只需要添加 Key 即可使用，无需像竞品一样手动为模型逐个配置参数。</p>
+<h4 id="构建提示词">构建提示词</h4>
+<p>在 Dify 的 LLM 节点内，你可以通过 System、User 和 Assistant 三种身份，构建若干轮上文。这一设计非常方便为 LLM 提供 Few-Shots 示例，以更好符合我们的输出要求。</p>
+<p>这其中，System 即系统提示词，User 即用户输入的请求。Assistant 即LLM做出的回答。在真正的 User Prompt 之前先提供若干轮高质量的 User-Assistant 对话示例，可以极大提高 LLM 输出的稳定性和质量。这种被称为 Few-shots 的方法有点像在提示词里为 LLM 进行临场「训练」，可以让 LLM 对提示词的把握更加精准。</p>
+<p>在任何一个提示词文本框内，输入 <code>/</code> 都可以唤起变量面板，以便快速选择需要插入到提示词中的变量。</p>
+<p>提示词文本框内的所有内容（包括变量）都可被复制、粘贴。当然，变量的粘贴必须确保在相同 Workflow 中，且被粘贴节点的前序调用路径中必须包含这个变量的来源节点。</p>
+<p>需要注意的是，尽管你可以在提示词文本框内添加 Array [File] 类型的变量，但是这种用法实际上并不会往提示词中插入内容。<strong>如果你需要往提示词中插入文件，你需要先使用「文档提取器」节点或同类插件，将文件解析为字符串</strong>。</p>
+<h4 id="结构化输出">结构化输出</h4>
+<p>结构化输出是将大模型能力应用到实际业务中时，一个非常重要的依赖。传统意义上，大模型输出的内容倾向于非结构化的 Markdown 文本，这方便了作为用户的人类阅读，但对于程序解析却极为不利。</p>
+<p>为了解决这个问题，OpenAI 等大模型厂商自很早开始就在增强模型的结构化输出能力。从最原始的 Prompt 约束到后训练对齐，再到通过强制选择 Token 的方式强制模型输出符合要求的 JSON，模型的结构化输出能力越来越稳定，越来越可靠。和参数解析器依赖 Function Call 不同，Dify 的结构化输出没有使用独立节点，而是直接放置在了 LLM 节点中，直接调用模型原生的 Structured Output 能力。对于不支持 Structured Output 能力的模型，Dify 会降级通过 Prompt 方式引导模型，并由 LLM 节点完成 Parse 的任务。</p>
+<p>在结构化输出折叠菜单展开后，即可进入 LLM 节点的结构化输出配置选项。我建议通过 JSON Schema 的方式，更明确地规定每一个字段的属性和描述。和代码生成节点类似地，结构化输出的编辑对话框也支持使用 LLM 辅助生成 JSON Schema，但是你同样可以使用任意大模型生成的 JSON Schema，切换到「JSON Schema」选项卡导入，并切换回「可视化编辑」选项卡检查解析结果。</p>
+<p>我个人不太推荐直接使用现有的 JSON 导入，因为这样做会丢失 JSON Schema 中每一字段的属性和描述，可能不利于模型生成符合条件的 JSON Output。如果你确有这个需要，可以考虑使用带有推理能力的模型，从现有的 JSON 和你的描述中反推一个 JSON Schema，<strong>但请务必亲自检查校对 LLM 提供的 JSON Schema</strong>。</p>
+<p>当一个 LLM 节点使用 Structured Output 后，其输出除 text 外，还会提供一个 <code>array[object]</code> 类型的变量，后续节点可随时引用。</p>
+<hr>
+<h2 id="dify-rag">Dify + RAG</h2>
+<p>将文档上传到Dify知识库的过程涉及多个步骤，从文件选择、预处理、索引模式选择到检索设置，旨在构建一个高效、智能的知识检索系统。</p>
+<h3 id="1知识库">1.知识库</h3>
+<p>知识库：Dify主导航栏中的“知识”，在此页面可以看到已有的知识库。</p>
+<ul>
+<li>创建新知识库：拖放或选择要上传的文件，支持批量上传，但数量受订阅计划限制。</li>
+<li>空知识库选项：如果尚未准备文档，可选择创建空知识库。</li>
+<li>外部数据源：使用外部数据源（如Notion或网站同步）时，知识库类型将固定，建议为每个数据源创建单独知识库。</li>
+</ul>
+<h3 id="2分块数据清洗">2.分块、数据清洗</h3>
+<p>文本预处理与清理：内容上传到知识库之后，需要进行分块和数据清洗，这个阶段可以理解为内容的预处理和结构化。</p>
+<ul>
+<li>自动模式：Dify自动分割和清理内容，简化文档准备流程。</li>
+<li>定义模式：对于需要更精细控制的情况，可选择自定义模式进行手动调整。</li>
+</ul>
+<p><strong>分段重叠长度</strong>：下一段包含上一段的一部分末尾的内容，保持上下文的连续性。</p>
+<h4 id="父子分块">父子分块</h4>
+<p><strong>子块用于检索，父块用作上下文</strong>。通过父子分块，其实相当于允许用户变相给 chunk 中的某一部分内容「增加权重」。实现类似搜索引擎一样的，使用 Keyword 召回父分块的效果。</p>
+<ul>
+<li><strong>子块是从父块切割出的，用于「检索」的最小单元</strong>。比如一个父块中可能前若干行是 UUID，Category，Keywords 或 Title，将其分别拆分为子块后，任意子分块命中检索，都会召回整个父块条目。</li>
+<li><strong>父块是用于「召回」的最小单元</strong>。只要其中任何一个子分块被检索命中，其所在的父分块就会出现在知识库检索结果中。</li>
+</ul>
+<p>在传统的分块检索中，如果需要在一个 chunk 内召回其中的一行文本（比如 Title），其检索置信度会受到 chunk 长度、chunk 内其他文本等因素的影响。因此，分块检索在此时难以保证召回的稳定性。而在采用父子分块并妥善设置分段标识后，Workflow 可以根据更小粒度的文本进行检索召回。在知识库检索前搭配参数提取器进行 Query 改写或字段提取，大多数情况下都可获得不错的检索效果。</p>
+<h3 id="3索引模式">3.索引模式</h3>
+<p>索引模式：根据应用场景选择合适的索引模式，如高质量模式、经济模式或问答模式。</p>
+<ul>
+<li>高质量模式：利用 <a href="RAG%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90%5CRAG.md#%E5%90%91%E9%87%8F%E5%8C%96%EF%BC%88Embedding%EF%BC%89%E3%80%81%E5%90%91%E9%87%8F%E5%BA%93"><strong>Embedding模型</strong></a> 将文本转换为数值向量，支持向量检索、全文检索和混合检索。</li>
+<li>经济模式：采用<strong>离线向量引擎</strong>和<strong>关键字索引</strong>，虽然准确率有所降低，但省去了额外的 token 消耗和相关成本。</li>
+<li>问答模式：系统会进行文本分词，并通过摘要的方式，为每段生成QA问答对。</li>
+</ul>
+<h3 id="4检索设置">4.检索设置</h3>
+<h4 id="高质量索引模式">高质量索引模式</h4>
+<p>在高质量索引模式下，Dify 提供三种检索设置：向量搜索、全文搜索、混合搜索。</p>
+<ul>
+<li><strong>向量搜索</strong>：将查询向量化，计算与知识库中文本向量的距离，识别最接近的文本块。</li>
+<li><strong>全文搜索</strong>：基于关键字匹配进行搜索。</li>
+<li><strong>混合搜索</strong>：结合向量搜索和全文搜索的优势，就是同时使用向量检索和全文检索，并按照一定的权重（或使用 Rerank 模型）对结果进行重排序，最后再应用 Top K 和 Score 阈值设置。</li>
+</ul>
+<blockquote>
+<p>就我个人经验而言，Top K 在大多数场景下并不是越大越好，特别是对于参数量有限的模型而言。当模型参数规模缩小到 8B 这个量级，Top K 大于 3 都有可能引起模型的混乱，需要非常精细的提示词引导和上下文管理才能让模型按照预期回复。</p>
+<p>有关 Top K 和 Score 阈值的设置，完全取决于你实际工作流的需要和知识库中文档以及召回 Query 的质量，因此很难有一个放之四海皆准的预设。如果条件允许，不妨使用控制变量法设计若干轮实验，找到最适合你应用场景的参数。</p>
+</blockquote>
+<ul>
+<li><strong>Rerank模型</strong>：对检索结果进行语义重排序，优化排序结果。</li>
+</ul>
+<h4 id="经济索引模式">经济索引模式</h4>
+<p>在经济索引模式下，Dify 提供单一检索设置：倒排索引和TopK</p>
+<ul>
+<li>倒排索引：一种为快速检索文档中的<strong>关键字</strong>而设计的索引结构。</li>
+<li>TopK和分数阈值：设置检索结果的数量和相似度阈值。</li>
+</ul>
+<hr>
+<h2 id="dify-agent">Dify + Agent</h2>
+<p>在Dify平台上，通过选择模型、编写提示、添加工具与知识库、配置推理模式及对话开启器，最后进行调试预览并发布为Webapp，实现Agent的创建与部署。</p>
+<ol>
+<li>
+<p>探索与集成应用模板</p>
+<ul>
+<li>Dify平台提供了丰富的“探索”（Explore）部分，其中包含多个代理助理的应用模板。用户可以直接将这些模板集成到自己的工作区中，快速开始使用。同时还允许用户创建自定义代理助理，以满足特定的个人或组织需求。</li>
+</ul>
+</li>
+<li>
+<p>选择推理模型</p>
+<ul>
+<li>代理助理的任务完成能力很大程度上取决于所选LLM模型的推理能力。建议使用如 GPT-4 等更强大的模型系列，以获得更稳定、更精确的任务完成结果。</li>
+</ul>
+</li>
+<li>
+<p>编写提示与设置流程</p>
+<ul>
+<li>在“说明”（Instructions）部分，用户可以详细编写代理助理的任务目标、工作流程、所需资源和限制条件等提示信息。这些信息将帮助代理助理更好地理解并执行任务。</li>
+</ul>
+</li>
+<li>
+<p>添加工具与知识库</p>
+<ul>
+<li>工具集成：在“工具”（Tools）部分，用户可以添加各种内置或自定义工具，以增强代理助理的功能。这些工具可以包括互联网搜索、科学计算、图像创建等，帮助代理助理与现实世界进行更丰富的交互。</li>
+<li><strong>知识库（RAG）</strong>：在“上下文”（Context）部分，用户可以整合知识库工具，为代理助理提供外部背景知识和信息检索能力。</li>
+</ul>
+</li>
+<li>
+<p>推理模式设置</p>
+<p>Dify支持两种推理模式：<strong>Function Calling</strong> 和 <strong>ReAct</strong>。</p>
+<ul>
+<li><strong>Function Calling</strong>：对于支持该模式的模型（如GPT-3.5、GPT-4），建议使用此模式以获得更好更稳定的性能。</li>
+<li><strong>ReAct</strong>：对于不支持Function Calling的模型系列，Dify提供了ReAct推理框架作为替代方案，以实现类似的功能。</li>
+</ul>
+</li>
+<li>
+<p>配置对话开启器</p>
+<ul>
+<li>用户可以为代理助理设置对话开场白和初始问题，以便在用户首次与代理助理交互时，展示其可以执行的任务类型和可以提出的问题示例。</li>
+</ul>
+</li>
+<li>
+<p>调试与预览</p>
+<ul>
+<li>在将代理助理发布为应用程序之前，用户可以在Dify平台上进行调试和预览，以评估其完成任务的有效性和准确性。</li>
+</ul>
+</li>
+<li>
+<p>应用程序发布</p>
+<ul>
+<li>一旦代理助理配置完成并经过调试，用户就可以将其发布为Web应用程序（Webapp），供更多人使用。这将使得代理助理的功能和服务能够跨平台、跨设备地提供给更广泛的用户群体。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="全部节点介绍">全部节点介绍</h2>
+<p>Dify 的工作流模式通过将复杂的任务分解为多个节点，降低系统复杂度，提高应用的可解释性、稳定性和容错性。以下是 Dify 工作流中所有节点的详细介绍：</p>
+<h3 id="1-开始节点">1. 开始节点</h3>
+<p><strong>功能</strong>：工作流的起始点，通常用于初始化变量或设置初始状态。</p>
+<h3 id="2-结束节点">2. 结束节点</h3>
+<p><strong>功能</strong>：工作流的终止点，标志着工作流的完成。</p>
+<h3 id="3-直接回复节点">3. 直接回复节点</h3>
+<p><strong>功能</strong>：直接向用户返回响应，适用于简单的交互场景。</p>
+<h3 id="4-llm-节点">4. LLM 节点</h3>
+<p><strong>功能</strong>：调用大型语言模型（LLM）进行文本生成或处理，适用于需要自然语言理解和生成的场景。</p>
+<h3 id="5-知识检索节点">5. 知识检索节点</h3>
+<p><strong>功能</strong>：从知识库中检索相关信息，适用于需要获取背景知识或数据的场景。</p>
+<h3 id="6-问题分类节点">6. 问题分类节点</h3>
+<p><strong>功能</strong>：对用户输入的问题进行分类，帮助系统理解用户意图。</p>
+<h3 id="7-条件分支节点">7. 条件分支节点</h3>
+<p><strong>功能</strong>：根据特定条件决定工作流的执行路径，适用于需要根据用户输入或状态进行不同处理的场景。</p>
+<h3 id="8-代码执行节点">8. 代码执行节点</h3>
+<p><strong>功能</strong>：执行自定义代码，适用于需要进行复杂计算或逻辑处理的场景。</p>
+<h3 id="9-模板转换节点-template">9. <mark>模板转换节点 (Template）</mark></h3>
+<p><strong>功能</strong>：模板转换节点允许使用 Jinja2 的 Python 模板语言进行灵活的数据转换和文本处理。通过定义模板，可以将输入数据格式化为所需的输出格式。</p>
+<p><strong>使用场景</strong>：</p>
+<ul>
+<li><strong>数据格式化</strong>：将原始数据转换为特定格式，例如将 JSON 数据转换为 HTML 或 Markdown 格式。</li>
+<li><strong>动态内容生成</strong>：根据输入动态生成文本内容，例如生成个性化的邮件或报告。</li>
+</ul>
+<p>「<strong>模板转换</strong>」节点是 Dify 中一个相当「万金油」的存在。它可以按照指定的逻辑，拼接来自任意节点的任意类型的变量，并通过 Jinja2 进行简单的文本处理。</p>
+<p>除了其原本的用途「模板转换」外，这里提几个「邪修」用例，希望能帮助你解决问题。</p>
+<p><strong>强制类型转换</strong>。「模板转换」节点的输出变量只有一个 output，且类型为 string。然而，模板转换节点支持任意类型节点的输入。因此，如果你需要把数组、对象等非字符串类型的变量转换为字符串类型，增加一个模板转换节点就是最快的方法。这对于只支持插入 string 类型的场景（如 LLM 节点的 Prompt）相当有用。</p>
+<p><strong>存储可复用的 Prompt</strong>。如果你的 Workflow 中有多个 LLM 节点，它们共享某些提示词片段，你可以使用模板转换节点构建 Workflow 中的临时 Prompt 模板库，以在多个 LLM 节点之间引用。这样做的好处是可以实现「一处修改，处处生效」，不会再因为忘记修改某一节点的提示词而导致排查到天荒地老。</p>
+<p><strong>示例</strong>：</p>
+<p>假设你有一个用户信息的字典，你可以使用模板转换节点生成一封个性化的欢迎邮件：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">js 体验AI代码助手 代码解读复制代码Hello {{ user.name }},</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Welcome to our service</span><span style="color:#D73A49;--shiki-dark:#F97583">!</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Your registration date is {{ user.registration_date }}.</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">Best regards,</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                                        The Team</span></span></code></pre>
+<h3 id="10-变量聚合节点variable-aggregator">10. 变量聚合节点（Variable Aggregator）</h3>
+<p><a href="https://docs.dify.ai/zh/use-dify/nodes/variable-aggregator">Variable Aggregator</a></p>
+<p><strong>功能</strong>：变量聚合节点用于将来自多个分支的变量聚合为一个变量，以便在后续节点中统一配置和使用。</p>
+<p><strong>使用场景</strong>：</p>
+<ul>
+<li><strong>数据整合</strong>: 当工作流中有多个分支产生不同的输出时，可以使用变量聚合节点将这些输出整合为一个统一的变量，方便后续处理。</li>
+<li><strong>简化数据传递</strong>: 减少在多个节点之间传递多个变量的复杂性。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<p>如果有多个分支分别输出用户的姓名、地址和联系方式，可以使用变量聚合节点将这些信息整合为一个<strong>User 用户信息</strong>对象。</p>
+<h3 id="11-变量赋值节点variable-assigner">11. 变量赋值节点（Variable Assigner）</h3>
+<p><strong>功能</strong>：变量赋值节点用于向可写入变量（例如会话变量）进行赋值操作。可以动态更新变量的值。</p>
+<p><strong>使用场景</strong>：</p>
+<ul>
+<li><strong>动态更新</strong>: 在工作流的执行过程中，根据条件或用户输入动态更新变量的值。</li>
+<li><strong>状态管理</strong>: 管理工作流中的状态信息，例如跟踪用户的进度或选择。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<p>在用户选择不同选项时，可以使用变量赋值节点更新用户的选择状态：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">js</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 体验AI代码助手</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 代码解读</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">复制代码{</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"user_selection"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"option_1"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h3 id="12-迭代节点iteration">12. 迭代节点（Iteration）</h3>
+<p><strong>功能</strong>：迭代节点用于对列表对象执行多次步骤，直到输出所有结果。可以在工作流中处理批量数据。</p>
+<h3 id="13-参数提取节点parameter-extractor">13. 参数提取节点（Parameter Extractor）</h3>
+<p><strong>功能</strong>：参数提取节点利用大语言模型（LLM）从自然语言中推理并提取结构化参数，用于后续的工具调用或 HTTP 请求。</p>
+<h3 id="14-http-请求节点http-request">14. HTTP 请求节点（HTTP Request）</h3>
+<p><strong>功能</strong>：HTTP 请求节点允许通过 HTTP 协议发送服务器请求，适用于获取外部数据、调用 API、生成图片等场景。</p>
+<h3 id="15-工具节点">15. 工具节点</h3>
+<p><strong>功能</strong>：调用特定工具或服务，扩展工作流的功能。</p>
+<h3 id="16-预览与调试节点">16. 预览与调试节点</h3>
+<p><strong>功能</strong>：允许开发者在工作流运行前进行预览和调试，确保工作流的正确性。</p>
+<h3 id="17-文件上传节点">17. 文件上传节点</h3>
+<p><strong>功能</strong>：处理文件上传，适用于需要用户上传文件的场景。</p>
+<h3 id="18-附加功能节点">18. 附加功能节点</h3>
+<p><strong>功能</strong>：提供额外的功能或服务，增强工作流的灵活性。</p>
+<h3 id="19-运行历史节点">19. 运行历史节点</h3>
+<p><strong>功能</strong>：记录和查看工作流的运行历史，便于调试和分析。</p>
+<h3 id="20-检查清单节点">20. 检查清单节点</h3>
+<p><strong>功能</strong>：提供检查清单功能，确保工作流的各个步骤都已完成。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

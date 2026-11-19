@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>数据库安全与保护 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">数据库安全与保护</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%B8%83%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BF%9D%E6%8A%A4">七、数据库安全与保护</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%AE%89%E5%85%A8%E6%80%A7">安全性</a></li>
+<li class="toc-item toc-level-2"><a href="#%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6">访问控制</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E5%85%A8%E6%80%A7%E6%8E%A7%E5%88%B6">数据库安全性控制</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%94%A8%E6%88%B7%E6%A0%87%E8%AF%86%E5%92%8C%E9%89%B4%E5%88%AB">用户标识和鉴别</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%AD%98%E5%8F%96%E6%8E%A7%E5%88%B6">存取控制</a></li>
+<li class="toc-item toc-level-4"><a href="#%E8%87%AA%E4%B8%BB%E5%AD%98%E5%8F%96%E6%8E%A7%E5%88%B6dac">自主存取控制(DAC)</a></li>
+<li class="toc-item toc-level-5"><a href="#%E5%AD%98%E5%8F%96%E6%8E%A7%E5%88%B6%E6%96%B9%E6%B3%95%E6%8E%88%E6%9D%83%E4%B8%8E%E5%9B%9E%E6%94%B6">存取控制方法：授权与回收</a></li>
+<li class="toc-item toc-level-6"><a href="#grant%E6%8E%88%E6%9D%83">GRANT授权</a></li>
+<li class="toc-item toc-level-6"><a href="#revoke%E5%9B%9E%E6%94%B6">REVOKE回收</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%BC%BA%E5%88%B6%E5%AD%98%E5%8F%96%E6%8E%A7%E5%88%B6mac">强制存取控制(MAC)</a></li>
+<li class="toc-item toc-level-2"><a href="#mysql%E7%9A%84%E5%AE%89%E5%85%A8%E8%AE%BE%E7%BD%AE">MySQL的安全设置</a></li>
+<li class="toc-item toc-level-3"><a href="#%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86">用户管理</a></li>
+<li class="toc-item toc-level-4"><a href="#1%E5%88%9B%E5%BB%BA%E7%99%BB%E5%BD%95%E7%94%A8%E6%88%B7">1.创建登录用户</a></li>
+<li class="toc-item toc-level-4"><a href="#2%E4%BF%AE%E6%94%B9%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81">2.修改用户密码</a></li>
+<li class="toc-item toc-level-4"><a href="#3%E4%BF%AE%E6%94%B9%E7%94%A8%E6%88%B7%E5%90%8D">3.修改用户名</a></li>
+<li class="toc-item toc-level-4"><a href="#4%E5%88%A0%E9%99%A4%E7%94%A8%E6%88%B7">4.删除用户</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86">权限管理</a></li>
+<li class="toc-item toc-level-4"><a href="#1%E6%8E%88%E4%BA%88%E6%9D%83%E9%99%90grant">1.授予权限grant</a></li>
+<li class="toc-item toc-level-4"><a href="#2%E6%92%A4%E9%94%80%E6%9D%83%E9%99%90revoke">2.撤销权限revoke</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%B0%8F%E7%BB%93sql%E7%81%B5%E6%B4%BB%E7%9A%84%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6">小结：SQL灵活的授权机制</a></li>
+<li class="toc-item toc-level-3"><a href="#%E8%A7%92%E8%89%B2%E7%AE%A1%E7%90%86">角色管理</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D">备份与恢复</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%AE%A1%E8%AE%A1">审计</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/database/" class="post-category">
+        it / 数据库      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/database/">#database</a>
+      <a href="/tags/security/">#security</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">数据库安全与保护</h1>
+
+    <div class="post-body">
+<h1 id="七数据库安全与保护">七、数据库安全与保护</h1>
+<p>[toc]</p>
+<p>问题的提出：</p>
+<p>数据库的一大特点是数据可以共享
+数据共享必然带来数据库的安全性问题
+数据库系统中的数据共享不能是无条件的共享</p>
+<p>数据库的<strong>安全性</strong>是指<strong>保护数据库以防止不合法使用所造成的数据泄露、更改或破坏</strong>。</p>
+<p>系统安全保护措施是否有效是数据库系统主要的性能指标之一。</p>
+<h2 id="安全性">安全性</h2>
+<p>计算机系统存在技术安全、管理安全和政策法律三类安全性问题。</p>
+<p>TCSEC/TDI 标准由安全策略、责任、保证和文档四个方面内容构成。</p>
+<hr>
+<p>数据库的安全性是指保护数据库，防止不合法的使用，以免数据的泄露、更改或破坏。</p>
+<p>数据库的安全性和完整性这两个概念听起来有些相似，有时容易混淆，但两者是完全不同的。</p>
+<ol>
+<li><strong>安全性</strong>：保护数据以防止非法用户<strong>故意</strong>造成的破坏，确保合法用户做其想做的整改。</li>
+<li><strong>完整性</strong>：保护数据以防止合法用户<strong>无意</strong>中造成的破坏，确保用户所做的事情是正确的。</li>
+</ol>
+<p>两者不同的关键在于“合法”和“非法”及“故意”与“无意”。</p>
+<hr>
+<p>数据库的不安全因素：</p>
+<ol>
+<li>非授权用户对数据库的恶意存取和破坏</li>
+<li>数据库中重要或敏感的数据被泄露</li>
+<li>安全环境的脆弱性</li>
+</ol>
+<hr>
+<p>为了保护数据库，防止故意的破坏，可以从低到高的5个级别上设置各种安全措施。</p>
+<ol>
+<li><strong>物理控制</strong>：
+计算机系统的机房和设备应加以保护，通过加锁或专门监护等防止系统场地被非法进入，从而进行物理破坏。</li>
+<li><strong>法律保护</strong>：
+通过立法、规章制度防止授权用户以非法形式将其访问数据库的权限转授给非法者。</li>
+<li><strong>操作系统支持</strong>：
+无论数据库系统是多么安全，操作系统的安全弱点均可能成为入侵数据库的手段，应防止未经授权的用户从操作系统处着手访问数据库。</li>
+<li><strong>网络管理</strong>：
+由于大多数DBMS都允许用户通过网络进行远程访问，所以网络软件内部的安全性是很重要的。</li>
+<li><strong>DBMS</strong>实现：
+DBMS安全机制的职责是检查用户的身份是否合法及使用数据库的权限是否正确。</li>
+</ol>
+<hr>
+<p>计算机系统安全模型：</p>
+<p><img src="/assets/images/database-security/%E5%AE%89%E5%85%A8%E6%80%A7.png" alt="安全性"></p>
+<ul>
+<li>系统根据用户标识鉴定用户身份，合法用户才准许进入计算机系统</li>
+<li>数据库管理系统还要进行存取控制，只允许用户执行合法操作</li>
+<li>操作系统有自己的保护措施</li>
+<li>数据可以以密码形式存储到数据库中</li>
+</ul>
+<hr>
+<p>数据库安全性控制的常用方法：</p>
+<ol>
+<li>用户标识和鉴定</li>
+<li>存取控制</li>
+<li>视图</li>
+<li>审计</li>
+<li>数据加密</li>
+</ol>
+<h2 id="访问控制">访问控制</h2>
+<ol>
+<li>用户账号管理</li>
+<li>账户权限管理</li>
+</ol>
+<h2 id="数据库安全性控制">数据库安全性控制</h2>
+<p>首先，数据库管理系统对提出SQL访问请求的数据库<strong>用户进行身份鉴别</strong>，防止不可信用户使用系统。</p>
+<p>然后，在SQL处理层进行<strong>自主存取控制</strong>和<strong>强制存取控制</strong>，进一步可以进行<strong>推理控制</strong>。</p>
+<p>还可以对用户访问行为和系统关键操作进行<strong>审计</strong>，对异常用户行为进行简单入侵检测。</p>
+<h3 id="用户标识和鉴别">用户标识和鉴别</h3>
+<p>用户身份鉴别（Identification &amp;  Authentication）</p>
+<ul>
+<li>系统提供的最外层安全保护措施</li>
+<li>用户标识：由用户名和用户标识号组成（用户标识号在系统整个生命周期内唯一）</li>
+</ul>
+<p>用户标识和鉴别方法：</p>
+<ol>
+<li><strong>静态口令鉴别</strong>
+静态口令一般由用户自己设定，这些口令是静态不变的。</li>
+<li><strong>动态口令鉴别</strong>
+口令是动态变化的，每次鉴别时均需使用动态产生的新口令登录数据库管理系统，即采用一次一密的方法。</li>
+<li><strong>生物特征鉴别</strong>
+通过生物特征进行认证的技术，生物特征如指纹、虹膜和掌纹等。</li>
+<li><strong>智能卡鉴别</strong>
+智能卡是一种不可复制的硬件，内置集成电路的芯片，具有硬件加密功能。</li>
+</ol>
+<h3 id="存取控制">存取控制</h3>
+<p>存取控制策略：</p>
+<p>数据库安全最重要的一点就是确保<strong>只授权给有资格的用户访问数据库的权限，同时令所有未被授权的人员无法接触数据</strong>，这主要通过数据库系统的<strong>存取控制策略</strong>来实现。</p>
+<p>存取控制机制组成：</p>
+<ol>
+<li><strong>定义用户权限</strong>，并将用户权限登记到数据字典中
+用户对某一数据对象的操作权力称为权限
+DBMS提供适当的语言来定义用户权限，存放在数据字典中，称做安全规则或授权规则。</li>
+<li><strong>合法权限检查</strong>
+用户发出存取数据库操作请求
+DBMS查找数据字典，进行合法权限检查。</li>
+</ol>
+<p><strong>用户权限定义</strong>和<strong>合法权检查机制</strong>一起组成了数据库管理系统的存取控制子系统。</p>
+<hr>
+<p>常用存取控制方法包括**自主存取控制(DAC)<strong>和</strong>强制存取控制(MAC)**两种。</p>
+<ol>
+<li><strong>自主存取控制</strong>（Discretionary Access Control ，简称 DAC）
+用户对不同的数据对象有不同的存取权限
+不同的用户对同一对象也有不同的权限
+用户还可将其拥有的存取权限转授给其他用户</li>
+<li><strong>强制存取控制</strong>（Mandatory Access Control，简称 MAC）
+每一个数据对象被标以一定的密级
+每一个用户也被授予某一个级别的许可证
+对于任意一个对象，只有具有合法许可证的用户才可以存取</li>
+</ol>
+<h4 id="自主存取控制dac">自主存取控制(DAC)</h4>
+<p>自主存取控制(DAC)的 SQL 语句包括 <strong>GRANT</strong> 和 <strong>REVOKE</strong> 两个。</p>
+<p>用户权限由<strong>数据对象</strong>和<strong>操作类型</strong>两部分构成。</p>
+<p>定义用户存取权限：<strong>定义用户可以在哪些数据库对象上进行哪些类型的操作</strong>。</p>
+<p>定义存取权限称为<strong>授权</strong>。</p>
+<p>权限类型：</p>
+<p>自主存取控制的权限类型分为两种，即角色权限和数据库对象权限。</p>
+<ol>
+<li><strong>角色权限</strong>：
+给角色授权，并为用户分配角色，用户的权限为其角色权限之和。角色权限由DBA授予。</li>
+<li><strong>数据库对象权限</strong>：
+不同的数据库对象，可提供给用户不同的操作。该权限由DBA或该对象的所有者（Owner）授予用户。</li>
+</ol>
+<p><img src="https://img-blog.csdn.net/20130903205901156" alt="img" referrerpolicy="no-referrer"></p>
+<h5 id="存取控制方法授权与回收">存取控制方法：授权与回收</h5>
+<p>定义一个用户的存取权限就是要定义这个用户可以在哪些数据对象上进行哪些类型的操作。在数据库系统中，定义存取权限成为授权。</p>
+<h6 id="grant授权">GRANT授权</h6>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">grant</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [,&#x3C;>]...</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">on</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象类型</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象名</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [,&#x3C;对象类型> &#x3C;对象名>]...</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">to</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">用户</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [,&#x3C;用户>]...</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[with grant option]</span></span></code></pre>
+<p>将对指定操作对象的指定操作权限授予指定的用户，发出该grant语句的可以是DBA，也可以是已经拥有该权限的用户。接收权限的用户可以是一个或多个具体用户，也可以是PUBLIC，即全体用户。指定WITH GRANT OPTION子句，则获得某种权限的用户还可以把这种权限授权给其他用户.</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">grant</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> all privileges</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">on</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student,sc</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">to</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user1</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">with</span><span style="color:#D73A49;--shiki-dark:#F97583"> grant</span><span style="color:#D73A49;--shiki-dark:#F97583"> option</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<h6 id="revoke回收">REVOKE回收</h6>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">revoke</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [,&#x3C;>]...</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">on</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象类型</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象名</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [,&#x3C;对象类型> &#x3C;对象名>]...</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">用户</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [,&#x3C;用户>]...</span></span></code></pre>
+<p>cascade会级联：依次向下收回权限</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">revoke</span><span style="color:#D73A49;--shiki-dark:#F97583"> insert</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">on</span><span style="color:#D73A49;--shiki-dark:#F97583"> table</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">from</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user1 cascade;</span></span></code></pre>
+<p>创建数据库模式的权限</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">create</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">username</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[with] [dba|resource|connect]</span></span></code></pre>
+<h4 id="强制存取控制mac">强制存取控制(MAC)</h4>
+<p>自主存取能够通过授权机制有效地控制对敏感数据的存取，但它存在一个<strong>漏洞</strong>——一些别有用心的用户可以欺骗一个授权用户，采用一定的手段来获取敏感数据。</p>
+<blockquote>
+<p>例如，领导Manager是客户单Customer关系的物主，他将“读”权限授予用户A，且A不能再将权限转授他人，其目的是让A审查客户信息，看有无错误。现在A自己另外创建一个新关系A_Customer，然后将自Customer读取的数据写入（即复制到）A_Customer。这样，A是A_Customer的物主，他可以做任何事情，包括再将其权限转授给任何其他用户。</p>
+<p>存在这种漏洞的根源在于，自主存取控制机制仅以授权将用户（主体）与被存取数据对象（客体）关联，通过控制权限实现安全要求，对用户和数据对象本身未做任何安全性标注。强制存取控制就可以处理自主存取控制的这种漏洞。</p>
+</blockquote>
+<p>强制存取控制（MAC）：</p>
+<ol>
+<li>保证更高程度的安全性</li>
+<li>用户不能直接感知或进行控制</li>
+<li>适用于对数据有严格而固定密级分类的部门
+<ul>
+<li>军事部门</li>
+<li>政府部门</li>
+</ul>
+</li>
+</ol>
+<p>在强制存取控制中，数据库管理系统所管理的全部实体被分为<strong>主体</strong>和<strong>客体</strong>两大类。</p>
+<ul>
+<li><strong>主体</strong>是系统中的活动实体
+<ul>
+<li>数据库管理系统所管理的实际用户</li>
+<li>代表用户的各进程</li>
+</ul>
+</li>
+<li><strong>客体</strong>是系统中的被动实体，受主体操纵
+<ul>
+<li>文件、基本表、索引、视图</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p><strong>敏感度标记</strong>（Label）</p>
+<p>对于主体和客体，DBMS为它们每个实例（值）指派一个敏感度标记（Label）</p>
+<p>敏感度标记分成若干级别：</p>
+<ul>
+<li>绝密（Top Secret，TS）</li>
+<li>机密（Secret，S）</li>
+<li>可信（Confidential，C）</li>
+<li>公开（Public，P）</li>
+<li>TS&gt;=S&gt;=C&gt;=P</li>
+</ul>
+<p>主体的敏感度标记称为<strong>许可证级别</strong>（Clearance Level）
+客体的敏感度标记称为<strong>密级</strong>（Classification Level）</p>
+<hr>
+<p>强制存取控制规则：</p>
+<ol>
+<li>仅当主体的许可证级别大于或等于客体的密级时，该主体才能读取相应的客体。</li>
+<li>仅当主体的许可证级别小于或等于客体的密级时，该主体才能写相应的客体。</li>
+</ol>
+<p>强制存取控制是<strong>对数据本身进行密级标记</strong>，无论数据如何复制，标记与数据都是一个不可分的整体，只有符合密级标记要求的用户才可以操纵数据，从而提供了更高级别的安全性。</p>
+<p>强制存取控制的<strong>优点</strong>是系统能<strong>执行“信息流控制”</strong>。</p>
+<p>【注意】这种方法在通用数据库系统中不是十分有用，它只在某些专用系统中有用，例如军事部门或政府部门。</p>
+<h2 id="mysql的安全设置">MySQL的安全设置</h2>
+<p>MySQL安全设置用于实现“正确的人”能够“正确的访问”“正确的数据库资源”。</p>
+<p>MySQL通过两个模块实现数据库资源的安全访问控制，即<strong>身份认证模块</strong>和<strong>权限验证模块</strong>。</p>
+<ul>
+<li><strong>身份认证模块</strong>：用于<strong>实现数据库用户在某台登录主机的身份认证</strong>，只有通过身份认证的数据库用户才能登录主机并成功连接到MySQL服务器，继而向MySQL服务器发送MySQL命令或SQL语句；</li>
+<li><strong>权限验证模块</strong>：用于<strong>验证MySQL账户是否有权执行该MySQL命令或SQL语句</strong>，确保“数据库资源”被真确地访问或者执行。</li>
+</ul>
+<h3 id="用户管理">用户管理</h3>
+<h4 id="1创建登录用户">1.创建登录用户</h4>
+<p>创建用户的语法形式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 用户</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> [IDENTIFIED BY </span><span style="color:#005CC5;--shiki-dark:#79B8FF">[</span><span style="color:#24292E;--shiki-dark:#E1E4E8">PASSWORD] </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'密码'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">] [,用户 </span><span style="color:#005CC5;--shiki-dark:#79B8FF">[</span><span style="color:#24292E;--shiki-dark:#E1E4E8">IDENTIFIED BY </span><span style="color:#005CC5;--shiki-dark:#79B8FF">[</span><span style="color:#24292E;--shiki-dark:#E1E4E8">PASSWORD] </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'密码'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]]…;</span></span></code></pre>
+<p>【说明】：</p>
+<ol>
+<li>用户的格式：用户名@主机名。其中，主机名指定了创建的用户使用MySQL连接的主机。另外，“%”表示一组主机，localhost表示本地主机。</li>
+<li>IDENTIFIED BY子句指定创建用户时的密码。如果密码是一个普通的字符串，则不需要使用PASSWORD关键字。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例12-1】创建用户tempuser，其口令为temp。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> tempuser</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@localhost IDENTIFIED </span><span style="color:#D73A49;--shiki-dark:#F97583">BY</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'temp'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p>创建的新用户的详细信息自动保存在系统数据库mysql的user表中，执行如下SQL语句，可查看数据库服务器的用户信息。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">USE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysql;</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#D73A49;--shiki-dark:#F97583"> FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> user;</span></span></code></pre>
+<h4 id="2修改用户密码">2.修改用户密码</h4>
+<p>修改用户密码的语法形式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#D73A49;--shiki-dark:#F97583"> PASSWORD</span><span style="color:#D73A49;--shiki-dark:#F97583"> FOR</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 用户</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '新密码'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例12-2】修改用户tempuser的密码为abc。</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#D73A49;--shiki-dark:#F97583"> PASSWORD</span><span style="color:#D73A49;--shiki-dark:#F97583"> FOR</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tempuser@localhost</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'abc'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<h4 id="3修改用户名">3.修改用户名</h4>
+<p>修改用户名的语法形式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">RENAME USER 旧用户名 </span><span style="color:#D73A49;--shiki-dark:#F97583">To</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 新用户名 [ ,旧用户名 To 新用户名] [...]</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例12-3】修改普通用户tempuser的用户名为temp_U。</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">RENAME USER tempuser@localhost </span><span style="color:#D73A49;--shiki-dark:#F97583">TO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> temp_U@localhost;</span></span></code></pre>
+<h4 id="4删除用户">4.删除用户</h4>
+<p>使用DROP USER语句可删除一个或多个MySQL用户，并取消其权限。
+其语法形式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 用户[,…];</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例12-5】删除用户temp_U。</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> temp_U@localhost;</span></span></code></pre>
+<h3 id="权限管理">权限管理</h3>
+<p>权限管理主要是对登录到MySQL服务器的数据库用户进行权限验证。所有用户的权限都存储在MySQL的权限表中。</p>
+<p>合理的权限管理能够保证数据库系统的安全，不合理的权限设置会给数据库系统带来危害。</p>
+<p>权限管理主要包括两个内容，即<strong>授予权限</strong>和<strong>撤销权限</strong>。</p>
+<h4 id="1授予权限grant">1.授予权限grant</h4>
+<p>GRANT语句的一般格式：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">GRANT</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">权限</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;权限>]... </span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象类型</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象名</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;对象类型> &#x3C;对象名>]…</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">TO</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">用户</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;用户>]...</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[WITH GRANT OPTION];</span></span></code></pre>
+<p>语义：将对指定操作对象的指定操作权限授予指定的用户</p>
+<p>发出GRANT：</p>
+<ul>
+<li>数据库管理员</li>
+<li>数据库对象创建者（即属主Owner）</li>
+<li>拥有该权限的用户</li>
+</ul>
+<p>接受权限的用户：</p>
+<ul>
+<li>一个或多个具体用户</li>
+<li>PUBLIC（即全体用户）</li>
+</ul>
+<p>WITH GRANT OPTION子句：</p>
+<ul>
+<li>指定：可以再授予</li>
+<li>没有指定：不能传播</li>
+</ul>
+<p>不允许循环授权</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】把查询Student表权限授给用户U1。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">USE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> jwgl13;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> U1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@localhost IDENTIFIED </span><span style="color:#D73A49;--shiki-dark:#F97583">BY</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '123456'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">GRANT</span><span style="color:#D73A49;--shiki-dark:#F97583"> SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Student </span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">TO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> U1@localhost;</span></span>
+<span class="line"><span class="line-number">7</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">#创建用户并授权后，为了使其生效，输入命令:</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">FLUSH PRIVILEGES;</span></span></code></pre>
+<p>2:</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】把对Student表的全部权限授予用户U2和U3。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">USE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> jwgl13;</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> U2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@localhost IDENTIFIED </span><span style="color:#D73A49;--shiki-dark:#F97583">BY</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '123456'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> U3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@localhost IDENTIFIED </span><span style="color:#D73A49;--shiki-dark:#F97583">BY</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '123456'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">GRANT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ALL PRIVILEGES</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Student</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">TO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> U2@localhost,U3@localhost;</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">FLUSH PRIVILEGES;</span></span></code></pre>
+<h4 id="2撤销权限revoke">2.撤销权限revoke</h4>
+<p>授予的权限可以由数据库管理员或其他授权者用REVOKE语句收回。</p>
+<p>REVOKE语句的一般格式为：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">REVOKE</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">权限</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;权限>]... </span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象类型</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象名</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;对象类型>&#x3C;对象名>]…</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">用户</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;用户>]...[CASCADE | RESTRICT];</span></span></code></pre>
+<p>例：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】把用户U1查询student表的权限收回。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">REVOKE</span><span style="color:#D73A49;--shiki-dark:#F97583"> SELECT</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> U1@localhost;</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】把用户U4修改学生姓名的权限收回。</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">REVOKE</span><span style="color:#D73A49;--shiki-dark:#F97583"> UPDATE</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(Sname)</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Student </span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> U4@localhost;</span></span>
+<span class="line"><span class="line-number">10</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】收回所有用户对表Score的查询权限。</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">REVOKE</span><span style="color:#D73A49;--shiki-dark:#F97583"> SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Score </span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> PUBLIC;</span></span>
+<span class="line"><span class="line-number">15</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】把用户U5对Score表的INSERT权限收回。</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">REVOKE</span><span style="color:#D73A49;--shiki-dark:#F97583"> INSERT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Score</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> U5@localhost;</span></span></code></pre>
+<h4 id="小结sql灵活的授权机制">小结：SQL灵活的授权机制</h4>
+<p><strong>数据库管理员</strong>：</p>
+<p>拥有所有对象的所有权限
+根据实际情况不同的权限授予不同的用户</p>
+<p><strong>用户</strong>：</p>
+<p>拥有自己建立的对象的全部的操作权限
+可以使用GRANT，把权限授予其他用户</p>
+<p><strong>被授权的用户</strong>：</p>
+<p>如果具有“继续授权”的许可，可以把获得的权限再授予其他用户
+所有授予出去的权力在必要时又都可用REVOKE语句收回。</p>
+<h3 id="角色管理">角色管理</h3>
+<p>数据库角色：被命名的一组与数据库操作相关的权限。</p>
+<ul>
+<li>角色是权限的集合</li>
+<li>可以为一组具有相同权限的用户创建一个角色</li>
+<li>简化授权的过程</li>
+</ul>
+<p>1.角色的创建</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583">  ROLE</span><span style="color:#D73A49;--shiki-dark:#F97583">  &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">角色名</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span></code></pre>
+<p>2.给角色授权</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583"> GRANT</span><span style="color:#D73A49;--shiki-dark:#F97583">  &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">权限</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;权限>]… </span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象类型</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象名  </span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583"> TO</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">角色</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;角色>]…</span></span></code></pre>
+<p>3.将一个角色授予其他的角色或用户</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">GRANT</span><span style="color:#D73A49;--shiki-dark:#F97583">  &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">角色1</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;角色2>]…</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">TO</span><span style="color:#D73A49;--shiki-dark:#F97583">  &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">角色3</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;用户1>]… </span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[WITH ADMIN OPTION]</span></span></code></pre>
+<ul>
+<li>该语句把角色授予某用户，或授予另一个角色；</li>
+<li>授予者是角色的创建者或拥有在这个角色上的ADMIN OPTION；</li>
+<li>指定了WITH ADMIN OPTION则获得某种权限的角色或用户还可以把这种权限授予其他角色。</li>
+</ul>
+<p>一个角色的权限：直接授予这个角色的全部权限加上其他角色
+授予这个角色的全部权限。</p>
+<p>4.角色权限的收回</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">REVOKE</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">权限</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;权限>]…</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象类型</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">对象名</span><span style="color:#D73A49;--shiki-dark:#F97583">></span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">角色</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">[,&#x3C;角色>]…</span></span></code></pre>
+<ul>
+<li>用户可以回收角色的权限，从而修改角色拥有的权限。</li>
+<li>REVOKE执行者是角色的创建者</li>
+<li>拥有在这个（些）角色上的ADMIN OPTION</li>
+</ul>
+<p>5.删除角色</p>
+<p>语法形式如下：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ROLE角色[,角色,…];</span></span></code></pre>
+<p>例</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】通过角色来实现将一组权限授予一组用户。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 步骤如下：</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- （1）首先创建一个角色 R1</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">USE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> jwgl13;</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> ROLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> R1@localhost;</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- （2）然后使用GRANT语句，使角色R1拥有Student表的SELECT、UPDATE、INSERT权限。</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">GRANT</span><span style="color:#D73A49;--shiki-dark:#F97583"> SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">UPDATE</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">INSERT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Student </span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">TO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> R1@localhost;</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- （3）创建用户U_A、U_B、U_C</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> U_A</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@localhost IDENTIFIED </span><span style="color:#D73A49;--shiki-dark:#F97583">BY</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '111111'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> U_B</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@localhost IDENTIFIED </span><span style="color:#D73A49;--shiki-dark:#F97583">BY</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '111111'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> USER</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> U_C</span><span style="color:#24292E;--shiki-dark:#E1E4E8">@localhost IDENTIFIED </span><span style="color:#D73A49;--shiki-dark:#F97583">BY</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '111111'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- （4）将这个角色授予U_A、U_B、U_C，使他们具有角色R1所包含的全部权限。</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">GRANT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> R1@localhost</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#D73A49;--shiki-dark:#F97583">TO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> U_A@localhost,U_B@localhost,U_C@localhost;</span></span>
+<span class="line"><span class="line-number">18</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 验证角色是否正确分配，可使用SHOW GRANTS语句：</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">SHOW GRANTS </span><span style="color:#D73A49;--shiki-dark:#F97583">FOR</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> U_A@localhost </span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#D73A49;--shiki-dark:#F97583">USING</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> R1@localhost;</span></span>
+<span class="line"><span class="line-number">22</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 注意：用户在使用角色权限前必须激活角色，命令形式如下：</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#D73A49;--shiki-dark:#F97583">SET</span><span style="color:#D73A49;--shiki-dark:#F97583"> GLOBAL</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> activate_all_roles_on_login</span><span style="color:#D73A49;--shiki-dark:#F97583">=ON</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span class="line-number">25</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- （5）可以一次性通过R1来回收U_A的这3个权限</span></span>
+<span class="line"><span class="line-number">27</span><span style="color:#D73A49;--shiki-dark:#F97583">REVOKE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> R1@localhost </span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> U_A@localhost;</span></span>
+<span class="line"><span class="line-number">28</span></span></code></pre>
+<p>例2</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】角色的权限修改。</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 使角色R1在原来的基础上增加了Student表的DELETE 权限。</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">GRANT</span><span style="color:#D73A49;--shiki-dark:#F97583"> DELETE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Student</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">TO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> R1@localhost;</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】收回R1的SELECT权限。</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#D73A49;--shiki-dark:#F97583">REVOKE</span><span style="color:#D73A49;--shiki-dark:#F97583"> SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Student</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> R1@localhost; </span></span>
+<span class="line"><span class="line-number">11</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 【例】删除角色。</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#D73A49;--shiki-dark:#F97583">DROP</span><span style="color:#D73A49;--shiki-dark:#F97583"> ROLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> R1@localhost; </span></span></code></pre>
+<h2 id="备份与恢复">备份与恢复</h2>
+<p>导出一整个数据库：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">C:\WINDOWS\system32</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysqldump -u 用户名 -p 数据库名 </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 导出的文件名</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">C:\WINDOWS\system32</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysqldump -u root -p user </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> d:\demo.sql</span></span></code></pre>
+<p>导出一张表：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">C:\WINDOWS\system32</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysqldump -u 用户名 -p 数据库名 表名称 </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> 导出的文件名</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">C:\WINDOWS\system32</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mysqldump -u root -p user user_1 </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> d\demo.sql</span></span></code></pre>
+<p>恢复：
+数据的回复必须要先登录,登录成功后新建一个数据库,进入到指定的数据库中执行如下命令</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mysql</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Source 脚本目录(绝对路径)</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">mysql</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> Source C:\java\demo.sql</span></span></code></pre>
+<h2 id="审计">审计</h2>
+<ol>
+<li>审计功能把用户对数据库的所有操作自动记录下来放入审计日记中。DBA可以利用审计跟踪的信息，重现导致数据库出现现有状况的一系列事件，中出非法存取数据的人、时间和内容等。</li>
+<li>审计通常是费时间和空间的，一般主要用于安全性要求较高的部门。</li>
+<li>审计一般可以分为用户级审计和系统级审计。</li>
+<li>AUDIT语句用来设置审计功能，NOAUDIT用来取消审计功能。</li>
+</ol>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">audit</span><span style="color:#D73A49;--shiki-dark:#F97583"> alter</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#D73A49;--shiki-dark:#F97583">update</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">on</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student;</span></span>
+<span class="line"><span class="line-number">3</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">noaudit all</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">on</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> student;</span></span></code></pre>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

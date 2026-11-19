@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Harness Engineering（驾驭工程） - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#harness-engineering%E9%A9%BE%E9%A9%AD%E5%B7%A5%E7%A8%8B">Harness Engineering（驾驭工程）</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%A1%88%E4%BE%8B">案例</a></li>
+<li class="toc-item toc-level-3"><a href="#1%E4%BF%AE%E6%94%B9%E6%8F%90%E7%A4%BA%E8%AF%8D%E7%BB%93%E6%9E%84%E5%B7%A5%E5%85%B7%E6%8F%8F%E8%BF%B0%E6%96%B9%E5%BC%8F%E4%B8%AD%E9%97%B4%E4%BB%B6%E9%80%BB%E8%BE%91">1.修改提示词结构、工具描述方式、中间件逻辑</a></li>
+<li class="toc-item toc-level-3"><a href="#2hashline-%E5%8D%8F%E8%AE%AE%E7%BB%99%E6%AF%8F%E8%A1%8C%E4%BB%A3%E7%A0%81%E8%B5%8B%E4%BA%88%E5%9F%BA%E4%BA%8E%E5%86%85%E5%AE%B9%E7%9A%84%E5%93%88%E5%B8%8C%E6%A0%87%E7%AD%BE">2.Hashline 协议：给每行代码赋予基于内容的哈希标签</a></li>
+<li class="toc-item toc-level-3"><a href="#3%E6%B2%89%E9%BB%98%E5%8D%B3%E6%88%90%E5%8A%9Fsilence-is-success">3.沉默即成功（Silence is Success）</a></li>
+<li class="toc-item toc-level-2"><a href="#harness-%E7%9A%84%E5%9B%9B%E5%A4%A7%E6%8A%A4%E6%A0%8F">Harness 的四大护栏</a></li>
+<li class="toc-item toc-level-3"><a href="#1%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%A5%E7%A8%8Bcontext-engineering">1.上下文工程（Context Engineering）</a></li>
+<li class="toc-item toc-level-3"><a href="#2%E6%9E%B6%E6%9E%84%E7%BA%A6%E6%9D%9Farchitecture-constraints">2.架构约束（Architecture Constraints）</a></li>
+<li class="toc-item toc-level-3"><a href="#3%E5%8F%8D%E9%A6%88%E5%BE%AA%E7%8E%AFfeedback-loop">3.反馈循环（Feedback Loop）</a></li>
+<li class="toc-item toc-level-3"><a href="#4%E7%86%B5%E7%AE%A1%E7%90%86entropy-management">4.熵管理（Entropy Management）</a></li>
+<li class="toc-item toc-level-2"><a href="#harness-engineering-%E4%B8%89%E9%98%B6%E6%AE%B5%E8%B7%AF%E7%BA%BF%E5%9B%BE">Harness Engineering 三阶段路线图</a></li>
+<li class="toc-item toc-level-2"><a href="#harness-%E4%B8%8E%E4%BC%A0%E7%BB%9F%E6%A1%86%E6%9E%B6%E7%9A%84%E5%85%B3%E7%B3%BB">Harness 与传统框架的关系</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/llm/">#llm</a>
+      <a href="/tags/agent/">#agent</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Harness Engineering（驾驭工程）</h1>
+
+    <div class="post-body">
+<h1 id="harness-engineering驾驭工程">Harness Engineering（驾驭工程）</h1>
+<blockquote>
+<p><a href="https://cloud.tencent.com/developer/article/2664396">一文读懂 Harness Engineering：起源、原理与落地实践-腾讯云开发者社区-腾讯云</a></p>
+</blockquote>
+<p><strong>Harness Engineering（驾驭工程）<strong>是围绕 AI 智能体设计和构建</strong>约束机制、反馈回路、工作流控制和持续改进循环</strong>的系统工程实践。</p>
+<p>当 AI Agent 真正进入生产环境、执行跨步骤的长周期自主任务时，一类新的失败模式浮现了：Agent会忽视团队规范、生成违反架构约束的代码、在并行执行时与自身冲突、随时间推移逐渐降低代码质量。于是 Harness Engineering 应运而生。</p>
+<p>Harness一词来自马具——缰绳、马鞍、嚼子——这是一套引导强大但不可预测的动物的完整装备。<strong>驾驭工程不是去削弱 AI 的能力，而是为它打造一套黄金缰绳，让它跑得又快又稳。</strong></p>
+<blockquote>
+<p>这个概念由 HashiCorp 联合创始人 Mitchell Hashimoto 在 2026 年 2 月 5 日首次提出，六天后 OpenAI 在百万行代码实验报告中正式采用这一术语，随后 Martin Fowler 撰文深度分析，一个月内成为开发者社区的高频词。</p>
+</blockquote>
+<ul>
+<li><strong>案例</strong>：</li>
+</ul>
+<p>LangChain 的案例尤其有说服力：底层模型一个参数都没动，<strong>仅仅通过优化外部驾驭环境</strong>（文档结构、验证回路、追踪系统），编码 Agent 在 Terminal Bench 2.0 的得分从 52.8% 飙升至 66.5%，全球排名从第 30 位跃升至第 5 位。</p>
+<p>五个独立团队也得出了相同结论：<strong>瓶颈不在模型智能，而在基础设施。</strong></p>
+<ul>
+<li>
+<p><strong>AI 工程范式的三次跃迁</strong>：</p>
+<ul>
+<li>Prompt Engineering 提示词工程
+<ul>
+<li>优化对象：输入措辞
+<ul>
+<li>CoT、Few-shot 示例</li>
+</ul>
+</li>
+<li>解决：单次对话质量</li>
+<li>2023 ~ 2024</li>
+</ul>
+</li>
+<li>Context Engineering 上下文工程
+<ul>
+<li>优化对象：信息输入
+<ul>
+<li>RAG 检索、MCP 工具接入、记忆管理</li>
+</ul>
+</li>
+<li>解决：知识边界与幻觉</li>
+<li>2025</li>
+</ul>
+</li>
+<li>Harness Engineering 驾驭工程
+<ul>
+<li>优化对象：运行环境</li>
+<li>解决：Agent 可靠性与可持续性</li>
+<li>2026</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Agent 常见失败模式</strong>：</p>
+</li>
+</ul>
+<p>Anthropic 工程师在长时间运行 Agent 的过程中，总结了三种典型的翻车姿势，正是驾驭工程要解决的核心痛点：</p>
+<p><strong>失败模式 1：试图一步到位（One-shotting）</strong></p>
+<p>Agent 倾向于在一个会话里把所有功能都做完。结果是上下文窗口耗尽，留下一堆没有文档的半成品代码，下一个会话启动时只能花大量时间猜测之前发生了什么。</p>
+<p><strong>失败模式 2：过早宣布胜利</strong></p>
+<p>在项目后期，当部分功能已经完成后，Agent 会环顾四周，看到已有进展就直接宣布任务完成——即使还有大量功能未实现。</p>
+<p><strong>失败模式 3：过早标记功能完成</strong></p>
+<p>在没有明确提示的情况下，Agent 写完代码就标记为完成，却没有做端到端测试。单元测试或 curl 命令通过了不代表功能真正可用。</p>
+<p>除此之外，更隐蔽的问题是<strong>模式复制</strong>。Agent 把代码库中存在的模式当作&quot;合法实践&quot;，忠实地复制并放大，这其中也包括坏的模式。。这意味着不加约束的 Agent 会以惊人的速度积累技术债务。</p>
+<h2 id="案例">案例</h2>
+<h3 id="1修改提示词结构工具描述方式中间件逻辑">1.修改提示词结构、工具描述方式、中间件逻辑</h3>
+<p>LangChain 在 Terminal Bench 2.0 中做了控制变量，底层模型固定为 gpt-5.2-codex，权重一个没动。只修改了系统提示词结构、工具描述方式、中间件逻辑，也就是只改了 Harness。这一改动使得分从 52.8% 升到 66.5%，全球排名从第 30 名跃升至第 5 名。</p>
+<p>核心 Harness 优化措施：团队利用 LangSmith 的 Trace 功能大规模分析了智能体的失败模式，并针对性地进行了以下三项核心改进：</p>
+<ol>
+<li>系统提示词与中间件：强制“构建-验证”循环</li>
+</ol>
+<p><strong>发现的问题</strong>：智能体最常见的失败模式是写完代码后，仅凭“自我感觉良好”就停止，缺乏对代码的实际测试和验证。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>在系统提示词中明确加入了 <strong>“规划-构建-验证-修复”</strong> 的结构化工作流指导。</li>
+<li>引入了 <code>PreCompletionChecklistMiddleware</code> 中间件。这个中间件会在智能体试图结束任务前强制拦截，并提醒它必须对照任务原始需求进行验证，只有通过验证才能退出</li>
+<li>工具与环境上下文：直接注入，而非探索</li>
+</ul>
+<p><strong>发现的问题</strong>：智能体在不熟悉的环境中浪费大量时间去探索目录结构、寻找可用工具，这个过程容易出错。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li><strong>发现的问题</strong>：智能体在不熟悉的环境中浪费大量时间去探索目录结构、寻找可用工具，这个过程容易出错。</li>
+<li>解决方案：
+<ul>
+<li>使用 <code>LocalContextMiddleware</code>，在智能体启动时自动运行，将当前工作目录、父/子目录、Python 环境等关键信息<strong>直接注入</strong>其上下文，相当于给智能体做了一次“环境入职培训”。</li>
+<li>在提示词中明确告知智能体，其编写的工作将通过<strong>程序化测试</strong>进行评分，引导它写出更规范、可测试的代码。</li>
+</ul>
+</li>
+<li>推理预算分配：“三明治”策略</li>
+</ul>
+<p><strong>发现的问题</strong>：在不限制推理预算的情况下，智能体可能在无意义的“末日循环”中过度消耗时间，甚至因超时而失败。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>针对 <code>gpt-5.2-codex</code>，他们发现全程使用最高强度推理模式 (<code>xhigh</code>) 会导致超时增加，得分反而 <strong>更低 (53.9%)</strong>，低于使用 <code>high</code> 模式的得分 (63.6%)。</li>
+<li>最终方案是采用了 <strong>“推理三明治” (xhigh-high-xhigh)</strong> 策略：在<strong>规划</strong>和<strong>最终验证</strong>阶段使用高强度的 <code>xhigh</code> 模式，在中间的<strong>代码实现</strong>阶段使用稍低的 <code>high</code> 模式，以此平衡深度与速度</li>
+<li>模式检测中间件：打破“末日循环”</li>
+</ul>
+<p><strong>发现的问题</strong>：智能体有时会在一个错误的方向上反复尝试，进行细微的、无效的代码修改（在 Trace 中，这种情况有时会重复10次以上）。</p>
+<p><strong>解决方案</strong>：开发了LoopDetectionMiddleware。它通过 Hook 追踪智能体对每个文件的编辑次数，一旦超过阈值，就会自动注入提示，建议模型“<strong>考虑重新审视你的方法</strong>”，帮助它跳出思维定式。</p>
+<h3 id="2hashline-协议给每行代码赋予基于内容的哈希标签">2.Hashline 协议：给每行代码赋予基于内容的哈希标签</h3>
+<p>独立安全研究员 Can Boluk 发现，Agent 修改代码时大量失败不是因为逻辑错误，而是机械性失误。例如“第 47 行少了一个空格”、“匹配文本不完全一致”。</p>
+<p>他设计了一套 Hashline 协议：给每行代码赋予基于内容的哈希标签，模型只需引用标签而非精确匹配原始文本。Hashline 通过修改read_file工具的<strong>返回格式</strong>，彻底改变了游戏规则：</p>
+<ol>
+<li>
+<p>读取时加标签：当模型读取文件时，返回的每一行代码都会附带一个<strong>2-3 个字符的内容哈希标签</strong>（例如11:<code>a3|function hello() {</code>）。</p>
+</li>
+<li>
+<p>编辑时引用标签：模型需要修改某一行时，直接<strong>引用这个短标签</strong>，而不是写一遍整行代码。</p>
+</li>
+<li>
+<p>写入时校验：写入前，系统会检查该标签对应的<strong>原文内容是否发生了变化</strong>。如果有变化（哈希不匹配），直接拒绝编辑，防止覆盖别人的修改。</p>
+</li>
+</ol>
+<p>这个改动带来了一组非常夸张的数据：</p>
+<ul>
+<li><strong>最大黑马</strong>：<strong>Grok Code Fast 1</strong>的成功率直接从<strong>6.7% 飙升至 68.3%</strong>，翻了十倍不止。</li>
+<li><strong>普遍提升</strong>：在16个模型、3种编辑格式、每种540个任务的大规模测试中，Hashline 在<strong>几乎所有模型</strong>上都匹配或超越了str_replace。</li>
+<li><strong>成本直降</strong>：Grok 4 Fast 的输出 token<strong>下降了 61%</strong>，因为模型不再需要反复重试和输出大段修正代码了。</li>
+</ul>
+<p>正如他所说：“Gemini 成功率提升了 8%，比大多数模型升级带来的提升都大，而且<strong>训练成本是零</strong>。</p>
+<h3 id="3沉默即成功silence-is-success">3.沉默即成功（Silence is Success）</h3>
+<p>HumanLayer 团队遵循了传统的CI/CD实践：每次代码修改后，都会运行完整的测试套件，并将所有输出（包括成功的测试）返回给AI智能体。</p>
+<p><strong>问题出现了</strong>：在一个中等规模的项目中，一次完整的测试运行可能产生超过<strong>4000行</strong>的输出。这海量的“噪音”瞬间涌入AI大模型本就宝贵的上下文窗口（通常建议控制在75000 token左右的最佳“智能区”）。</p>
+<p>这导致了两个严重的后果：</p>
+<ol>
+<li><strong>“成功幻觉”</strong>：AI智能体在阅读了大量测试文件的内容后，产生了认知混淆。它开始<strong>误以为那些通过测试所验证的功能，已经是自己实现的业务逻辑了</strong>。这导致它后续的代码修改完全偏离了实际需求——因为它“以为”代码已经写好了。</li>
+<li><strong>资源浪费</strong>：每一行“PASS src/utils/helper.test.ts”这样的成功输出，都在无情地消耗着宝贵的上下文token，挤占了真正用于推理和解决问题的空间，并快速将模型推向需要“压缩记忆”的“迟钝区”。</li>
+</ol>
+<p>解决方案：为了解决这个问题，他们设计了一个极其简单但在逻辑上却非常颠覆的协议：“沉默即成功” (Silence is Success)。他们修改了执行测试的工具逻辑，不再将原始输出一股脑地扔给模型，而是实现了这样一个流程：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8"># 伪代码示例：HumanLayer采用的“静默执行”逻辑</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#6F42C1;--shiki-dark:#B392F0">run_silent</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    local description</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"$1"</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    local command</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"$2"</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    local tmp_file</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0">$</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(mktemp)</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> eval </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"$command"</span><span style="color:#D73A49;--shiki-dark:#F97583"> ></span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "$tmp_file"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#D73A49;--shiki-dark:#F97583">>&#x26;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; then</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        # 成功时：只输出一个绿色对勾，然后删除原始日志</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        printf </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"  ✓ %s</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\n</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "$description"</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        rm </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">f </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"$tmp_file"</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#D73A49;--shiki-dark:#F97583">    else</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        # 失败时：输出红叉，并将之前暂存的完整错误日志全部打印出来</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        local exit_code</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$</span><span style="color:#D73A49;--shiki-dark:#F97583">?</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        printf </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"  ✗ %s</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\n</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "$description"</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        cat </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"$tmp_file"</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        rm </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">f </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"$tmp_file"</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#24292E;--shiki-dark:#E1E4E8">        return $exit_code</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    fi</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>（注：此代码逻辑源于HumanLayer团队的公开技术分享）</p>
+<p>这个协议的核心是<strong>确定性控制</strong>：成功，就只返回一个极简的✓符号（占用远少于10个token）；失败，才返回全部的错误细节，让模型精准地知道问题出在哪里。这样，模型不再需要自己去判断是否需要截断输出，也彻底杜绝了被无用信息干扰的可能。</p>
+<p>实验结果：</p>
+<p>这一改动带来了惊人的效果提升：</p>
+<ul>
+<li><strong>任务达成效率飙升</strong>：智能体在<strong>10步操作内</strong>成功完成任务的比例，从原先的<strong>43%<strong>猛增到了</strong>78%</strong>。</li>
+<li><strong>成本与效率双赢</strong>：平均每次任务节省了约**35%**的上下文token消耗，这不仅降低了API调用成本，也让模型的注意力始终保持在“智能区”，从而做出更准确的决策。</li>
+</ul>
+<h2 id="harness-的四大护栏">Harness 的四大护栏</h2>
+<p>综合 OpenAI、Anthropic、LangChain 和 Martin Fowler 的实践，Harness 可以归纳为四个核心组件，即四根&quot;护栏&quot;：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">    A</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">&#x3C;b>上下文工程&#x3C;/b>&#x3C;br/>Context Engineering&#x3C;br/>动态知识注入</span><span style="color:#24292E;--shiki-dark:#E1E4E8">：</span><span style="color:#032F62;--shiki-dark:#9ECBFF">AGENTS.md&#x3C;br/>按需检索</span><span style="color:#24292E;--shiki-dark:#E1E4E8">：</span><span style="color:#032F62;--shiki-dark:#9ECBFF">活文档机制</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">    B</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">&#x3C;b>架构约束&#x3C;/b>&#x3C;br/>Architecture Constraints&#x3C;br/>分层依赖模型</span><span style="color:#24292E;--shiki-dark:#E1E4E8">：</span><span style="color:#032F62;--shiki-dark:#9ECBFF">自动 Linter&#x3C;br/>CI 强制阻断</span><span style="color:#24292E;--shiki-dark:#E1E4E8">：</span><span style="color:#032F62;--shiki-dark:#9ECBFF">类型系统</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">    C</span><span style="color:#D73A49;--shiki-dark:#F97583">([</span><span style="color:#032F62;--shiki-dark:#9ECBFF">AI Agent&#x3C;br/>智能体</span><span style="color:#D73A49;--shiki-dark:#F97583">])</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">    D</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">&#x3C;b>反馈循环&#x3C;/b>&#x3C;br/>Feedback Loop&#x3C;br/>智能体审智能体</span><span style="color:#24292E;--shiki-dark:#E1E4E8">：</span><span style="color:#032F62;--shiki-dark:#9ECBFF">自动测试&#x3C;br/>CI 验证</span><span style="color:#24292E;--shiki-dark:#E1E4E8">：</span><span style="color:#032F62;--shiki-dark:#9ECBFF">错误信号回传</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">    E</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">&#x3C;b>熵管理&#x3C;/b>&#x3C;br/>Entropy Management&#x3C;br/>定期垃圾回收</span><span style="color:#24292E;--shiki-dark:#E1E4E8">：</span><span style="color:#032F62;--shiki-dark:#9ECBFF">文档园丁&#x3C;br/>持续小额偿还技术债</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">    A </span><span style="color:#D73A49;--shiki-dark:#F97583">-.-></span><span style="color:#E36209;--shiki-dark:#FFAB70"> C</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">    B </span><span style="color:#D73A49;--shiki-dark:#F97583">-.-></span><span style="color:#E36209;--shiki-dark:#FFAB70"> C</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">    D </span><span style="color:#D73A49;--shiki-dark:#F97583">-.-></span><span style="color:#E36209;--shiki-dark:#FFAB70"> C</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">    E </span><span style="color:#D73A49;--shiki-dark:#F97583">-.-></span><span style="color:#E36209;--shiki-dark:#FFAB70"> C</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style A fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">e3f2fd</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">1976d2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style B fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f3e5f5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7b1fa2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style C fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">1a237e</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">0d1b2a</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">color</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style D fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">e8f5e9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">388e3c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span>
+<span class="line"><span class="line-number">17</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style E fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff3e0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f57c00</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span></code></pre>
+<h3 id="1上下文工程context-engineering">1.上下文工程（Context Engineering）</h3>
+<p>就像给新员工一本详细的工作手册，<code>AGENTS.md</code> 是 AI 智能体进入代码仓库时看到的第一份指南。但这不是一本静态的说明书——上下文是稀缺资源，过多的指导反而会挤掉任务、代码和相关文档的空间，变成陈旧规则的坟场。</p>
+<p>更好的做法是：提供一个稳定、小巧的入口点，然后教 Agent 根据当前任务按需检索和拉取更多的上下文。</p>
+<p>具体操作：</p>
+<ol>
+<li>标注清楚 <code>docs/</code>下每份文档是什么、什么时候该读</li>
+<li>每份文档头部带元信息：最后更新时间、状态、覆盖范围</li>
+<li>Agent 根据当前任务按需检索，而非一股脑全加载</li>
+</ol>
+<blockquote>
+<p>Mitchell Hashimoto 的 Ghostty 项目 <code>AGENTS.md</code> 里每一行都对应一个历史 Agent 失败案例。</p>
+</blockquote>
+<h3 id="2架构约束architecture-constraints">2.架构约束（Architecture Constraints）</h3>
+<p>OpenAI 团队建立了严格的层级依赖模型：</p>
+<p><strong>Types → Config → Repo → Service → Runtime → UI</strong></p>
+<p>下层不能反向依赖上层。所有架构规则被编码为<strong>自定义 Linter 规则</strong>，在 CI 中强制阻断。人写的还是 AI 写的，违规就合不进去。</p>
+<p>一个关键细节：Linter 的错误信息不只是&quot;你违反了规则 X&quot;，还会解释规则为什么存在、正确做法是什么。Agent 读到错误能自动理解并修正，不需要人类介入。</p>
+<p>规则写在文档里 → Agent 仍然可以违反。</p>
+<p>规则编码为系统级阻断 → 从根本上阻止违规。</p>
+<h3 id="3反馈循环feedback-loop">3.反馈循环（Feedback Loop）</h3>
+<blockquote>
+<p>人类喜欢详细的反馈报告，但Agent 不是。4000 行测试输出里，真正有价值的信息可能只有失败那几行，但 Agent 会把全部内容读一遍，注意力被通过的测试、覆盖率数据、性能指标稀释。</p>
+</blockquote>
+<p>传统开发中，人类工程师负责代码审查（Code Review）。在驾驭工程中，这个工作变成了智能体对智能体的方式：Codex 在本地审核自身更改，请求额外审查，循环往复直到通过。</p>
+<p>反馈循环中的钩子可以运行预定义的测试套件，并在失败时带着错误信息循环回到模型，或者提示模型独立评估其代码。并且如果 AI 写的测试用例通过了带有 Bug 的代码，Harness 就会判定测试无效，强迫它重新思考测试边界。</p>
+<p>正确的设计是**&quot;沉默即成功&quot;**：</p>
+<ul>
+<li>每步完成后自动触发检查脚本。通过 → 零输出。失败 → 结构化错误信息。</li>
+<li>Agent 标记任务完成前，系统强制拦截，要求它对照需求逐项确认边界条件、错误处理、测试更新。</li>
+<li>同一文件被修改超过 3 次且测试仍失败，触发干预：“检测到重复编辑，建议回滚后重新审视需求。”</li>
+</ul>
+<p>对人类来说，详细的信息可以帮助理解；但对 Agent，噪声淹没信号。</p>
+<h3 id="4熵管理entropy-management">4.熵管理（Entropy Management）</h3>
+<p>这个论断基于AI编程时代两个已经发生的事实：</p>
+<ol>
+<li><strong>AI 复制的速度远超人类</strong>：AI编程智能体能够<strong>瞬间</strong>分析整个代码库，并识别出其中“最普遍”的模式。一旦你允许一个临时的、不完美的妥协方案（比如为了赶进度绕过架构约束）合入主分支，智能体就会将这个“坏模式”视为<strong>可参考的先例</strong>，在几分钟内生成的新代码中，大规模复制并在代码库的每个角落复用这种模式。<strong>人类引入坏模式的速度是线性的，而AI扩散它的速度是指数级的。</strong></li>
+<li><strong>“集中清理”模式已失效</strong>：OpenAI 的内部工程团队在早期实践后发现，传统的“每周五集中清理技术债”模式已不可行。因为在AI辅助开发的背景下，技术债务的堆积速度远超人类团队的清理速度。当一周的工作被智能体加速完成后，堆积的技术债可能在几天甚至几小时内就达到了积重难返的地步。</li>
+</ol>
+<p>随着时间推移，软件系统会逐渐混乱（<strong>熵增</strong>）。为了解决上述困境，OpenAI 的工程师 Ryan Lopopolo 提出了一个新的实践：<strong>“垃圾收集日”（Garbage Collection Day）</strong>。</p>
+<p>它的核心机制与传统模式截然不同：</p>
+<ol>
+<li><strong>频率与节奏</strong>：不是每周一次，而是<strong>每天一次</strong>。在每个工作日的下午（例如4点到5点），团队会固定进入“清理模式”。</li>
+<li><strong>工作内容</strong>：在这一个小时里，工程师<strong>不再开发新功能</strong>，而是专门用来审视当天AI Agent生成的所有代码、合并请求（PR）、以及CI/CD流水线的反馈。</li>
+<li><strong>核心任务</strong>：快速识别出当天新引入的“坏模式”或临时代码妥协，并立即将它们“编译”成可供AI自动执行的规则。</li>
+</ol>
+<p>这本质上就是<strong>把偿还技术债的动作，从一个耗时巨大的“大项目”，拆解为融入到每天工作流末尾的、自动化、可积累的“小习惯”</strong>。</p>
+<p>具体措施：定期运行后台 Codex 任务扫描偏差、更新质量等级、发起针对性重构 PR。此外还有一个专门的 <strong>Doc-gardening Agent</strong>（文档园丁代理），在后台自动扫描文档与代码之间的不一致，发现过时内容就自动提交 PR 修复——Agent 为 Agent 维护文档。</p>
+<h2 id="harness-engineering-三阶段路线图">Harness Engineering 三阶段路线图</h2>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 用户开发者空间</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">        direction</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> LR</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">        User</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">用户自然语言需求</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Harness核心</span><span style="color:#24292E;--shiki-dark:#E1E4E8">["</span><span style="color:#E36209;--shiki-dark:#FFAB70">Harness Engineering 核心</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#E36209;--shiki-dark:#FFAB70">br</span><span style="color:#24292E;--shiki-dark:#E1E4E8">/></span><span style="color:#E36209;--shiki-dark:#FFAB70">层 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#E36209;--shiki-dark:#FFAB70">可干预 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#E36209;--shiki-dark:#FFAB70">可优化</span><span style="color:#24292E;--shiki-dark:#E1E4E8">"]</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">        direction TB</span></span>
+<span class="line"><span class="line-number">9</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#D73A49;--shiki-dark:#F97583">        subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Phase1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">["</span><span style="color:#E36209;--shiki-dark:#FFAB70">Phase 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#E36209;--shiki-dark:#FFAB70">信息层 </span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">信息索引</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#24292E;--shiki-dark:#E1E4E8">"]</span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">            direction TB</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P1A</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">AGENTS.md 索引地图</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P1B</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">结构化文档库&#x3C;br/>docs/ 目录</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P1C</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">上下文注入中间件&#x3C;br/>如: LocalContextMiddleware</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">15</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P1A </span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#032F62;--shiki-dark:#9ECBFF">> P1B </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> P1C</span></span>
+<span class="line"><span class="line-number">16</span><span style="color:#D73A49;--shiki-dark:#F97583">        end</span></span>
+<span class="line"><span class="line-number">17</span></span>
+<span class="line"><span class="line-number">18</span><span style="color:#D73A49;--shiki-dark:#F97583">        subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Phase3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">["</span><span style="color:#E36209;--shiki-dark:#FFAB70">Phase 3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#E36209;--shiki-dark:#FFAB70">自动化层 </span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">多Agent&#x3C;br/>协作</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#24292E;--shiki-dark:#E1E4E8">"]</span></span>
+<span class="line"><span class="line-number">19</span><span style="color:#E36209;--shiki-dark:#FFAB70">            direction TB</span></span>
+<span class="line"><span class="line-number">20</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P3A</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">父Agent&#x3C;br/>任务拆解与决策</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">21</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P3B1</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">子Agent 1&#x3C;br/>隔离上下文执行</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">22</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P3B2</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">子Agent 2&#x3C;br/>隔离上下文执行</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">23</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P3D</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">清理Agent&#x3C;br/>债务扫描与预防</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">24</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P3A </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> P3B1</span></span>
+<span class="line"><span class="line-number">25</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P3A </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> P3B2</span></span>
+<span class="line"><span class="line-number">26</span><span style="color:#D73A49;--shiki-dark:#F97583">        end</span></span>
+<span class="line"><span class="line-number">27</span></span>
+<span class="line"><span class="line-number">28</span><span style="color:#D73A49;--shiki-dark:#F97583">        subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Phase2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">["</span><span style="color:#E36209;--shiki-dark:#FFAB70">Phase 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#E36209;--shiki-dark:#FFAB70">约束层 </span><span style="color:#D73A49;--shiki-dark:#F97583">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">规则自动&#x3C;br/>化</span><span style="color:#D73A49;--shiki-dark:#F97583">)</span><span style="color:#24292E;--shiki-dark:#E1E4E8">"]</span></span>
+<span class="line"><span class="line-number">29</span><span style="color:#E36209;--shiki-dark:#FFAB70">            direction TB</span></span>
+<span class="line"><span class="line-number">30</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P2A</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">自动化检查规则&#x3C;br/>Linter / Hooks</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">31</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P2B</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">CI/CD 集成门禁</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">32</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P2C</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">LoopDetectionMiddleware&#x3C;br/>PreCompletionChecklistMiddleware</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">33</span><span style="color:#E36209;--shiki-dark:#FFAB70">            P2A </span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#032F62;--shiki-dark:#9ECBFF">> P2B </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> P2C</span></span>
+<span class="line"><span class="line-number">34</span><span style="color:#D73A49;--shiki-dark:#F97583">        end</span></span>
+<span class="line"><span class="line-number">35</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">36</span></span>
+<span class="line"><span class="line-number">37</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> 底层模型层</span><span style="color:#24292E;--shiki-dark:#E1E4E8">["</span><span style="color:#E36209;--shiki-dark:#FFAB70">底层模型层 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#E36209;--shiki-dark:#FFAB70">固定不变</span><span style="color:#24292E;--shiki-dark:#E1E4E8">"]</span></span>
+<span class="line"><span class="line-number">38</span><span style="color:#E36209;--shiki-dark:#FFAB70">        direction TB</span></span>
+<span class="line"><span class="line-number">39</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Model</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">基础模型&#x3C;br/>如: gpt</span><span style="color:#24292E;--shiki-dark:#E1E4E8">-</span><span style="color:#032F62;--shiki-dark:#9ECBFF">5.2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">-</span><span style="color:#032F62;--shiki-dark:#9ECBFF">codex / Grok</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">40</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">41</span></span>
+<span class="line"><span class="line-number">42</span><span style="color:#D73A49;--shiki-dark:#F97583">    subgraph</span><span style="color:#E36209;--shiki-dark:#FFAB70"> 执行环境与工具</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"执行环境与工具"</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">43</span><span style="color:#E36209;--shiki-dark:#FFAB70">        direction TB</span></span>
+<span class="line"><span class="line-number">44</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Env</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">沙盒环境&#x3C;br/>Terminal / Harbor</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">45</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Tools</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">外部Tools&#x3C;br/>read_file / 测试套件</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">46</span><span style="color:#E36209;--shiki-dark:#FFAB70">        Env </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Tools</span></span>
+<span class="line"><span class="line-number">47</span><span style="color:#D73A49;--shiki-dark:#F97583">    end</span></span>
+<span class="line"><span class="line-number">48</span></span>
+<span class="line"><span class="line-number">49</span><span style="color:#E36209;--shiki-dark:#FFAB70">    User </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> P1A</span></span>
+<span class="line"><span class="line-number">50</span><span style="color:#E36209;--shiki-dark:#FFAB70">    P2C </span><span style="color:#D73A49;--shiki-dark:#F97583">-.->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">失败时返回精准错误</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> User</span></span>
+<span class="line"><span class="line-number">51</span></span>
+<span class="line"><span class="line-number">52</span><span style="color:#E36209;--shiki-dark:#FFAB70">    P1C </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Model</span></span>
+<span class="line"><span class="line-number">53</span><span style="color:#E36209;--shiki-dark:#FFAB70">    P2B </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Model</span></span>
+<span class="line"><span class="line-number">54</span><span style="color:#E36209;--shiki-dark:#FFAB70">    P3A </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Model</span></span>
+<span class="line"><span class="line-number">55</span></span>
+<span class="line"><span class="line-number">56</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Model </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> Env</span></span>
+<span class="line"><span class="line-number">57</span><span style="color:#E36209;--shiki-dark:#FFAB70">    Tools </span><span style="color:#D73A49;--shiki-dark:#F97583">-.->|</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"沉默即成功"协议&#x3C;br/>通过时仅输出</span><span style="color:#24292E;--shiki-dark:#E1E4E8">✓</span><span style="color:#D73A49;--shiki-dark:#F97583">|</span><span style="color:#E36209;--shiki-dark:#FFAB70"> P2B</span></span>
+<span class="line"><span class="line-number">58</span></span>
+<span class="line"><span class="line-number">59</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 用户开发者空间 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fffde7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fbc02d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span>
+<span class="line"><span class="line-number">60</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style User fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">999</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span>
+<span class="line"><span class="line-number">61</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Harness核心 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">e1f5fe</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">0288d1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span>
+<span class="line"><span class="line-number">62</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Phase1 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">e8f5e9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">388e3c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span>
+<span class="line"><span class="line-number">63</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Phase3 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f3e5f5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7b1fa2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span>
+<span class="line"><span class="line-number">64</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Phase2 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff3e0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f57c00</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span>
+<span class="line"><span class="line-number">65</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 底层模型层 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fffde7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fbc02d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span>
+<span class="line"><span class="line-number">66</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Model fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">999</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span>
+<span class="line"><span class="line-number">67</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style 执行环境与工具 fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fffde7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fbc02d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span>
+<span class="line"><span class="line-number">68</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Env fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">999</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span>
+<span class="line"><span class="line-number">69</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style Tools fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">999</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">1px</span></span></code></pre>
+<p>这个三阶段路线图，是目前将<strong>Harness Engineering</strong>从理念落地为实践的最清晰、最可操作的指南之一。它精准地捕捉到了从“信息混乱”到“自动化治理”的渐进式演进路径，每一步都为下一步打下基础。</p>
+<p>业界在以下六个方面已形成明确共识：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">#</th>
+<th style="text-align:left">共识</th>
+<th style="text-align:left">核心观点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">1</td>
+<td style="text-align:left"><strong>瓶颈在基础设施，不在模型智能</strong></td>
+<td style="text-align:left">五个独立团队得出相同结论。仅改变 Harness 工具格式，就能让模型得分从 6.7% 跳到 68.3%</td>
+</tr>
+<tr>
+<td style="text-align:left">2</td>
+<td style="text-align:left"><strong>文档必须是活的反馈循环</strong></td>
+<td style="text-align:left">静态文档是坟场，动态文档才有价值。让后台 Agent 定期清理过时文档并提交 PR</td>
+</tr>
+<tr>
+<td style="text-align:left">3</td>
+<td style="text-align:left"><strong>思考与执行分离</strong></td>
+<td style="text-align:left">复杂任务不可能在单个上下文窗口内完成，需要 Orchestrator + Worker 分层架构，状态持久化到外部存储</td>
+</tr>
+<tr>
+<td style="text-align:left">4</td>
+<td style="text-align:left"><strong>上下文不是越多越好</strong></td>
+<td style="text-align:left">上下文是稀缺资源。巨大的指令文件会挤掉任务空间，应按需检索、动态注入</td>
+</tr>
+<tr>
+<td style="text-align:left">5</td>
+<td style="text-align:left"><strong>约束必须自动化</strong></td>
+<td style="text-align:left">人工 Review 是瓶颈。护栏要编码为 Linter、CI、类型系统，让机器来执行而非人</td>
+</tr>
+<tr>
+<td style="text-align:left">6</td>
+<td style="text-align:left"><strong>工程师角色在转变</strong></td>
+<td style="text-align:left">从代码的编写者变成环境的建筑师。最大的工程挑战是设计让 Agent 可靠工作的控制系统</td>
+</tr>
+</tbody>
+</table>
+<h2 id="harness-与传统框架的关系">Harness 与传统框架的关系</h2>
+<p>Harness 不是 SDK、脚手架或 Agent 框架的替代品，而是<strong>位于它们之上的一层</strong>：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">flowchart</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> TB</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#E36209;--shiki-dark:#FFAB70">	A</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">Harness Layer</span><span style="color:#24292E;--shiki-dark:#E1E4E8">（</span><span style="color:#032F62;--shiki-dark:#9ECBFF">驾驭层</span><span style="color:#24292E;--shiki-dark:#E1E4E8">）</span><span style="color:#032F62;--shiki-dark:#9ECBFF">&#x3C;br/>约束 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#032F62;--shiki-dark:#9ECBFF">反馈循环 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#032F62;--shiki-dark:#9ECBFF">上下文工程 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#032F62;--shiki-dark:#9ECBFF">熵管理 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#032F62;--shiki-dark:#9ECBFF">生命周期管理</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#E36209;--shiki-dark:#FFAB70">	B</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">框架层 &#x3C;br/>Agent Frameworks</span><span style="color:#24292E;--shiki-dark:#E1E4E8">（</span><span style="color:#032F62;--shiki-dark:#9ECBFF">LangGraph / AutoGen / CrewAI</span><span style="color:#24292E;--shiki-dark:#E1E4E8">）</span><span style="color:#032F62;--shiki-dark:#9ECBFF">&#x3C;br/>智能体定义 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#032F62;--shiki-dark:#9ECBFF">消息路由 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#032F62;--shiki-dark:#9ECBFF">任务生命周期 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#032F62;--shiki-dark:#9ECBFF">依赖管理</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#E36209;--shiki-dark:#FFAB70">	C</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">SDK层 &#x3C;br/>SDK / API</span><span style="color:#24292E;--shiki-dark:#E1E4E8">（</span><span style="color:#032F62;--shiki-dark:#9ECBFF">OpenAI / Anthropic / Gemini</span><span style="color:#24292E;--shiki-dark:#E1E4E8">）</span><span style="color:#032F62;--shiki-dark:#9ECBFF">&#x3C;br/>模型调用 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#032F62;--shiki-dark:#9ECBFF">工具注册 </span><span style="color:#24292E;--shiki-dark:#E1E4E8">· </span><span style="color:#032F62;--shiki-dark:#9ECBFF">流式输出</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">5</span><span style="color:#E36209;--shiki-dark:#FFAB70">	D</span><span style="color:#D73A49;--shiki-dark:#F97583">[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">模型层 &#x3C;br/>Foundation Model</span><span style="color:#24292E;--shiki-dark:#E1E4E8">（</span><span style="color:#032F62;--shiki-dark:#9ECBFF">GPT / Claude / Gemini / DeepSeek</span><span style="color:#24292E;--shiki-dark:#E1E4E8">）</span><span style="color:#D73A49;--shiki-dark:#F97583">]</span></span>
+<span class="line"><span class="line-number">6</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">    A </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> B</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">    B </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> C</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">    C </span><span style="color:#D73A49;--shiki-dark:#F97583">--></span><span style="color:#E36209;--shiki-dark:#FFAB70"> D</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span class="line-number">11</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style A fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">fff3e0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f57c00</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span>
+<span class="line"><span class="line-number">12</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style B fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">f3e5f5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">7b1fa2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span>
+<span class="line"><span class="line-number">13</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style C fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">e3f2fd</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">1976d2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span>
+<span class="line"><span class="line-number">14</span><span style="color:#E36209;--shiki-dark:#FFAB70">    style D fill</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">e8f5e9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:#</span><span style="color:#E36209;--shiki-dark:#FFAB70">388e3c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#E36209;--shiki-dark:#FFAB70">stroke-width</span><span style="color:#24292E;--shiki-dark:#E1E4E8">:</span><span style="color:#E36209;--shiki-dark:#FFAB70">2px</span></span></code></pre>
+<p>传统框架解决的是<strong>如何构建 AI 智能体</strong>，而驾驭层解决的是完全不同的问题：<strong>智能体如何可靠地运行</strong>。</p>
+<p>模型正在逐渐吸收框架约 80% 的功能（智能体定义、消息路由、任务生命周期……），但剩余 20%——<strong>持久化、确定性重放、成本控制、可观测性、错误恢复</strong>——正是驾驭层存在的价值。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

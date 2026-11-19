@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>成本与成本分类 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">成本与成本分类</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%88%90%E6%9C%AC">成本</a></li>
+<li class="toc-item toc-level-3"><a href="#%E6%88%90%E6%9C%AC%E5%88%86%E7%B1%BB">成本分类</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%A0%B9%E6%8D%AE%E5%85%B6%E4%B8%8E%E4%BA%A7%E5%93%81%E4%BA%A7%E9%87%8F%E6%88%96%E4%B8%9A%E5%8A%A1%E9%87%8F%E7%9A%84%E5%85%B3%E7%B3%BB%E5%88%86%E4%B8%BA%E5%9B%BA%E5%AE%9A%E8%B4%B9%E7%94%A8%E5%92%8C%E5%8F%98%E5%8A%A8%E8%B4%B9%E7%94%A8">根据其与产品产量（或业务量）的关系分为固定费用和变动费用</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%A0%B9%E6%8D%AE%E5%9B%9E%E6%94%B6%E5%90%8E%E5%BD%92%E5%B1%9E%E4%B8%8D%E5%90%8C%E5%88%86%E4%B8%BA%E6%98%BE%E6%80%A7%E6%88%90%E6%9C%AC%E5%92%8C%E9%9A%90%E6%80%A7%E6%88%90%E6%9C%AC">根据回收后归属不同分为显性成本和隐性成本</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/" class="post-category">
+        it      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/operations-research/">#operations-research</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">成本与成本分类</h1>
+
+    <div class="post-body">
+<h2 id="成本">成本</h2>
+<p>工业产品的成本费用可划分为：原材料、燃料动力费、工资及附加费、废品损失费、车间费用和企业管理费<strong>六项</strong>。</p>
+<p><img src="/assets/images/cost-classification/%E5%9B%BA%E5%AE%9A%E6%88%90%E6%9C%ACand%E5%8F%AF%E5%8F%98%E6%88%90%E6%9C%AC.jpg" alt="10产品成本"></p>
+<h3 id="成本分类">成本分类</h3>
+<h4 id="根据其与产品产量或业务量的关系分为固定费用和变动费用">根据其与产品产量（或业务量）的关系分为固定费用和变动费用</h4>
+<ul>
+<li>
+<p><strong>固定成本</strong>：在一定时期内不随企业产量的增减而变化。</p>
+<ul>
+<li>预付成本：有所提供生产力决定的。</li>
+<li>计划成本：管理部门认为要达到预期目标所必需的费用。</li>
+</ul>
+</li>
+<li>
+<p><strong>可变成本</strong>：随着企业产品产量的增减而变化。</p>
+</li>
+</ul>
+<p>成本方程为：</p>
+<div class="math math-display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>C</mi><mo>=</mo><mi>F</mi><mo>+</mo><mi>V</mi><mo>=</mo><mo stretchy="false">(</mo><mi>F</mi><mi>c</mi><mo>+</mo><mi>F</mi><mi>p</mi><mo stretchy="false">)</mo><mo>+</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">C = F + V =(Fc + Fp)+V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord mathnormal">p</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span></span></div><ul>
+<li>C 为总成本或生产费用</li>
+<li>V 为可变成本</li>
+<li>F 为固定成本或称固定费用</li>
+<li>Fc 为预付成本，把在全部销售量上保持不变</li>
+<li>Fp 为计划成本，它随销售量而波动</li>
+</ul>
+<h4 id="根据回收后归属不同分为显性成本和隐性成本">根据回收后归属不同分为显性成本和隐性成本</h4>
+<ul>
+<li><strong>显性成本（会计成本）</strong>：企业在成产要素市场中购买或租用索要的生产要素的实际支出。</li>
+<li><strong>隐性成本（机会成本）</strong>：形式上没有支付义务的。</li>
+</ul>
+<p>在会计上起支配作用的是隐性成本。</p>
+<p>判断资源是否得到最优使用的是：机会成本。</p>
+<ul>
+<li><strong>增量成本</strong>：某项决策而产生的相关成本，总成本的增量。</li>
+<li><strong>沉没成本</strong>：在短期中，固定成本就是沉没成本。</li>
+</ul>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

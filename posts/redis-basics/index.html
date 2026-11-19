@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>Redis 入门 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">Redis 入门</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%B8%80redis">一、Redis</a></li>
+<li class="toc-item toc-level-2"><a href="#%E5%90%AF%E5%8A%A8redis%E6%9C%8D%E5%8A%A1">启动Redis服务</a></li>
+<li class="toc-item toc-level-2"><a href="#%E6%89%93%E5%BC%80redis%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%BF%9B%E8%A1%8C%E8%BF%9E%E6%8E%A5">打开Redis客户端进行连接</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81">修改密码</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C">常用操作</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%BA%8C%E7%BC%93%E5%AD%98">二、缓存</a></li>
+<li class="toc-item toc-level-2"><a href="#1%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9">1、缓存雪崩</a></li>
+<li class="toc-item toc-level-3"><a href="#11-%E5%A4%A7%E9%87%8F%E6%95%B0%E6%8D%AEkey%E5%90%8C%E6%97%B6%E8%BF%87%E6%9C%9F">1.1 大量数据（Key）同时过期</a></li>
+<li class="toc-item toc-level-3"><a href="#12-redis-%E6%95%85%E9%9A%9C%E5%AE%95%E6%9C%BA">1.2 redis 故障宕机</a></li>
+<li class="toc-item toc-level-2"><a href="#2%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BFhot-key-%E8%BF%87%E6%9C%9F">2、缓存击穿（Hot Key 过期）</a></li>
+<li class="toc-item toc-level-2"><a href="#3%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E6%9F%A5%E8%AF%A2%E4%B8%8D%E5%AD%98%E5%9C%A8%E7%9A%84%E6%95%B0%E6%8D%AE">3、缓存穿透（查询不存在的数据）</a></li>
+<li class="toc-item toc-level-1"><a href="#%E4%B8%89%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7">三、数据一致性</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/database/" class="post-category">
+        it / 数据库      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/database/">#database</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">Redis 入门</h1>
+
+    <div class="post-body">
+<h1 id="一redis">一、Redis</h1>
+<p><a href="https://blog.csdn.net/weixin_44893902/article/details/123087435">Window下Redis的安装和部署详细图文教程（Redis的安装和可视化工具的使用）_redis安装-CSDN博客</a></p>
+<h2 id="启动redis服务">启动Redis服务</h2>
+<p>在Redis的安装目录下打开cmd窗口，然后执行命令来启动服务：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#6F42C1;--shiki-dark:#B392F0">redis-server.exe</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> redis.conf</span></span>
+<span class="line"><span class="line-number">2</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#6A737D;--shiki-dark:#6A737D"># Or use RedisService (recommended)</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#6F42C1;--shiki-dark:#B392F0">RedisService.exe</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> run</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --foreground</span></span></code></pre>
+<ul>
+<li><strong><code>redis-server.exe</code></strong>：就像 Linux 上的原生 Redis，只是被 Cygwin 移植到了 Windows。路径写法很别扭（<code>C:\</code> 要写成 <code>/cygdrive/c/</code>）。</li>
+<li><strong><code>RedisService.exe</code></strong>：有人在 <code>redis-server.exe</code> 外面包了一层，帮你自动处理路径转换，还能一键安装成系统服务。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>redis-server.exe redis.conf</code></th>
+<th><code>RedisService.exe run --foreground</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>本质</strong></td>
+<td>原始 Redis 程序（Cygwin 构建）</td>
+<td>Windows 服务包装器 + 原始程序</td>
+</tr>
+<tr>
+<td><strong>路径格式</strong></td>
+<td>必须用 Cygwin 格式（<code>/cygdrive/c/...</code>）</td>
+<td>自动转换，可用 Windows 原生路径（<code>C:\...</code>）</td>
+</tr>
+<tr>
+<td><strong>配置文件</strong></td>
+<td>通过命令行参数传入 <code>redis.conf</code></td>
+<td>可通过 <code>--dir</code>、<code>-c</code> 等参数指定，或内部默认</td>
+</tr>
+<tr>
+<td><strong>服务模式</strong></td>
+<td>❌ 不支持</td>
+<td>✅ 支持 <code>install</code> / <code>uninstall</code> 注册为 Windows 服务</td>
+</tr>
+<tr>
+<td><strong>日志输出</strong></td>
+<td>直接输出到控制台</td>
+<td>直接输出到控制台（<code>--foreground</code> 表示前台运行）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="打开redis客户端进行连接">打开Redis客户端进行连接</h2>
+<p>我们使用<code>redis-cli.exe</code>命令来打开Redis客户端：</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>redis-cli.exe -h 127.0.0.1 -p 6379</span></span></code></pre>
+<p>之后，在命令中输入ping命令来检测redis服务器与redis客户端的连通性，返回<code>PONG</code>则说明连接成功了。</p>
+<h3 id="修改密码">修改密码</h3>
+<p>在配置文件中,找到<strong>requirepass foobared</strong>字样，在其后面追加一行，输入<code>requirepass 123456</code>设置访问Redis时所需的密码。</p>
+<p>一般测试情况下可以不用设定密码。我这里设置123456做演示。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span># requirepass foobared</span></span>
+<span class="line"><span class="line-number">2</span><span>requirepass 123456</span></span></code></pre>
+<h3 id="常用操作">常用操作</h3>
+<p>卸载服务：<code>redis-server --service-uninstall</code></p>
+<p>开启服务：<code>redis-server --service-start</code></p>
+<p>停止服务：<code>redis-server --service-stop</code></p>
+<h1 id="二缓存">二、缓存</h1>
+<h2 id="1缓存雪崩">1、缓存雪崩</h2>
+<p><strong>【简】批量缓存失效，数据库压力骤增。</strong></p>
+<p>我们在写入缓存的时候，一般会给这个缓存设置一个过期时间。“缓存雪崩”就像是一个大雪山突然崩塌一样，所有的数据都一下子全都过期了，导致系统的缓存全部消失，系统需要重新从数据库加载所有的数据。这个过程会让系统瞬间承受巨大的压力，可能导致整个系统崩溃，无法继续服务。</p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span style="color:#D73A49;--shiki-dark:#F97583">sequenceDiagram</span></span>
+<span class="line"><span class="line-number">2</span><span style="color:#D73A49;--shiki-dark:#F97583">    participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> 应用</span></span>
+<span class="line"><span class="line-number">3</span><span style="color:#D73A49;--shiki-dark:#F97583">    participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> redis</span></span>
+<span class="line"><span class="line-number">4</span><span style="color:#D73A49;--shiki-dark:#F97583">    participant</span><span style="color:#E36209;--shiki-dark:#FFAB70"> MySQL</span></span>
+<span class="line"><span class="line-number">5</span></span>
+<span class="line"><span class="line-number">6</span><span style="color:#E36209;--shiki-dark:#FFAB70">    应用</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">redis</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 从缓存读取数据</span></span>
+<span class="line"><span class="line-number">7</span><span style="color:#E36209;--shiki-dark:#FFAB70">    redis</span><span style="color:#D73A49;--shiki-dark:#F97583">-->></span><span style="color:#E36209;--shiki-dark:#FFAB70">应用</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 缓存不存在</span></span>
+<span class="line"><span class="line-number">8</span><span style="color:#E36209;--shiki-dark:#FFAB70">    应用</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">MySQL</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 从数据库读取数据</span></span>
+<span class="line"><span class="line-number">9</span><span style="color:#E36209;--shiki-dark:#FFAB70">    MySQL</span><span style="color:#D73A49;--shiki-dark:#F97583">-->></span><span style="color:#E36209;--shiki-dark:#FFAB70">应用</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 返回数据库的数据</span></span>
+<span class="line"><span class="line-number">10</span><span style="color:#E36209;--shiki-dark:#FFAB70">    应用</span><span style="color:#D73A49;--shiki-dark:#F97583">->></span><span style="color:#E36209;--shiki-dark:#FFAB70">redis</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 将数据加载到缓存</span></span></code></pre>
+<ul>
+<li><strong>发生缓存雪崩的原因</strong>通常有两个：<strong>大量数据同时过期</strong>和<strong>Redis故障宕机</strong>。</li>
+</ul>
+<h3 id="11-大量数据key同时过期">1.1 大量数据（Key）同时过期</h3>
+<p>在系统使用缓存时，缓存中的数据会设置一个过期时间，这样数据就会在一段时间后失效，防止数据存在的时间太长。</p>
+<p>假设你系统中的很多数据都有相似的过期时间，并且这些数据在<strong>同一时刻都过期</strong>，那么系统就需要在这段时间内同时从数据库重新加载大量数据。这会导致数据库的负载急剧增加，系统变得非常缓慢，甚至崩溃。</p>
+<p>针对大量数据同时过期，一般有三种解决方案：</p>
+<ol>
+<li><strong>随机过期时间</strong></li>
+</ol>
+<p>为了避免大量数据同时过期导致缓存雪崩，我们可以把缓存的过期时间设置得不完全相同。可以通过加一些随机数来避免大量数据同时过期，比如在每个数据的过期时间上增加几秒钟或几分钟的随机时间。这样，数据的过期时间就会错开，避免了大量数据同时过期。</p>
+<blockquote>
+<p>比如你的电商系统中，商品的缓存时间是1小时，你可以为每个商品设置一个1小时加上一个随机的时间，比如10分钟、20分钟、30分钟等。这样，即使有大量商品的缓存过期，它们的过期时间也不会完全重合。</p>
+</blockquote>
+<ol start="2">
+<li><strong>互斥锁</strong></li>
+</ol>
+<p>当缓存数据过期时，多个请求可能同时去数据库查询并更新缓存，导致数据库压力骤增。我们可以使用互斥锁来保证每次只有一个请求去更新缓存，其他请求需要等待，这样就避免了多个请求同时去访问数据库，减轻了数据库压力。</p>
+<p>如果商品的缓存失效，多个用户请求该商品信息时，我们可以使用互斥锁机制，确保只有一个请求能从数据库加载数据并更新缓存，其他请求则等待。</p>
+<ol start="3">
+<li>
+<p><strong>多级缓存</strong></p>
+</li>
+<li>
+<p><strong>后台更新缓存（异步预热）</strong></p>
+</li>
+</ol>
+<p>另一个解决方案是通过<strong>后台异步任务</strong>来提前更新缓存，避免每次用户请求时都去查询数据库。当缓存快过期时，后台会提前从数据库读取新的数据，并更新缓存。这样，用户请求时就能从缓存中获取到数据，而不是每次都访问数据库。</p>
+<h3 id="12-redis-故障宕机">1.2 redis 故障宕机</h3>
+<p>针对这种情况的解决方案一般有两种：</p>
+<ol>
+<li><strong>熔断降级（服务熔断或请求限流）</strong></li>
+</ol>
+<p>如果Redis发生故障，我们可以采用<strong>服务熔断</strong>或<strong>请求限流机制</strong>来保护系统。</p>
+<p><strong>服务熔断</strong>是说，直接暂停业务对缓存层数据的访问，直接返回错误，这样就保护了数据库，防止数据库被巨大的请求冲击，保证了数据库的正常运行。但是缺点也是显而易见的，那就是业务停摆。</p>
+<p><strong>请求限流</strong>的意思是只允许一小部分请求可以到达数据库，其余的请求则被直接拒绝。等 redis 故障恢复之后并且完成缓存预热之后，再把请求限流解除掉。</p>
+<ol start="2">
+<li><strong>构建Redis集群</strong></li>
+</ol>
+<p>另一个有效的解决方案是构建Redis集群，通过主从复制、分片等技术，保证Redis在故障时能够自动切换，避免整个缓存服务的宕机。Redis集群可以分担负载，提供高可用性和容错性，确保系统稳定运行。</p>
+<h2 id="2缓存击穿hot-key-过期">2、缓存击穿（Hot Key 过期）</h2>
+<p><strong>【简】某个热点 Key 突然过期，大量请求同时打到 MySQL。</strong></p>
+<p><strong>热点数据（热点 Key）</strong>：是指一些访问量非常大的数据。比如在一个电商网站上，某个爆款商品在促销时会吸引大量用户浏览和购买，这个商品的相关信息就成为了热点数据。简单来说，热点数据就是指那些在特定时间段内频繁被访问、请求量特别大的数据。</p>
+<p>当某个热点 Key 突然过期，大量请求同时打到 MySQL，就造成了缓存击穿。</p>
+<p>对于缓存击穿，有两种常见的解决方案：<strong>互斥锁</strong>和<strong>不给热点数据设置过期时间</strong>。</p>
+<ol>
+<li><strong>互斥锁</strong></li>
+</ol>
+<p>这个方案的核心思想是：当缓存中的热点数据失效时，只有一个请求会去数据库获取数据并更新缓存，其他的请求都会等待，直到缓存更新完成。这样，避免了多个请求同时去访问数据库，从而减轻数据库的压力。</p>
+<p>这样做的好处是，即使有大量用户访问这款商品，它们也不会同时去访问数据库，只会等到第一个请求处理完毕，避免了数据库被压垮。</p>
+<ol start="2">
+<li><strong>不给热点数据设置过期时间</strong></li>
+</ol>
+<p>通过这个方案，我们可以避免缓存中的热点数据过期，从而避免缓存击穿问题。实际上，对于一些访问量极大的热点数据，我们可以选择不设置过期时间，而是让<strong>后台异步更新缓存</strong>，或者在热点数据马上要过期的时候，提前通知后台线程来更新缓存并且重新设置过期时间。</p>
+<p>这种方法的优点是，它避免了热点数据的频繁过期问题，从根本上消除了缓存击穿的风险。</p>
+<h2 id="3缓存穿透查询不存在的数据">3、缓存穿透（查询不存在的数据）</h2>
+<p><strong>【简】恶意请求查询数据库中不存在的数据，缓存永远不命中。</strong></p>
+<p>缓存穿透：缓存中没有该数据，且数据库中也没有该数据。请求直接穿透缓存去访问数据库，浪费了缓存的作用，也给数据库带来额外负担。</p>
+<p>缓存穿透的发生通常有两种原因：<strong>业务误操作</strong>和<strong>黑客攻击</strong>。</p>
+<ol>
+<li><strong>业务误操作</strong>：有时，开发人员在编写代码时，可能会因为错误的逻辑导致缓存存储不正确或者缓存数据没有及时更新。比如，某个请求本应该查询缓存，但却直接访问数据库，或者某些数据的缓存失效后没有重新更新。这样就会导致缓存穿透现象的发生。</li>
+<li><strong>黑客攻击</strong>：黑客有时会通过恶意请求，访问一些不存在的数据，造成大量无效查询，最终导致系统的压力增大。</li>
+</ol>
+<p><strong>解决：</strong></p>
+<p>1、<strong>空值缓存</strong></p>
+<p>当数据库返回空结果时，缓存一个空值（如 <code>&lt;font style=&quot;color:rgb(232, 62, 140);&quot;&gt;null&lt;/font&gt;</code> 或特殊标记）到缓存中，后续相同的请求可以直接从缓存中获取空值，而不需要再查询数据库。</p>
+<p>这样就可以避免每次请求都查询数据库，即使数据不存在，也可以减少数据库的压力。</p>
+<p>2、<strong>布隆过滤器</strong></p>
+<p>布隆过滤器是一种空间效率高、能够判断某个元素是否存在于集合中的数据结构。它通过多个哈希函数对元素进行映射，可以在常数时间内判断一个元素是否在集合中存在，但它可能会产生误判，即判断某个元素存在于集合中，但实际并不存在（假阳性）。</p>
+<p>通过在缓存层前增加布隆过滤器，避免无效的数据库查询。布隆过滤器可以在缓存中查询是否存在该数据的 ID，如果不存在，则直接返回，不会继续查询数据库。</p>
+<p>3、<strong>API 接口防护</strong></p>
+<p>可以通过对接口进行访问频率限制，控制请求的频率，避免恶意请求导致的缓存穿透。比如可以使用一些防止滥用的工具，如 Redis 计数器，限制某个 IP 在一定时间内只能访问特定接口一定次数。</p>
+<h1 id="三数据一致性">三、数据一致性</h1>
+<p>多级缓存数据一致性问题没有银弹，需要结合业务场景选择合适的方案：</p>
+<ol>
+<li>核心策略：Cache Aside Pattern（先更DB，再删缓存，发通知）</li>
+<li>分布式一致性：RocketMQ消息通知 + 事务消息</li>
+<li>特殊场景防护：缓存空值、互斥锁、过期时间随机化</li>
+<li>最终一致性保障：消息重试 + 定期同步</li>
+</ol>
+<p>在实际应用中，还需要根据数据的一致性要求、访问频率和更新频率，调整缓存策略和过期时间，在性能和一致性之间找到最佳平衡点。</p>
+<p><a href="https://zhuanlan.zhihu.com/p/1961028238286495822">多级缓存数据一致性的解决方案 - 知乎</a></p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

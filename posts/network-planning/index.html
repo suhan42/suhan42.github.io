@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>网络计划技术 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">网络计划技术</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%AC%AC%E4%B8%83%E7%AB%A0-%E7%BD%91%E7%BB%9C%E8%AE%A1%E5%88%92%E6%8A%80%E6%9C%AF">第七章 网络计划技术</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%80%E7%BD%91%E7%BB%9C%E8%AE%A1%E5%88%92%E6%8A%80%E6%9C%AF">一、网络计划技术</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%8C%E7%BD%91%E7%BB%9C%E5%9B%BE">二、网络图</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%89%E7%AE%AD%E7%BA%BF%E5%BC%8F%E7%BD%91%E7%BB%9C%E5%9B%BE">三、箭线式网络图</a></li>
+<li class="toc-item toc-level-4"><a href="#31%E6%9E%84%E6%88%90">3.1构成</a></li>
+<li class="toc-item toc-level-4"><a href="#32%E7%BC%96%E7%BB%98">3.2编绘</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9B%9B%E7%BD%91%E7%BB%9C%E6%97%B6%E9%97%B4%E7%9A%84%E8%AE%A1%E7%AE%97">四、网络时间的计算</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%85%AD%E4%BD%9C%E4%B8%9A%E6%97%B6%E9%97%B4">六、作业时间</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%83%E7%BB%93%E7%82%B9%E6%97%B6%E9%97%B4">七、结点时间</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%85%AB%E6%B4%BB%E5%8A%A8%E6%97%B6%E9%97%B4">八、活动时间</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B9%9D%E7%BB%93%E7%82%B9%E6%97%B6%E5%B7%AE">九、结点时差</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8D%81%E7%BD%91%E7%BB%9C%E8%AE%A1%E5%88%92%E4%BC%98%E5%8C%96%E7%9A%84%E5%86%85%E5%AE%B9">十、网络计划优化的内容</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%8D%81%E4%B8%80%E6%91%8A%E5%85%A5%E5%B7%A5%E7%A8%8B%E6%88%90%E6%9C%AC%E7%9A%84%E8%B4%B9%E7%94%A8%E5%88%86%E7%B1%BB">十一、摊入工程成本的费用分类</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/operations-research/" class="post-category">
+        it / 运筹学      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/operations-research/">#operations-research</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">网络计划技术</h1>
+
+    <div class="post-body">
+<h1 id="第七章-网络计划技术">第七章 网络计划技术</h1>
+<h3 id="一网络计划技术">一、网络计划技术</h3>
+<p><strong>网络计划技术</strong>是一种组织生产和进行计划管理的科学方法，也称统筹法，是综合运用计划评核技术和关键路线法的一种比较先进的管理方法。</p>
+<p>网络计划技术特别适用于大型的错综复杂的生产项目或工程项目。</p>
+<p><strong>计算评核技术</strong>（PERT）：是对计划项目进行核算，评价，然后选定最有计划方案的一种技术。</p>
+<p><strong>关键路线法</strong>（CPM）：是在计划项目的各个错中复杂的工作中，抓住其中的关键路线进行计划安排的一种方法。</p>
+<h3 id="二网络图">二、网络图</h3>
+<p>网络图是计划项目的各个组成部分内在逻辑关系的综合反映，是进行计划和计算的基础，是网络计划技术的基础。</p>
+<p>分为</p>
+<ul>
+<li><strong>箭线式网络图</strong>
+<ul>
+<li><strong>箭线</strong>：代表<strong>活动（作业）</strong></li>
+<li><strong>结点</strong>：代表活动的<strong>开始</strong>和<strong>完成</strong>（一般用奇数排序）</li>
+<li>还要引入虚活动：虚工作（虚活动）是在网络图中，只表示其相邻的前后工作之间相互制约、相互依存的逻辑关系，既不占用时间也不消耗资源的一种虚拟工作。</li>
+</ul>
+</li>
+<li><strong>结点式网络图</strong>不引入虚活动</li>
+</ul>
+<h3 id="三箭线式网络图">三、箭线式网络图</h3>
+<h4 id="31构成">3.1构成</h4>
+<p>由<strong>活动</strong>、<strong>结点</strong>和<strong>线路</strong>三个组成部分组成。</p>
+<ul>
+<li><strong>活动</strong>：指作业或工序，用箭线表示。按键线的方向，在左侧写上活动的名称，右侧写上活动占用的时间。</li>
+</ul>
+<p><strong>虚活动</strong>：不消耗资源，不占用时间
+以下两种情况要引用虚活动：</p>
+<ol>
+<li>
+<p>先后两个结点之间的工作过程只能代表一项活动，当两个或两个以上的活动具有同样的始点和终点时。</p>
+</li>
+<li>
+<p>为了正确表示各个活动之间的承接关系，需要引入虚活动。</p>
+</li>
+</ol>
+<ul>
+<li><strong>结点</strong>：指事项。两个活动之间的交接点。说明一个活动的开始或完成，不占用时间，不消耗资源。</li>
+</ul>
+<p>一个网络应只有一个始点和终点。除始点和终点，其他结点都有两重性，即对前面是终点，对后面是始点</p>
+<p>结点编号的原则是：箭尾结点小于箭头结点，而且一般采用非连续编号。</p>
+<p>编号方法是：去点去线编号法。</p>
+<ul>
+<li><strong>线路</strong>：从网络的始点开始，顺着箭线方向，中间经过互相连接的始点和箭线，到终点的一条连线。</li>
+</ul>
+<p>总作业时长最长的线路就是<strong>关键线路</strong>，或叫主要矛盾线。决定了整个网络计划的完工时间，线路的总长度叫做路长。关键线路在图上用<strong>双线</strong>或红线标出。</p>
+<h4 id="32编绘">3.2编绘</h4>
+<p>任务的分解：把一个计划项目的总任务分解成一定数量的分任务，并确定他们之间有相互继承的关系。</p>
+<p>分解的原则：分工要清，职责要明，既要防止分工过细，网络图过于繁杂，又要防止分工不清，互相扯皮的现象。</p>
+<p>具体来说：</p>
+<ol>
+<li>工作性质不同或由不同单位执行的工作应分开。</li>
+<li>同一单位进行的工作，工作时间先后不衔接的要分开。</li>
+<li>占用时间，不消耗资源，但影响工程完工日期的都应作为分任务，列入网络图。</li>
+</ol>
+<h3 id="四网络时间的计算">四、网络时间的计算</h3>
+<p>网络时间的计算有图上计算法，表格计算法，矩阵计算法。后两者适用于计算机进行计算。</p>
+<p>图上计算法要用到的相关符号：</p>
+<p><img src="/assets/images/network-planning/7%E7%BD%91%E7%BB%9C%E6%97%B6%E9%97%B4.jpg" alt="7网络时间"></p>
+<h3 id="六作业时间">六、作业时间</h3>
+<ol>
+<li>单一时间估计法：就是在估计各项活动的作业时间时，只确定一个时间值。</li>
+<li>三种时间估计法：就是在估计各项活动的作业时间时，先估计出三个时间值，然后再求出完成该活动的作业时间。</li>
+</ol>
+<p><img src="/assets/images/network-planning/7%E4%BD%9C%E4%B8%9A%E6%97%B6%E9%97%B4.png" alt="7作业时间"></p>
+<h3 id="七结点时间">七、结点时间</h3>
+<ol>
+<li>
+<p>结点的最早开始（完成）时间：从始点开始计算，取相加的最大值</p>
+<p>结点最早开始时间的计算公式如下：</p>
+</li>
+</ol>
+<p><img src="/assets/images/network-planning/7%E7%BB%93%E7%82%B9%E6%97%B6%E9%97%B41.png" alt="7结点时间1"></p>
+<ol start="2">
+<li>结点的最迟完成时间：从终点开始算，取相减的最小值。结点最迟完成时间的计算公式如下：</li>
+</ol>
+<p><img src="/assets/images/network-planning/7%E7%BB%93%E7%82%B9%E6%97%B6%E9%97%B42.png" alt="7结点时间2"></p>
+<p>最早开始是阿金和最迟完成时间相等的结点称为关键点或关键事项，经过这些点的路线就是关键路线</p>
+<h3 id="八活动时间">八、活动时间</h3>
+<ol>
+<li>最早开始时间：即箭尾结点的最早开始时间</li>
+</ol>
+<p><img src="/assets/images/network-planning/7%E6%B4%BB%E5%8A%A8%E6%97%B6%E9%97%B41.png" alt="7活动时间1"></p>
+<ol start="2">
+<li>最早完成时间: 等于它的最早时间+作业时间</li>
+</ol>
+<p><img src="/assets/images/network-planning/7%E6%B4%BB%E5%8A%A8%E6%97%B6%E9%97%B42.png" alt="7活动时间2"></p>
+<ol start="3">
+<li>最迟完成时间：即箭头节点的最迟完成时间。也是活动的最迟开始时间+作业时间。</li>
+</ol>
+<p><img src="/assets/images/network-planning/7%E6%B4%BB%E5%8A%A8%E6%97%B6%E9%97%B43.png" alt="7活动时间3"></p>
+<ol start="4">
+<li>最迟开始时间：箭头结点的最迟完成时间 - 作业时间，或紧后活动的最迟开始时间。</li>
+</ol>
+<p><img src="/assets/images/network-planning/7%E6%B4%BB%E5%8A%A8%E6%97%B6%E9%97%B44.png" alt="7活动时间4"></p>
+<h3 id="九结点时差">九、结点时差</h3>
+<p>结点时差= 最迟完成时间 - 最早开始时间
+结点时差为 0 的点为关键点</p>
+<ol>
+<li>活动时差（工序时差）</li>
+</ol>
+<p><img src="/assets/images/network-planning/7%E7%BB%93%E7%82%B9%E6%97%B6%E5%B7%AE.png" alt="7结点时差"></p>
+<ol start="2">
+<li>线段时差</li>
+</ol>
+<p>线段：两个关键节点之间的一个活动，或两个关键节点之间的几个活动连续相接的连线称为线段。</p>
+<p>注意：
+两个关键结点之间没有第三个结点算一个线段；
+两个关键结点之间还有第三个结点算两个线段。
+线段时差等于线段中各个活动的总时差的最长者。</p>
+<ol start="3">
+<li>线路时差</li>
+</ol>
+<p>线路：从始点出发，经过了连续相接的活动，直到终点的一条连线叫做线路
+线路时差等于各线差时差之和。
+关键线路的线路时差为 0</p>
+<ol start="4">
+<li>关键线路</li>
+</ol>
+<p>（1）总作业时间最长的线路就是关键线路。
+（2）关键线路的线路时差等于0
+（3）把所有关键结点按照顺序串联起来的线路叫关键线路。</p>
+<h3 id="十网络计划优化的内容">十、网络计划优化的内容</h3>
+<ol>
+<li>
+<p>优化，就是要制定出最优的计划方案，即该计划方案能最合理的，最有效的利用人力，物力，财力。并达到周期最短、成本最低的目的。</p>
+</li>
+<li>
+<p>时间优化：在人力物力财力等基本上有保证的条件下，寻求最短的工程周期。</p>
+</li>
+</ol>
+<p>时间与资源优化：合理利用资源的条件下，寻求最短的工程周期。
+这就是说，需要综合考虑工程进度和资源限制两方面的情况，进行资源的平衡工作。
+进行平衡工作的原则是：
+（1）在分配资源时，优先保证关键活动和时差较小的哪些活动的需要，已达到工程周期最短的目的
+（2）合理的、平均的使用人力、设备等资源，避免资源上使用的骤增、骤减，从而增加调进、调出的困难。</p>
+<ol start="3">
+<li>时间与成本优化</li>
+</ol>
+<p>（1）包含智能工期最短的情况下，寻求成本较低的方案
+（2）在成本最低的情况下，寻求合理的工程周期
+直接费用增长率 = （极限费用 - 正常费用） / ( 正常时间 - 极限时间)</p>
+<h3 id="十一摊入工程成本的费用分类">十一、摊入工程成本的费用分类</h3>
+<p>摊入工程成本的费用可分为直接费用和间接费用</p>
+<ol>
+<li>直接费用是指构成产品或工程实体的基本材料的费用</li>
+<li>间接费用是指不能按产品或工程直接计算的费用</li>
+<li>正常时间就是采用正常的工艺方法。能够完成该项活动的时间对应与正常时间所发化的费用叫做正常费用。</li>
+<li>极限时间也叫赶工时间，是指采用最先进的工艺方法，能够完成该项活动的时间。极限时间所花费费用叫做极限费用。极限时间是完成该项活动的最短时间，即使费用在增加，完成时间也不能再缩短了。</li>
+</ol>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

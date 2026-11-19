@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>LLM API 调参 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#llm-api%E8%B0%83%E5%8F%82">LLM API调参</a></li>
+<li class="toc-item toc-level-2"><a href="#temperature-top-p-top-k-%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90">temperature 、 top_p 、 top_k 参数解析</a></li>
+<li class="toc-item toc-level-3"><a href="#temperature%E6%B8%A9%E5%BA%A6%E6%8E%A7%E5%88%B6%E5%88%9B%E9%80%A0%E5%8A%9B%E7%9A%84%E6%B2%B9%E9%97%A8">Temperature（温度）：控制创造力的“油门”</a></li>
+<li class="toc-item toc-level-3"><a href="#top-k%E9%99%90%E5%88%B6%E5%80%99%E9%80%89%E8%AF%8D%E7%9A%84%E6%95%B0%E9%87%8F">Top-K：限制候选词的数量</a></li>
+<li class="toc-item toc-level-3"><a href="#top-p-nucleus-sampling%E9%99%90%E5%88%B6%E5%80%99%E9%80%89%E8%AF%8D%E7%9A%84%E6%A6%82%E7%8E%87%E8%8C%83%E5%9B%B4">Top-P (Nucleus Sampling)：限制候选词的概率范围</a></li>
+<li class="toc-item toc-level-3"><a href="#top-k-%E5%92%8C-top-p-%E6%AF%94%E8%BE%83">Top-K 和 Top-P 比较</a></li>
+<li class="toc-item toc-level-4"><a href="#%E6%A0%B8%E5%BF%83%E5%B7%AE%E5%BC%82%E5%9B%BA%E5%AE%9A-vs-%E5%8A%A8%E6%80%81">核心差异：固定 vs 动态</a></li>
+<li class="toc-item toc-level-4"><a href="#%E5%AE%9E%E9%99%85%E5%9C%BA%E6%99%AF%E5%AF%B9%E6%AF%94">实际场景对比</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BC%98%E5%8A%A3%E5%8A%BF">优劣势</a></li>
+<li class="toc-item toc-level-4"><a href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E7%94%A8%E5%93%AA%E4%B8%AA">什么时候用哪个</a></li>
+<li class="toc-item toc-level-2"><a href="#token%E8%AE%A1%E7%AE%97%E5%92%8C%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86">token计算和上下文管理</a></li>
+<li class="toc-item toc-level-2"><a href="#streaming%E8%BE%93%E5%87%BA">Streaming输出</a></li>
+<li class="toc-item toc-level-2"><a href="#%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BA">结构化输出</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/llm/" class="post-category">
+        it / LLM      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/llm/">#llm</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">LLM API 调参</h1>
+
+    <div class="post-body">
+<h1 id="llm-api调参">LLM API调参</h1>
+<p>调OpenAI API+或者国内的各种兼容接口（通义、智谱、DeepSeek）</p>
+<h2 id="temperature-top-p-top-k-参数解析"><code>temperature</code>、<code>top_p</code>、<code>top_k</code>参数解析</h2>
+<blockquote>
+<p>temperature、top_p、top_k，这几个参数控制输出的随机性，不同任务应该用不同的设置。</p>
+<p><a href="https://juejin.cn/post/7547739399469039652">每天都在用大模型，但是你知道temperature、top_p、top_k这些常见参数是做什么的吗？还记得第一次打开Go - 掘金</a></p>
+</blockquote>
+<p>大模型每次生成下一个词（token）时，它其实会计算一个所有可能词的概率分布列表。比如，接下来是：</p>
+<ul>
+<li>“模型” (概率20%)</li>
+<li>“很” (概率15%)</li>
+<li>“强大” (概率10%)</li>
+<li>“吃” (概率0.001%)</li>
+<li>...</li>
+</ul>
+<p>参数就是用来控制<strong>如何从这个概率分布中选词</strong>的策略。</p>
+<h3 id="temperature温度控制创造力的油门">Temperature（温度）：控制创造力的“油门”</h3>
+<ul>
+<li><strong>它是什么？</strong> 一个控制输出随机性的参数。</li>
+<li><strong>如何工作？</strong> 它会在采样前重新调整模型的原始概率分布。<strong>温度值越高，概率分布越平缓（高概率和低概率的差异变小）；温度值越低，概率分布越尖锐（高概率的更高，低概率的更低）。</strong></li>
+<li><strong>比喻理解：</strong>
+<ul>
+<li><code>temperature = 0</code>：<strong>考试中的学霸</strong>。永远只选择那个最确定、概率最高的答案。输出确定性最强，但也最枯燥、重复。</li>
+<li><code>temperature = 0.5 - 0.7</code>：<strong>专业的创意写手</strong>。在保持合理性的前提下，有一定的创造力和变化性。这是大多数任务的推荐范围。</li>
+<li><code>temperature = 1.0</code>：<strong>按照模型原本的“想法”来</strong>。</li>
+<li><code>temperature &gt; 1.0</code> (e.g., 1.2+): <strong>喝醉的诗人</strong>。天马行空，充满惊喜（和惊吓），容易产生不合逻辑或事实错误的内容。</li>
+</ul>
+</li>
+<li><strong>何时用？</strong>
+<ul>
+<li><strong>低温度 (0.1-0.5)</strong> ：事实问答、代码生成、数据提取、摘要——<strong>需要精确和可靠性的任务</strong>。</li>
+<li><strong>中高温度 (0.7-1.0)</strong> ：创意写作、营销文案、头脑风暴、对话生成——<strong>需要多样性和创造力的任务</strong>。</li>
+</ul>
+</li>
+</ul>
+<h3 id="top-k限制候选词的数量">Top-K：限制候选词的数量</h3>
+<ul>
+<li><strong>它是什么？</strong> 在抽样时，只考虑概率最高的前K个词，然后在这K个词里重新计算概率进行选择。</li>
+<li><strong>如何工作？</strong> 如果 <code>top_k=50</code>，模型会忽略所有排名50开外的词，只从前50个最可能的词中挑选下一个词。</li>
+<li><strong>比喻理解：</strong> <strong>“决赛圈”选拔</strong>。海选（所有词汇）中只有综合排名前K的选手能进入决赛圈，冠军只在决赛圈中产生。</li>
+<li><strong>优点/缺点：</strong> 能有效过滤掉那些完全不相关的垃圾词。但如果K值固定，在某些上下文中，可能恰好把一些合理但概率稍低的词也排除在外了（比如，“首都”后面，“北京”概率最高，但“东京”也可能是一个有效选项，如果K设得太小，就可能永远选不到“东京”）。</li>
+</ul>
+<h3 id="top-p-nucleus-sampling限制候选词的概率范围">Top-P (Nucleus Sampling)：限制候选词的概率范围</h3>
+<ul>
+<li><strong>它是什么？</strong> 在抽样时，从概率最高的词开始累加，直到总和刚好超过P值，然后只从这个集合中抽样。</li>
+<li><strong>如何工作？</strong> 如果 <code>top_p=0.9</code>，模型会从排名第一的词开始累加概率，直到总和超过90%，然后只在这个动态大小的词表中进行选择。</li>
+<li><strong>比喻理解：</strong> <strong>“按成绩划线”录取</strong>。不看固定名额，而是划定一个分数线（概率阈值），所有过线的词都可以参与抽签。这个词表的大小是<strong>动态变化</strong>的：如果概率分布很尖锐，词表就小；如果概率分布平缓，词表就大。</li>
+</ul>
+<h3 id="top-k-和-top-p-比较">Top-K 和 Top-P 比较</h3>
+<p>有没有想到一个问题：有了Top-K为什么还要Top-P？它们不是都在限制候选词吗？</p>
+<h4 id="核心差异固定-vs-动态"><strong>核心差异：固定 vs 动态</strong></h4>
+<ul>
+<li><strong>Top-K：固定数量策略</strong>
+<ul>
+<li>无论什么情况，都严格只选前K个词</li>
+<li>就像固定班级人数：无论学生水平如何，班里永远只有50人</li>
+</ul>
+</li>
+<li><strong>Top-P：动态质量策略</strong>
+<ul>
+<li>根据概率分布的&quot;陡峭程度&quot;自动调整候选词数量</li>
+<li>就像按分数线录取：90分以上的都要，可能是10人也可能是100人</li>
+</ul>
+</li>
+</ul>
+<h4 id="实际场景对比">实际场景对比</h4>
+<p><strong>场景1：概率分布很尖锐（模型很确信）</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>arduino 体验AI代码助手 代码解读复制代码词汇概率分布：</span></span>
+<span class="line"><span class="line-number">2</span><span>"北京" 85%, "上海" 8%, "深圳" 4%, "广州" 2%, "杭州" 0.5%, ...</span></span></code></pre>
+<ul>
+<li><strong>Top-K=50</strong>：会选择前50个词，包含很多概率极低（&lt;0.1%）的无关词汇</li>
+<li><strong>Top-P=0.9</strong>：只会选择&quot;北京&quot;和&quot;上海&quot;，因为85%+8%=93%已超过90%</li>
+</ul>
+<p>结果：Top-P更智能，避免了无意义的词汇干扰</p>
+<p><strong>场景2：概率分布很平缓（模型不太确定）</strong></p>
+<pre class="shiki shiki-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8" tabindex="0"><code><span class="line"><span class="line-number">1</span><span>arduino 体验AI代码助手 代码解读复制代码词汇概率分布：</span></span>
+<span class="line"><span class="line-number">2</span><span>"可能" 12%, "也许" 11%, "或许" 10%, "大概" 9%, "估计" 8%, ...前20个词概率都比较接近</span></span></code></pre>
+<ul>
+<li><strong>Top-K=50</strong>：会考虑前50个词，给模型充分的选择空间</li>
+<li><strong>Top-P=0.9</strong>：可能需要考虑前15-20个词才能达到90%累计概率</li>
+</ul>
+<p>结果：两种方法都合理，但Top-P自动适应了分布特性</p>
+<h4 id="优劣势">优劣势</h4>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>优势</th>
+<th>劣势</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Top-K</strong></td>
+<td>计算简单，参数直观 行为可预测</td>
+<td>无法适应分布变化 可能包含噪声</td>
+</tr>
+<tr>
+<td><strong>Top-P</strong></td>
+<td>自动适应分布特性 更智能的筛选</td>
+<td>概念稍复杂 行为不太直观</td>
+</tr>
+</tbody>
+</table>
+<h4 id="什么时候用哪个">什么时候用哪个</h4>
+<ul>
+<li><strong>推荐Top-P的情况：</strong>
+<ul>
+<li>通用对话和创作任务（分布变化大）</li>
+<li>需要模型自适应不同确信度的场景</li>
+<li>追求更自然、智能的输出</li>
+</ul>
+</li>
+<li><strong>推荐Top-K的情况：</strong>
+<ul>
+<li>需要严格控制输出范围的任务</li>
+<li>计算资源有限（Top-K更快）</li>
+<li>调试时需要可预测的行为</li>
+</ul>
+</li>
+<li><strong>两者结合：</strong>
+<ul>
+<li>很多系统支持同时设置，比如 <code>top_k=40, top_p=0.9</code></li>
+<li>这会先用Top-K筛选出40个候选词，再用Top-P进一步筛选</li>
+<li>取两者的交集，兼顾效率和智能性</li>
+</ul>
+</li>
+</ul>
+<h2 id="token计算和上下文管理">token计算和上下文管理</h2>
+<p>每个模型有上下文长度限制，你的conversation history不能无限增长。怎么做上下文压缩，怎么做滑动窗口，怎么决定哪些历史消息可以丢，这些是Agent开发里很实际的工程问题。</p>
+<p><a href="/posts/prompt-engineering/#%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AA%97%E5%8F%A3">上下文窗口</a></p>
+<h2 id="streaming输出">Streaming输出</h2>
+<p>生产环境里Agent的响应一般都要做流式输出，用户体验差距很大。这个API调用方式和普通的同步调用不一样，要专门学一下。</p>
+<h2 id="结构化输出">结构化输出</h2>
+<p>让模型输出JSON，有很多种方式：在prompt里约束、用FunctionCalling、用模型原生的structured output接口。这几种方式的稳定性和适用场景不一样，要都试过，知道在什么情况下用哪种。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

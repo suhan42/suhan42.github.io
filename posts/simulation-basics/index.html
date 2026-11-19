@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="suhan 的个人博客，收录技术笔记、随笔和交互作品。">
+  <title>模拟的基本概念 - Suhan</title>
+
+  <script type="application/json" id="theme-config">[{"id":"night","label":"夜航深色","color":"#0b0d14","scheme":"dark","default":true},{"id":"paper","label":"纸墨浅色","color":"#f7f4ee","scheme":"light","default":true},{"id":"nocturne","label":"Nocturne 深色","color":"#211d25","scheme":"dark"},{"id":"nocturne-bright","label":"Nocturne Bright","color":"#fbf8ff","scheme":"light"}]</script>
+  <script>
+    // 在首帧前恢复主题，避免刷新时闪白或闪黑；没有保存值时跟随系统偏好。
+    (() => {
+      let stored = null;
+      try {
+        stored = localStorage.getItem("site-theme");
+      } catch (error) {
+        stored = null;
+      }
+      const themeConfigElement = document.getElementById("theme-config");
+      const themeConfig = themeConfigElement ? JSON.parse(themeConfigElement.textContent) : [];
+      const systemScheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const defaultTheme = themeConfig.find(item => item.scheme === systemScheme && item.default)?.id || themeConfig[0]?.id || "night";
+      const theme = themeConfig.some(item => item.id === stored) ? stored : defaultTheme;
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = themeConfig.find(item => item.id === theme)?.color || "#0b0d14";
+    })();
+  </script>
+
+  <link href="/assets/images/suhan.png" rel="icon">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/css/themes.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/main.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/css/markdown.css?v=1eb77a0cb0" rel="stylesheet">
+  <link href="/assets/vendor/katex/katex.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand" aria-label="Suhan 首页">
+      <img src="/assets/images/suhan.png" alt="" class="brand-mark" width="28" height="28" aria-hidden="true">
+      <span class="brand-name">Suhan</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/categories/essay/" class="nav-link">Essay</a></li>
+        <li><a href="/categories/it/" class="nav-link is-active" aria-current="page">IT</a></li>
+        <li><a href="/categories/acgn/" class="nav-link">ACGN</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://github.com/suhan42" class="icon-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <span class="bi bi-github" aria-hidden="true"></span>
+      </a>
+
+      <details class="theme-picker" data-theme-picker>
+        <summary class="theme-toggle" data-theme-toggle aria-label="选择主题" title="选择主题">
+          <span class="icon-sun bi bi-brightness-high" aria-hidden="true"></span>
+          <span class="icon-moon bi bi-moon-stars" aria-hidden="true"></span>
+        </summary>
+        <div class="theme-menu" role="group" aria-label="主题选择">
+          <button type="button" class="theme-option" data-theme-option="night" aria-pressed="false"><span class="theme-swatch" style="--swatch: #0b0d14" aria-hidden="true"></span>夜航深色</button>
+          <button type="button" class="theme-option" data-theme-option="paper" aria-pressed="false"><span class="theme-swatch" style="--swatch: #f7f4ee" aria-hidden="true"></span>纸墨浅色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne" aria-pressed="false"><span class="theme-swatch" style="--swatch: #211d25" aria-hidden="true"></span>Nocturne 深色</button>
+          <button type="button" class="theme-option" data-theme-option="nocturne-bright" aria-pressed="false"><span class="theme-swatch" style="--swatch: #fbf8ff" aria-hidden="true"></span>Nocturne Bright</button>
+        </div>
+      </details>
+
+      <details class="mobile-nav">
+        <summary class="icon-link" aria-label="打开导航菜单">
+          <span class="bi bi-list" aria-hidden="true"></span>
+        </summary>
+        <nav class="mobile-menu" aria-label="移动导航">
+          <a href="/">Home</a>
+          <a href="/categories/essay/">Essay</a>
+          <a href="/categories/it/" class="is-active" aria-current="page">IT</a>
+          <a href="/categories/acgn/">ACGN</a>
+          <a href="/about/">About</a>
+          <a href="/archive/">Archive</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+  <main id="main" class="layout post-layout-shell" tabindex="-1">
+<div class="post-layout">
+  <details class="post-toc" open>
+    <summary aria-label="收起文章目录">
+      <span>目录</span>
+      <span class="bi bi-chevron-double-left toc-toggle-glyph" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list">
+<li class="toc-item toc-level-1"><a href="#post-title">模拟的基本概念</a></li>
+<li class="toc-item toc-level-1"><a href="#%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0-%E6%A8%A1%E6%8B%9F%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5">第十一章 模拟的基本概念</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%80%E6%A8%A1%E6%8B%9F%E7%9A%84%E6%A6%82%E5%BF%B5">一、模拟的概念</a></li>
+<li class="toc-item toc-level-4"><a href="#%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%B3%95">蒙特卡洛法</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%8C%E4%BD%BF%E7%94%A8%E6%A8%A1%E6%8B%9F%E7%9A%84%E5%8E%9F%E5%9B%A0">二、使用模拟的原因</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%B8%89-%E7%B3%BB%E7%BB%9F%E6%A8%A1%E6%8B%9F%E8%BF%87%E7%A8%8B">三、 系统模拟过程</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%9B%9B%E6%A8%A1%E6%8B%9F%E7%9A%84%E4%B8%8D%E8%B6%B3%E5%A4%84">四、模拟的不足处</a></li>
+<li class="toc-item toc-level-3"><a href="#%E4%BA%94%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83">五、概率分布</a></li>
+<li class="toc-item toc-level-3"><a href="#%E5%85%AD%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F%E9%9A%8F%E6%9C%BA%E6%95%B0%E9%9A%8F%E6%9C%BA%E6%95%B0%E5%88%86%E5%B8%83">六、随机变量、随机数、随机数分布</a></li>
+</ol>
+    </nav>
+  </details>
+
+  <article class="post-page">
+    <div class="post-meta">
+      <a href="/categories/it/operations-research/" class="post-category">
+        it / 运筹学      </a>
+      <time datetime="2026-11-18">2026-11-18</time>
+      <span aria-hidden="true">/</span>
+      <a href="/tags/operations-research/">#operations-research</a>
+    </div>
+
+    <h1 id="post-title" class="post-title">模拟的基本概念</h1>
+
+    <div class="post-body">
+<h1 id="第十一章-模拟的基本概念">第十一章 模拟的基本概念</h1>
+<h3 id="一模拟的概念">一、模拟的概念</h3>
+<p>模拟又称<strong>仿真</strong>，它的基本思想是<strong>构造一个实验的模型</strong>，这个模型与我们研究的系统的主要性能十分近似。</p>
+<p>模拟是一种<strong>定量</strong>的过程，他先为过程设计一个模型然后在组织一系列的反复试验以预测该过程全部时间里所发生的情况。</p>
+<p>分析解：如果构成模型的关系相当简单，那么有可能用各种数学的方法来取得我们感兴趣问题的精确数据</p>
+<h4 id="蒙特卡洛法">蒙特卡洛法</h4>
+<p><strong>蒙特卡洛法</strong>是应用随机进行模拟实验的方法，他要对研究的系统进行随机观察抽样，通过对样本的观察统计，得到系统的参数值。</p>
+<p>蒙特卡洛法是一个模拟技术，他用一系列的<strong>均匀随机数</strong>创造分布函数，该法提出由累积分布来作为产生“发生”事件和“服务”事件分布的方法，蒙特卡洛法常采用表格形式和图形表示来分析和求解实际应用问题。</p>
+<h3 id="二使用模拟的原因">二、使用模拟的原因</h3>
+<ol>
+<li>由于难以观察到实际环境，模拟可能是唯一可以利用的方法</li>
+<li>不可能求出一个数字解</li>
+<li>实际观察一个系统可能太费钱</li>
+<li>不可能有足够的时间来广泛的操作该系统</li>
+<li>对一个系统的实际应用和观察可能破坏性太大</li>
+</ol>
+<h3 id="三-系统模拟过程">三、 系统模拟过程</h3>
+<p>系统模拟过程是建立模型并通过魔性的运行对模型进行检验和修正，使模型不断趋于完善的过程</p>
+<p>有以下步骤：</p>
+<ol>
+<li>确定要模拟的问题的和系统</li>
+<li>将所要用的模型化为公式</li>
+<li>测试模型：将其情况与真实问题周围的情况作为比较</li>
+<li>鉴别和搜集所需要数据以测试模型</li>
+<li>执行该项模型</li>
+<li>分析模型结果</li>
+<li>重新执行该项模型已测试新答案</li>
+<li>使模拟生效</li>
+</ol>
+<h3 id="四模拟的不足处">四、模拟的不足处</h3>
+<ol>
+<li>模拟是不精确的</li>
+<li>一个良好的模拟模型可能非常昂贵</li>
+<li>并非所有的方法都可用模拟的方法，但不能得出答案本身</li>
+<li>模拟能产生一种估算答案的方法，但不能得出答案本身</li>
+<li>概率分布其在模拟中的应用（简单应用）</li>
+<li>模特卡洛法是一个模拟技术，它用一系列的随机数创造分布函数</li>
+</ol>
+<h3 id="五概率分布">五、概率分布</h3>
+<p>我们把概率分布分成<strong>离散</strong>的和<strong>连续</strong>的两种类型</p>
+<p>离散的概率分布中允许变量只取有限个数的数值</p>
+<p>连续的概率分布中允许变量在某个范围内取任何数值</p>
+<h3 id="六随机变量随机数随机数分布">六、随机变量、随机数、随机数分布</h3>
+<p>变量在某些范围内是随机变化的，称为随机变量累计频率数，称为随机数</p>
+<p>单渠道随机排队：是由一个服务台，随机到达和随机服务时间的情况形成</p>
+<p>随机变量是具有各种不同数值的一个变量，这些不同数值是再一次随机试验中，作为结果之一而出现的，随机变量可能是离散型，也可能是连续型。如果一个随机变量允许在某个给定范围内具有有限个个数的数值，他就离散型的随机变量。另一方面，如果一个随机变量允许在某个给定的范围内具有任何个数的数值，他就是一个连续的随机变量。</p>
+<p>均匀随机数是均匀分布随机变量的抽样序列数，是随机数中最基本的一种。</p>
+    </div>
+  </article>
+</div>
+  </main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-note">
+        suhan 的个人博客。写技术笔记和随笔，也维护几个手作交互页；本站由 Eleventy 构建为纯静态页面。
+      </p>
+      <p class="footer-note">&copy; 2026 suhan42</p>
+    </div>
+
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="/archive/">Archive</a>
+      <a href="/feed.xml">RSS</a>
+      <a href="https://github.com/suhan42" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>
