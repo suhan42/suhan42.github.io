@@ -2,6 +2,28 @@
 
 最新内容放前面；同一天合并写，聚焦具体内容，不记录过多 git 操作。
 
+## 2026-11-19
+
+### 文档收敛
+
+- 活动文档从 7 份收敛为 4 份：`architecture.md`、`content.md`、`operations.md`、`changelog.md`。
+- `target-architecture.md` 合并为当前架构文档 `architecture.md`；`content-inventory.md` 与 `legacy-url-map.md` 合并为 `content.md`。
+- 从 `release-checklist.md` 和 `migration-plan.md` 提炼当前构建、发布、验收和回滚流程到 `operations.md`。
+- `migration-plan.md`、`release-checklist.md`、`markdown代码块渲染分析.md`、`legacy-url-map.md` 移入 `docs/archive/2026-11-migration/`，保留迁移期原始记录。
+- AGENTS、README、归档索引和迁移前分析中的文档链接同步更新。
+
+### 未使用 vendor 清理
+
+- 删除未被基础模板、CSS 或 JS 引用的 `assets/vendor/bootstrap/`、`assets/vendor/hc-mobile-nav/` 和根目录 `assets/vendor/jquery-1.11.0.min.js`。
+- 保留仍在使用的 `assets/vendor/bootstrap-icons/` 和 `assets/vendor/katex/`。
+- 删除未加载的旧前端文件 `assets/css/variables.css`、`assets/css/change_colour.css`、`assets/css/me.css` 和 `assets/js/me.js`。
+- `views/fireworks2.html` 明确标记为已退役，不建立旧 URL 跳转。
+
+### 微信小程序图片补齐
+
+- `微信小程序.md` 的 4 张 `imgs-vxp` 本地示意图已补齐并归档到 `assets/images/wechat-miniprogram/`，正文引用恢复为站点绝对路径。
+- 将 `渲染层&逻辑层.png` 重命名为 `渲染层与逻辑层.png`，避免文件名中的 `&` 在 HTML URL 中变成 `&amp;` 后导致输出校验断链。
+
 ## 2026-11-18
 
 ### 批量导入 47 篇笔记
@@ -233,7 +255,7 @@
 - 创建迁移分支 `migration/eleventy-v1`。
 - 清点 13 个首页内容对象（10 个 `posts/` 内容源 + 3 个硬编码自定义页）。
 - 建立 13 个旧 URL 的迁移策略表和 `views/fireworks2.html` 的待确认记录。
-- 创建 [release-checklist.md](release-checklist.md)，从 P0 到 P5 的验收清单。
+- 创建 [release-checklist.md](archive/2026-11-migration/release-checklist.md)，从 P0 到 P5 的验收清单。
 
 #### P1：内容正式化
 

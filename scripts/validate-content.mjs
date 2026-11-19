@@ -139,6 +139,9 @@ for (const filePath of files) {
     errors.push(`${relativePath}: category 必须是可作为 URL 的小写英文 slug "${data.category}"`);
   }
 
+  if (data.tags !== undefined && data.tags !== null && data.tags !== '' && !Array.isArray(data.tags)) {
+    errors.push(`${relativePath}: tags 必须是字符串数组`);
+  }
   const tags = Array.isArray(data.tags) ? data.tags : [];
   for (const tag of tags) {
     if (typeof tag !== 'string' || !ALLOWED_TAGS.has(tag)) {

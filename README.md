@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-项目正在从旧的自研生成器迁移到 Eleventy 架构，迁移分支为 `migration/eleventy-v1`，回滚点为本地标签 `pre-eleventy-migration`。当前进度和阶段边界见 `docs/migration-plan.md`。
+项目使用 Eleventy 构建，源码、内容和构建产物分层维护。当前架构见 `docs/architecture.md`，内容与旧 URL 见 `docs/content.md`，构建发布流程见 `docs/operations.md`；迁移期历史保存在 `docs/archive/2026-11-migration/`。
 
 ## 快速开始
 
@@ -102,7 +102,7 @@ npm run build
 
 站点使用四套可切换主题：`night` 是夜航深色、`paper` 是纸墨浅色、`nocturne` 是 Nocturne 深色、`nocturne-bright` 是 Nocturne Bright 浅色。Nocturne 两套主题使用各自的标题/正文字体栈和完整正文组件规则，`night` / `paper` 保持原色板和原字体。`base.njk` 在首帧前恢复用户选择，没有保存值时跟随系统配色；`assets/js/theme.js` 负责菜单选择、持久化和无障碍标签更新。
 
-页面样式按 `assets/css/themes.css`（主题变量）、`assets/css/main.css`（站点组件）、`assets/css/markdown.css`（正文内容层）三份加载，基础站点不再加载 Bootstrap、jQuery 和 hc-mobile-nav。移动导航使用原生 `details`，主题菜单和移动菜单都支持键盘操作。
+页面样式按 `assets/css/themes.css`（主题变量）、`assets/css/main.css`（站点组件）、`assets/css/markdown.css`（正文内容层）三份加载，基础站点不再加载 Bootstrap、jQuery 和 hc-mobile-nav；`assets/vendor/` 只保留实际使用的 `bootstrap-icons` 和 `katex`。移动导航使用原生 `details`，主题菜单和移动菜单都支持键盘操作。
 
 文章页目录由正文标题自动生成，不要求手写目录数据。桌面端显示在正文左侧并随页面滚动吸附，收起后正文从 880px 扩展到 1000px；移动端折叠在正文上方。Markdown 标题和文章型 HTML 里的标题都会参与生成。
 
@@ -154,17 +154,15 @@ GitHub Pages 设置固定为 `Settings → Pages → Deploy from a branch → gh
 - 构建可以在任意工作分支执行和验证，但实际发布必须以合并到 `main` 并完成验收的 `site/` 为准。
 - `npm run publish:pages` 只发布已经提交的内容；未提交的本地构建不会自动进入 `gh-pages`。
 
-完整验收清单见 `docs/release-checklist.md`。
+完整验收清单见 `docs/operations.md`。
 
 ## 文档索引
 
 | 文档 | 内容 |
 |---|---|
-| `docs/current-analysis.md` | 迁移前的现状分析和框架对比证据 |
-| `docs/target-architecture.md` | 目标架构唯一事实来源 |
-| `docs/migration-plan.md` | 阶段任务、当前进度和回滚边界 |
-| `docs/content-inventory.md` | 内容清点表和候选元数据 |
-| `docs/legacy-url-map.md` | 旧 URL 清单和跳转策略 |
-| `docs/release-checklist.md` | 人工发布验收清单 |
+| `docs/architecture.md` | 当前架构、内容模型、路由和构建边界 |
+| `docs/content.md` | 内容清点、分类、标签和旧 URL |
+| `docs/operations.md` | 构建、发布、验收和回滚 |
 | `docs/changelog.md` | 具体变更日志 |
+| `docs/archive/2026-11-migration/` | 迁移期历史计划和证据 |
 | `AGENTS.md` | AI/agent 行为规范 |
