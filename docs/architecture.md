@@ -197,7 +197,7 @@ status: published
 
 文章源图片的规范归档位置是 `assets/images/<命名空间>/<文件名>`。新增或导入文章后，应执行 materialize：复制图片到规范位置，改写 Markdown 或文章型 HTML 中的图片 URL 与 front matter `cover`，校验写入成功后删除文章目录中的源图片。命名空间优先使用 front matter `subcategory`，没有声明时回退到合法子分类目录名，再回退到 front matter `slug`；相对路径只在当前文章目录内有效，`../` 或跨文章目录引用必须明文报错，不自动猜测共享图片。图片按文件名扁平化到命名空间，同一目标文件名内容不一致时必须 fail-fast。
 
-`npm run build` 的 `prebuild` 和 `npm run serve` 的 `preserve` 会执行 `assets:sync --write`，扫描全部文章并完成源图片 materialize；同步是幂等的，没有相对图片时不产生改动。`scripts/post-assets.mjs` 仍提供构建期虚拟兜底：如果直接运行 Eleventy 或仍有未同步的相对图片，图片会通过 passthrough copy 输出到 `site/assets/images/<命名空间>/<文件名>`，并在渲染结果中改写为 `/assets/images/...`。外部图片应显式使用完整 HTTPS URL；CSDN 图床会按 Referer 拒绝站外请求，构建输出阶段由 `scripts/csdn-image-policy.mjs` 只给 CSDN 图片补 `referrerpolicy="no-referrer"`。首页卡片从构建后的正文 HTML 中读取第一张真实 `<img>`，代码块中的图片语法不会参与提取；front matter `cover` 始终优先，用于需要单独裁切或更换卡面时。
+`npm run build` 的 `prebuild` 和 `npm run serve` 的 `preserve` 会执行 `assets:sync --write`，扫描全部文章并完成源图片 materialize；同步是幂等的，没有相对图片时不产生改动。`scripts/post-assets.mjs` 仍提供构建期虚拟兜底：如果直接运行 Eleventy 或仍有未同步的相对图片，图片会通过 passthrough copy 输出到 `site/assets/images/<命名空间>/<文件名>`，并在渲染结果中改写为 `/assets/images/...`。外部图片应显式使用完整 HTTPS URL；CSDN、CNBlogs、SegmentFault 等图床会按 Referer 拒绝站外请求，构建输出阶段由 `scripts/remote-image-policy.mjs` 只给已知防盗链图床补 `referrerpolicy="no-referrer"`。首页卡片从构建后的正文 HTML 中读取第一张真实 `<img>`，代码块中的图片语法不会参与提取；front matter `cover` 始终优先，用于需要单独裁切或更换卡面时。
 
 子分类使用 front matter 显式声明：`src/content/posts/git/example.md` 中，front matter 写 `subcategory: git`，目录也必须是 `git/`，`category: it` 是父分类，最终父分类页为 `/categories/it/`，子分类页为 `/categories/it/git/`。根目录文章没有子分类；当前只支持一层子分类目录，目录名和 id 只允许小写英文、数字和连字符，并且同一目录内的文章必须使用同一个父分类。
 
@@ -328,7 +328,7 @@ npm run publish:pages:check
 npm run publish:pages
 ```
 
-`validate:content` 校验 front matter、必填字段、slug 唯一性、日期格式、图片路径和状态枚举。`test:first-image` 校验首页首图提取规则。`test:markdown` 校验自定义 Markdown 规则和代码保护边界。`test:image-policy` 校验只给 CSDN 图片注入 no-referrer。`test:theme` 校验 `themes.json` 的 theme-color 与 `themes.css` 的主题背景一致。`build` 先清理 `site/`，再执行 Eleventy 构建。`validate:output` 检查输出文件、失效链接、反斜杠路径、对 `node_modules` 的引用和 published 文章数量。
+`validate:content` 校验 front matter、必填字段、slug 唯一性、日期格式、图片路径和状态枚举。`test:first-image` 校验首页首图提取规则。`test:markdown` 校验自定义 Markdown 规则和代码保护边界。`test:image-policy` 校验只给已知防盗链图床注入 no-referrer。`test:theme` 校验 `themes.json` 的 theme-color 与 `themes.css` 的主题背景一致。`build` 先清理 `site/`，再执行 Eleventy 构建。`validate:output` 检查输出文件、失效链接、反斜杠路径、对 `node_modules` 的引用和 published 文章数量。
 
 `publish:pages:check` 校验当前分支为 `main`、`site/` 没有未提交改动、发布根目录包含 `index.html` 和 `.nojekyll`，但不会推送。`publish:pages` 只发布已经提交到当前 HEAD 的 `site/` 内容；必须先由项目所有者确认提交并推送 `main`，未提交的本地构建不会自动进入发布分支。
 

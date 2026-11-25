@@ -19,7 +19,7 @@ npm run test:first-image  # 校验首图提取规则和边界
 npm run test:post-assets  # 校验相对图片规划、命名空间和冲突检测
 npm run assets:sync       # 预览全部文章的源图片归档计划
 npm run test:markdown  # 校验自定义 Markdown 规则和代码保护边界
-npm run test:image-policy # 校验 CSDN 图片 no-referrer 注入范围
+npm run test:image-policy # 校验防盗链图床 no-referrer 注入范围
 npm run test:theme     # 校验 themes.json 与 themes.css 的主题颜色一致
 npm run build          # 清理 site/ 并执行 Eleventy 构建
 npm run serve          # 本地预览，默认 http://localhost:8080
@@ -129,7 +129,7 @@ npm run validate:content	# 校验文章 front matter、slug 唯一性和路径�
 npm run test:first-image	# 校验首图提取规则和边界
 npm run test:post-assets	# 校验相对图片规划、命名空间和冲突检测
 npm run test:markdown		# 校验自定义 Markdown 规则和代码保护边界
-npm run test:image-policy	# 校验 CSDN 图片 no-referrer 注入范围
+npm run test:image-policy	# 校验防盗链图床 no-referrer 注入范围
 npm run test:theme		# 校验 themes.json 与 themes.css 的主题颜色一致
 
 npm run assets:sync		# 预览源图片归档计划；build 的 prebuild 会自动执行写入

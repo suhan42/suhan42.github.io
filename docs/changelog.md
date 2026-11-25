@@ -40,8 +40,8 @@
 - 旧 `关于Git使用.html` 跳转改到 `/posts/git-usage/`；已删除且无等价文章的 `MySQL自查表.html` 回退到 `/categories/it/`，两处内部链接同步修正。
 - `程序流程图` 恢复为 `flowchart` 子分类：文章移入 `flowchart/`，front matter 增加 `subcategory: flowchart`，`category-labels.json` 显示“程序流程图”。
 - `程序流程图` 的 9 张图片从 `assets/images/lct/` 迁移到 `assets/images/flowchart/`，正文中的 9 处绝对路径同步改写。
-- CSDN 图床会按 Referer 拒绝站外请求；新增 `scripts/csdn-image-policy.mjs`，在 HTML 输出阶段只给 CSDN 图片补 `referrerpolicy="no-referrer"`，其他图床和本地图片不受影响，`数据库基础` 等文章恢复远程图片直接引用。
-- 新增 `npm run test:image-policy`，覆盖 CSDN 主机识别、已有 `referrerpolicy` 保留、Runoob 和本地图片不注入。
+- CSDN、CNBlogs、SegmentFault 图床会按 Referer 拒绝站外请求；新增 `scripts/remote-image-policy.mjs`，在 HTML 输出阶段只给已知防盗链图床补 `referrerpolicy="no-referrer"`，其他图床和本地图片不受影响。
+- 新增 `npm run test:image-policy`，覆盖 CSDN、CNBlogs、SegmentFault 主机识别、已有 `referrerpolicy` 保留、Runoob 和本地图片不注入。
 - 标签从 86 个细碎标签收敛为 18 个受控标签：`llm`、`agent`、`rag`、`prompt`、`database`、`linux`、`git`、`markdown`、`python`、`operations-research`、`security`、`workflow`、`static-site`、`wechat`、`c`、`cpp`、`essay`、`game`；Docker 和程序流程图保留空标签，由子分类负责归类。
 - 验证结果：`validate:content` 通过 61 个文件，`build` 生成 107 个模板文件和 117 个 HTML 页面，`validate:output` 通过 61 篇 published、95 个 sitemap URL；`test:post-assets`、`test:markdown`、`test:first-image`、`test:image-policy` 通过。
 - 内容清点表更新为当前 61 篇 published、18 个标签页、10 个子分类；`database`、`operations-research`、`flowchart`、`llm`、`rag` 等均已生成分类页。

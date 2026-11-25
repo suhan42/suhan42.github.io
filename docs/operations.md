@@ -37,7 +37,7 @@ npm run validate:output
 1. 首页可以打开，公开文章数量与 `validate:output` 的 published 数量一致。
 2. 每篇 published 文章可以从首页、归档或分类页访问。
 3. draft 和测试内容不出现在首页、RSS、sitemap 和搜索索引。
-4. 首页封面、正文图片和远程图片在浏览器中实际加载，重点检查 CSDN 防盗链图片。
+4. 首页封面、正文图片和远程图片在浏览器中实际加载，重点检查 CSDN、CNBlogs、SegmentFault 防盗链图片。
 5. 四套主题 `night`、`paper`、`nocturne`、`nocturne-bright` 的正文、代码块、表格和导航可读。
 6. 390px 移动端导航、文章目录、代码块横向滚动和图片缩放正常。
 7. 重要旧 URL 跳转到新 URL，目标页面不是 404。
@@ -68,4 +68,4 @@ npm run publish:pages
 ## 当前已知待办
 
 - 分类和受控标签的最终集合仍待项目所有者确认；当前分类为 `acgn`、`essay`、`it`，标签为 18 个受控标签。
-- CSDN 图片通过 `referrerpolicy="no-referrer"` 规避防盗链，仍依赖图床可用性；关键封面建议逐步本地化。
+- CSDN、CNBlogs、SegmentFault 图片通过 `referrerpolicy="no-referrer"` 规避防盗链，仍依赖图床可用性；关键封面建议逐步本地化。

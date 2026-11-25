@@ -6,7 +6,7 @@ import { resolve } from "node:path";
 import { bundledLanguages, createHighlighter } from "shiki";
 import { transformerRenderLineNumber } from "@shikijs/transformers";
 import { firstImage } from "./scripts/first-image.mjs";
-import { addCsdnReferrerPolicy } from "./scripts/csdn-image-policy.mjs";
+import { addHotlinkReferrerPolicy } from "./scripts/remote-image-policy.mjs";
 import {
   buildPostAssetPlans,
   getPostSubcategory,
@@ -179,10 +179,10 @@ export default function (eleventyConfig) {
   // AGENTS.md 是目录内的协作说明，不是文章；构建时必须跳过，避免被当成正文发布。
   eleventyConfig.ignores.add("src/content/posts/AGENTS.md");
 
-  // CSDN 图床会按 Referer 拒绝站外请求；只给 CSDN 图片补 no-referrer，其他远程图保持默认行为。
-  eleventyConfig.addTransform("csdn-image-referrer", (content, outputPath) => {
+  // 部分图床会按 Referer 拒绝站外请求；只给已知防盗链图床补 no-referrer，其他远程图保持默认行为。
+  eleventyConfig.addTransform("hotlink-image-referrer", (content, outputPath) => {
     if (!outputPath || !outputPath.endsWith(".html")) return content;
-    return addCsdnReferrerPolicy(content);
+    return addHotlinkReferrerPolicy(content);
   });
 
   // 清理 Nunjucks 块标签两侧的缩进与换行，避免构建产物出现只有空格的尾随行。
